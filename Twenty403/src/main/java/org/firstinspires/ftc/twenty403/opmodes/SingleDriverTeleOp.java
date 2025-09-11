@@ -29,7 +29,6 @@ public class SingleDriverTeleOp extends CommandOpMode {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new SingleController(driverGamepad, robot, setup);
-        robot.drivebaseSubsystem.setPoseEstimate(AutoConstants.OBSERVATION_START.toPose());
         CommandScheduler.scheduleForState(
             EZCmd.Drive.NormalMode(robot.drivebaseSubsystem), //was ResetGyro cmd
             OpModeState.INIT

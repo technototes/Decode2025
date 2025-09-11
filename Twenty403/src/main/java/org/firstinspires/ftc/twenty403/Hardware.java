@@ -5,6 +5,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.sun.source.tree.IfTree;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.hardware.motor.Motor;
@@ -14,6 +15,8 @@ import com.technototes.library.hardware.sensor.IMU;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Loggable;
 import java.util.List;
+import java.util.Set;
+import com.pedropathing.follower.Follower;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.twenty403.helpers.IEncoder;
 import org.firstinspires.ftc.twenty403.helpers.OctoquadEncoder;
@@ -23,7 +26,7 @@ public class Hardware implements Loggable {
     public List<LynxModule> hubs;
 
     public IGyro imu;
-    public EncodedMotor<DcMotorEx> fl, fr, rl, rr;
+    public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top, bottoml, bottomr;
     public IEncoder odoF, odoR;
     private OctoQuad octoquad;
 
@@ -46,13 +49,18 @@ public class Hardware implements Loggable {
             rl = new EncodedMotor<>(Setup.HardwareNames.RLMOTOR);
             rr = new EncodedMotor<>(Setup.HardwareNames.RRMOTOR);
         }
-        if (Setup.Connected.OCTOQUAD) {
-            octoquad = hwmap.get(OctoQuad.class, Setup.HardwareNames.OCTOQUAD);
-            octoquad.resetAllPositions();
-            if (Setup.Connected.ODOSUBSYSTEM) {
-                odoR = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_STRAFE);
-                odoF = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_FWD_BK);
-            }
+//        if (Setup.Connected.OCTOQUAD) {
+//            octoquad = hwmap.get(OctoQuad.class, Setup.HardwareNames.OCTOQUAD);
+//            octoquad.resetAllPositions();
+//            if (Setup.Connected.ODOSUBSYSTEM) {
+//                odoR = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_STRAFE);
+//                odoF = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_FWD_BK);
+//            }
+//        }
+        if (Setup.Connected.LAUNCHER) {
+            top = new EncodedMotor<>(Setup.HardwareNames.TOP);
+            bottomr = new EncodedMotor<>(Setup.HardwareNames.BOTTOMR);
+            bottoml = new EncodedMotor<>(Setup.HardwareNames.BOTTOML);
         }
     }
 
