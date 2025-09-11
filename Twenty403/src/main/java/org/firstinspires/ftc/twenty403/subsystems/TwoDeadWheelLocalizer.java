@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
+import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
@@ -30,7 +31,7 @@ public class TwoDeadWheelLocalizer
     extends TwoTrackingWheelLocalizer
     implements Subsystem, Loggable {
 
-    @Config
+    @Configurable
     public abstract static class OdoDeadWheelConstants implements DeadWheelConstants {
 
         // I don't think this is used in a 2 wheel localizer

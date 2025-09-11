@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.twenty403;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 
 public class Setup {
 
-    @Config
+    @Configurable
     public static class Connected {
 
         public static boolean DRIVEBASE = true;
@@ -12,9 +13,10 @@ public class Setup {
         public static boolean SAFETYSUBSYSTEM = false;
         public static boolean EXTERNALIMU = true;
         public static boolean OCTOQUAD = true;
+        public static boolean LAUNCHER = true;
     }
 
-    @Config
+    @Configurable
     public static class HardwareNames {
 
         public static String FLMOTOR = "fl";
@@ -26,9 +28,12 @@ public class Setup {
         public static String OCTOQUAD = "octoquad";
         public static String ODOF = "odof";
         public static String ODOR = "odor";
+        public static String TOP = "top";
+        public static String BOTTOML = "bottoml";
+        public static String BOTTOMR  = "bottomr";
     }
 
-    @Config
+    @Configurable
     public static class OctoQuadPorts {
 
         public static int ARMENCODER = 2;
@@ -36,7 +41,7 @@ public class Setup {
         public static int ODO_FWD_BK = 1;
     }
 
-    @Config
+    @Configurable
     public static class OtherSettings {
 
         public static int AUTOTIME = 25;
