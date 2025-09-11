@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.twenty403.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.motor.EncodedMotor;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.firstinspires.ftc.twenty403.Hardware;
 
-@Config
+@Configurable
 public class SafetySubsystem implements Subsystem, Loggable {
 
     public enum FailedPart {

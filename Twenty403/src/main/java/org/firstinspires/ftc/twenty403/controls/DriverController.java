@@ -21,6 +21,9 @@ public class DriverController {
     public CommandButton snailButton;
     public CommandAxis straightTrigger;
     public CommandAxis angleTrigger;
+    public CommandButton launch;
+    public CommandButton moveballup;
+    public CommandButton moveballupandlaunch;
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
@@ -29,6 +32,9 @@ public class DriverController {
         AssignNamedControllerButton();
         if (Setup.Connected.DRIVEBASE) {
             bindDriveControls();
+        }
+        if (Setup.Connected.LAUNCHER) {
+            bindLaunchControls();
         }
     }
 
@@ -40,6 +46,9 @@ public class DriverController {
         snailButton = gamepad.leftBumper;
         straightTrigger = gamepad.rightTrigger;
         angleTrigger = gamepad.leftTrigger;
+        moveballup = gamepad.ps_square;
+        launch = gamepad.ps_triangle;
+        moveballupandlaunch = gamepad.ps_circle;
     }
 
     public void bindDriveControls() {
@@ -60,5 +69,17 @@ public class DriverController {
         snailButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
 
         resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
+    }
+
+    public void bindLaunchControls() {
+
+        launch.whilePressed(robot.launcherSubsystem::Launch);
+        launch.whenReleased(robot.launcherSubsystem::Stop);
+
+        moveballup.whenPressed(robot.launcherSubsystem::moveball);
+        launch.whenReleased(robot.launcherSubsystem::Stop);
+
+        moveballupandlaunch.whenPressed(robot.launcherSubsystem::everything);
+        moveballupandlaunch.whenReleased(robot.launcherSubsystem::Stop);
     }
 }

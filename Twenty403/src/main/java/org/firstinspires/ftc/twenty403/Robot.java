@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.twenty403;
 
+import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.follower.Follower;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
+import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.SafetySubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.TwoDeadWheelLocalizer;
-
+@Configurable
 public class Robot implements Loggable {
 
     public StartingPosition position;
@@ -16,6 +19,9 @@ public class Robot implements Loggable {
     public DrivebaseSubsystem drivebaseSubsystem;
     public TwoDeadWheelLocalizer localizer;
     public SafetySubsystem safetySubsystem;
+    public LauncherSubsystem launcherSubsystem;
+
+    public Follower f;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
         this.position = pos;
@@ -36,10 +42,17 @@ public class Robot implements Loggable {
                 localizer
             );
         }
+        if (Setup.Connected.LAUNCHER) {
+            this.launcherSubsystem = new LauncherSubsystem(hw);
+        }
         if (Setup.Connected.SAFETYSUBSYSTEM) {
             this.safetySubsystem = new SafetySubsystem(hw);
         }
     }
 
     public void atStart() {}
+
+    public Follower getF(){
+        return f;
+    }
 }

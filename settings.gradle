@@ -1,12 +1,12 @@
 include ':FtcRobotController'
 // Uncomment this to use TechnoLib from a subdirectory.
 // Or just try 'bun libflip' to let the script do it for you...
-include 'RobotLibrary'                                                   // FLIP: TechnoLibLocal
-project(':RobotLibrary').projectDir = new File('TechnoLib/RobotLibrary') // FLIP: TechnoLibLocal
-include 'Path'                                                           // FLIP: TechnoLibLocal
-project(':Path').projectDir = new File('TechnoLib/Path')                 // FLIP: TechnoLibLocal
-include 'Vision'                                                         // FLIP: TechnoLibLocal
-project(':Vision').projectDir = new File('TechnoLib/Vision')             // FLIP: TechnoLibLocal
+// include 'RobotLibrary'                                                   // FLIP: TechnoLibLocal
+// project(':RobotLibrary').projectDir = new File('TechnoLib/RobotLibrary') // FLIP: TechnoLibLocal
+// include 'Path'                                                           // FLIP: TechnoLibLocal
+// project(':Path').projectDir = new File('TechnoLib/Path')                 // FLIP: TechnoLibLocal
+// include 'Vision'                                                         // FLIP: TechnoLibLocal
+// project(':Vision').projectDir = new File('TechnoLib/Vision')             // FLIP: TechnoLibLocal
 
 // include 'MeepMeep'                                                       // FLIP: MeepMeepLocal
 // project(':MeepMeep').projectDir = new File('MeepMeep')                   // FLIP: MeepMeepLocal
