@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -26,7 +27,7 @@ public class DrivebaseSubsystem
     // The 5203 motors when direct driven
     // move about 63 inches forward and is measured as roughly 3000 ticks on the encoders
 
-    @Config
+    @Configurable
     public abstract static class DriveConstants implements MecanumConstants {
 
         public static double SLOW_MOTOR_SPEED = 0.4;
