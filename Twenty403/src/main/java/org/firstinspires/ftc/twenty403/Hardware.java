@@ -5,21 +5,16 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.sun.source.tree.IfTree;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
-import com.technototes.library.hardware.motor.Motor;
 import com.technototes.library.hardware.sensor.AdafruitIMU;
 import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.hardware.sensor.IMU;
-import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Loggable;
 import java.util.List;
-import java.util.Set;
-import com.pedropathing.follower.Follower;
+
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.twenty403.helpers.IEncoder;
-import org.firstinspires.ftc.twenty403.helpers.OctoquadEncoder;
 
 public class Hardware implements Loggable {
 
@@ -29,7 +24,7 @@ public class Hardware implements Loggable {
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top;
     public IEncoder odoF, odoR;
     private OctoQuad octoquad;
-    public CRServo bottoml, bottomr;
+    public CRServo bottomLeft, bottomRight;
 
     /* Put other hardware here! */
 
@@ -60,8 +55,8 @@ public class Hardware implements Loggable {
 //        }
         if (Setup.Connected.LAUNCHER) {
             top = new EncodedMotor<>(Setup.HardwareNames.TOP);
-            bottomr = new CRServo(Setup.HardwareNames.BOTTOMR);
-            bottoml = new CRServo(Setup.HardwareNames.BOTTOML);
+            bottomRight = new CRServo(Setup.HardwareNames.BOTTOMR);
+            bottomLeft = new CRServo(Setup.HardwareNames.BOTTOML);
         }
     }
 
