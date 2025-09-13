@@ -42,7 +42,7 @@
     "- // g-": "",
     "- // g ": "Open the FTC Dashboard!",
     "dash": "bun run open http://192.168.43.1:8080/dash",
-    "dash2": "bun run open http://192.168.43.1:8001",
+    "panel": "bun run open http://192.168.43.1:8001",
     "- // h-": "",
     "- // h ": "platform-specific commands",
     "- // h+": "",
