@@ -9,11 +9,11 @@ public class Setup {
     public static class Connected {
 
         public static boolean DRIVEBASE = true;
-        public static boolean ODOSUBSYSTEM = true;
+        public static boolean ODOSUBSYSTEM = false;
         public static boolean SAFETYSUBSYSTEM = false;
-        public static boolean EXTERNALIMU = true;
-        public static boolean OCTOQUAD = true;
-        public static boolean LAUNCHER = true;
+        public static boolean EXTERNALIMU = false;
+        public static boolean OCTOQUAD = false;
+        public static boolean LAUNCHER = false;
     }
 
     @Configurable
