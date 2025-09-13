@@ -15,17 +15,16 @@ public class LauncherSubsystem {
 
     boolean hasHardware;
     EncodedMotor<DcMotorEx> top;
-    CRServo bottoml, bottomr;
+    CRServo bottomLeft, bottomRight;
     public LauncherSubsystem(Hardware h) {
+        hasHardware = Setup.Connected.LAUNCHER;
         // Do stuff in here
-        if (Setup.Connected.LAUNCHER) {
-            hasHardware = true;
+        if (hasHardware) {
             top = h.top;
             top.coast();
-            bottoml = h.bottoml;
-            bottomr = h.bottomr;
+            bottomLeft = h.bottomLeft;
+            bottomRight = h.bottomRight;
         } else {
-            hasHardware = false;
             top = null;
         }
     }
@@ -39,8 +38,8 @@ public class LauncherSubsystem {
     }
     public void moveball(){
         if(hasHardware) {
-            bottomr.setPower(CRSERVO_SPEED);
-            bottoml.setPower(CRSERVO_SPEED);
+            bottomRight.setPower(CRSERVO_SPEED);
+            bottomLeft.setPower(CRSERVO_SPEED);
         }
     }
 
@@ -54,8 +53,8 @@ public class LauncherSubsystem {
     public void Stop() {
         if (hasHardware) {
             top.setVelocity(0);
-            bottoml.setPower(0);
-            bottomr.setPower(0);
+            bottomLeft.setPower(0);
+            bottomRight.setPower(0);
         }
     }
 }
