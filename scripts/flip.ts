@@ -41,18 +41,12 @@ const botList: FileList = {
   key: 'BUILD ALL BOTS',
   files: ['settings.gradle', 'build.gradle'],
 };
-const meepList: FileList = {
-  key: 'MeepMeepLocal',
-  files: ['MeepMeepTesting/build.gradle', 'settings.gradle'],
-};
 // This is a map of keys (the argument to call flip.js with) to objects that
 // are a name (the tag at the end of the comment) and an array of files to
 // scan & process
 const fileList = new Map<string, FileList>([
   ['lib', technoLib],
   ['bot', botList],
-  ['meepmeep', meepList],
-  ['meep', meepList],
 ]);
 
 // For any line that ends with '// FLIP: id',
