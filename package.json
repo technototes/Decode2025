@@ -78,12 +78,12 @@
     "@freik/containers": "^0.4.4",
     "@freik/typechk": "^0.9.0",
     "@freik/workspace": "^0.6.5",
-    "@types/bun": "^1.2.19",
+    "@types/bun": "^1.2.21",
     "husky": "^9.1.7",
     "java-parser": "^3.0.1",
     "prettier": "^3.6.2",
-    "prettier-plugin-java": "^2.7.3",
+    "prettier-plugin-java": "^2.7.5",
     "simple-git": "^3.28.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   }
 }

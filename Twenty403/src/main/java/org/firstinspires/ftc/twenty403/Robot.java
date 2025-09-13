@@ -20,7 +20,6 @@ public class Robot implements Loggable {
     public TwoDeadWheelLocalizer localizer;
     public SafetySubsystem safetySubsystem;
     public LauncherSubsystem launcherSubsystem;
-
     public Follower follower;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
