@@ -14,6 +14,7 @@ public class Setup {
         public static boolean EXTERNALIMU = false;
         public static boolean OCTOQUAD = false;
         public static boolean LAUNCHER = false;
+        public static boolean OTOS = false;
     }
 
     @Configurable
@@ -31,6 +32,7 @@ public class Setup {
         public static String TOP = "top";
         public static String BOTTOML = "bottoml";
         public static String BOTTOMR  = "bottomr";
+        public static String OTOS = "sparky";
     }
 
     @Configurable
