@@ -1,6 +1,25 @@
 repositories {
     mavenCentral()
     google() // Needed for androidx
+
+    // Start Freik-added stuff:
+    // Used by TechnoLib; jitpack.io can turn GitHub Releases into package repository like jsDelivr
+    maven { url = 'https://jitpack.io' }
+
+    // Specifically for Road Runner and FTC Dashboard
+    maven { url = 'https://maven.brott.dev/' }
+
+
+    // don't remove this extra maven url unless maven.brott.dev is redirecting to something else
+    // `maven.brott.dev` is 302 redirecting to `acmerobotics.z13.web.core.windows.net`
+    // if unable to access `maven.brott.dev` the above code can fail-over to `acmerobotics.z13.web.core.windows.net`
+    // if experiencing DNS poisoning, try to add this to etc/hosts `52.239.247.97 acmerobotics.z13.web.core.windows.net`
+    // alternatively you can add `142.251.33.115 maven.brott.dev` to your etc/hosts, `nslookup ghs.googlehosted.com` to get the latest IP address
+    maven { url = 'https://acmerobotics.z13.web.core.windows.net/' }
+
+    // Stuff for Pedro pathing
+    maven { url = 'https://maven.pedropathing.com' }
+    maven { url = "https://mymaven.bylazar.com/releases" }
 }
 
 dependencies {
@@ -13,5 +32,22 @@ dependencies {
     implementation 'org.firstinspires.ftc:FtcCommon:11.0.0'
     implementation 'org.firstinspires.ftc:Vision:11.0.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
-}
 
+    // Freik: 16750/20403 external dependencies:
+    // TechnoLib: This should be commented out to use a local source copy
+    //            'bun libflip' will also comment it out
+    implementation 'com.github.technototes:technolib:2.3.0' // FLIP: TechnoLibLocal
+
+    // RoadRunner - this is for pathing during autonomous
+    implementation "com.acmerobotics.roadrunner:core:0.5.6"
+    // EasyOpenCV - computer vision for FTC
+    implementation 'org.openftc:easyopencv:1.7.3'
+    // FTC Dashboard - telemetry, monitoring, and realtime adjustment
+    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
+
+    // Adding support for Pedro Pathing
+    implementation 'com.pedropathing:ftc:2.0.0'
+    implementation 'com.pedropathing:telemetry:0.0.6'
+    implementation 'com.bylazar:fullpanels:1.0.2'
+
+}

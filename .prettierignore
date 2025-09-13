@@ -1,0 +1,6 @@
+**/generated/**
+**/*.xml
+# The Prettier Java plugin messes up the lambdas in these files pretty badly:
+# But now we're not using RoadRunner, so I'm going to try to get all of our team code foramtted
+# **/AutoConst*.java
+FtcRobotController/src

@@ -3,7 +3,7 @@
  *
  * Try to avoid editing this file, as it may be updated from time to time as the FTC SDK
  * evolves. Rather, if it is necessary to customize the build process, do those edits in
- * the build.gradle file in TeamCode.
+ * the build.gradle file in each Team's folder (Twenty403 & Sixteen750).
  *
  * This file contains the necessary content of the 'build.gradle' files for robot controller
  * applications built using the FTC SDK. Each individual 'build.gradle' in those applications
@@ -106,9 +106,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    packagingOptions {
-        pickFirst '**/*.so'
-    }
     ndkVersion '21.3.6528147'
 }
 
