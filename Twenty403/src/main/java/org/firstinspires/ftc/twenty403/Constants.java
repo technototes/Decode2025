@@ -1,9 +1,14 @@
 package org.firstinspires.ftc.twenty403;
 
+import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.FLMOTOR;
+import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.FRMOTOR;
+import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.RLMOTOR;
+import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.RRMOTOR;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
-import com.pedropathing.ftc.drivetrains.Mecanum;
+
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
@@ -19,19 +24,19 @@ public class Constants {
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .leftFrontMotorName("fl")
-            .leftRearMotorName("rl")
-            .rightFrontMotorName("fr")
-            .rightRearMotorName("rr")
+            .leftFrontMotorName(FLMOTOR)
+            .leftRearMotorName(RLMOTOR)
+            .rightFrontMotorName(FRMOTOR)
+            .rightRearMotorName(RRMOTOR)
             .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE);
     public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
-            .leftFrontMotorName("fl")
-            .leftRearMotorName("rl")
-            .rightFrontMotorName("fr")
-            .rightRearMotorName("rr")
+            .leftFrontMotorName(FLMOTOR)
+            .leftRearMotorName(RLMOTOR)
+            .rightFrontMotorName(FRMOTOR)
+            .rightRearMotorName(RRMOTOR)
             .leftFrontEncoderDirection(Encoder.FORWARD)
             .leftRearEncoderDirection(Encoder.FORWARD)
             .rightFrontEncoderDirection(Encoder.REVERSE)

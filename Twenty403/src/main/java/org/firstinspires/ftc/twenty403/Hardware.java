@@ -26,9 +26,10 @@ public class Hardware implements Loggable {
     public List<LynxModule> hubs;
 
     public IGyro imu;
-    public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top, bottoml, bottomr;
+    public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top;
     public IEncoder odoF, odoR;
     private OctoQuad octoquad;
+    public CRServo bottoml, bottomr;
 
     /* Put other hardware here! */
 
@@ -59,8 +60,8 @@ public class Hardware implements Loggable {
 //        }
         if (Setup.Connected.LAUNCHER) {
             top = new EncodedMotor<>(Setup.HardwareNames.TOP);
-            bottomr = new EncodedMotor<>(Setup.HardwareNames.BOTTOMR);
-            bottoml = new EncodedMotor<>(Setup.HardwareNames.BOTTOML);
+            bottomr = new CRServo(Setup.HardwareNames.BOTTOMR);
+            bottoml = new CRServo(Setup.HardwareNames.BOTTOML);
         }
     }
 

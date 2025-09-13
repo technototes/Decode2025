@@ -21,7 +21,7 @@ public class Robot implements Loggable {
     public SafetySubsystem safetySubsystem;
     public LauncherSubsystem launcherSubsystem;
 
-    public Follower f;
+    public Follower follower;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
         this.position = pos;
@@ -52,7 +52,7 @@ public class Robot implements Loggable {
 
     public void atStart() {}
 
-    public Follower getF(){
-        return f;
+    public Follower getFollower(){
+        return follower;
     }
 }
