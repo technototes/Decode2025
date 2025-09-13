@@ -42,9 +42,7 @@ public class Constants {
             .rightFrontEncoderDirection(Encoder.REVERSE)
             .rightRearEncoderDirection(Encoder.REVERSE);
 
-    public PathChain toPathChain(Path path){
-        return new PathChain(path);
-    }
+
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pathConstraints(pathConstraints)

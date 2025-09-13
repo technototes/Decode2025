@@ -6,19 +6,19 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.technototes.library.command.Command;
 
-public class PPTrajectorySequenceCommand implements Command {
+public class PPPathCommand implements Command {
 
     public PathChain pathChain;
     public Follower follower;
 
-    public PPTrajectorySequenceCommand(Follower f, PathChain p) {
+    public PPPathCommand(Follower f, PathChain p) {
         follower = f;
         pathChain = p;
     }
     public PathChain toPathChain(Path path){
         return new PathChain(path);
     }
-    public PPTrajectorySequenceCommand(
+    public PPPathCommand(
             Follower f,
             Path p
     ) {
