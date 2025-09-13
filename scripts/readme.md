@@ -30,9 +30,8 @@ As of this writing, there are two uses of this script:
    this repo and make sure it's named `TechnoLib` and you're good to go.
 
 2. `botflip`: Enable/disable "extra" robots and portions of the repository. This
-   turns the RoadRunnerQuickStart, MeepMeepTesting, and LearnBot portions on or
-   off. It's a good idea to turn them off when you head to a competition, so
-   that building code won't take as long
+   turns the LearnBot portions on or off. It's a good idea to turn them off when
+   you head to a competition, so that building code won't take as long
 
 ### `fastforward`
 
@@ -83,7 +82,7 @@ _should_ be the same as the "Build->Make Project" menu item in Android Studio.
 
 Build just the 16750, 20403, or LearnBot portion of the repository.
 
-#### `meep`
+#### `meep`: DEPRECATED (We're using PedroPathing this year)
 
 This runs a fairly complex transformation step to allow sharing code from the
 robots with the MeepMeep simulator. It's invoked by Gradle when building the
