@@ -12,7 +12,4 @@ public class Paths {
     public static Command splineTestCommand(Robot r) {
         return new TrajectorySequenceCommand(r.drivebase, AutoConstants.SPLINETEST1_TO_SPLINETEST2);
     }
-
-
-
 }

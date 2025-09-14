@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.twenty403.subsystems;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.technototes.library.hardware.motor.CRServo;
@@ -16,6 +17,7 @@ public class LauncherSubsystem {
     boolean hasHardware;
     EncodedMotor<DcMotorEx> top;
     CRServo bottomLeft, bottomRight;
+
     public LauncherSubsystem(Hardware h) {
         hasHardware = Setup.Connected.LAUNCHER;
         // Do stuff in here
@@ -36,15 +38,16 @@ public class LauncherSubsystem {
             top.setVelocity(MOTOR_VELOCITY);
         }
     }
-    public void moveball(){
-        if(hasHardware) {
+
+    public void moveball() {
+        if (hasHardware) {
             bottomRight.setPower(CRSERVO_SPEED);
             bottomLeft.setPower(CRSERVO_SPEED);
         }
     }
 
-    public void everything(){
-        if(hasHardware) {
+    public void everything() {
+        if (hasHardware) {
             Launch();
             moveball();
         }

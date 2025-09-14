@@ -72,9 +72,8 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-
         launch.whilePressed(robot.launcherSubsystem::Launch);
-        launch.whenReleased(robot.launcherSubsystem  ::Stop);
+        launch.whenReleased(robot.launcherSubsystem::Stop);
 
         moveballup.whenPressed(robot.launcherSubsystem::moveball);
         moveballup.whenReleased(robot.launcherSubsystem::Stop);

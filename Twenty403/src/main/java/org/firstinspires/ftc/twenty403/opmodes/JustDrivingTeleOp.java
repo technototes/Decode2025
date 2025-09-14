@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-
+import java.util.List;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
@@ -22,8 +22,6 @@ import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
-
-import java.util.List;
 
 @TeleOp(name = "Driving w/Turbo!")
 @SuppressWarnings("unused")
@@ -41,7 +39,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
         controlsOperator = new OperatorController(codriverGamepad, robot);
-//    for pedro:    robot.getF().setStartingPose(whatever it is);
+        //    for pedro:    robot.getF().setStartingPose(whatever it is);
         if (Setup.Connected.DRIVEBASE) {
             controlsDriver = new DriverController(driverGamepad, robot);
 
@@ -69,22 +67,23 @@ public class JustDrivingTeleOp extends CommandOpMode {
     public void uponStart() {
         robot.atStart();
     }
+
     @Override
-    public void runLoop(){
+    public void runLoop() {
         LLStatus status = limelight.getStatus();
         telemetry.addData("Name", "%s", status.getName());
         telemetry.addData(
-                "LL",
-                "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
-                status.getTemp(),
-                status.getCpu(),
-                (int) status.getFps()
+            "LL",
+            "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
+            status.getTemp(),
+            status.getCpu(),
+            (int) status.getFps()
         );
         telemetry.addData(
-                "Pipeline",
-                "Index: %d, Type: %s",
-                status.getPipelineIndex(),
-                status.getPipelineType()
+            "Pipeline",
+            "Index: %d, Type: %s",
+            status.getPipelineIndex(),
+            status.getPipelineType()
         );
 
         LLResult result = limelight.getLatestResult();
@@ -96,10 +95,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
             double parseLatency = result.getParseLatency();
             telemetry.addData("LL Latency", captureLatency + targetingLatency);
             telemetry.addData("Parse Latency", parseLatency);
-            telemetry.addData(
-                    "PythonOutput",
-                    java.util.Arrays.toString(result.getPythonOutput())
-            );
+            telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
 
             if (result.isValid()) {
                 telemetry.addData("tx", result.getTx());
@@ -117,39 +113,37 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
                 // Access classifier results
                 List<LLResultTypes.ClassifierResult> classifierResults =
-                        result.getClassifierResults();
+                    result.getClassifierResults();
                 for (LLResultTypes.ClassifierResult cr : classifierResults) {
                     telemetry.addData(
-                            "Classifier",
-                            "Class: %s, Confidence: %.2f",
-                            cr.getClassName(),
-                            cr.getConfidence()
+                        "Classifier",
+                        "Class: %s, Confidence: %.2f",
+                        cr.getClassName(),
+                        cr.getConfidence()
                     );
                 }
 
                 // Access detector results
-                List<LLResultTypes.DetectorResult> detectorResults =
-                        result.getDetectorResults();
+                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
                 for (LLResultTypes.DetectorResult dr : detectorResults) {
                     telemetry.addData(
-                            "Detector",
-                            "Class: %s, Area: %.2f",
-                            dr.getClassName(),
-                            dr.getTargetArea()
+                        "Detector",
+                        "Class: %s, Area: %.2f",
+                        dr.getClassName(),
+                        dr.getTargetArea()
                     );
                 }
 
                 // Access fiducial results
-                List<LLResultTypes.FiducialResult> fiducialResults =
-                        result.getFiducialResults();
+                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
                 for (LLResultTypes.FiducialResult fr : fiducialResults) {
                     telemetry.addData(
-                            "Fiducial",
-                            "ID: %d, Family: %s, X: %.2f, Y: %.2f",
-                            fr.getFiducialId(),
-                            fr.getFamily(),
-                            fr.getTargetXDegrees(),
-                            fr.getTargetYDegrees()
+                        "Fiducial",
+                        "ID: %d, Family: %s, X: %.2f, Y: %.2f",
+                        fr.getFiducialId(),
+                        fr.getFamily(),
+                        fr.getTargetXDegrees(),
+                        fr.getTargetYDegrees()
                     );
                 }
 
@@ -157,10 +151,10 @@ public class JustDrivingTeleOp extends CommandOpMode {
                 List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
                 for (LLResultTypes.ColorResult cr : colorResults) {
                     telemetry.addData(
-                            "Color",
-                            "X: %.2f, Y: %.2f",
-                            cr.getTargetXDegrees(),
-                            cr.getTargetYDegrees()
+                        "Color",
+                        "X: %.2f, Y: %.2f",
+                        cr.getTargetXDegrees(),
+                        cr.getTargetYDegrees()
                     );
                 }
             }
@@ -169,11 +163,10 @@ public class JustDrivingTeleOp extends CommandOpMode {
         }
 
         telemetry.update();
-
-
     }
+
     @Override
-    public void end(){
+    public void end() {
         limelight.stop();
     }
 }

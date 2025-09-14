@@ -9,8 +9,6 @@ import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.technototes.path.geometry.ConfigurablePoseD;
 import com.technototes.path.trajectorysequence.TrajectorySequence;
 import com.technototes.path.trajectorysequence.TrajectorySequenceBuilder;
-
-
 import java.util.function.Function;
 import java.util.function.Supplier;
 
