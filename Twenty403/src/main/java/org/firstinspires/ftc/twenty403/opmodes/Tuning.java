@@ -144,7 +144,7 @@ class LocalizationTest extends OpMode {
     public void init_loop() {
         telemetryM.debug(
             "This will print your robot's position to telemetry while " +
-            "allowing robot control through a basic mecanum drive on gamepad 1."
+                "allowing robot control through a basic mecanum drive on gamepad 1."
         );
         telemetryM.update(telemetry);
         follower.update();
@@ -209,8 +209,8 @@ class ForwardTuner extends OpMode {
     public void init_loop() {
         telemetryM.debug(
             "Pull your robot forward " +
-            DISTANCE +
-            " inches. Your forward ticks to inches will be shown on the telemetry."
+                DISTANCE +
+                " inches. Your forward ticks to inches will be shown on the telemetry."
         );
         telemetryM.update(telemetry);
         drawCurrent();
@@ -227,14 +227,14 @@ class ForwardTuner extends OpMode {
         telemetryM.debug("Distance Moved: " + follower.getPose().getX());
         telemetryM.debug(
             "The multiplier will display what your forward ticks to inches should be to scale your current distance to " +
-            DISTANCE +
-            " inches."
+                DISTANCE +
+                " inches."
         );
         telemetryM.debug(
             "Multiplier: " +
-            (DISTANCE /
-                (follower.getPose().getX() /
-                    follower.getPoseTracker().getLocalizer().getForwardMultiplier()))
+                (DISTANCE /
+                    (follower.getPose().getX() /
+                        follower.getPoseTracker().getLocalizer().getForwardMultiplier()))
         );
         telemetryM.update(telemetry);
 
@@ -270,8 +270,8 @@ class LateralTuner extends OpMode {
     public void init_loop() {
         telemetryM.debug(
             "Pull your robot to the right " +
-            DISTANCE +
-            " inches. Your strafe ticks to inches will be shown on the telemetry."
+                DISTANCE +
+                " inches. Your strafe ticks to inches will be shown on the telemetry."
         );
         telemetryM.update(telemetry);
         drawCurrent();
@@ -288,14 +288,14 @@ class LateralTuner extends OpMode {
         telemetryM.debug("Distance Moved: " + follower.getPose().getY());
         telemetryM.debug(
             "The multiplier will display what your strafe ticks to inches should be to scale your current distance to " +
-            DISTANCE +
-            " inches."
+                DISTANCE +
+                " inches."
         );
         telemetryM.debug(
             "Multiplier: " +
-            (DISTANCE /
-                (follower.getPose().getY() /
-                    follower.getPoseTracker().getLocalizer().getLateralMultiplier()))
+                (DISTANCE /
+                    (follower.getPose().getY() /
+                        follower.getPoseTracker().getLocalizer().getLateralMultiplier()))
         );
         telemetryM.update(telemetry);
 
@@ -331,8 +331,8 @@ class TurnTuner extends OpMode {
     public void init_loop() {
         telemetryM.debug(
             "Turn your robot " +
-            ANGLE +
-            " radians. Your turn ticks to inches will be shown on the telemetry."
+                ANGLE +
+                " radians. Your turn ticks to inches will be shown on the telemetry."
         );
         telemetryM.update(telemetry);
 
@@ -350,14 +350,14 @@ class TurnTuner extends OpMode {
         telemetryM.debug("Total Angle: " + follower.getTotalHeading());
         telemetryM.debug(
             "The multiplier will display what your turn ticks to inches should be to scale your current angle to " +
-            ANGLE +
-            " radians."
+                ANGLE +
+                " radians."
         );
         telemetryM.debug(
             "Multiplier: " +
-            (ANGLE /
-                (follower.getTotalHeading() /
-                    follower.getPoseTracker().getLocalizer().getTurningMultiplier()))
+                (ANGLE /
+                    (follower.getTotalHeading() /
+                        follower.getPoseTracker().getLocalizer().getTurningMultiplier()))
         );
         telemetryM.update(telemetry);
 
@@ -674,7 +674,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
                 double currentVelocity = follower.getVelocity().dot(heading);
                 accelerations.add(
                     (currentVelocity - previousVelocity) /
-                    ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))
+                        ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))
                 );
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
@@ -786,7 +786,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
                 double currentVelocity = Math.abs(follower.getVelocity().dot(heading));
                 accelerations.add(
                     (currentVelocity - previousVelocity) /
-                    ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))
+                        ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))
                 );
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
@@ -1135,8 +1135,8 @@ class CentripetalTuner extends OpMode {
     public void init_loop() {
         telemetryM.debug(
             "This will run the robot in a curve going " +
-            DISTANCE +
-            " inches to the left and the same number of inches forward."
+                DISTANCE +
+                " inches to the left and the same number of inches forward."
         );
         telemetryM.debug("The robot will go continuously along the path.");
         telemetryM.debug("Make sure you have enough room.");
@@ -1458,8 +1458,8 @@ class Circle extends OpMode {
     public void init_loop() {
         telemetryM.debug(
             "This will run in a roughly circular shape of radius " +
-            RADIUS +
-            ", starting on the right-most edge. "
+                RADIUS +
+                ", starting on the right-most edge. "
         );
         telemetryM.debug(
             "So, make sure you have enough space to the left, front, and back to run the OpMode."
