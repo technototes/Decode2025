@@ -11,10 +11,8 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-
 import java.util.List;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 /*
  * This OpMode illustrates how to use the Limelight3A Vision Sensor.

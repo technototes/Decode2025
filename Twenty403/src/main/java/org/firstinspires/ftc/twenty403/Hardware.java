@@ -13,7 +13,6 @@ import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.hardware.sensor.IMU;
 import com.technototes.library.logger.Loggable;
 import java.util.List;
-
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.twenty403.helpers.IEncoder;
 
@@ -47,21 +46,21 @@ public class Hardware implements Loggable {
             rl = new EncodedMotor<>(Setup.HardwareNames.RLMOTOR);
             rr = new EncodedMotor<>(Setup.HardwareNames.RRMOTOR);
         }
-//        if (Setup.Connected.OCTOQUAD) {
-//            octoquad = hwmap.get(OctoQuad.class, Setup.HardwareNames.OCTOQUAD);
-//            octoquad.resetAllPositions();
-//            if (Setup.Connected.ODOSUBSYSTEM) {
-//                odoR = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_STRAFE);
-//                odoF = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_FWD_BK);
-//            }
-//        }
+        //        if (Setup.Connected.OCTOQUAD) {
+        //            octoquad = hwmap.get(OctoQuad.class, Setup.HardwareNames.OCTOQUAD);
+        //            octoquad.resetAllPositions();
+        //            if (Setup.Connected.ODOSUBSYSTEM) {
+        //                odoR = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_STRAFE);
+        //                odoF = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_FWD_BK);
+        //            }
+        //        }
         if (Setup.Connected.LAUNCHER) {
             top = new EncodedMotor<>(Setup.HardwareNames.TOP);
             bottomRight = new CRServo(Setup.HardwareNames.BOTTOMR);
             bottomLeft = new CRServo(Setup.HardwareNames.BOTTOML);
         }
         if (Setup.Connected.OTOS) {
-            odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);;
+            odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         }
     }
 

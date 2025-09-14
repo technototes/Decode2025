@@ -5,11 +5,12 @@ import com.pedropathing.follower.Follower;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
-import org.firstinspires.ftc.twenty403.subsystems.OTOSLocalizer;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.twenty403.subsystems.OTOSLocalizer;
 import org.firstinspires.ftc.twenty403.subsystems.SafetySubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.TwoDeadWheelLocalizer;
+
 @Configurable
 public class Robot implements Loggable {
 
@@ -59,7 +60,7 @@ public class Robot implements Loggable {
 
     public void atStart() {}
 
-    public Follower getFollower(){
+    public Follower getFollower() {
         return follower;
     }
 }

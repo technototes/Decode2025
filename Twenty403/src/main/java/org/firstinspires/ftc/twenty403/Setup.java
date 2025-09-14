@@ -31,7 +31,7 @@ public class Setup {
         public static String ODOR = "odor";
         public static String TOP = "top";
         public static String BOTTOML = "bottoml";
-        public static String BOTTOMR  = "bottomr";
+        public static String BOTTOMR = "bottomr";
         public static String OTOS = "sparky";
         public static String LIMELIGHT = "limelight";
     }
