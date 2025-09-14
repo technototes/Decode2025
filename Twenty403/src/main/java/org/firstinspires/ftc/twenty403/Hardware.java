@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.twenty403;
 
 import com.qualcomm.hardware.digitalchickenlabs.OctoQuad;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -26,6 +27,7 @@ public class Hardware implements Loggable {
     private OctoQuad octoquad;
     public CRServo bottomLeft, bottomRight;
     public SparkFunOTOS odo;
+    public Limelight3A limelight;
 
     /* Put other hardware here! */
 
@@ -61,6 +63,9 @@ public class Hardware implements Loggable {
         }
         if (Setup.Connected.OTOS) {
             odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+        }
+        if (Setup.Connected.LIMELIGHT) {
+            limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         }
     }
 

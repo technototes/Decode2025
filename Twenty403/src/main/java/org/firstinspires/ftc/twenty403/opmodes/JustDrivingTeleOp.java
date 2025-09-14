@@ -12,7 +12,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
@@ -31,7 +35,16 @@ public class JustDrivingTeleOp extends CommandOpMode {
     public DriverController controlsDriver;
     public OperatorController controlsOperator;
     public Hardware hardware;
+
     private Limelight3A limelight;
+
+    /*
+     * Barcode pipeline: 0
+     * Color Pipeline: 1
+     * Classifier Pipeline: 2
+     * Object Detection Pipeline: 3
+     * AprilTag Pipeline: 4
+     * */
 
     @Override
     public void uponInit() {
@@ -70,6 +83,8 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void runLoop() {
+        controlsDriver.bindLaunchControls();
+        controlsDriver.bindPipelineControls();
         LLStatus status = limelight.getStatus();
         telemetry.addData("Name", "%s", status.getName());
         telemetry.addData(
@@ -105,57 +120,74 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
                 telemetry.addData("Botpose", botpose.toString());
 
-                // Access barcode results
-                List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
-                for (LLResultTypes.BarcodeResult br : barcodeResults) {
-                    telemetry.addData("Barcode", "Data: %s", br.getData());
-                }
+                if (result.getPipelineIndex() == Setup.HardwareNames.Barcode_Pipeline) {
+                    // Access barcode results
+                    List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
+                    for (LLResultTypes.BarcodeResult br : barcodeResults) {
+                        telemetry.addData("Barcode", "Data: %s", br.getData());
+                    }
+                } else if (result.getPipelineIndex() == Setup.HardwareNames.Classifier_Pipeline) {
+                    // Access classifier results
+                    List<LLResultTypes.ClassifierResult> classifierResults =
+                            result.getClassifierResults();
+                    for (LLResultTypes.ClassifierResult cr : classifierResults) {
+                        telemetry.addData(
+                                "Classifier",
+                                "Class: %s, Confidence: %.2f",
+                                cr.getClassName(),
+                                cr.getConfidence()
+                        );
+                    }
+                } else if (result.getPipelineIndex() == Setup.HardwareNames.Object_Detection_Pipeline) {
+                    // Access detector results
+                    List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
+                    for (LLResultTypes.DetectorResult dr : detectorResults) {
+                        telemetry.addData(
+                                "Detector",
+                                "Class: %s, Area: %.2f",
+                                dr.getClassName(),
+                                dr.getTargetArea()
+                        );
+                    }
+                } else if (result.getPipelineIndex() == Setup.HardwareNames.AprilTag_Pipeline) {
+                    // Access fiducial results
+                    List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+                    for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                        if (fr.getFiducialId() == 23 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
+                            Setup.HardwareNames.Motif[0] = "P";
+                            Setup.HardwareNames.Motif[1] = "P";
+                            Setup.HardwareNames.Motif[2] = "G";
+                        } else if (fr.getFiducialId() == 22 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
+                            Setup.HardwareNames.Motif[0] = "P";
+                            Setup.HardwareNames.Motif[1] = "G";
+                            Setup.HardwareNames.Motif[2] = "P";
+                        } else if (fr.getFiducialId() == 21 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
+                            Setup.HardwareNames.Motif[0] = "G";
+                            Setup.HardwareNames.Motif[1] = "P";
+                            Setup.HardwareNames.Motif[2] = "P";
 
-                // Access classifier results
-                List<LLResultTypes.ClassifierResult> classifierResults =
-                    result.getClassifierResults();
-                for (LLResultTypes.ClassifierResult cr : classifierResults) {
-                    telemetry.addData(
-                        "Classifier",
-                        "Class: %s, Confidence: %.2f",
-                        cr.getClassName(),
-                        cr.getConfidence()
-                    );
-                }
-
-                // Access detector results
-                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
-                for (LLResultTypes.DetectorResult dr : detectorResults) {
-                    telemetry.addData(
-                        "Detector",
-                        "Class: %s, Area: %.2f",
-                        dr.getClassName(),
-                        dr.getTargetArea()
-                    );
-                }
-
-                // Access fiducial results
-                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                    telemetry.addData(
-                        "Fiducial",
-                        "ID: %d, Family: %s, X: %.2f, Y: %.2f",
-                        fr.getFiducialId(),
-                        fr.getFamily(),
-                        fr.getTargetXDegrees(),
-                        fr.getTargetYDegrees()
-                    );
-                }
-
-                // Access color results
-                List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                for (LLResultTypes.ColorResult cr : colorResults) {
-                    telemetry.addData(
-                        "Color",
-                        "X: %.2f, Y: %.2f",
-                        cr.getTargetXDegrees(),
-                        cr.getTargetYDegrees()
-                    );
+                        }
+                        telemetry.addData(
+                                "Fiducial",
+                                "ID: %d, Family: %s, X: %.2f, Y: %.2f",
+                                fr.getFiducialId(),
+                                fr.getFamily(),
+                                fr.getTargetXDegrees(),
+                                fr.getTargetYDegrees()
+                        );
+                        telemetry.addData("Motif:", Setup.HardwareNames.Motif);
+                    }
+                } else if (result.getPipelineIndex() == Setup.HardwareNames.Color_Pipeline) {
+                    // Access color results
+                    List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+                    for (LLResultTypes.ColorResult cr : colorResults) {
+                        telemetry.addData(
+                                "Color",
+                                "X: %.2f, Y: %.2f",
+                                cr.getTargetXDegrees(),
+                                cr.getTargetYDegrees()
+                        );
+                    }
                 }
             }
         } else {
