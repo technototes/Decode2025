@@ -2,6 +2,8 @@ package org.firstinspires.ftc.twenty403.opmodes;
 
 //package org.firstinspires.ftc.robotcontroller.external.samples;
 
+import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
+
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
@@ -36,7 +38,7 @@ import java.util.List;
  *   and the ip address the Limelight device assigned the Control Hub and which is displayed in small text
  *   below the name of the Limelight on the top level configuration screen.
  */
-@TeleOp(name = "Sensor: Limelight3A", group = "Sensor")
+@TeleOp(name = "Limelight Debug")
 @Disabled
 public class SensorLimelight3A extends LinearOpMode {
 
@@ -44,7 +46,7 @@ public class SensorLimelight3A extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
 
         telemetry.setMsTransmissionInterval(11);
 
