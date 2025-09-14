@@ -24,6 +24,7 @@
     "- // c ": "These scripts are for formatting code/scripts/markdown stuff:",
     "- // c+": "",
     "format": "tools format bun",
+    "force-format": "prettier -w **/*.java",
     "- // d-": "",
     "- // d ": "This will toggle using TechnoLib locally or from Maven",
     "libflip": "bun run scripts/flip.ts lib",
