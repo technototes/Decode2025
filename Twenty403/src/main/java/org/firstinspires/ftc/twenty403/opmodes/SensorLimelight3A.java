@@ -41,7 +41,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 public class SensorLimelight3A extends LinearOpMode {
 
     private Limelight3A limelight;
-
+    /*
+    * Barcode pipeline: 0
+    * Color Pipeline: 1
+    * Classifier Pipeline: 2
+    * Object Detection Pipeline: 3
+    * AprilTag Pipeline: 4
+    * */
     @Override
     public void runOpMode() throws InterruptedException {
         limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);

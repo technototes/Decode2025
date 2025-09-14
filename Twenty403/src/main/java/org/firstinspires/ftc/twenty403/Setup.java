@@ -2,6 +2,10 @@ package org.firstinspires.ftc.twenty403;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
+import com.technototes.library.logger.Log;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class Setup {
 
@@ -16,6 +20,7 @@ public class Setup {
         public static boolean OCTOQUAD = false;
         public static boolean LAUNCHER = false;
         public static boolean OTOS = true;
+        public static boolean LIMELIGHT = false;
     }
 
     @Configurable
@@ -38,6 +43,13 @@ public class Setup {
         public static String TESTSERVO = "testservo";
         public static String TESTMOTOR = "testmotor";
         public static String TESTCRSERVO = "testcrservo";
+
+        public static int Barcode_Pipeline = 0;
+        public static int Color_Pipeline = 1;
+        public static int Classifier_Pipeline = 2;
+        public static int Object_Detection_Pipeline = 3;
+        public static int AprilTag_Pipeline = 4;
+        public static String[] Motif = {"1", "2", "3"};
     }
 
     @Configurable
