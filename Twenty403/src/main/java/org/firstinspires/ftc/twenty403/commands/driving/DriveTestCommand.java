@@ -15,6 +15,6 @@ public class DriveTestCommand implements Command {
 
     @Override
     public void execute() {
-        subsystem.setMotorPowers(p, p, p, p);
+        subsystem.drive(p, p, p, p);
     }
 }
