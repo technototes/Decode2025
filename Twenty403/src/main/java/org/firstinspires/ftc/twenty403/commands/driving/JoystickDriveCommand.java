@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.twenty403.commands.driving;
 
+import com.pedropathing.math.Vector;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
 import com.technototes.library.util.MathUtils;
@@ -78,7 +79,9 @@ public class JoystickDriveCommand implements Command {
         // .1 (about 5 degrees off) provides .46 power => .14
         if (subsystem.isSnailMode()) {
             return Math.cbrt(normalized) * DriveConstants.SLOW_ROTATION_SCALE;
+            return Math.cbrt(normalized) * DriveConstants.SLOW_ROTATION_SCALE;
         } else {
+            return (normalized) * DriveConstants.NORMAL_ROTATION_SCALE;
             return (normalized) * DriveConstants.NORMAL_ROTATION_SCALE;
         }
     }
