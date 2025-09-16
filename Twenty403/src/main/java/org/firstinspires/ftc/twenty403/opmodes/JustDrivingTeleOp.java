@@ -43,10 +43,10 @@ public class JustDrivingTeleOp extends CommandOpMode {
         if (Setup.Connected.DRIVEBASE) {
             controlsDriver = new DriverController(driverGamepad, robot);
 
-            CommandScheduler.scheduleForState(
-                EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem),
-                OpModeState.INIT
-            );
+            // CommandScheduler.scheduleForState(
+            //     EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem),
+            //     OpModeState.INIT
+            // );
         }
         limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
 

@@ -40,7 +40,7 @@ dependencies {
 
 
     // RoadRunner - this is for pathing during autonomous
-    implementation "com.acmerobotics.roadrunner:core:0.5.6"
+    // implementation "com.acmerobotics.roadrunner:core:0.5.6"
     // EasyOpenCV - computer vision for FTC
     implementation 'org.openftc:easyopencv:1.7.3'
     // FTC Dashboard - telemetry, monitoring, and realtime adjustment

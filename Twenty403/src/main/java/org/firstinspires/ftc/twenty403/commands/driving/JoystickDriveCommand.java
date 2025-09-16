@@ -1,21 +1,15 @@
 package org.firstinspires.ftc.twenty403.commands.driving;
 
-import static org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem.DriveConstants.NORMAL_ROTATION_SCALE;
-import static org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem.DriveConstants.SLOW_ROTATION_SCALE;
-import static org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem.DriveConstants.TRIGGER_THRESHOLD;
-
-import com.acmerobotics.roadrunner.drive.DriveSignal;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.pedropathing.math.Vector;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.MathUtils;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.regex.MatchResult;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
+import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem.DriveConstants;
 
 public class JoystickDriveCommand implements Command, Loggable {
 
@@ -38,7 +32,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         x = xyStick.getXSupplier();
         y = xyStick.getYSupplier();
         r = rotStick.getXSupplier();
-        targetHeadingRads = -sub.getExternalHeading();
+        targetHeadingRads = -sub.getGyro();
         straightDrive = strtDrive;
         drive45 = angleDrive;
     }
@@ -49,7 +43,7 @@ public class JoystickDriveCommand implements Command, Loggable {
     }
 
     public static boolean isTriggered(DoubleSupplier ds) {
-        if (ds == null || ds.getAsDouble() < DrivebaseSubsystem.DriveConstants.TRIGGER_THRESHOLD) {
+        if (ds == null || ds.getAsDouble() < DriveConstants.TRIGGER_THRESHOLD) {
             return false;
         }
         return true;
@@ -65,7 +59,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         if (subsystem.isTurboMode() || (!straightTrigger && !fortyfiveTrigger)) {
             // No straighten override: return the stick value
             // (with some adjustment...)
-            return -Math.pow(r.getAsDouble(), 3) * NORMAL_ROTATION_SCALE;
+            return -Math.pow(r.getAsDouble(), 3) * DriveConstants.NORMAL_ROTATION_SCALE;
         }
 
         // headingInRads is [0-2pi]
@@ -85,45 +79,46 @@ public class JoystickDriveCommand implements Command, Loggable {
         // .9 (about 40 degrees off) provides .96 power => .288
         // .1 (about 5 degrees off) provides .46 power => .14
         if (subsystem.isSnailMode()) {
-            return Math.cbrt(normalized) * SLOW_ROTATION_SCALE;
+            return Math.cbrt(normalized) * DriveConstants.SLOW_ROTATION_SCALE;
         } else {
-            return (normalized) * NORMAL_ROTATION_SCALE;
+            return (normalized) * DriveConstants.NORMAL_ROTATION_SCALE;
         }
     }
 
     @Override
     public void execute() {
         // If subsystem is busy it is running a trajectory.
-        if (!subsystem.isBusy()) {
-            double curHeading = -subsystem.getExternalHeading();
+        double curHeading = -subsystem.getGyro();
 
-            // The math & signs looks wonky, because this makes things field-relative
-            // (Remember that "3 O'Clock" is zero degrees)
-            // We are making this change for the omni wheels on 20403
-            double yvalue = -y.getAsDouble();
-            double xvalue = -x.getAsDouble();
-            if (straightDrive != null) {
-                if (straightDrive.getAsDouble() > TRIGGER_THRESHOLD) {
-                    if (Math.abs(yvalue) > Math.abs(xvalue)) xvalue = 0;
-                    else yvalue = 0;
-                }
+        // The math & signs looks wonky, because this makes things field-relative
+        // (Remember that "3 O'Clock" is zero degrees)
+        // We are making this change for the omni wheels on 20403
+        double yvalue = -y.getAsDouble();
+        double xvalue = -x.getAsDouble();
+        if (straightDrive != null) {
+            if (straightDrive.getAsDouble() > DriveConstants.TRIGGER_THRESHOLD) {
+                if (Math.abs(yvalue) > Math.abs(xvalue)) xvalue = 0;
+                else yvalue = 0;
             }
-            Vector2d input = new Vector2d(
-                yvalue * subsystem.speed,
-                xvalue * subsystem.speed
-            ).rotated(curHeading);
-            // TODO:
-            // Calculate the magnitude of the motion to scale the speed by...
-            // then call subsystem.setMag(mag)
-            // find a student who's done physics for this one...
-            // (Also: We probably want to pick the larger of the magnitude of the drive sticks,
-            // and the rotation stick)
-            // We could also use this for implementating "snail mode" and "turbo mode"
-            subsystem.setWeightedDrivePower(
-                new Pose2d(input.getX(), input.getY(), getRotation(curHeading))
-            );
         }
-        subsystem.update();
+        Vector v = new Vector();
+        v.setOrthogonalComponents(yvalue * subsystem.speed, xvalue * subsystem.speed);
+        v.rotateVector(curHeading);
+        // Vector2d input = new Vector2d(
+        //     yvalue * subsystem.speed,
+        //     xvalue * subsystem.speed
+        // ).rotated(curHeading);
+        // TODO:
+        // Calculate the magnitude of the motion to scale the speed by...
+        // then call subsystem.setMag(mag)
+        // find a student who's done physics for this one...
+        // (Also: We probably want to pick the larger of the magnitude of the drive sticks,
+        // and the rotation stick)
+        // We could also use this for implementating "snail mode" and "turbo mode"
+        // subsystem.setWeightedDrivePower(
+        //     new Pose2d(input.getX(), input.getY(), getRotation(curHeading))
+        // );
+        subsystem.drive(v.getXComponent(), v.getYComponent(), getRotation(curHeading));
     }
 
     @Override
@@ -131,8 +126,10 @@ public class JoystickDriveCommand implements Command, Loggable {
         return false;
     }
 
+    /*
     @Override
     public void end(boolean cancel) {
         if (cancel) subsystem.setDriveSignal(new DriveSignal());
     }
+    */
 }
