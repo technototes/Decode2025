@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.twenty403.helpers;
 
 public enum StartingPosition {
-    Observation,
-    Net,
+    Goal,
+    Base,
     Unspecified,
 }

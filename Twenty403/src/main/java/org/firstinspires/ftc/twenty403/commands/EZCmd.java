@@ -19,12 +19,12 @@ public class EZCmd {
             return Command.create(drive::setTurboMode);
         }
 
-        public static Command ResetGyro(DrivebaseSubsystem drive) {
-            return Command.create(drive::setExternalHeading, 0.0);
-        }
-
-        public static Command RecordHeading(DrivebaseSubsystem drive) {
-            return Command.create(drive::saveHeading);
-        }
+        // public static Command ResetGyro(DrivebaseSubsystem drive) {
+        //     return Command.create(drive::setExternalHeading, 0.0);
+        // }
+        //
+        // public static Command RecordHeading(DrivebaseSubsystem drive) {
+        //     return Command.create(drive::saveHeading);
+        // }
     }
 }
