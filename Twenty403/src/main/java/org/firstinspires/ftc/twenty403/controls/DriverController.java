@@ -68,7 +68,7 @@ public class DriverController {
         snailButton.whenPressed(EZCmd.Drive.SnailMode(robot.drivebaseSubsystem));
         snailButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
 
-        resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
+        // resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
     }
 
     public void bindLaunchControls() {
