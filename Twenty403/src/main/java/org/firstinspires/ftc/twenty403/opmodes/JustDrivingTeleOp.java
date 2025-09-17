@@ -4,20 +4,28 @@ import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.bylazar.gamepad.GamepadManager;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
+import com.bylazar.gamepad.PanelsGamepad;
+
+import com.bylazar.telemetry.PanelsTelemetry;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
@@ -26,8 +34,8 @@ import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
-
-@TeleOp(name = "Driving w/Turbo!")
+// unicode is moai emoji
+@TeleOp(name = "Two Controller Drive \uD83D\uDDFF")
 @SuppressWarnings("unused")
 public class JustDrivingTeleOp extends CommandOpMode {
 
@@ -35,6 +43,10 @@ public class JustDrivingTeleOp extends CommandOpMode {
     public DriverController controlsDriver;
     public OperatorController controlsOperator;
     public Hardware hardware;
+    // For Panels controller widget the three lines below
+    private final GamepadManager driverManager = PanelsGamepad.INSTANCE.getFirstManager();
+    private final GamepadManager operatorManager = PanelsGamepad.INSTANCE.getSecondManager();
+    private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
     private Limelight3A limelight;
 
@@ -83,9 +95,63 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void runLoop() {
+        LLStatus status = limelight.getStatus();
+        limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
         controlsDriver.bindLaunchControls();
         controlsDriver.bindPipelineControls();
-        LLStatus status = limelight.getStatus();
+        // For Panels controller widget until
+        Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
+
+        Gamepad Operator = operatorManager.asCombinedFTCGamepad(gamepad2);
+
+        panelsTelemetry.debug("==== Buttons ====");
+        panelsTelemetry.debug("A: " + Driver.a);
+        panelsTelemetry.debug("B: " + Driver.b);
+        panelsTelemetry.debug("X: " + Driver.x);
+        panelsTelemetry.debug("Y: " + Driver.y);
+        panelsTelemetry.debug("DPad Up: " + Driver.dpad_up);
+        panelsTelemetry.debug("DPad Down: " + Driver.dpad_down);
+        panelsTelemetry.debug("DPad Left: " + Driver.dpad_left);
+        panelsTelemetry.debug("DPad Right: " + Driver.dpad_right);
+        panelsTelemetry.debug("Left Bumper: " + Driver.left_bumper);
+        panelsTelemetry.debug("Right Bumper: " + Driver.right_bumper);
+        panelsTelemetry.debug("Left Trigger: " + Driver.left_trigger);
+        panelsTelemetry.debug("Right Trigger: " + Driver.right_trigger);
+        panelsTelemetry.debug("Start / Options: " + Driver.options);
+        panelsTelemetry.debug("Back / Share: " + Driver.back);
+        panelsTelemetry.debug("Guide / PS: " + Driver.guide);
+        panelsTelemetry.debug("Touchpad: " + Driver.touchpad);
+        panelsTelemetry.debug("Left Stick Button: " + Driver.left_stick_button);
+        panelsTelemetry.debug("Right Stick Button: " + Driver.right_stick_button);
+        panelsTelemetry.debug("A: " + Operator.a);
+        panelsTelemetry.debug("B: " + Operator.b);
+        panelsTelemetry.debug("X: " + Operator.x);
+        panelsTelemetry.debug("Y: " + Operator.y);
+        panelsTelemetry.debug("DPad Up: " + Operator.dpad_up);
+        panelsTelemetry.debug("DPad Down: " + Operator.dpad_down);
+        panelsTelemetry.debug("DPad Left: " + Operator.dpad_left);
+        panelsTelemetry.debug("DPad Right: " + Operator.dpad_right);
+        panelsTelemetry.debug("Left Bumper: " + Operator.left_bumper);
+        panelsTelemetry.debug("Right Bumper: " + Operator.right_bumper);
+        panelsTelemetry.debug("Left Trigger: " + Operator.left_trigger);
+        panelsTelemetry.debug("Right Trigger: " + Operator.right_trigger);
+        panelsTelemetry.debug("Start / Options: " + Operator.options);
+        panelsTelemetry.debug("Back / Share: " + Operator.back);
+        panelsTelemetry.debug("Guide / PS: " + Operator.guide);
+        panelsTelemetry.debug("Touchpad: " + Operator.touchpad);
+        panelsTelemetry.debug("Left Stick Button: " + Operator.left_stick_button);
+        panelsTelemetry.debug("Right Stick Button: " + Operator.right_stick_button);
+
+        panelsTelemetry.debug("==== Sticks ====");
+        panelsTelemetry.debug("Left Stick X: " + Driver.left_stick_x);
+        panelsTelemetry.debug("Left Stick Y: " + Driver.left_stick_y);
+        panelsTelemetry.debug("Right Stick X: " + Driver.right_stick_x);
+        panelsTelemetry.debug("Right Stick Y: " + Driver.right_stick_y);
+        panelsTelemetry.debug("Left Stick X: " + Operator.left_stick_x);
+        panelsTelemetry.debug("Left Stick Y: " + Operator.left_stick_y);
+        panelsTelemetry.debug("Right Stick X: " + Operator.right_stick_x);
+        panelsTelemetry.debug("Right Stick Y: " + Operator.right_stick_y);
+        // here
         telemetry.addData("Name", "%s", status.getName());
         telemetry.addData(
             "LL",
@@ -104,7 +170,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
         LLResult result = limelight.getLatestResult();
         if (result != null) {
             // Access general information
-            Pose3D botpose = result.getBotpose();
+            Pose3D botpose = result.getBotpose_MT2();
             double captureLatency = result.getCaptureLatency();
             double targetingLatency = result.getTargetingLatency();
             double parseLatency = result.getParseLatency();
@@ -180,6 +246,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
                 } else if (result.getPipelineIndex() == Setup.HardwareNames.Color_Pipeline) {
                     // Access color results
                     List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+                    LLResultTypes.ColorResult closestCR = null;
                     for (LLResultTypes.ColorResult cr : colorResults) {
                         telemetry.addData(
                                 "Color",
@@ -187,6 +254,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
                                 cr.getTargetXDegrees(),
                                 cr.getTargetYDegrees()
                         );
+
                     }
                 }
             }
