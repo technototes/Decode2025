@@ -73,11 +73,14 @@ public class JustDrivingTeleOp extends CommandOpMode {
             //     OpModeState.INIT
             // );
         }
-        limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
+        if (Setup.Connected.LIMELIGHT) {
+            limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
+            limelight.setPollRateHz(100);
 
-        telemetry.setMsTransmissionInterval(11);
+            telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);
+            limelight.pipelineSwitch(0);
+        }
 
         /*
          * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
@@ -95,10 +98,13 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void runLoop() {
-        LLStatus status = limelight.getStatus();
-        limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
-        controlsDriver.bindLaunchControls();
-        controlsDriver.bindPipelineControls();
+        LLStatus status = null;
+        if (Setup.Connected.LIMELIGHT) {
+            status = limelight.getStatus();
+            limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
+            controlsDriver.bindLaunchControls();
+            controlsDriver.bindPipelineControls();
+        }
         // For Panels controller widget until
         Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
 
@@ -151,63 +157,71 @@ public class JustDrivingTeleOp extends CommandOpMode {
         panelsTelemetry.debug("Left Stick Y: " + Operator.left_stick_y);
         panelsTelemetry.debug("Right Stick X: " + Operator.right_stick_x);
         panelsTelemetry.debug("Right Stick Y: " + Operator.right_stick_y);
-        // here
-        telemetry.addData("Name", "%s", status.getName());
-        telemetry.addData(
-            "LL",
-            "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
-            status.getTemp(),
-            status.getCpu(),
-            (int) status.getFps()
-        );
-        telemetry.addData(
-            "Pipeline",
-            "Index: %d, Type: %s",
-            status.getPipelineIndex(),
-            status.getPipelineType()
-        );
+        if (Setup.Connected.LIMELIGHT) {
+            // here
+            telemetry.addData("Name", "%s", status.getName());
+            telemetry.addData(
+                    "LL",
+                    "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
+                    status.getTemp(),
+                    status.getCpu(),
+                    (int) status.getFps()
+            );
+            telemetry.addData(
+                    "Pipeline",
+                    "Index: %d, Type: %s",
+                    status.getPipelineIndex(),
+                    status.getPipelineType()
+            );
 
-        LLResult result = limelight.getLatestResult();
-        if (result != null) {
-            // Access general information
-            Pose3D botpose = result.getBotpose_MT2();
-            double captureLatency = result.getCaptureLatency();
-            double targetingLatency = result.getTargetingLatency();
-            double parseLatency = result.getParseLatency();
-            telemetry.addData("LL Latency", captureLatency + targetingLatency);
-            telemetry.addData("Parse Latency", parseLatency);
-            telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
+            LLResult result = limelight.getLatestResult();
 
-            if (result.isValid()) {
-                telemetry.addData("tx", result.getTx());
-                telemetry.addData("txnc", result.getTxNC());
-                telemetry.addData("ty", result.getTy());
-                telemetry.addData("tync", result.getTyNC());
+            if (result != null) {
+                long staleness = result.getStaleness();
+                if (staleness < 100) { // Less than 100 milliseconds old
+                    telemetry.addData("Data", "Good");
+                } else {
+                    telemetry.addData("Data", "Old (" + staleness + " ms)");
+                }
+                // Access general information
+                Pose3D botpose = result.getBotpose_MT2();
+                double captureLatency = result.getCaptureLatency();
+                double targetingLatency = result.getTargetingLatency();
+                double parseLatency = result.getParseLatency();
+                telemetry.addData("LL Latency", captureLatency + targetingLatency);
+                telemetry.addData("Parse Latency", parseLatency);
+                telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
 
-                telemetry.addData("Botpose", botpose.toString());
+                if (result.isValid()) {
+                    telemetry.addData("tx", result.getTx());
+                    telemetry.addData("txnc", result.getTxNC());
+                    telemetry.addData("ty", result.getTy());
+                    telemetry.addData("tync", result.getTyNC());
 
-                if (result.getPipelineIndex() == Setup.HardwareNames.Barcode_Pipeline) {
-                    // Access barcode results
-                    List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
-                    for (LLResultTypes.BarcodeResult br : barcodeResults) {
-                        telemetry.addData("Barcode", "Data: %s", br.getData());
-                    }
-                } else if (result.getPipelineIndex() == Setup.HardwareNames.Classifier_Pipeline) {
-                    // Access classifier results
-                    List<LLResultTypes.ClassifierResult> classifierResults =
-                            result.getClassifierResults();
-                    for (LLResultTypes.ClassifierResult cr : classifierResults) {
-                        telemetry.addData(
-                                "Classifier",
-                                "Class: %s, Confidence: %.2f",
-                                cr.getClassName(),
-                                cr.getConfidence()
-                        );
-                    }
-                } else if (result.getPipelineIndex() == Setup.HardwareNames.Object_Detection_Pipeline) {
-                    // Access detector results
-                    List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
-                    for (LLResultTypes.DetectorResult dr : detectorResults) {
+                    telemetry.addData("Botpose", botpose.toString());
+
+                    if (result.getPipelineIndex() == Setup.HardwareNames.Barcode_Pipeline) {
+                        // Access barcode results
+                        List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
+                        for (LLResultTypes.BarcodeResult br : barcodeResults) {
+                            telemetry.addData("Barcode", "Data: %s", br.getData());
+                        }
+                    } else if (result.getPipelineIndex() == Setup.HardwareNames.Classifier_Pipeline) {
+                        // Access classifier results
+                        List<LLResultTypes.ClassifierResult> classifierResults =
+                                result.getClassifierResults();
+                            LLResultTypes.ClassifierResult cr = classifierResults.get(0);
+                            telemetry.addData(
+                                    "Classifier",
+                                    "Class: %s, Confidence: %.2f",
+                                    cr.getClassName(),
+                                    cr.getConfidence()
+                            );
+
+                    } else if (result.getPipelineIndex() == Setup.HardwareNames.Object_Detection_Pipeline) {
+                        // Access detector results
+                        List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
+                        LLResultTypes.DetectorResult dr = detectorResults.get(0);
                         telemetry.addData(
                                 "Detector",
                                 "Class: %s, Area: %.2f",
@@ -215,7 +229,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
                                 dr.getTargetArea()
                         );
                     }
-                } else if (result.getPipelineIndex() == Setup.HardwareNames.AprilTag_Pipeline) {
+                     else if (result.getPipelineIndex() == Setup.HardwareNames.AprilTag_Pipeline) {
                     // Access fiducial results
                     List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
                     for (LLResultTypes.FiducialResult fr : fiducialResults) {
@@ -247,19 +261,20 @@ public class JustDrivingTeleOp extends CommandOpMode {
                     // Access color results
                     List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
                     LLResultTypes.ColorResult closestCR = null;
-                    for (LLResultTypes.ColorResult cr : colorResults) {
-                        telemetry.addData(
-                                "Color",
-                                "X: %.2f, Y: %.2f",
-                                cr.getTargetXDegrees(),
-                                cr.getTargetYDegrees()
-                        );
+                    LLResultTypes.ColorResult cr = colorResults.get(0);
+                    telemetry.addData(
+                            "Color",
+                            "X: %.2f, Y: %.2f",
+                            cr.getTargetXDegrees(),
+                            cr.getTargetYDegrees()
+                    );
 
-                    }
                 }
+
+                }
+            } else {
+                telemetry.addData("Limelight", "No data available");
             }
-        } else {
-            telemetry.addData("Limelight", "No data available");
         }
 
         telemetry.update();
@@ -267,6 +282,8 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void end() {
-        limelight.stop();
+        if (Setup.Connected.LIMELIGHT) {
+            limelight.stop();
+        }
     }
 }
