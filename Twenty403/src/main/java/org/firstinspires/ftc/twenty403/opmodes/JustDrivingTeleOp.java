@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.twenty403.opmodes;
 
+import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.AprilTag_Pipeline;
 import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -79,7 +80,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
             telemetry.setMsTransmissionInterval(11);
 
-            limelight.pipelineSwitch(0);
+            limelight.pipelineSwitch(AprilTag_Pipeline);
         }
 
         /*
@@ -102,14 +103,13 @@ public class JustDrivingTeleOp extends CommandOpMode {
         if (Setup.Connected.LIMELIGHT) {
             status = limelight.getStatus();
             limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
-            controlsDriver.bindLaunchControls();
+            if (Setup.Connected.LAUNCHER) {
+                controlsDriver.bindLaunchControls();
+            }
             controlsDriver.bindPipelineControls();
         }
         // For Panels controller widget until
         Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
-
-        Gamepad Operator = operatorManager.asCombinedFTCGamepad(gamepad2);
-
         panelsTelemetry.debug("==== Buttons ====");
         panelsTelemetry.debug("A: " + Driver.a);
         panelsTelemetry.debug("B: " + Driver.b);
@@ -129,34 +129,13 @@ public class JustDrivingTeleOp extends CommandOpMode {
         panelsTelemetry.debug("Touchpad: " + Driver.touchpad);
         panelsTelemetry.debug("Left Stick Button: " + Driver.left_stick_button);
         panelsTelemetry.debug("Right Stick Button: " + Driver.right_stick_button);
-        panelsTelemetry.debug("A: " + Operator.a);
-        panelsTelemetry.debug("B: " + Operator.b);
-        panelsTelemetry.debug("X: " + Operator.x);
-        panelsTelemetry.debug("Y: " + Operator.y);
-        panelsTelemetry.debug("DPad Up: " + Operator.dpad_up);
-        panelsTelemetry.debug("DPad Down: " + Operator.dpad_down);
-        panelsTelemetry.debug("DPad Left: " + Operator.dpad_left);
-        panelsTelemetry.debug("DPad Right: " + Operator.dpad_right);
-        panelsTelemetry.debug("Left Bumper: " + Operator.left_bumper);
-        panelsTelemetry.debug("Right Bumper: " + Operator.right_bumper);
-        panelsTelemetry.debug("Left Trigger: " + Operator.left_trigger);
-        panelsTelemetry.debug("Right Trigger: " + Operator.right_trigger);
-        panelsTelemetry.debug("Start / Options: " + Operator.options);
-        panelsTelemetry.debug("Back / Share: " + Operator.back);
-        panelsTelemetry.debug("Guide / PS: " + Operator.guide);
-        panelsTelemetry.debug("Touchpad: " + Operator.touchpad);
-        panelsTelemetry.debug("Left Stick Button: " + Operator.left_stick_button);
-        panelsTelemetry.debug("Right Stick Button: " + Operator.right_stick_button);
-
         panelsTelemetry.debug("==== Sticks ====");
         panelsTelemetry.debug("Left Stick X: " + Driver.left_stick_x);
         panelsTelemetry.debug("Left Stick Y: " + Driver.left_stick_y);
         panelsTelemetry.debug("Right Stick X: " + Driver.right_stick_x);
         panelsTelemetry.debug("Right Stick Y: " + Driver.right_stick_y);
-        panelsTelemetry.debug("Left Stick X: " + Operator.left_stick_x);
-        panelsTelemetry.debug("Left Stick Y: " + Operator.left_stick_y);
-        panelsTelemetry.debug("Right Stick X: " + Operator.right_stick_x);
-        panelsTelemetry.debug("Right Stick Y: " + Operator.right_stick_y);
+        // here
+
         if (Setup.Connected.LIMELIGHT) {
             // here
             telemetry.addData("Name", "%s", status.getName());
@@ -189,87 +168,98 @@ public class JustDrivingTeleOp extends CommandOpMode {
                 double targetingLatency = result.getTargetingLatency();
                 double parseLatency = result.getParseLatency();
                 telemetry.addData("LL Latency", captureLatency + targetingLatency);
-                telemetry.addData("Parse Latency", parseLatency);
-                telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
+//                telemetry.addData("Parse Latency", parseLatency);
 
                 if (result.isValid()) {
-                    telemetry.addData("tx", result.getTx());
-                    telemetry.addData("txnc", result.getTxNC());
-                    telemetry.addData("ty", result.getTy());
-                    telemetry.addData("tync", result.getTyNC());
+//                    telemetry.addData("tx", result.getTx());
+//                    telemetry.addData("txnc", result.getTxNC());
+//                    telemetry.addData("ty", result.getTy());
+//                    telemetry.addData("tync", result.getTyNC());
+//
+//                    telemetry.addData("Botpose", botpose.toString());
 
-                    telemetry.addData("Botpose", botpose.toString());
+//                    if (result.getPipelineIndex() == Setup.HardwareNames.Barcode_Pipeline) {
+//                        // Access barcode results
+//                        List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
+//                        for (LLResultTypes.BarcodeResult br : barcodeResults) {
+//                            telemetry.addData("Barcode", "Data: %s", br.getData());
+//                        }
+//                    } else if (result.getPipelineIndex() == Setup.HardwareNames.Classifier_Pipeline) {
+//                        // Access classifier results
+//                        List<LLResultTypes.ClassifierResult> classifierResults =
+//                                result.getClassifierResults();
+//                        LLResultTypes.ClassifierResult cr = classifierResults.get(0);
+//                        telemetry.addData(
+//                                "Classifier",
+//                                "Class: %s, Confidence: %.2f",
+//                                cr.getClassName(),
+//                                cr.getConfidence()
+//                        );
+//
+//                    } else if (result.getPipelineIndex() == Setup.HardwareNames.Object_Detection_Pipeline) {
+//                        // Access detector results
+//                        List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
+//                        LLResultTypes.DetectorResult dr = detectorResults.get(0);
+//                        telemetry.addData(
+//                                "Detector",
+//                                "Class: %s, Area: %.2f",
+//                                dr.getClassName(),
+//                                dr.getTargetArea()
+//                        );
+//                    }
+                    if (result.getPipelineIndex() == Setup.HardwareNames.AprilTag_Pipeline) {
+                        // Access fiducial results
+                        List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+                        for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                            if (fr.getFiducialId() == 23 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
+                                Setup.HardwareNames.Motif[0] = "P";
+                                Setup.HardwareNames.Motif[1] = "P";
+                                Setup.HardwareNames.Motif[2] = "G";
+                            } else if (fr.getFiducialId() == 22 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
+                                Setup.HardwareNames.Motif[0] = "P";
+                                Setup.HardwareNames.Motif[1] = "G";
+                                Setup.HardwareNames.Motif[2] = "P";
+                            } else if (fr.getFiducialId() == 21 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
+                                Setup.HardwareNames.Motif[0] = "G";
+                                Setup.HardwareNames.Motif[1] = "P";
+                                Setup.HardwareNames.Motif[2] = "P";
 
-                    if (result.getPipelineIndex() == Setup.HardwareNames.Barcode_Pipeline) {
-                        // Access barcode results
-                        List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
-                        for (LLResultTypes.BarcodeResult br : barcodeResults) {
-                            telemetry.addData("Barcode", "Data: %s", br.getData());
-                        }
-                    } else if (result.getPipelineIndex() == Setup.HardwareNames.Classifier_Pipeline) {
-                        // Access classifier results
-                        List<LLResultTypes.ClassifierResult> classifierResults =
-                                result.getClassifierResults();
-                            LLResultTypes.ClassifierResult cr = classifierResults.get(0);
+                            }
                             telemetry.addData(
-                                    "Classifier",
-                                    "Class: %s, Confidence: %.2f",
-                                    cr.getClassName(),
-                                    cr.getConfidence()
+                                    "Fiducial",
+                                    "ID: %d, Family: %s, X: %.2f, Y: %.2f",
+                                    fr.getFiducialId(),
+                                    fr.getFamily(),
+                                    fr.getTargetXDegrees(),
+                                    fr.getTargetYDegrees()
                             );
-
-                    } else if (result.getPipelineIndex() == Setup.HardwareNames.Object_Detection_Pipeline) {
-                        // Access detector results
-                        List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
-                        LLResultTypes.DetectorResult dr = detectorResults.get(0);
-                        telemetry.addData(
-                                "Detector",
-                                "Class: %s, Area: %.2f",
-                                dr.getClassName(),
-                                dr.getTargetArea()
-                        );
-                    }
-                     else if (result.getPipelineIndex() == Setup.HardwareNames.AprilTag_Pipeline) {
-                    // Access fiducial results
-                    List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                    for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                        if (fr.getFiducialId() == 23 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
-                            Setup.HardwareNames.Motif[0] = "P";
-                            Setup.HardwareNames.Motif[1] = "P";
-                            Setup.HardwareNames.Motif[2] = "G";
-                        } else if (fr.getFiducialId() == 22 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
-                            Setup.HardwareNames.Motif[0] = "P";
-                            Setup.HardwareNames.Motif[1] = "G";
-                            Setup.HardwareNames.Motif[2] = "P";
-                        } else if (fr.getFiducialId() == 21 && Arrays.equals(Setup.HardwareNames.Motif, new String[]{"1", "2", "3"})) {
-                            Setup.HardwareNames.Motif[0] = "G";
-                            Setup.HardwareNames.Motif[1] = "P";
-                            Setup.HardwareNames.Motif[2] = "P";
-
+                            telemetry.addData("Motif:", Setup.HardwareNames.Motif);
                         }
-                        telemetry.addData(
-                                "Fiducial",
-                                "ID: %d, Family: %s, X: %.2f, Y: %.2f",
-                                fr.getFiducialId(),
-                                fr.getFamily(),
-                                fr.getTargetXDegrees(),
-                                fr.getTargetYDegrees()
-                        );
-                        telemetry.addData("Motif:", Setup.HardwareNames.Motif);
-                    }
-                } else if (result.getPipelineIndex() == Setup.HardwareNames.Color_Pipeline) {
-                    // Access color results
-                    List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                    LLResultTypes.ColorResult closestCR = null;
-                    LLResultTypes.ColorResult cr = colorResults.get(0);
-                    telemetry.addData(
-                            "Color",
-                            "X: %.2f, Y: %.2f",
-                            cr.getTargetXDegrees(),
-                            cr.getTargetYDegrees()
-                    );
+                    } else if (result.getPipelineIndex() == Setup.HardwareNames.Green_Color_Pipeline) {
+                        // Access color results
+                        List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+                        for (LLResultTypes.ColorResult cr : colorResults) {
+                            telemetry.addData(
+                                    "Color",
+                                    "X: %.2f, Y: %.2f",
+                                    cr.getTargetXDegrees(),
+                                    cr.getTargetYDegrees()
+                            );
+                        }
 
-                }
+                    } else if (result.getPipelineIndex() == Setup.HardwareNames.Purple_Color_Pipeline) {
+                        // Access color results
+                        List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+                        for (LLResultTypes.ColorResult cr : colorResults) {
+                            telemetry.addData(
+                                    "Color",
+                                    "X: %.2f, Y: %.2f",
+                                    cr.getTargetXDegrees(),
+                                    cr.getTargetYDegrees()
+                            );
+                        }
+
+                    }
 
                 }
             } else {

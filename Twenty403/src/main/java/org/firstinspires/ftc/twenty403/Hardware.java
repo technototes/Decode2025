@@ -26,7 +26,6 @@ public class Hardware implements Loggable {
     public IEncoder odoF, odoR;
     private OctoQuad octoquad;
     public CRServo bottomLeft, bottomRight;
-    public SparkFunOTOS odo;
     public Limelight3A limelight;
 
     /* Put other hardware here! */
@@ -60,9 +59,6 @@ public class Hardware implements Loggable {
             top = new EncodedMotor<>(Setup.HardwareNames.TOP);
             bottomRight = new CRServo(Setup.HardwareNames.BOTTOMR);
             bottomLeft = new CRServo(Setup.HardwareNames.BOTTOML);
-        }
-        if (Setup.Connected.OTOS) {
-            odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         }
         if (Setup.Connected.LIMELIGHT) {
             limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);

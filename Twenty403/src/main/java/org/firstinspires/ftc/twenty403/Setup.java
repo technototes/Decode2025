@@ -18,7 +18,7 @@ public class Setup {
         public static boolean OCTOQUAD = false;
         public static boolean LAUNCHER = false;
         public static boolean OTOS = false;
-        public static boolean LIMELIGHT = false;
+        public static boolean LIMELIGHT = true;
     }
 
     @Configurable
@@ -39,11 +39,12 @@ public class Setup {
         public static String OTOS = "sparky";
         public static String LIMELIGHT = "limelight";
 
-        public static int Barcode_Pipeline = 0;
-        public static int Color_Pipeline = 1;
-        public static int Classifier_Pipeline = 2;
-        public static int Object_Detection_Pipeline = 3;
-        public static int AprilTag_Pipeline = 4;
+//        public static int Barcode_Pipeline = 0;
+        public static int Green_Color_Pipeline = 0;
+//        public static int Classifier_Pipeline = 2;
+//        public static int Object_Detection_Pipeline = 3;
+        public static int AprilTag_Pipeline = 1;
+        public static int Purple_Color_Pipeline = 2;
         public static String[] Motif = {"1", "2", "3"};
     }
 
