@@ -9,6 +9,7 @@ public class Setup {
     public static class Connected {
 
         public static boolean DRIVEBASE = true;
+        public static boolean TESTSUBSYSTEM = false;
         public static boolean ODOSUBSYSTEM = false;
         public static boolean SAFETYSUBSYSTEM = false;
         public static boolean EXTERNALIMU = false;
@@ -34,6 +35,9 @@ public class Setup {
         public static String BOTTOMR = "bottomr";
         public static String OTOS = "sparky";
         public static String LIMELIGHT = "limelight";
+        public static String TESTSERVO = "testservo";
+        public static String TESTMOTOR = "testmotor";
+        public static String TESTCRSERVO = "testcrservo";
     }
 
     @Configurable

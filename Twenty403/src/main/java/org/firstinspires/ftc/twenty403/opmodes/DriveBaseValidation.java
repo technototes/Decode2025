@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.twenty403.Setup;
+import org.firstinspires.ftc.twenty403.subsystems.TestSubsystem;
 
 @Configurable
 @TeleOp(name = "Drivebase Testbed")
@@ -13,6 +14,7 @@ public class DriveBaseValidation extends LinearOpMode {
 
     public static double motorPower = 0.2;
     public static double triggerThreshold = 0.1;
+    public TestSubsystem ts;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -48,6 +50,18 @@ public class DriveBaseValidation extends LinearOpMode {
                 rr.setPower(motorPower);
             } else {
                 rr.setPower(0);
+            }
+            if (gamepad1.circle) {
+                ts.setServo();
+            }
+            if(gamepad1.square){
+                ts.spinCRServo();
+            }
+            if (gamepad1.triangle){
+                ts.spinMotor();
+            }
+            if (gamepad1.cross){
+                ts.Stop();
             }
         }
     }

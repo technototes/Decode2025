@@ -11,6 +11,7 @@ import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.hardware.sensor.AdafruitIMU;
 import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.hardware.sensor.IMU;
+import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Loggable;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
@@ -21,11 +22,13 @@ public class Hardware implements Loggable {
     public List<LynxModule> hubs;
 
     public IGyro imu;
-    public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top;
+    public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top, testMotor;
     public IEncoder odoF, odoR;
     private OctoQuad octoquad;
     public CRServo bottomLeft, bottomRight;
     public SparkFunOTOS odo;
+    public CRServo testCRServo;
+    public Servo testServo;
 
     /* Put other hardware here! */
 
@@ -61,6 +64,11 @@ public class Hardware implements Loggable {
         }
         if (Setup.Connected.OTOS) {
             odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+        }
+        if (Setup.Connected.TESTSUBSYSTEM) {
+            testMotor = new EncodedMotor<>(Setup.HardwareNames.TESTMOTOR);
+            testCRServo = new CRServo(Setup.HardwareNames.TESTCRSERVO);
+            testServo = new Servo(Setup.HardwareNames.TESTSERVO);
         }
     }
 
