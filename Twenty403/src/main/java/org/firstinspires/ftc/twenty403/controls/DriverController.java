@@ -30,10 +30,11 @@ public class DriverController {
     public CommandButton moveballupandlaunch;
     public CommandButton pipelineMode;
     public CommandButton barcodePipeline;
-    public CommandButton colorPipeline;
+    public CommandButton GreencolorPipeline;
     public CommandButton classifierPipeline;
     public CommandButton objectPipeline;
     public CommandButton apriltagPipeline;
+    public CommandButton PurplecolorPipeline;
     public static boolean pipelineToggle = false;
     public void togglePipelineMode() {
         pipelineToggle = !pipelineToggle;
@@ -68,7 +69,7 @@ public class DriverController {
         moveballupandlaunch = gamepad.ps_circle;
         pipelineMode = gamepad.dpadUp;
         barcodePipeline = gamepad.ps_square;
-        colorPipeline = gamepad.ps_cross;
+        GreencolorPipeline = gamepad.ps_cross;
         classifierPipeline = gamepad.ps_circle;
         objectPipeline = gamepad.ps_triangle;
         apriltagPipeline = gamepad.dpadRight;
@@ -110,10 +111,11 @@ public class DriverController {
     public void bindPipelineControls() {
         pipelineMode.whenPressed(this::togglePipelineMode);
         if (pipelineToggle) {
-            barcodePipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Barcode_Pipeline));
-            colorPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Color_Pipeline));
-            classifierPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Classifier_Pipeline));
-            objectPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Object_Detection_Pipeline));
+//            barcodePipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Barcode_Pipeline));
+            GreencolorPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Green_Color_Pipeline));
+            PurplecolorPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Purple_Color_Pipeline));
+//            classifierPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Classifier_Pipeline));
+//            objectPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Object_Detection_Pipeline));
             apriltagPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.AprilTag_Pipeline));
         }
     }
