@@ -7,6 +7,9 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
@@ -24,10 +27,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.firstinspires.ftc.robotcore.external.Supplier;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.twenty403.AutoConstants;
+import org.firstinspires.ftc.twenty403.Constants;
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
@@ -35,6 +40,8 @@ import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
+import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
+
 // unicode is moai emoji
 @TeleOp(name = "Two Controller Drive \uD83D\uDDFF")
 @SuppressWarnings("unused")
@@ -49,7 +56,15 @@ public class JustDrivingTeleOp extends CommandOpMode {
     private final GamepadManager operatorManager = PanelsGamepad.INSTANCE.getSecondManager();
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
+
     private Limelight3A limelight;
+    private Follower follower;
+    public static Pose startingPose; //See ExampleAuto to understand how to use this
+    private boolean automatedDrive;
+    private Supplier<PathChain> pathChain;
+    private TelemetryManager telemetryM;
+    private boolean slowMode = false;
+    private double slowModeMultiplier = 0.5;
 
     /*
      * Barcode pipeline: 0
@@ -82,6 +97,9 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
             limelight.pipelineSwitch(AprilTag_Pipeline);
         }
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
+        follower.update();
 
         /*
          * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
@@ -94,11 +112,42 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void uponStart() {
+        follower.startTeleopDrive();
         robot.atStart();
     }
 
     @Override
     public void runLoop() {
+        follower.update();
+        if (!automatedDrive) {
+            //Make the last parameter false for field-centric
+            //In case the drivers want to use a "slowMode" you can scale the vectors
+            //This is the normal version to use in the TeleOp
+            if (!slowMode) follower.setTeleOpDrive(
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
+                    false // Robot Centric
+            );
+                //This is how it looks with slowMode on
+            else follower.setTeleOpDrive(
+                    -gamepad1.left_stick_y * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
+                    -gamepad1.left_stick_x * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
+                    -gamepad1.right_stick_x * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
+                    false // Robot Centric
+            );
+        }
+        //Automated PathFollowing
+//        if (gamepad1.aWasPressed()) {
+//            follower.followPath(pathChain.get());
+//            automatedDrive = true;
+//        }
+
+        //Stop automated following if the follower is done
+        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
+        }
         LLStatus status = null;
         if (Setup.Connected.LIMELIGHT) {
             status = limelight.getStatus();
@@ -109,31 +158,31 @@ public class JustDrivingTeleOp extends CommandOpMode {
             controlsDriver.bindPipelineControls();
         }
         // For Panels controller widget until
-        Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
-        panelsTelemetry.debug("==== Buttons ====");
-        panelsTelemetry.debug("A: " + Driver.a);
-        panelsTelemetry.debug("B: " + Driver.b);
-        panelsTelemetry.debug("X: " + Driver.x);
-        panelsTelemetry.debug("Y: " + Driver.y);
-        panelsTelemetry.debug("DPad Up: " + Driver.dpad_up);
-        panelsTelemetry.debug("DPad Down: " + Driver.dpad_down);
-        panelsTelemetry.debug("DPad Left: " + Driver.dpad_left);
-        panelsTelemetry.debug("DPad Right: " + Driver.dpad_right);
-        panelsTelemetry.debug("Left Bumper: " + Driver.left_bumper);
-        panelsTelemetry.debug("Right Bumper: " + Driver.right_bumper);
-        panelsTelemetry.debug("Left Trigger: " + Driver.left_trigger);
-        panelsTelemetry.debug("Right Trigger: " + Driver.right_trigger);
-        panelsTelemetry.debug("Start / Options: " + Driver.options);
-        panelsTelemetry.debug("Back / Share: " + Driver.back);
-        panelsTelemetry.debug("Guide / PS: " + Driver.guide);
-        panelsTelemetry.debug("Touchpad: " + Driver.touchpad);
-        panelsTelemetry.debug("Left Stick Button: " + Driver.left_stick_button);
-        panelsTelemetry.debug("Right Stick Button: " + Driver.right_stick_button);
-        panelsTelemetry.debug("==== Sticks ====");
-        panelsTelemetry.debug("Left Stick X: " + Driver.left_stick_x);
-        panelsTelemetry.debug("Left Stick Y: " + Driver.left_stick_y);
-        panelsTelemetry.debug("Right Stick X: " + Driver.right_stick_x);
-        panelsTelemetry.debug("Right Stick Y: " + Driver.right_stick_y);
+//        Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
+//        panelsTelemetry.debug("==== Buttons ====");
+//        panelsTelemetry.debug("A: " + Driver.a);
+//        panelsTelemetry.debug("B: " + Driver.b);
+//        panelsTelemetry.debug("X: " + Driver.x);
+//        panelsTelemetry.debug("Y: " + Driver.y);
+//        panelsTelemetry.debug("DPad Up: " + Driver.dpad_up);
+//        panelsTelemetry.debug("DPad Down: " + Driver.dpad_down);
+//        panelsTelemetry.debug("DPad Left: " + Driver.dpad_left);
+//        panelsTelemetry.debug("DPad Right: " + Driver.dpad_right);
+//        panelsTelemetry.debug("Left Bumper: " + Driver.left_bumper);
+//        panelsTelemetry.debug("Right Bumper: " + Driver.right_bumper);
+//        panelsTelemetry.debug("Left Trigger: " + Driver.left_trigger);
+//        panelsTelemetry.debug("Right Trigger: " + Driver.right_trigger);
+//        panelsTelemetry.debug("Start / Options: " + Driver.options);
+//        panelsTelemetry.debug("Back / Share: " + Driver.back);
+//        panelsTelemetry.debug("Guide / PS: " + Driver.guide);
+//        panelsTelemetry.debug("Touchpad: " + Driver.touchpad);
+//        panelsTelemetry.debug("Left Stick Button: " + Driver.left_stick_button);
+//        panelsTelemetry.debug("Right Stick Button: " + Driver.right_stick_button);
+//        panelsTelemetry.debug("==== Sticks ====");
+//        panelsTelemetry.debug("Left Stick X: " + Driver.left_stick_x);
+//        panelsTelemetry.debug("Left Stick Y: " + Driver.left_stick_y);
+//        panelsTelemetry.debug("Right Stick X: " + Driver.right_stick_x);
+//        panelsTelemetry.debug("Right Stick Y: " + Driver.right_stick_y);
         // here
 
         if (Setup.Connected.LIMELIGHT) {
@@ -190,12 +239,10 @@ public class JustDrivingTeleOp extends CommandOpMode {
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE3";
 
                             }
-                            Pose3D targetPose = fr.getCameraPoseTargetSpace();
-                            double tx = targetPose.getPosition().x;
-                            double ty = targetPose.getPosition().y;
-                            double tz = targetPose.getPosition().z;
-                            // supposedly distance to apriltag
-                            double distance = Math.sqrt(tx*tx + ty*ty + tz*tz);
+
+
+                            // distance to apriltag
+                            double distance = calculateDistanceFromPose(fiducialResults.get(0));
                             telemetry.addData("Distance to AprilTag", String.valueOf(distance));
 
                         }
@@ -220,7 +267,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
                 telemetry.addData("Limelight", "No data available");
             }
         }
-
+        panelsTelemetry.update(telemetry);
         telemetry.update();
     }
 
@@ -229,5 +276,39 @@ public class JustDrivingTeleOp extends CommandOpMode {
         if (Setup.Connected.LIMELIGHT) {
             limelight.stop();
         }
+    }
+    /**
+            * Calculate distance using the target's 3D pose data (most accurate method)
+            * Uses the robot pose relative to the AprilTag coordinate system
+     */
+    private double calculateDistanceFromPose(LLResultTypes.FiducialResult target) {
+        try {
+            // Get robot pose relative to the AprilTag coordinate system
+            Pose3D robotPoseTargetSpace = target.getRobotPoseTargetSpace();
+
+            if (robotPoseTargetSpace != null) {
+                // Calculate 3D distance from robot to AprilTag
+                double x = robotPoseTargetSpace.getPosition().x;
+                double y = robotPoseTargetSpace.getPosition().y;
+                double z = robotPoseTargetSpace.getPosition().z;
+
+                // 3D distance calculation
+                double distance = Math.sqrt(x*x + y*y + z*z);
+
+                // Convert from meters to inches (Limelight uses meters)
+                distance = distance * 39.3701;
+                // cover for error
+                distance += 14;
+
+                // Sanity check - reject unreasonable values
+                if (distance > 0 && distance < 500) { // Reasonable range in inches
+                    return distance;
+                }
+            }
+        } catch (Exception e) {
+            telemetry.addData("Could not get distance", e.getMessage());
+        }
+
+        return -1; // Invalid result
     }
 }
