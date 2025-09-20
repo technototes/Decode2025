@@ -4,10 +4,13 @@ import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.structure.CommandOpMode;
@@ -15,6 +18,7 @@ import com.technototes.library.util.Alliance;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.twenty403.AutoConstants;
+import org.firstinspires.ftc.twenty403.Constants;
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
@@ -22,6 +26,7 @@ import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
+import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 @TeleOp(name = "Driving w/Turbo!")
 @SuppressWarnings("unused")
@@ -29,12 +34,20 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     public Robot robot;
     public DriverController controlsDriver;
+    private boolean slowMode;
     public OperatorController controlsOperator;
     public Hardware hardware;
     private Limelight3A limelight;
+    private boolean automatedDrive;
+
+    private Follower follower;
+    public static Pose startingPose;
+
+
 
     @Override
     public void uponInit() {
+
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
@@ -48,6 +61,9 @@ public class JustDrivingTeleOp extends CommandOpMode {
             //     OpModeState.INIT
             // );
         }
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
+        follower.update();
         limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
 
         telemetry.setMsTransmissionInterval(11);
@@ -65,11 +81,48 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void uponStart() {
+        follower.startTeleopDrive();
         robot.atStart();
     }
 
     @Override
     public void runLoop() {
+        follower.update();
+
+
+        if (!automatedDrive) {
+            //Make the last parameter false for field-centric
+            //In case the drivers want to use a "slowMode" you can scale the vectors
+            //This is the normal version to use in the TeleOp
+            if (!slowMode) follower.setTeleOpDrive(
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
+                    false
+            );
+                //This is how it looks with slowMode on
+            else follower.setTeleOpDrive(
+                    -gamepad1.left_stick_y * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
+                    -gamepad1.left_stick_x * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
+                    -gamepad1.right_stick_x * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
+                    false
+            );
+        }
+        //Automated PathFollowing
+//        if (gamepad1.aWasPressed()) {
+//            follower.followPath(pathChain.get());
+//            automatedDrive = true;
+//        }
+        //Stop automated following if the follower is done
+        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
+        }
+        //Slow Mode
+        if (gamepad1.rightBumperWasPressed()) {
+            slowMode = !slowMode;
+        }
+
         LLStatus status = limelight.getStatus();
         telemetry.addData("Name", "%s", status.getName());
         telemetry.addData(
