@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.sixteen750.controls;
 
 import com.technototes.library.command.CommandScheduler;
+
 import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.CycleCommandGroup;
+import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
 
@@ -16,7 +19,7 @@ public class DriverController {
     public CommandGamepad gamepad;
 
     public Stick driveLeftStick, driveRightStick;
-    public CommandButton resetGyroButton, turboButton, snailButton;
+    public CommandButton resetGyroButton, turboButton, snailButton, launchButton, spitButton, leverButton, brakeButton;
     public CommandButton override;
     public CommandAxis driveStraighten;
     public CommandAxis drive45;
@@ -30,6 +33,16 @@ public class DriverController {
         if (Setup.Connected.DRIVEBASE) {
             bindDriveControls();
         }
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
+            bindLaunchControls();
+        }
+        if (Setup.Connected.INTAKESUBSYSTEM) {
+            bindIntakeControls();
+        }
+        if (Setup.Connected.BRAKESUBSYSTEM) {
+            bindBrakeControls();
+        }
+
     }
 
     private void AssignNamedControllerButton() {
@@ -40,6 +53,10 @@ public class DriverController {
         drive45 = gamepad.leftTrigger;
         turboButton = gamepad.leftBumper;
         snailButton = gamepad.rightBumper;
+        launchButton = gamepad.ps_circle;
+        spitButton = gamepad.ps_square;
+        leverButton = gamepad.ps_cross;
+        brakeButton = gamepad.ps_triangle;
     }
 
     public void bindDriveControls() {
@@ -58,5 +75,19 @@ public class DriverController {
         snailButton.whenPressed(DrivingCommands.SnailDriving(robot.drivebase));
         snailButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(robot.drivebase));
+    }
+    public void bindLaunchControls() {
+        launchButton.whenPressed(TeleCommands.Launch(robot.launcherSubsystem));
+        launchButton.whenReleased(TeleCommands.Stop(robot.launcherSubsystem));
+    }
+    public void bindIntakeControls() {
+        spitButton.whenPressed(TeleCommands.Spit(robot.intakeSubsystem));
+        spitButton.whenReleased(TeleCommands.Intake(robot.intakeSubsystem));
+    }
+    public void bindBrakeControls() {
+        brakeButton.whenPressed(new CycleCommandGroup(
+                TeleCommands.EngageBrake(robot.brakeSubsystem),
+                TeleCommands.DisengageBrake(robot.brakeSubsystem)
+        ));
     }
 }
