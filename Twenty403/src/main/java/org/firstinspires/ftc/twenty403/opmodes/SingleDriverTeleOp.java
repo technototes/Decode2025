@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.logger.Loggable;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.twenty403.AutoConstants;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
 @SuppressWarnings("unused")
 @TeleOp(name = "OneDriverTeleOp")
-public class SingleDriverTeleOp extends CommandOpMode {
+public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
 
     public Robot robot;
     public Setup setup;
@@ -29,10 +30,10 @@ public class SingleDriverTeleOp extends CommandOpMode {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new SingleController(driverGamepad, robot, setup);
-        CommandScheduler.scheduleForState(
-            EZCmd.Drive.NormalMode(robot.drivebaseSubsystem), //was ResetGyro cmd
-            OpModeState.INIT
-        );
+        // CommandScheduler.scheduleForState(
+        //     EZCmd.Drive.NormalMode(robot.drivebaseSubsystem), //was ResetGyro cmd
+        //     OpModeState.INIT
+        // );
     }
 
     @Override

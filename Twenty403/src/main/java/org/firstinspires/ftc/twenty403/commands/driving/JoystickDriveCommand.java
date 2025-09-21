@@ -1,52 +1,50 @@
 package org.firstinspires.ftc.twenty403.commands.driving;
 
-import com.pedropathing.math.Vector;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
-import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.MathUtils;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem.DriveConstants;
 
-public class JoystickDriveCommand implements Command, Loggable {
+public class JoystickDriveCommand implements Command {
 
     public DrivebaseSubsystem subsystem;
     public DoubleSupplier x, y, r;
     public BooleanSupplier watchTrigger;
     public DoubleSupplier straightDrive;
     public DoubleSupplier drive45;
-    public double targetHeadingRads;
+
+    private Robot rob;
 
     public JoystickDriveCommand(
-        DrivebaseSubsystem sub,
+        Robot robot,
         Stick xyStick,
         Stick rotStick,
         DoubleSupplier strtDrive,
         DoubleSupplier angleDrive
     ) {
-        addRequirements(sub);
-        subsystem = sub;
+        rob = robot;
+        addRequirements(robot.drivebaseSubsystem);
+        subsystem = robot.drivebaseSubsystem;
         x = xyStick.getXSupplier();
         y = xyStick.getYSupplier();
         r = rotStick.getXSupplier();
-        targetHeadingRads = -sub.getGyro();
+        robot.gyro = robot.drivebaseSubsystem.getGyro();
         straightDrive = strtDrive;
         drive45 = angleDrive;
     }
 
     // Use this constructor if you don't want auto-straightening
-    public JoystickDriveCommand(DrivebaseSubsystem sub, Stick xyStick, Stick rotStick) {
-        this(sub, xyStick, rotStick, null, null);
+    public JoystickDriveCommand(Robot robot, Stick xyStick, Stick rotStick) {
+        this(robot, xyStick, rotStick, null, null);
     }
 
     public static boolean isTriggered(DoubleSupplier ds) {
-        if (ds == null || ds.getAsDouble() < DriveConstants.TRIGGER_THRESHOLD) {
-            return false;
-        }
-        return true;
+        return ds != null && ds.getAsDouble() > DriveConstants.TRIGGER_THRESHOLD;
     }
 
     // This will make the bot snap to an angle, if the 'straighten' button is pressed
@@ -63,7 +61,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         }
 
         // headingInRads is [0-2pi]
-        double heading = -Math.toDegrees(headingInRads);
+        double heading = Math.toDegrees(headingInRads);
         // Snap to the closest 90 or 270 degree angle (for going through the depot)
         double close = straightTrigger
             ? MathUtils.closestTo(heading, 0, 90, 180, 270, 360)
@@ -88,37 +86,25 @@ public class JoystickDriveCommand implements Command, Loggable {
     @Override
     public void execute() {
         // If subsystem is busy it is running a trajectory.
-        double curHeading = -subsystem.getGyro();
+        double curHeading = subsystem.getGyro();
+        rob.gyro = curHeading;
 
         // The math & signs looks wonky, because this makes things field-relative
         // (Remember that "3 O'Clock" is zero degrees)
         // We are making this change for the omni wheels on 20403
-        double yvalue = -y.getAsDouble();
-        double xvalue = -x.getAsDouble();
-        if (straightDrive != null) {
-            if (straightDrive.getAsDouble() > DriveConstants.TRIGGER_THRESHOLD) {
-                if (Math.abs(yvalue) > Math.abs(xvalue)) xvalue = 0;
-                else yvalue = 0;
+        double yvalue = y.getAsDouble();
+        double xvalue = x.getAsDouble();
+        if (isTriggered(straightDrive)) {
+            if (Math.abs(yvalue) > Math.abs(xvalue)) {
+                xvalue = 0;
+            } else {
+                yvalue = 0;
             }
         }
-        Vector v = new Vector();
-        v.setOrthogonalComponents(yvalue * subsystem.speed, xvalue * subsystem.speed);
-        v.rotateVector(curHeading);
-        // Vector2d input = new Vector2d(
-        //     yvalue * subsystem.speed,
-        //     xvalue * subsystem.speed
-        // ).rotated(curHeading);
-        // TODO:
-        // Calculate the magnitude of the motion to scale the speed by...
-        // then call subsystem.setMag(mag)
-        // find a student who's done physics for this one...
-        // (Also: We probably want to pick the larger of the magnitude of the drive sticks,
-        // and the rotation stick)
-        // We could also use this for implementating "snail mode" and "turbo mode"
-        // subsystem.setWeightedDrivePower(
-        //     new Pose2d(input.getX(), input.getY(), getRotation(curHeading))
-        // );
-        subsystem.drive(v.getXComponent(), v.getYComponent(), getRotation(curHeading));
+        rob.rv = getRotation(curHeading);
+        rob.yv = yvalue;
+        rob.xv = xvalue;
+        subsystem.joystickDriveWithGyro(xvalue, yvalue, rob.rv, curHeading);
     }
 
     @Override

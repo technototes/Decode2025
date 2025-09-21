@@ -54,7 +54,7 @@ public class DriverController {
     public void bindDriveControls() {
         CommandScheduler.scheduleJoystick(
             new JoystickDriveCommand(
-                robot.drivebaseSubsystem,
+                robot,
                 driveLeftStick,
                 driveRightStick,
                 straightTrigger,

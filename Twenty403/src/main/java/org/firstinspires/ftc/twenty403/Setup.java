@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.twenty403;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 
 public class Setup {

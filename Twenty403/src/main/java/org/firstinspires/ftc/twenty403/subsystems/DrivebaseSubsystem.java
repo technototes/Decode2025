@@ -56,6 +56,9 @@ public class DrivebaseSubsystem
     // @Log(name = "Speed")
     public double speed = DriveConstants.NORMAL_MOTOR_SPEED;
 
+    @Log(name = "")
+    public String driveStr;
+
     public DrivebaseSubsystem(
         EncodedMotor<DcMotorEx> fl,
         EncodedMotor<DcMotorEx> fr,
@@ -78,8 +81,8 @@ public class DrivebaseSubsystem
 
         fl.setDirection(DcMotorSimple.Direction.FORWARD);
         rl.setDirection(DcMotorSimple.Direction.FORWARD);
-        rr.setDirection(DcMotorSimple.Direction.REVERSE);
-        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+        rr.setDirection(DcMotorSimple.Direction.FORWARD);
+        fr.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     @Override
@@ -123,5 +126,11 @@ public class DrivebaseSubsystem
         motors[1].setPower(frSpeed * speed * DriveConstants.AFR_SCALE);
         motors[2].setPower(rlSpeed * speed * DriveConstants.ARL_SCALE);
         motors[3].setPower(rrSpeed * speed * DriveConstants.ARR_SCALE);
+    }
+
+    @Override
+    public void drive(double speed, double angle, double rotation) {
+        driveStr = String.format("s: %f a: %f r: %f", speed, angle, rotation);
+        super.drive(speed, angle, rotation);
     }
 }
