@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.twenty403.commands.driving;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.math.Vector;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem.DriveConstants;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-
+@Configurable
 public class JoystickDriveCommand implements Command {
 
     public DrivebaseSubsystem subsystem;

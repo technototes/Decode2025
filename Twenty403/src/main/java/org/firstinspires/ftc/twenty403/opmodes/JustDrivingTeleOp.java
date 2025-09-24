@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
@@ -43,6 +44,7 @@ import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 // unicode is moai emoji
+@Configurable
 @TeleOp(name = "Two Controller Drive \uD83D\uDDFF")
 @SuppressWarnings("unused")
 public class JustDrivingTeleOp extends CommandOpMode {

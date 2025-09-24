@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.Motif;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -34,7 +35,7 @@ import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 import java.util.Arrays;
 import java.util.List;
-
+@Configurable
 @SuppressWarnings("unused")
 @TeleOp(name = "OneDriverTeleOp")
 public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
