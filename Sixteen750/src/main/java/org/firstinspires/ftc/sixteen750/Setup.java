@@ -9,12 +9,12 @@ public class Setup {
 
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = false;
-        public static boolean SAFETYSUBSYSTEM = true;
-        public static boolean EXTERNAL_IMU = true;
+        public static boolean SAFETYSUBSYSTEM = false;
+        public static boolean EXTERNAL_IMU = true   ;
         public static boolean OTOS = true;
         public static boolean INTAKESUBSYSTEM = false;
-        public static boolean LAUNCHERSUBSYSTEM = false;
-        public static boolean AIMINGSUBSYSTEM = false;
+        public static boolean LAUNCHERSUBSYSTEM = true;
+        public static boolean AIMINGSUBSYSTEM = true;
         public static boolean BRAKESUBSYSTEM = false;
 
     }
