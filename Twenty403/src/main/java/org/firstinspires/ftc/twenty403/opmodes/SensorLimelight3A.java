@@ -2,7 +2,7 @@ package org.firstinspires.ftc.twenty403.opmodes;
 
 //package org.firstinspires.ftc.robotcontroller.external.samples;
 
-import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
+//import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -44,16 +44,16 @@ public class SensorLimelight3A extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
+        // limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
 
         telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);
+        // limelight.pipelineSwitch(0);
 
         /*
          * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
          */
-        limelight.start();
+        // limelight.start();
 
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
