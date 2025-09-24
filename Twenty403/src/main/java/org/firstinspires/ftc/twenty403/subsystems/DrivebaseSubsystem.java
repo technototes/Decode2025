@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.twenty403.subsystems;
 
 
+import static org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand.faceTagMode;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -11,6 +13,8 @@ import com.technototes.library.hardware.sensor.IGyro;
 
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.drivebase.SimpleMecanumDrivebaseSubsystem;
+
+import org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand;
 
 
 public class DrivebaseSubsystem
@@ -106,6 +110,9 @@ public class DrivebaseSubsystem
 
     public boolean isTurboMode() {
         return Math.abs(speed - DriveConstants.TURBO_MOTOR_SPEED) < 0.01;
+    }
+    public void enableFaceTagMode() {
+        faceTagMode = !faceTagMode;
     }
 
     public void setNormalMode() {

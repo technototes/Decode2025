@@ -10,6 +10,8 @@ import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem.DriveConstants;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 public class JoystickDriveCommand implements Command {
 
@@ -20,6 +22,9 @@ public class JoystickDriveCommand implements Command {
     public DoubleSupplier drive45;
 
     private Robot rob;
+    private Limelight3A limelight;
+    public static boolean faceTagMode = false; // you can toggle this with a button
+
 
     public JoystickDriveCommand(
         Robot robot,
@@ -48,6 +53,7 @@ public class JoystickDriveCommand implements Command {
         return ds != null && ds.getAsDouble() > DriveConstants.TRIGGER_THRESHOLD;
     }
 
+
     // This will make the bot snap to an angle, if the 'straighten' button is pressed
     // Otherwise, it just reads the rotation value from the rotation stick
     private double getRotation(double headingInRads) {
@@ -58,6 +64,26 @@ public class JoystickDriveCommand implements Command {
         if (subsystem.isTurboMode() || (!straightTrigger && !fortyfiveTrigger)) {
             // No straighten override: return the stick value
             // (with some adjustment...)
+            return -Math.pow(r.getAsDouble(), 3) * DriveConstants.NORMAL_ROTATION_SCALE;
+        }
+        if (faceTagMode) {
+
+            // --- Face AprilTag using Limelight ---
+            LLResult result = limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+                double tx = result.getTx(); // horizontal offset in degrees
+                double kP_TagAlign = 0.03;  // tune this gain
+                return -kP_TagAlign * tx;   // rotate until tx ~ 0
+            } else {
+                return 0.0; // no target → don't spin
+            }
+        }
+
+
+
+        // --- your existing snap-to-angle or joystick rotation logic ---
+
+        if (subsystem.isTurboMode() || (!straightTrigger && !fortyfiveTrigger)) {
             return -Math.pow(r.getAsDouble(), 3) * DriveConstants.NORMAL_ROTATION_SCALE;
         }
 
@@ -113,6 +139,10 @@ public class JoystickDriveCommand implements Command {
     @Override
     public boolean isFinished() {
         return false;
+    }
+
+    public void enableFaceTagMode() {
+        faceTagMode = !faceTagMode;
     }
 
     /*

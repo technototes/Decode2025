@@ -30,6 +30,7 @@ import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.SingleController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
+import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +47,9 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
     // For Panels controller widget the two lines below
     private final GamepadManager driverManager = PanelsGamepad.INSTANCE.getFirstManager();
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    private double kP_Turn   = 0.03; // rotation correction
+    private double kP_Strafe = 0.5;  // strafe correction
+    private double kP_Drive  = 0.3;  // forward correction
 
 
     @Override
@@ -94,30 +98,30 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
         }
         // For Panels controller widget until
         Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
-        panelsTelemetry.debug("==== Buttons ====");
-        panelsTelemetry.debug("A: " + Driver.a);
-        panelsTelemetry.debug("B: " + Driver.b);
-        panelsTelemetry.debug("X: " + Driver.x);
-        panelsTelemetry.debug("Y: " + Driver.y);
-        panelsTelemetry.debug("DPad Up: " + Driver.dpad_up);
-        panelsTelemetry.debug("DPad Down: " + Driver.dpad_down);
-        panelsTelemetry.debug("DPad Left: " + Driver.dpad_left);
-        panelsTelemetry.debug("DPad Right: " + Driver.dpad_right);
-        panelsTelemetry.debug("Left Bumper: " + Driver.left_bumper);
-        panelsTelemetry.debug("Right Bumper: " + Driver.right_bumper);
-        panelsTelemetry.debug("Left Trigger: " + Driver.left_trigger);
-        panelsTelemetry.debug("Right Trigger: " + Driver.right_trigger);
-        panelsTelemetry.debug("Start / Options: " + Driver.options);
-        panelsTelemetry.debug("Back / Share: " + Driver.back);
-        panelsTelemetry.debug("Guide / PS: " + Driver.guide);
-        panelsTelemetry.debug("Touchpad: " + Driver.touchpad);
-        panelsTelemetry.debug("Left Stick Button: " + Driver.left_stick_button);
-        panelsTelemetry.debug("Right Stick Button: " + Driver.right_stick_button);
-        panelsTelemetry.debug("==== Sticks ====");
-        panelsTelemetry.debug("Left Stick X: " + Driver.left_stick_x);
-        panelsTelemetry.debug("Left Stick Y: " + Driver.left_stick_y);
-        panelsTelemetry.debug("Right Stick X: " + Driver.right_stick_x);
-        panelsTelemetry.debug("Right Stick Y: " + Driver.right_stick_y);
+//        panelsTelemetry.debug("==== Buttons ====");
+//        panelsTelemetry.debug("A: " + Driver.a);
+//        panelsTelemetry.debug("B: " + Driver.b);
+//        panelsTelemetry.debug("X: " + Driver.x);
+//        panelsTelemetry.debug("Y: " + Driver.y);
+//        panelsTelemetry.debug("DPad Up: " + Driver.dpad_up);
+//        panelsTelemetry.debug("DPad Down: " + Driver.dpad_down);
+//        panelsTelemetry.debug("DPad Left: " + Driver.dpad_left);
+//        panelsTelemetry.debug("DPad Right: " + Driver.dpad_right);
+//        panelsTelemetry.debug("Left Bumper: " + Driver.left_bumper);
+//        panelsTelemetry.debug("Right Bumper: " + Driver.right_bumper);
+//        panelsTelemetry.debug("Left Trigger: " + Driver.left_trigger);
+//        panelsTelemetry.debug("Right Trigger: " + Driver.right_trigger);
+//        panelsTelemetry.debug("Start / Options: " + Driver.options);
+//        panelsTelemetry.debug("Back / Share: " + Driver.back);
+//        panelsTelemetry.debug("Guide / PS: " + Driver.guide);
+//        panelsTelemetry.debug("Touchpad: " + Driver.touchpad);
+//        panelsTelemetry.debug("Left Stick Button: " + Driver.left_stick_button);
+//        panelsTelemetry.debug("Right Stick Button: " + Driver.right_stick_button);
+//        panelsTelemetry.debug("==== Sticks ====");
+//        panelsTelemetry.debug("Left Stick X: " + Driver.left_stick_x);
+//        panelsTelemetry.debug("Left Stick Y: " + Driver.left_stick_y);
+//        panelsTelemetry.debug("Right Stick X: " + Driver.right_stick_x);
+//        panelsTelemetry.debug("Right Stick Y: " + Driver.right_stick_y);
         // here
 
         if (Setup.Connected.LIMELIGHT) {
@@ -181,6 +185,8 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
                             // supposedly distance to apriltag
                             double distance = Math.sqrt(tx*tx + ty*ty + tz*tz);
                             telemetry.addData("Distance to AprilTag", String.valueOf(distance));
+
+
 
                         }
                     } else if (result.getPipelineIndex() == Setup.HardwareNames.Green_Color_Pipeline) {

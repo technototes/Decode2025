@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.twenty403.commands;
 
 import com.technototes.library.command.Command;
+
+import org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 public class EZCmd {
@@ -17,6 +19,10 @@ public class EZCmd {
 
         public static Command TurboMode(DrivebaseSubsystem drive) {
             return Command.create(drive::setTurboMode);
+        }
+
+        public static Command AutoAim(DrivebaseSubsystem drive){
+            return Command.create(drive::enableFaceTagMode);
         }
 
         // public static Command ResetGyro(DrivebaseSubsystem drive) {

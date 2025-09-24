@@ -13,6 +13,8 @@ import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.commands.LLPipelineChangeCommand;
 import org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand;
 
+import java.util.Set;
+
 public class DriverController {
 
     public Robot robot;
@@ -35,7 +37,9 @@ public class DriverController {
     public CommandButton objectPipeline;
     public CommandButton apriltagPipeline;
     public CommandButton PurplecolorPipeline;
+    public CommandButton AutoAim;
     public static boolean pipelineToggle = false;
+    private boolean faceTagMode = false;
     public void togglePipelineMode() {
         pipelineToggle = !pipelineToggle;
     }
@@ -73,6 +77,7 @@ public class DriverController {
         classifierPipeline = gamepad.ps_circle;
         objectPipeline = gamepad.ps_triangle;
         apriltagPipeline = gamepad.dpadRight;
+        AutoAim = gamepad.dpadDown;
 
     }
 
@@ -92,6 +97,9 @@ public class DriverController {
 
         snailButton.whenPressed(EZCmd.Drive.SnailMode(robot.drivebaseSubsystem));
         snailButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
+        if (Setup.Connected.LIMELIGHT){
+            AutoAim.whenPressed(EZCmd.Drive.AutoAim(robot.drivebaseSubsystem));
+        }
 
         // resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
     }
