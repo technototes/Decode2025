@@ -1,0 +1,68 @@
+package com.technototes.library.logger;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
+import static java.lang.annotation.ElementType.METHOD;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/** Annotations for configuring Logs
+ * @author Alex Stedman
+ */
+@Retention(RetentionPolicy.RUNTIME)
+public @interface LogConfig {
+    /** Annotation for determining when logged item will be sent to Telemetry
+     *
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(value = { FIELD, LOCAL_VARIABLE, METHOD })
+    @interface Run {
+        /** Run the log during the teleop Period
+         *
+         * @return The above condition
+         */
+        boolean duringRun() default true;
+
+        /** Run the log during the init Period
+         *
+         * @return The above condition
+         */
+        boolean duringInit() default false;
+    }
+
+    /** Annotation for allowing Opmodes to log this item
+     *
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(value = { FIELD, LOCAL_VARIABLE, METHOD })
+    @interface AllowList {
+        /** The allowed opmodes
+         *
+         * @return Opmode Classes
+         */
+        Class<?>[] value();
+    }
+
+    /** Annotation for denying Opmodes to log this item
+     *
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(value = { FIELD, LOCAL_VARIABLE, METHOD })
+    @interface DenyList {
+        /** The denied opmodes
+         *
+         * @return Opmode Classes
+         */
+        Class<?>[] value();
+    }
+
+    /** Annotation to completely disable the entry
+     *
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(value = { FIELD, LOCAL_VARIABLE, METHOD })
+    @interface Disabled {
+    }
+}

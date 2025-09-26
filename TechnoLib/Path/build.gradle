@@ -1,0 +1,66 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace = 'com.technototes.path'
+
+    lint {
+        disable 'ExpiredTargetSdkVersion'
+    }
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 28
+    }
+
+    compileSdkVersion 35
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation project(':RobotLibrary')
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation('org.ejml:ejml-simple:0.39') {
+        exclude group: 'org.ejml', module: 'ejml-all'
+    }
+
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+
+
+    implementation 'com.acmerobotics.dashboard:dashboard:0.4.15'
+    implementation 'com.acmerobotics.roadrunner:core:0.5.6'
+
+
+    testImplementation(platform('org.junit:junit-bom:5.7.0'))
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.7.0')
+    testImplementation('org.mockito:mockito-core:3.5.11')
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.0"
+
+}
+
+/*
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath = project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError false
+    destinationDir = file("../docs/Path/")
+    options {
+        linkSource true
+        encoding = 'utf-8'
+    }
+}
+
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompileProvider.get().classpath.files
+    })
+}
+*/
+
+apply from: '../../build.dependencies.gradle'

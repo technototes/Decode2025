@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace = 'com.technototes.library'
+
+    lint {
+        disable 'ExpiredTargetSdkVersion'
+    }
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 28
+    }
+
+    compileSdkVersion 35
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation('org.ejml:ejml-simple:0.39') {
+        exclude group: 'org.ejml', module: 'ejml-all'
+    }
+/*
+    testImplementation(platform('org.junit:junit-bom:5.7.0'))
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.7.0')
+    testImplementation('org.mockito:mockito-core:3.5.11')
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.0"
+*/
+}
+
+/*
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+*/
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+}
+
+/*
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath = project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError false
+    destinationDir = file("../docs/TechnoLib/")
+    options {
+        linkSource true
+        encoding = 'utf-8'
+    }
+}
+
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompileProvider.get().classpath.files
+    })
+}
+*/
+
+apply from: '../../build.dependencies.gradle'
