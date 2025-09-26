@@ -14,7 +14,7 @@ public class Setup {
         public static boolean EXTERNALIMU = false;
         public static boolean OCTOQUAD = false;
         public static boolean LAUNCHER = false;
-        public static boolean OTOS = false;
+        public static boolean OTOS = true;
     }
 
     @Configurable
