@@ -33,7 +33,7 @@ public class Setup {
         public static String BOTTOML = "bottoml";
         public static String BOTTOMR = "bottomr";
         public static String OTOS = "sparky";
-        //public static String LIMELIGHT = "limelight";
+        public static String LIMELIGHT = "limelight";
     }
 
     @Configurable
