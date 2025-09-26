@@ -42,7 +42,7 @@ public class LauncherSubsystem {
     public void moveball() {
         if (hasHardware) {
             bottomRight.setPower(CRSERVO_SPEED);
-            bottomLeft.setPower(CRSERVO_SPEED);
+            bottomLeft.setPower(-CRSERVO_SPEED);
         }
     }
 

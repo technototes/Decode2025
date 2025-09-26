@@ -14,8 +14,6 @@ import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
 import com.pedropathing.ftc.localization.constants.OTOSConstants;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -29,19 +27,16 @@ public class Constants {
     public static double botWeightKg = 0.0;
     public static double xvelocity = 0.0;
     public static double yvelocity = 0.0;
-    public static double fdeceleration = 0.0;
-    public static double ldeceleration = 0.0;
-    public static double fti = 0.0;
-    public static double sti = 0.0;
-    public static double rti = 0.0;
-    public static double ls = 0.0;
-    public static double as = 0.0;
+    public static double fowarddeceleration = 0.0;
+    public static double lateraldeceleration = 0.0;
+    public static double linearscalar = 0.0;
+    public static double angularscalar = 0.0;
 
     public static FollowerConstants followerConstants = new FollowerConstants()
         // tune these
         .mass(botWeightKg)
-        .forwardZeroPowerAcceleration(fdeceleration)
-        .lateralZeroPowerAcceleration(ldeceleration);
+        .forwardZeroPowerAcceleration(fowarddeceleration)
+        .lateralZeroPowerAcceleration(lateraldeceleration);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -57,35 +52,20 @@ public class Constants {
         .xVelocity(xvelocity)
         .yVelocity(yvelocity);
     // for drive encoder localization
-    public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
-        .leftFrontMotorName(FLMOTOR)
-        .leftRearMotorName(RLMOTOR)
-        .rightFrontMotorName(FRMOTOR)
-        .rightRearMotorName(RRMOTOR)
-        .leftFrontEncoderDirection(Encoder.FORWARD)
-        .leftRearEncoderDirection(Encoder.FORWARD)
-        .rightFrontEncoderDirection(Encoder.REVERSE)
-        .rightRearEncoderDirection(Encoder.REVERSE)
-        // need to tune for drive encoder localization
-        .forwardTicksToInches(fti)
-        .strafeTicksToInches(sti)
-        .turnTicksToInches(rti);
 
     public static OTOSConstants otosLocalizerConstants = new OTOSConstants()
         .hardwareMapName(OTOS)
         .linearUnit(DistanceUnit.INCH)
         .angleUnit(AngleUnit.RADIANS)
         // need to tune for OTOS localization
-        .linearScalar(ls)
-        .angularScalar(as);
+        .linearScalar(linearscalar)
+        .angularScalar(angularscalar);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
             .pathConstraints(pathConstraints)
-            // comment for for otos localization and vice versa
-            .driveEncoderLocalizer(localizerConstants)
             // uncomment for otos localization and vice versa
-            //                .OTOSLocalizer(otosLocalizerConstants)
+            .OTOSLocalizer(otosLocalizerConstants)
             .mecanumDrivetrain(driveConstants)
             .build();
     }

@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.twenty403.helpers;
 
+import com.bylazar.configurables.annotations.Configurable;
+
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-
+@Configurable
 public class HeadingHelper {
 
     public double headingUpdateTime;

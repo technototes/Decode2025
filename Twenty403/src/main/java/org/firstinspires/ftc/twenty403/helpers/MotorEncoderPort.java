@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.twenty403.helpers;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.hardware.sensor.encoder.MotorEncoder;
 import com.technototes.library.hardware.sensor.encoder.MotorEncoder.Direction;
-
+@Configurable
 public class MotorEncoderPort implements IEncoder {
 
     protected MotorEncoder motorPort;

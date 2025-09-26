@@ -1,21 +1,22 @@
 package org.firstinspires.ftc.twenty403.subsystems;
 
+
+import static org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand.faceTagMode;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.hardware.sensor.IGyro;
+
 import com.technototes.library.logger.Log;
-import com.technototes.library.logger.LogConfig;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.drivebase.SimpleMecanumDrivebaseSubsystem;
-import com.technototes.path.subsystem.MecanumConstants;
-import com.technototes.path.subsystem.PathingMecanumDrivebaseSubsystem;
-import java.util.function.Supplier;
-import org.firstinspires.ftc.twenty403.commands.EZCmd;
-import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
+
+import org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand;
+
 
 public class DrivebaseSubsystem
     extends SimpleMecanumDrivebaseSubsystem<DcMotorEx>
@@ -110,6 +111,9 @@ public class DrivebaseSubsystem
 
     public boolean isTurboMode() {
         return Math.abs(speed - DriveConstants.TURBO_MOTOR_SPEED) < 0.01;
+    }
+    public void enableFaceTagMode() {
+        faceTagMode = !faceTagMode;
     }
 
     public void setNormalMode() {
