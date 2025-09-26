@@ -21,14 +21,12 @@ public class Hardware implements Loggable {
 
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr;
-    public EncodedMotor suspend;
-    public EncodedMotor suspend2;
-    public Servo clawservo;
-    public Servo wristservo;
-    public Servo linkservo;
-    public EncodedMotor<DcMotorEx> slidemotor;
-    public Servo armservo;
-    public Servo bucketservo;
+    public EncodedMotor intake;
+    public EncodedMotor launcher1;
+    public EncodedMotor launcher2;
+    public Servo brake;
+    public Servo hood;
+    public Servo lever;
     public MotorEncoder odoF, odoR;
     public SparkFunOTOS odo;
 
@@ -57,6 +55,20 @@ public class Hardware implements Loggable {
         }
         if (Setup.Connected.OTOS) {
             odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+        }
+        if (Setup.Connected.INTAKESUBSYSTEM){
+            intake = new EncodedMotor(Setup.HardwareNames.INTAKE_MOTOR);
+        }
+        if (Setup.Connected.LAUNCHERSUBSYSTEM){
+            launcher1 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR1);
+            launcher2 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR2);
+        }
+        if (Setup.Connected.AIMINGSUBSYSTEM){
+            hood = new Servo(Setup.HardwareNames.HOOD_SERVO);
+            lever = new Servo(Setup.HardwareNames.LEVER_SERVO);
+        }
+        if (Setup.Connected.BRAKESUBSYSTEM){
+            brake = new Servo(Setup.HardwareNames.BRAKE_SERVO);
         }
     }
 

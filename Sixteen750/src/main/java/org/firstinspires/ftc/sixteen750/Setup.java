@@ -9,9 +9,14 @@ public class Setup {
 
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = false;
-        public static boolean SAFETYSUBSYSTEM = true;
-        public static boolean EXTERNAL_IMU = true;
+        public static boolean SAFETYSUBSYSTEM = false;
+        public static boolean EXTERNAL_IMU = true   ;
         public static boolean OTOS = true;
+        public static boolean INTAKESUBSYSTEM = false;
+        public static boolean LAUNCHERSUBSYSTEM = true;
+        public static boolean AIMINGSUBSYSTEM = true;
+        public static boolean BRAKESUBSYSTEM = false;
+
     }
 
     @Config
@@ -26,6 +31,12 @@ public class Setup {
         public static String ODOF = "odof";
         public static String ODOR = "odor";
         public static String OTOS = "sparky";
+        public static String INTAKE_MOTOR = "intake";
+        public static String LAUNCHER_MOTOR1 = "launcher1";
+        public static String LAUNCHER_MOTOR2 = "launcher2";
+        public static String BRAKE_SERVO = "brake";
+        public static String HOOD_SERVO = "hood";
+        public static String LEVER_SERVO = "lever";
     }
 
     @Config
