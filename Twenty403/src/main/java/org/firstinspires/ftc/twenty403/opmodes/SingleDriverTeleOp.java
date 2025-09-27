@@ -32,6 +32,8 @@ import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.SingleController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
+import org.firstinspires.ftc.twenty403.subsystems.FeedingSubsystem;
+import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +46,9 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
     public Setup setup;
     public DriverController controls;
     public Hardware hardware;
+    private boolean launchOn;
     private Limelight3A limelight;
+    private LauncherSubsystem launcherSubsystem;
     // For Panels controller widget the two lines below
     private final GamepadManager driverManager = PanelsGamepad.INSTANCE.getFirstManager();
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -64,17 +68,19 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
         //     EZCmd.Drive.NormalMode(robot.drivebaseSubsystem), //was ResetGyro cmd
         //     OpModeState.INIT
         // );
-        limelight = hardware.limelight;
-        limelight.setPollRateHz(100);
+        if (Setup.Connected.LIMELIGHT) {
+            limelight = hardware.limelight;
+            limelight.setPollRateHz(100);
 
-        telemetry.setMsTransmissionInterval(11);
+            telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(AprilTag_Pipeline);
+            limelight.pipelineSwitch(AprilTag_Pipeline);
 
-        /*
-         * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
-         */
-        limelight.start();
+            /*
+             * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
+             */
+            limelight.start();
+        }
 
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
@@ -97,6 +103,7 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
             }
             controls.bindPipelineControls();
         }
+
         // For Panels controller widget until
         Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
 //        panelsTelemetry.debug("==== Buttons ====");
