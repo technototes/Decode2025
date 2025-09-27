@@ -2,7 +2,6 @@ package org.firstinspires.ftc.twenty403.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.technototes.library.command.WaitCommand;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import org.firstinspires.ftc.twenty403.Hardware;
@@ -11,8 +10,7 @@ import org.firstinspires.ftc.twenty403.Setup;
 @Configurable
 public class LauncherSubsystem {
 
-    public static double MOTOR_VELOCITY = .75; // 0.5 1.0
-
+    public static double TARGET_MOTOR_VELOCITY = .58; // 0.5 1.0
 
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
@@ -33,7 +31,7 @@ public class LauncherSubsystem {
         // Spin the motors
         // TODO: make the motors spit the thing at the right angle
         if (hasHardware) {
-            top.setVelocity(MOTOR_VELOCITY);
+            top.setVelocity(TARGET_MOTOR_VELOCITY);
         }
     }
 
