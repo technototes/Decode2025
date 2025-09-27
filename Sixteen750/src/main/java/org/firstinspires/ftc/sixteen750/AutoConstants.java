@@ -20,14 +20,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.technototes.path.geometry.ConfigurablePoseD;
 import com.technototes.path.trajectorysequence.TrajectorySequence;
 import com.technototes.path.trajectorysequence.TrajectorySequenceBuilder;
-
+import java.util.function.Function;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import java.util.function.Function;
-
 @Config
 public class AutoConstants {
+
     public static double botWeightKg = 0.0;
     public static double xvelocity = 0.0;
     public static double yvelocity = 0.0;
@@ -39,14 +38,20 @@ public class AutoConstants {
     public static double ls = 0.0;
     public static double as = 0.0;
 
-    public static FollowerConstants followerConstants = new FollowerConstants()
+    public static FollowerConstants getFollowerConstants() {
+        return new FollowerConstants()
             // tune these
             .mass(botWeightKg)
             .forwardZeroPowerAcceleration(fdeceleration)
             .lateralZeroPowerAcceleration(ldeceleration);
+    }
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
-    public static MecanumConstants driveConstants = new MecanumConstants()
+    public static PathConstraints getPathConstraints() {
+        return new PathConstraints(0.99, 100, 1, 1);
+    }
+
+    public static MecanumConstants getDriveConstants() {
+        return new MecanumConstants()
             .maxPower(1)
             .leftFrontMotorName(FL_DRIVE_MOTOR)
             .leftRearMotorName(RL_DRIVE_MOTOR)
@@ -58,8 +63,11 @@ public class AutoConstants {
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .xVelocity(xvelocity)
             .yVelocity(yvelocity);
+    }
+
     // for drive encoder localization
-    public static DriveEncoderConstants driveLocalizerConstants = new DriveEncoderConstants()
+    public static DriveEncoderConstants getDriveLocalizerConstants() {
+        return new DriveEncoderConstants()
             .leftFrontMotorName(FL_DRIVE_MOTOR)
             .leftRearMotorName(RL_DRIVE_MOTOR)
             .rightFrontMotorName(FR_DRIVE_MOTOR)
@@ -72,19 +80,21 @@ public class AutoConstants {
             .forwardTicksToInches(fti)
             .strafeTicksToInches(sti)
             .turnTicksToInches(rti);
+    }
 
+    public static Follower createFollower(HardwareMap hardwareMap) {
+        return new FollowerBuilder(getFollowerConstants(), hardwareMap)
+            .pathConstraints(getPathConstraints())
+            .OTOSLocalizer(getLocalizerConstants())
+            .build();
+    }
 
-        public static Follower createFollower(HardwareMap hardwareMap) {
-            return new FollowerBuilder(followerConstants, hardwareMap)
-                    .pathConstraints(pathConstraints)
-                    .OTOSLocalizer(localizerConstants)
-                    .build();
-
-        }
-    public static OTOSConstants localizerConstants = new OTOSConstants()
+    public static OTOSConstants getLocalizerConstants() {
+        return new OTOSConstants()
             .hardwareMapName("otos")
             .linearUnit(DistanceUnit.INCH)
             .angleUnit(AngleUnit.RADIANS);
+    }
 
     //New testing constants for this year's game
     public static ConfigurablePoseD SPLINETEST1 = new ConfigurablePoseD(0, -55, 0);
