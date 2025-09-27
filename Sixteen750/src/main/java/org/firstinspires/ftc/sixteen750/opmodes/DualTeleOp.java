@@ -40,10 +40,12 @@ public class DualTeleOp extends CommandOpMode {
                     DrivingCommands.ResetGyro(robot.drivebase),
                     OpModeState.INIT
             );
-            CommandScheduler.scheduleForState(
-                    TeleCommands.Intake(robot.intakeSubsystem),
-                    OpModeState.RUN
-            );
+            if (Setup.Connected.INTAKESUBSYSTEM) {
+                CommandScheduler.scheduleForState(
+                        TeleCommands.Intake(robot.intakeSubsystem),
+                        OpModeState.RUN
+                );
+            }
         }
     }
 

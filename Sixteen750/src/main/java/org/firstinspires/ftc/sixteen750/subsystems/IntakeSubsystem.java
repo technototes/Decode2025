@@ -30,18 +30,17 @@ public class IntakeSubsystem {
     public void Intake() {
         // Spin the motors
         if (hasHardware) {
+            intake.setDirection(DcMotorSimple.Direction.REVERSE);
             intake.setVelocity(MOTOR_VELOCITY);
         }
     }
     public void Spit() {
         // Spin the motors
         if (hasHardware) {
-            intake.setDirection(DcMotorSimple.Direction.REVERSE);
+            intake.setDirection(DcMotorSimple.Direction.FORWARD);
             intake.setVelocity(MOTOR_VELOCITY);
         }
     }
-
-
 
     public void Stop() {
         if (hasHardware) {

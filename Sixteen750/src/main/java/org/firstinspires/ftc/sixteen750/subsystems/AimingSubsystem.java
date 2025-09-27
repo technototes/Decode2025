@@ -10,8 +10,11 @@ import org.firstinspires.ftc.sixteen750.Setup;
 public class AimingSubsystem {
 
     public static double HOOD_POS = 0.5; // 0.5 1.0
-    public static double LEVER_POS = 0.1;
-    public static double LEVER_POS_GO = 0.5;
+    public static double HOOD_POS_UP = 1; // 0.5 1.0
+    public static double HOOD_POS_DOWN = 0.4; // 0.5 1.0
+
+    public static double LEVER_POS = 0.7;
+    public static double LEVER_POS_GO = 0.2;
     boolean hasHardware;
     Servo hood;
     Servo lever;
@@ -32,6 +35,18 @@ public class AimingSubsystem {
         if (hasHardware) {
             //theres gonna be a lot of math here to aim
             hood.setPosition(HOOD_POS);
+        }
+    }
+    public void testHoodUp(){
+        if (hasHardware) {
+            //theres gonna be a lot of math here to aim
+            hood.setPosition(HOOD_POS_UP);
+        }
+    }
+    public void testHoodDown(){
+        if (hasHardware) {
+            //theres gonna be a lot of math here to aim
+            hood.setPosition(HOOD_POS_DOWN);
         }
     }
     public void StopBall() {

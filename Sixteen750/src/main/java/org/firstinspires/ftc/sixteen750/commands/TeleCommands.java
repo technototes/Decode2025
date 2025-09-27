@@ -36,6 +36,9 @@ public class TeleCommands {
     public static Command Aim(AimingSubsystem as) {
         return Command.create(as::Aim);
     }
+    public static Command HoodUp(AimingSubsystem as){ return Command.create(as::testHoodUp);}
+    public static Command HoodDown(AimingSubsystem as){ return Command.create(as::testHoodDown);}
+
 
     public static Command LeverStop(AimingSubsystem as) {
         return Command.create(as::StopBall);
