@@ -51,7 +51,7 @@ public class Constants {
         .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
         .xVelocity(xvelocity)
         .yVelocity(yvelocity);
-    // for drive encoder localization
+
 
     public static OTOSConstants otosLocalizerConstants = new OTOSConstants()
         .hardwareMapName(OTOS)

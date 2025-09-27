@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.twenty403.controls;
 
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
@@ -10,10 +11,9 @@ import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.commands.EZCmd;
+import org.firstinspires.ftc.twenty403.commands.FeedCMD;
 import org.firstinspires.ftc.twenty403.commands.LLPipelineChangeCommand;
 import org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand;
-
-import java.util.Set;
 
 public class DriverController {
 
@@ -38,6 +38,7 @@ public class DriverController {
     public CommandButton PurplecolorPipeline;
     public CommandButton AutoAim;
     public static boolean pipelineToggle = false;
+    public static boolean launchOn = false;
     private boolean faceTagMode = false;
     public void togglePipelineMode() {
         pipelineToggle = !pipelineToggle;
@@ -104,13 +105,7 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-        if (!pipelineToggle) {
-            launch.whilePressed(robot.launcherSubsystem::Launch);
-            launch.whenReleased(robot.launcherSubsystem::Stop);
-
-
-
-        }
+        launch.whenPressed(this::setLaunch);
     }
     public void bindFeedControls() {
         moveballup.whilePressed(robot.feedingSubsystem::moveball);
@@ -125,6 +120,16 @@ public class DriverController {
 //            classifierPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Classifier_Pipeline));
 //            objectPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Object_Detection_Pipeline));
             apriltagPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.AprilTag_Pipeline));
+        }
+    }
+    public void setLaunch(){
+        launchOn = !launchOn;
+    }
+    public void Launch() {
+        if (launchOn) {
+            robot.launcherSubsystem.Launch();
+        } else {
+            robot.launcherSubsystem.Stop();
         }
     }
 

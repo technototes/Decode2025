@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.twenty403.subsystems;
 
-import static org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem.MOTOR_VELOCITY;
+import static org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem.TARGET_MOTOR_VELOCITY;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.hardware.motor.CRServo;
-import com.technototes.library.hardware.motor.EncodedMotor;
+
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Setup;
 
@@ -34,13 +33,14 @@ public class FeedingSubsystem {
 
 
     public void moveball() {
-        if (LauncherSubsystem.top.getVelocity() == MOTOR_VELOCITY) {
-            if (hasHardware) {
-                bottomRight.setPower(CRSERVO_SPEED);
-                bottomLeft.setPower(-CRSERVO_SPEED);
+        if (hasHardware) {
+            if (LauncherSubsystem.top.getVelocity() < TARGET_MOTOR_VELOCITY) {
+                // Do not feed the ball if the launcher has not reached the
+                // target velocity. We don't want bland throws.
+                return;
             }
-        } else {
-            moveball();
+            bottomRight.setPower(CRSERVO_SPEED);
+            bottomLeft.setPower(-CRSERVO_SPEED);
         }
     }
 
