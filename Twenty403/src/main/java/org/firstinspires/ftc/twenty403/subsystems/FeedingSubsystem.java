@@ -34,13 +34,11 @@ public class FeedingSubsystem {
 
     public void moveball() {
         if (hasHardware) {
-            // Doesn't work with configurable launcher velocities
-            // Also hardcodes behavior in subsystem instead of letting command do that
-//            if (LauncherSubsystem.top.getVelocity() < TARGET_MOTOR_VELOCITY) {
-//                // Do not feed the ball if the launcher has not reached the
-//                // target velocity. We don't want bland throws.
-//                return;
-//            }
+            if (LauncherSubsystem.top.getVelocity() < TARGET_MOTOR_VELOCITY) {
+                // Do not feed the ball if the launcher has not reached the
+                // target velocity. We don't want bland throws.
+                return;
+            }
             bottomRight.setPower(CRSERVO_SPEED);
             bottomLeft.setPower(-CRSERVO_SPEED);
         }
