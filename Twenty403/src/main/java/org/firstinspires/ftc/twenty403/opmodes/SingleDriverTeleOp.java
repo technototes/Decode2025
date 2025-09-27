@@ -46,7 +46,6 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
     public Setup setup;
     public DriverController controls;
     public Hardware hardware;
-    private boolean launchOn;
     private Limelight3A limelight;
     private LauncherSubsystem launcherSubsystem;
     // For Panels controller widget the two lines below

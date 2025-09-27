@@ -63,9 +63,6 @@ public class DriverController {
         if (Setup.Connected.LIMELIGHT){
             bindPipelineControls();
         }
-        if (Setup.Connected.FEED){
-            bindFeedControls();
-        }
     }
 
     private void AssignNamedControllerButton() {
