@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem.Dri
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.hardware.motor.EncodedMotor;
@@ -156,7 +155,7 @@ public class DrivebaseSubsystem
         EncodedMotor<DcMotorEx> rl,
         EncodedMotor<DcMotorEx> rr,
         IGyro i,
-        OTOSLocalizer l
+        RROTOSLocalizer l
     ) {
         super(fl, fr, rl, rr, i, () -> DriveConstants.class);
         fl2 = fl;

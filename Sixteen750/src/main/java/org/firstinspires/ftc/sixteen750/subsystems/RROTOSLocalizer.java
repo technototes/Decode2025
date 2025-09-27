@@ -6,11 +6,11 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.Localizer;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
-public class OTOSLocalizer implements Localizer {
+public class RROTOSLocalizer implements Localizer {
 
     SparkFunOTOS sparky;
 
-    public OTOSLocalizer(SparkFunOTOS sparky) {
+    public RROTOSLocalizer(SparkFunOTOS sparky) {
         this.sparky = sparky;
         sparky.initialize();
     }
