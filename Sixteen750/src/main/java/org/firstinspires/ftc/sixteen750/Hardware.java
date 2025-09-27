@@ -5,6 +5,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.hardware.sensor.AdafruitIMU;
 import com.technototes.library.hardware.sensor.IGyro;
@@ -20,7 +21,7 @@ public class Hardware implements Loggable {
     public List<LynxModule> hubs;
 
     public IGyro imu;
-    public EncodedMotor<DcMotorEx> fl, fr, rl, rr;
+    public EncodedMotor<DcMotorEx> fl, fr, rl, rr,testMotor;
     public EncodedMotor intake;
     public EncodedMotor launcher1;
     public EncodedMotor launcher2;
@@ -29,6 +30,8 @@ public class Hardware implements Loggable {
     public Servo lever;
     public MotorEncoder odoF, odoR;
     public SparkFunOTOS odo;
+    public CRServo testCRServo;
+    public Servo testServo;
 
     /* Put other hardware here! */
 
@@ -69,6 +72,11 @@ public class Hardware implements Loggable {
         }
         if (Setup.Connected.BRAKESUBSYSTEM){
             brake = new Servo(Setup.HardwareNames.BRAKE_SERVO);
+        }
+        if (Setup.Connected.TESTSUBSYSTEM) {
+            testMotor = new EncodedMotor<>(Setup.HardwareNames.TESTMOTOR);
+            testCRServo = new CRServo(Setup.HardwareNames.TESTCRSERVO);
+            testServo = new Servo(Setup.HardwareNames.TESTSERVO);
         }
     }
 

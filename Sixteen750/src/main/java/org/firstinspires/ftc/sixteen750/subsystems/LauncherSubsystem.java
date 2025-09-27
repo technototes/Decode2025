@@ -11,7 +11,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 @Configurable
 public class LauncherSubsystem {
 
-    public static double MOTOR_VELOCITY = 0.25; // 0.5 1.0
+    public static double MOTOR_VELOCITY = 1; // 0.5 1.0
     boolean hasHardware;
     EncodedMotor<DcMotorEx> launcher1;
     EncodedMotor<DcMotorEx> launcher2;
@@ -23,8 +23,8 @@ public class LauncherSubsystem {
         if (hasHardware) {
             launcher1 = h.launcher1;
             launcher2 = h.launcher2;
-            launcher1.setDirection(DcMotorSimple.Direction.FORWARD);
-            launcher2.setDirection(DcMotorSimple.Direction.REVERSE);
+            launcher1.setDirection(DcMotorSimple.Direction.REVERSE);
+            launcher2.setDirection(DcMotorSimple.Direction.FORWARD);
             launcher1.coast();
             launcher2.coast();
         } else {

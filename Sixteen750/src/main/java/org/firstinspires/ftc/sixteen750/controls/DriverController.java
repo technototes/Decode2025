@@ -19,7 +19,7 @@ public class DriverController {
     public CommandGamepad gamepad;
 
     public Stick driveLeftStick, driveRightStick;
-    public CommandButton resetGyroButton, turboButton, snailButton, launchButton, spitButton, leverButton, brakeButton;
+    public CommandButton resetGyroButton, turboButton, snailButton, launchButton, spitButton, leverButton, brakeButton, hoodButton;
     public CommandButton override;
     public CommandAxis driveStraighten;
     public CommandAxis drive45;
@@ -42,7 +42,9 @@ public class DriverController {
         if (Setup.Connected.BRAKESUBSYSTEM) {
             bindBrakeControls();
         }
-
+        if (Setup.Connected.AIMINGSUBSYSTEM) {
+            bindAimControls();
+        }
     }
 
     private void AssignNamedControllerButton() {
@@ -57,6 +59,7 @@ public class DriverController {
         spitButton = gamepad.ps_square;
         leverButton = gamepad.ps_cross;
         brakeButton = gamepad.ps_triangle;
+        hoodButton = gamepad.dpadUp;
     }
 
     public void bindDriveControls() {
@@ -81,13 +84,34 @@ public class DriverController {
         launchButton.whenReleased(TeleCommands.Stop(robot.launcherSubsystem));
     }
     public void bindIntakeControls() {
-        spitButton.whenPressed(TeleCommands.Spit(robot.intakeSubsystem));
-        spitButton.whenReleased(TeleCommands.Intake(robot.intakeSubsystem));
+        spitButton.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
+        spitButton.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
     }
     public void bindBrakeControls() {
         brakeButton.whenPressed(new CycleCommandGroup(
                 TeleCommands.EngageBrake(robot.brakeSubsystem),
                 TeleCommands.DisengageBrake(robot.brakeSubsystem)
+        ));
+    }
+
+    public void bindAimControls(){
+        boolean yippee = true;
+
+                if(yippee) {
+                    leverButton.whenPressed(
+                    TeleCommands.LeverStop(robot.aimingSubsystem));
+                    yippee = false;
+                }
+                else {
+                    leverButton.whenPressed(
+                    TeleCommands.LeverGo(robot.aimingSubsystem));
+                    yippee = true;
+                }
+
+
+        hoodButton.whenPressed(new CycleCommandGroup(
+                TeleCommands.HoodUp(robot.aimingSubsystem),
+                TeleCommands.HoodDown(robot.aimingSubsystem)
         ));
     }
 }
