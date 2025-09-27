@@ -29,7 +29,6 @@ public class DriverController {
     public CommandAxis angleTrigger;
     public CommandButton launch;
     public CommandButton moveballup;
-    public CommandButton moveballupandlaunch;
     public CommandButton pipelineMode;
     public CommandButton barcodePipeline;
     public CommandButton GreencolorPipeline;
@@ -55,11 +54,11 @@ public class DriverController {
         if (Setup.Connected.LAUNCHER) {
             bindLaunchControls();
         }
-        if (Setup.Connected.LIMELIGHT){
-            bindPipelineControls();
-        }
         if (Setup.Connected.FEED){
             bindFeedControls();
+        }
+        if (Setup.Connected.LIMELIGHT){
+            bindPipelineControls();
         }
     }
 
@@ -73,12 +72,9 @@ public class DriverController {
         angleTrigger = gamepad.leftTrigger;
         moveballup = gamepad.ps_square;
         launch = gamepad.ps_triangle;
-        moveballupandlaunch = gamepad.ps_circle;
         pipelineMode = gamepad.dpadUp;
-        barcodePipeline = gamepad.ps_square;
         GreencolorPipeline = gamepad.ps_cross;
-        classifierPipeline = gamepad.ps_circle;
-        objectPipeline = gamepad.ps_triangle;
+        PurplecolorPipeline = gamepad.ps_circle;
         apriltagPipeline = gamepad.dpadRight;
         AutoAim = gamepad.dpadDown;
 

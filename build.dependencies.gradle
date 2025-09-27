@@ -17,8 +17,7 @@ repositories {
     // alternatively you can add `142.251.33.115 maven.brott.dev` to your etc/hosts, `nslookup ghs.googlehosted.com` to get the latest IP address
     maven { url = 'https://acmerobotics.z13.web.core.windows.net/' }
 
-    // Stuff for Pedro pathing
-    maven { url = 'https://maven.pedropathing.com' }
+    // Panels dashbboard
     maven { url = "https://mymaven.bylazar.com/releases" }
 }
 
@@ -45,8 +44,8 @@ dependencies {
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
 
     // Adding support for Pedro Pathing
-    implementation 'com.pedropathing:ftc:2.0.1'
-    implementation 'com.pedropathing:telemetry:0.0.6'
+    implementation 'com.pedropathing:ftc:2.0.2'
+    implementation 'com.pedropathing:telemetry:1.0.0'
     implementation 'com.bylazar:fullpanels:1.0.6'
 
 }
