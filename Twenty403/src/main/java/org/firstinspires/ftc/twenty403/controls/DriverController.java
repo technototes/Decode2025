@@ -58,6 +58,9 @@ public class DriverController {
         if (Setup.Connected.LIMELIGHT){
             bindPipelineControls();
         }
+        if (Setup.Connected.FEED){
+            bindFeedControls();
+        }
     }
 
     private void AssignNamedControllerButton() {
@@ -109,12 +112,13 @@ public class DriverController {
             launch.whilePressed(robot.launcherSubsystem::Launch);
             launch.whenReleased(robot.launcherSubsystem::Stop);
 
-            moveballup.whenPressed(robot.launcherSubsystem::moveball);
-            moveballup.whenReleased(robot.launcherSubsystem::Stop);
 
-            moveballupandlaunch.whenPressed(robot.launcherSubsystem::everything);
-            moveballupandlaunch.whenReleased(robot.launcherSubsystem::Stop);
+
         }
+    }
+    public void bindFeedControls() {
+        moveballup.whilePressed(robot.feedingSubsystem::moveball);
+        moveballup.whenReleased(robot.feedingSubsystem::stop);
     }
     public void bindPipelineControls() {
         pipelineMode.whenPressed(this::togglePipelineMode);

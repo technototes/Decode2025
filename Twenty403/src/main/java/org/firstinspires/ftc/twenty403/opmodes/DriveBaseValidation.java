@@ -10,6 +10,8 @@ import com.technototes.library.hardware.motor.CRServo;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.subsystems.TestSubsystem;
 
+import java.util.Set;
+
 @Configurable
 @TeleOp(name = "Drivebase Testbed")
 public class DriveBaseValidation extends LinearOpMode {
@@ -25,6 +27,9 @@ public class DriveBaseValidation extends LinearOpMode {
         DcMotorEx fl = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.FLMOTOR);
         DcMotorEx rr = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.RRMOTOR);
         DcMotorEx rl = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.RLMOTOR);
+        DcMotorEx launch = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.TOP);
+        com.qualcomm.robotcore.hardware.CRServo bl = this.hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.BOTTOML);
+        com.qualcomm.robotcore.hardware.CRServo br = this.hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.BOTTOMR);
         fl.setDirection(DcMotorSimple.Direction.FORWARD);
         rl.setDirection(DcMotorSimple.Direction.FORWARD);
         rr.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -54,17 +59,20 @@ public class DriveBaseValidation extends LinearOpMode {
             } else {
                 rr.setPower(0);
             }
-            if (gamepad1.circle) {
-                ts.setServo();
+            if (gamepad1.cross) {
+                launch.setPower(5);
+            } else {
+                launch.setPower(0);
             }
             if(gamepad1.square){
-                ts.spinCRServo();
+                br.setPower(-1);
+            } else {
+                br.setPower(0);
             }
             if (gamepad1.triangle){
-                ts.spinMotor();
-            }
-            if (gamepad1.cross){
-                ts.Stop();
+                bl.setPower(1);
+            } else {
+                bl.setPower(0);
             }
         }
     }
