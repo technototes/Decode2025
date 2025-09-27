@@ -47,7 +47,6 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
     public DriverController controls;
     public Hardware hardware;
     private Limelight3A limelight;
-    private LauncherSubsystem launcherSubsystem;
     // For Panels controller widget the two lines below
     private final GamepadManager driverManager = PanelsGamepad.INSTANCE.getFirstManager();
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -60,6 +59,9 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
+        if (Setup.Connected.LAUNCHER) {
+            controls.Launch();
+        }
         if (Setup.Connected.LIMELIGHT) {
             limelight = hardware.limelight;
             limelight.setPollRateHz(100);
