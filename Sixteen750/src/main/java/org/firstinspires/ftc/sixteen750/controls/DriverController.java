@@ -19,7 +19,7 @@ public class DriverController {
     public CommandGamepad gamepad;
 
     public Stick driveLeftStick, driveRightStick;
-    public CommandButton resetGyroButton, turboButton, snailButton, launchButton, spitButton, leverButton, brakeButton;
+    public CommandButton resetGyroButton, turboButton, snailButton, launchButton, spitButton, leverButton, brakeButton, intakeButton;
     public CommandButton override;
     public CommandAxis driveStraighten;
     public CommandAxis drive45;
@@ -56,7 +56,8 @@ public class DriverController {
         launchButton = gamepad.ps_circle;
         spitButton = gamepad.ps_square;
         leverButton = gamepad.ps_cross;
-        brakeButton = gamepad.ps_triangle;
+        brakeButton = gamepad.ps_share;
+        intakeButton = gamepad.ps_triangle;
     }
 
     public void bindDriveControls() {
@@ -82,7 +83,9 @@ public class DriverController {
     }
     public void bindIntakeControls() {
         spitButton.whenPressed(TeleCommands.Spit(robot.intakeSubsystem));
-        spitButton.whenReleased(TeleCommands.Intake(robot.intakeSubsystem));
+        spitButton.whenReleased(TeleCommands.Hold(robot.intakeSubsystem));
+        intakeButton.whenPressed(TeleCommands.Intake(robot.intakeSubsystem));
+        intakeButton.whenReleased(TeleCommands.Hold(robot.intakeSubsystem));
     }
     public void bindBrakeControls() {
         brakeButton.whenPressed(new CycleCommandGroup(

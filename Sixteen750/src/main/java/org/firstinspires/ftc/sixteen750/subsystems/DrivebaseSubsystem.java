@@ -35,10 +35,10 @@ public class DrivebaseSubsystem
         public static double MOTOR_THRESHOLD = 0.2;
 
         @TicksPerRev
-        public static final double TICKS_PER_REV = 385.6; // previous: 537.6
+        public static final double TICKS_PER_REV = 145.6; // previous: 537.6
 
         @MaxRPM
-        public static final double MAX_RPM = 435; // 2021: 6000;
+        public static final double MAX_RPM = 1150; // 2021: 6000;
 
         public static double MAX_TICKS_PER_SEC = (TICKS_PER_REV * MAX_RPM) / 60.0;
 
@@ -54,17 +54,17 @@ public class DrivebaseSubsystem
         );
 
         @WheelRadius
-        public static double WHEEL_RADIUS = 1.88976; // in
+        public static double WHEEL_RADIUS = 2.04724409; // in
 
         @GearRatio
-        public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed og: 1 / 19.2;
+        public static double GEAR_RATIO = 0.380952381; // output (wheel) speed / input (motor) speed og: 1 / 19.2;
 
         //gear ration is actually .667 but i think it might mess up what we already have
         @TrackWidth
-        public static double TRACK_WIDTH = 13.5; // 2021: 10; // in
+        public static double TRACK_WIDTH = 8; // 2021: 10; // in
 
         @WheelBase
-        public static double WHEEL_BASE = 12.75; // in
+        public static double WHEEL_BASE = 1; // in
 
         @KV
         public static double kV =
