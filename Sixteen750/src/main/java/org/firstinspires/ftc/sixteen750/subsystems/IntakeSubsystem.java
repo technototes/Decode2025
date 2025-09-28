@@ -12,7 +12,9 @@ import org.firstinspires.ftc.sixteen750.Setup;
 @Configurable
 public class IntakeSubsystem {
 
-    public static double MOTOR_VELOCITY = 0.25; // 0.5 1.0
+    public static double INTAK_VELO = 0.5; // 0.5 1.0
+    public static double SPIT_VELO =0.3;
+    public static double HOLD_VELO = 0.25;
     boolean hasHardware;
     EncodedMotor<DcMotorEx> intake;
 
@@ -30,18 +32,22 @@ public class IntakeSubsystem {
     public void Intake() {
         // Spin the motors
         if (hasHardware) {
-            intake.setVelocity(MOTOR_VELOCITY);
+            intake.setVelocity(INTAK_VELO);
         }
     }
     public void Spit() {
         // Spin the motors
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake.setVelocity(MOTOR_VELOCITY);
+            intake.setVelocity(SPIT_VELO);
         }
     }
-
-
+public void Hold() {
+    if (hasHardware) {
+        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake.setVelocity(HOLD_VELO);
+    }
+}
 
     public void Stop() {
         if (hasHardware) {

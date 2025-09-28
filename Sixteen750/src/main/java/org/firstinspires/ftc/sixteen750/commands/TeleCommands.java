@@ -24,6 +24,9 @@ public class TeleCommands {
     public static Command Spit(IntakeSubsystem is) {
         return Command.create(is::Spit);
     }
+    public static Command Hold(IntakeSubsystem is) {
+        return Command.create(is::Hold);
+    }
 
     public static Command EngageBrake(BrakeSubsystem bs) {
         return Command.create(bs::Engage);
