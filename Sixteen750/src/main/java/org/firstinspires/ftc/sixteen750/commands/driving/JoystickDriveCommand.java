@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.sixteen750.commands.driving;
 
+import static org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem.DriveConstants.faceTagMode;
+
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Loggable;
@@ -22,6 +26,8 @@ public class JoystickDriveCommand implements Command, Loggable {
     public DoubleSupplier drive45;
     public boolean driverDriving;
     public boolean operatorDriving;
+    private Limelight3A limelight;
+
 
     public JoystickDriveCommand(
         DrivebaseSubsystem sub,
@@ -56,6 +62,18 @@ public class JoystickDriveCommand implements Command, Loggable {
         boolean fortyfiveTrigger;
         straightTrigger = isTriggered(driveStraighten);
         fortyfiveTrigger = isTriggered(drive45);
+        if (faceTagMode) {
+
+            // --- Face AprilTag using Limelight ---
+            LLResult result = limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+                double tx = result.getTx(); // horizontal offset in degrees
+                double kP_TagAlign = 0.03;  // tune this gain
+                return -kP_TagAlign * tx;   // rotate until tx ~ 0
+            } else {
+                return 0.0; // no target → don't spin
+            }
+        }
         if (!straightTrigger && !fortyfiveTrigger) {
             // No straighten override: return the stick value
             // (with some adjustment...)
