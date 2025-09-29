@@ -23,6 +23,7 @@ public class DriverController {
     public CommandButton override;
     public CommandAxis driveStraighten;
     public CommandAxis drive45;
+    public CommandButton AutoOrient;
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
@@ -60,6 +61,7 @@ public class DriverController {
         leverButton = gamepad.ps_cross;
         brakeButton = gamepad.ps_triangle;
         hoodButton = gamepad.dpadUp;
+        AutoOrient = gamepad.dpadDown;
     }
 
     public void bindDriveControls() {
@@ -78,6 +80,9 @@ public class DriverController {
         snailButton.whenPressed(DrivingCommands.SnailDriving(robot.drivebase));
         snailButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(robot.drivebase));
+        if (Setup.Connected.LIMELIGHT){
+            AutoOrient.whenPressed(DrivingCommands.AutoOrient(robot.drivebase));
+        }
     }
     public void bindLaunchControls() {
         launchButton.whenPressed(TeleCommands.Launch(robot.launcherSubsystem));

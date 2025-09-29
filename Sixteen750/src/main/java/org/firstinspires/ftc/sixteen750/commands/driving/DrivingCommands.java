@@ -16,6 +16,9 @@ public class DrivingCommands {
     public static Command TurboDriving(DrivebaseSubsystem ds) {
         return Command.create(ds::setTurboMode);
     }
+    public static Command AutoOrient(DrivebaseSubsystem ds){
+        return Command.create(ds::enableFaceTagMode);
+    }
 
     public static Command NormalSpeed(DrivebaseSubsystem ds) {
         return Command.create(ds::auto);
