@@ -2,6 +2,7 @@ package org.firstinspires.ftc.sixteen750.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.hardware.servo.Servo;
+import com.technototes.library.logger.Log;
 
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
@@ -11,6 +12,7 @@ public class BrakeSubsystem {
 
     public static double BRAKE_POS = 0.5; // 0.5 1.0
     public static double GO_POS = 0.1;
+    public double brakePos;
     boolean hasHardware;
     Servo brake;
 
