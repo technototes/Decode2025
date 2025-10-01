@@ -2,6 +2,8 @@ package org.firstinspires.ftc.sixteen750.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.hardware.servo.Servo;
+import com.technototes.library.logger.Log;
+import com.technototes.library.logger.LogConfig;
 
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
@@ -15,6 +17,8 @@ public class AimingSubsystem {
 
     public static double LEVER_POS = 0.7;
     public static double LEVER_POS_GO = 0.2;
+    public double leverPos;
+    public double hoodPos;
     boolean hasHardware;
     Servo hood;
     Servo lever;
