@@ -34,6 +34,7 @@ public class DrivebaseSubsystem
         public static double AUTO_MOTOR_SPEED = 0.9;
         public static double TRIGGER_THRESHOLD = 0.7;
         public static double MOTOR_THRESHOLD = 0.2;
+        public static boolean faceTagMode = false;
 
         @TicksPerRev
         public static final double TICKS_PER_REV = 385.6; // previous: 537.6
@@ -247,4 +248,8 @@ public class DrivebaseSubsystem
         Turbo = false;
     }
     // Stuff below is used for tele-op trajectory motion
+
+    public void enableFaceTagMode() {
+        DriveConstants.faceTagMode = !DriveConstants.faceTagMode;
+    }
 }
