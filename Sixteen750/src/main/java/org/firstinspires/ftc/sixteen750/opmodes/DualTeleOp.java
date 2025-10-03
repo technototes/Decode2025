@@ -37,14 +37,12 @@ public class DualTeleOp extends CommandOpMode {
             // Just pick a starting point
             robot.drivebase.setPoseEstimate(HeadingHelper.getSavedPose());
             CommandScheduler.scheduleForState(
-                DrivingCommands.ResetGyro(robot.drivebase),
-                OpModeState.INIT
+                    DrivingCommands.ResetGyro(robot.drivebase),
+                    OpModeState.INIT
             );
-        }
-        if (Setup.Connected.INTAKESUBSYSTEM) {
             CommandScheduler.scheduleForState(
-                TeleCommands.Intake(robot.intakeSubsystem),
-                OpModeState.RUN
+                    TeleCommands.Intake(robot.intakeSubsystem),
+                    OpModeState.RUN
             );
         }
     }
