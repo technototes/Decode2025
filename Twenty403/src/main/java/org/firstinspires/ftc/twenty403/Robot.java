@@ -29,6 +29,9 @@ public class Robot implements Loggable {
     @Log(name = "R")
     public double rv;
 
+    @Log(name = "Launcher")
+    public double launcherVelociy;
+
     public StartingPosition position;
     public Alliance alliance;
     public double initialVoltage;

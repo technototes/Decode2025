@@ -28,6 +28,8 @@ public class DriverController {
     public CommandAxis straightTrigger;
     public CommandAxis angleTrigger;
     public CommandButton launch;
+    public CommandButton launchFaster;
+    public CommandButton launchSlower;
     public CommandButton moveballup;
     public CommandButton pipelineMode;
     public CommandButton barcodePipeline;
@@ -75,7 +77,9 @@ public class DriverController {
         launch = gamepad.ps_triangle;
         pipelineMode = gamepad.dpadUp;
         GreencolorPipeline = gamepad.ps_cross;
+        launchSlower = gamepad.ps_cross;
         PurplecolorPipeline = gamepad.ps_circle;
+        launchFaster = gamepad.ps_circle;
         apriltagPipeline = gamepad.dpadRight;
         AutoAim = gamepad.dpadDown;
 
@@ -106,6 +110,8 @@ public class DriverController {
 
     public void bindLaunchControls() {
         launch.whenPressed(this::setLaunch);
+        launchSlower.whenPressed(this::launchSlower);
+        launchFaster.whenPressed(this::launchFaster);
     }
     public void bindFeedControls() {
         moveballup.whilePressed(robot.feedingSubsystem::moveball);
@@ -124,7 +130,19 @@ public class DriverController {
     }
     public void setLaunch(){
         launchOn = !launchOn;
+        Launch();
     }
+
+    public void launchFaster()
+    {
+        robot.launcherSubsystem.IncreaseVelocity();
+    }
+
+    public void launchSlower()
+    {
+        robot.launcherSubsystem.DecreaseVelocity();
+    }
+
     public void Launch() {
         if (launchOn) {
             robot.launcherSubsystem.Launch();
