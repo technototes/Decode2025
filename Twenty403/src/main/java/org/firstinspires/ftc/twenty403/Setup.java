@@ -19,6 +19,7 @@ public class Setup {
         public static boolean LAUNCHER = true;
         public static boolean FEED = true;
         public static boolean LIMELIGHT = false;
+        public static boolean OTOS = false;
     }
 
     @Configurable
