@@ -27,7 +27,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class AutoConstants {
 
-    public static double botWeightKg = 0.0;
+    public static double botWeightKg = 9.44;
     public static double xvelocity = 0.0;
     public static double yvelocity = 0.0;
     public static double fdeceleration = 0.0;
@@ -37,6 +37,21 @@ public class AutoConstants {
     public static double rti = 0.0;
     public static double ls = 0.0;
     public static double as = 0.0;
+    public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
+            .forwardTicksToInches(0.6)
+            .strafeTicksToInches(-0.19)
+            .turnTicksToInches(-0.018) //-0.018
+            .robotLength(10.28)
+            .robotWidth(7.625)
+            .rightFrontMotorName("fr")
+            .rightRearMotorName("rr")
+            .leftRearMotorName("rl")
+            .leftFrontMotorName("fl")
+            .leftFrontEncoderDirection(Encoder.FORWARD)
+            .leftRearEncoderDirection(Encoder.FORWARD)
+            .rightFrontEncoderDirection(Encoder.REVERSE)
+            .rightRearEncoderDirection(Encoder.REVERSE);
+
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
@@ -85,7 +100,9 @@ public class AutoConstants {
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
-            .OTOSLocalizer(getLocalizerConstants())
+            //.OTOSLocalizer(getLocalizerConstants())
+                .mecanumDrivetrain(getDriveConstants())
+                .driveEncoderLocalizer(localizerConstants)
             .build();
     }
 

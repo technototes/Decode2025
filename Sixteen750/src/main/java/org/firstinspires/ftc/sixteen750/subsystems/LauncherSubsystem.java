@@ -11,7 +11,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 @Configurable
 public class LauncherSubsystem {
 
-    public static double MOTOR_VELOCITY = 0.6; // 0.5 1.0
+    public static double MOTOR_VELOCITY = 0.4; // 0.5 1.0
     boolean hasHardware;
     EncodedMotor<DcMotorEx> launcher1;
     EncodedMotor<DcMotorEx> launcher2;

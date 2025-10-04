@@ -12,6 +12,7 @@ public class BrakeSubsystem {
 
     public static double BRAKE_POS = 0.5; // 0.5 1.0
     public static double GO_POS = 0.1;
+    @Log(name = "brakePos")
     public double brakePos;
     boolean hasHardware;
     Servo brake;
@@ -25,15 +26,18 @@ public class BrakeSubsystem {
             brake = null;
         }
     }
-
-    public void Engage() {
+    public void setBrakePos(double w){
         if (hasHardware) {
-            brake.setPosition(BRAKE_POS);
+            brakePos = w;
+            brake.setPosition(w);
         }
     }
+
+    public void Engage() {
+        setBrakePos(BRAKE_POS);
+    }
     public void Disengage() {
-        if (hasHardware) {
-            brake.setPosition(GO_POS);
-        }
+        setBrakePos(GO_POS);
+
     }
 }

@@ -12,7 +12,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 @Configurable
 public class IntakeSubsystem {
 
-    public static double MOTOR_VELOCITY = 0.25; // 0.5 1.0
+    public static double MOTOR_VELOCITY = 1; // 0.5 1.0
     boolean hasHardware;
     EncodedMotor<DcMotorEx> intake;
 
@@ -42,7 +42,7 @@ public class IntakeSubsystem {
         }
     }
 
-    public void Stop() {
+    public void StopIntake() {
         if (hasHardware) {
             intake.setVelocity(0);
         }

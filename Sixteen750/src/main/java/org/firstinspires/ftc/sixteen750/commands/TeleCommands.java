@@ -20,6 +20,9 @@ public class TeleCommands {
     public static Command Intake(IntakeSubsystem is) {
         return Command.create(is::Intake);
     }
+    public static Command IntakeStop(IntakeSubsystem is) {
+        return Command.create(is::StopIntake);
+    }
 
     public static Command Spit(IntakeSubsystem is) {
         return Command.create(is::Spit);
