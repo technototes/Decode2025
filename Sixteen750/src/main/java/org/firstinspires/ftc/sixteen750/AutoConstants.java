@@ -29,13 +29,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class AutoConstants {
 
     // note these need to be tuned
-    public static double botWeightKg = 0.0;
+    public static double botWeightKg = 9.33;
     public static double xvelocity = 0.0;
     public static double yvelocity = 0.0;
     public static double fowarddeceleration = 0.0;
     public static double lateraldeceleration = 0.0;
     public static double linearscalar = 0.0;
     public static double angularscalar = 0.0;
+    public static Pose2d offset = new Pose2d(3,3,90);
 
     public static FollowerConstants followerConstants = new FollowerConstants()
             // tune these
