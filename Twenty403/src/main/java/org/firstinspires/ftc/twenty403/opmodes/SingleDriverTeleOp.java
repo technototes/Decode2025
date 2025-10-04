@@ -59,9 +59,6 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
-        if (Setup.Connected.LAUNCHER) {
-            controls.Launch();
-        }
         if (Setup.Connected.LIMELIGHT) {
             limelight = hardware.limelight;
             limelight.setPollRateHz(100);
@@ -89,6 +86,9 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
     @Override
     public void runLoop() {
         LLStatus status = null;
+        if (Setup.Connected.LAUNCHER) {
+            controls.Launch();
+        }
         if (Setup.Connected.LIMELIGHT) {
             status = limelight.getStatus();
             limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
