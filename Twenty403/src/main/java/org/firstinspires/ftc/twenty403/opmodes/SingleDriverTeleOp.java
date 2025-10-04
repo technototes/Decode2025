@@ -59,9 +59,6 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
-        if (Setup.Connected.LAUNCHER) {
-            controls.Launch();
-        }
         if (Setup.Connected.LIMELIGHT) {
             limelight = hardware.limelight;
             limelight.setPollRateHz(100);
