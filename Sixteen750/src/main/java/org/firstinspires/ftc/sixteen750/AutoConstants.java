@@ -31,6 +31,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class AutoConstants {
 
+    // note these need to be tuned
     public static double botWeightKg = 9.44;
     public static double xvelocity = 0.0;
     public static double yvelocity = 0.0;
@@ -42,11 +43,18 @@ public class AutoConstants {
     public static double turnTicksToInches = -0.018;
     public static double robotLength = 10.28;
     public static double robotWidth = 7.625;
-    public static SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(1.50, 0.0,180);
+    public static SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(1.50, 0.0, 180);
+    public static double linearscalar = -1.08;
+    public static double angularscalar = 0.9;
     public static PIDFCoefficients headingPIDF = new PIDFCoefficients(1, 0, 0, 0.01);
     public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
     //public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
     //public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
+
+    public static double TValueConstraint = 0.99;
+    public static double timeoutConstraint = 100;
+    public static double brakingStrength = 1.0;
+    public static double brakingStart = 1.0;
 
     // Need to explain SIOF to students.
     // (Hurray for programming languages never quite doing what you expect)
@@ -68,7 +76,7 @@ public class AutoConstants {
     }
 
     public static FollowerConstants getFollowerConstants() {
-            // tune these
+        // tune these
         return new FollowerConstants()
             .mass(botWeightKg)
             .forwardZeroPowerAcceleration(fwdDeceleration)
@@ -78,7 +86,12 @@ public class AutoConstants {
     }
 
     public static PathConstraints getPathConstraints() {
-        return new PathConstraints(0.99, 100, 1, 1);
+        return new PathConstraints(
+            TValueConstraint,
+            timeoutConstraint,
+            brakingStrength,
+            brakingStart
+        );
     }
 
     public static MecanumConstants getDriveConstants() {
@@ -96,6 +109,15 @@ public class AutoConstants {
             .yVelocity(yvelocity);
     }
 
+    public static OTOSConstants getOTOSConstants() {
+        return new OTOSConstants()
+            .hardwareMapName(OTOS)
+            .linearUnit(DistanceUnit.INCH)
+            .angleUnit(AngleUnit.RADIANS)
+            // need to tune for OTOS localization
+            .linearScalar(linearscalar)
+            .angularScalar(angularscalar);
+    }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, OTOS);
@@ -106,16 +128,6 @@ public class AutoConstants {
             .mecanumDrivetrain(getDriveConstants())
             //.driveEncoderLocalizer(getEncoderConstants())
             .build();
-    }
-
-    public static OTOSConstants getOTOSConstants() {
-        return new OTOSConstants()
-            .hardwareMapName(OTOS)
-            .linearUnit(DistanceUnit.INCH)
-            .linearScalar(-1.08)
-            .angularScalar(0.9) // 0.9 1.08
-            .offset(offset)
-            .angleUnit(AngleUnit.RADIANS);
     }
 
     //New testing constants for this year's game
