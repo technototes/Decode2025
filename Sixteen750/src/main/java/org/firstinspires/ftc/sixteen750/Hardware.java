@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.sixteen750;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -23,7 +24,7 @@ public class Hardware implements Loggable {
     public List<LynxModule> hubs;
 
     public IGyro imu;
-    public EncodedMotor<DcMotorEx> fl, fr, rl, rr,testMotor;
+    public EncodedMotor<DcMotorEx> fl, fr, rl, rr, testMotor;
     public EncodedMotor intake;
     public EncodedMotor launcher1;
     public EncodedMotor launcher2;
@@ -34,6 +35,7 @@ public class Hardware implements Loggable {
     public SparkFunOTOS odo;
     public CRServo testCRServo;
     public Servo testServo;
+    public Limelight3A limelight;
 
     /* Put other hardware here! */
 
@@ -61,24 +63,27 @@ public class Hardware implements Loggable {
         if (Setup.Connected.OTOS) {
             odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         }
-        if (Setup.Connected.INTAKESUBSYSTEM){
+        if (Setup.Connected.INTAKESUBSYSTEM) {
             intake = new EncodedMotor(Setup.HardwareNames.INTAKE_MOTOR);
         }
-        if (Setup.Connected.LAUNCHERSUBSYSTEM){
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             launcher1 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR1);
             launcher2 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR2);
         }
-        if (Setup.Connected.AIMINGSUBSYSTEM){
+        if (Setup.Connected.AIMINGSUBSYSTEM) {
             hood = new Servo(Setup.HardwareNames.HOOD_SERVO);
             lever = new Servo(Setup.HardwareNames.LEVER_SERVO);
         }
-        if (Setup.Connected.BRAKESUBSYSTEM){
+        if (Setup.Connected.BRAKESUBSYSTEM) {
             brake = new Servo(Setup.HardwareNames.BRAKE_SERVO);
         }
         if (Setup.Connected.TESTSUBSYSTEM) {
             testMotor = new EncodedMotor<>(Setup.HardwareNames.TESTMOTOR);
             testCRServo = new CRServo(Setup.HardwareNames.TESTCRSERVO);
             testServo = new Servo(Setup.HardwareNames.TESTSERVO);
+        }
+        if (Setup.Connected.LIMELIGHT) {
+            limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         }
     }
 

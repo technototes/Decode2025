@@ -8,17 +8,16 @@ public class Setup {
     public static class Connected {
 
         public static final boolean TESTSUBSYSTEM = true;
-        public static final boolean LIMELIGHT = false;
+        public static final boolean LIMELIGHT = true;
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = false;
         public static boolean SAFETYSUBSYSTEM = false;
-        public static boolean EXTERNAL_IMU = false  ;
+        public static boolean EXTERNAL_IMU = false;
         public static boolean OTOS = true;
         public static boolean INTAKESUBSYSTEM = true;
         public static boolean LAUNCHERSUBSYSTEM = true;
         public static boolean AIMINGSUBSYSTEM = true;
         public static boolean BRAKESUBSYSTEM = false;
-
     }
 
     @Config
@@ -42,6 +41,13 @@ public class Setup {
         public static String TESTSERVO = "testservo";
         public static String TESTMOTOR = "testmotor";
         public static String TESTCRSERVO = "testcrservo";
+        public static String LIMELIGHT = "limelight";
+        public static int Green_Color_Pipeline = 0;
+        // public static int Classifier_Pipeline = 2;
+        // public static int Object_Detection_Pipeline = 3;
+        public static int AprilTag_Pipeline = 1;
+        public static int Purple_Color_Pipeline = 2;
+        public static String[] Motif = { "1", "2", "3" };
     }
 
     @Config
@@ -50,5 +56,4 @@ public class Setup {
         public static double STRAIGHTEN_DEAD_ZONE = 0.08;
         public static double TRIGGER_THRESHOLD = 0.3;
     }
-
 }
