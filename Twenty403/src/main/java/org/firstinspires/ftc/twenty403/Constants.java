@@ -61,12 +61,25 @@ public class Constants {
         .linearScalar(linearscalar)
         .angularScalar(angularscalar);
 
+    public static DriveEncoderConstants driveEncoderConstants = new DriveEncoderConstants()
+            .leftFrontMotorName(FLMOTOR)
+            .leftRearMotorName(RLMOTOR)
+            .rightFrontMotorName(FRMOTOR)
+            .rightRearMotorName(RRMOTOR)
+            .leftFrontEncoderDirection(Encoder.FORWARD)
+            .leftRearEncoderDirection(Encoder.FORWARD)
+            .rightFrontEncoderDirection(Encoder.FORWARD)
+            .rightRearEncoderDirection(Encoder.FORWARD);
     public static Follower createFollower(HardwareMap hardwareMap) {
-        return new FollowerBuilder(followerConstants, hardwareMap)
-            .pathConstraints(pathConstraints)
+        FollowerBuilder builder = new FollowerBuilder(followerConstants, hardwareMap)
+            .pathConstraints(pathConstraints);
+        if (Setup.Connected.OTOS) {
             // uncomment for otos localization and vice versa
-            .OTOSLocalizer(otosLocalizerConstants)
-            .mecanumDrivetrain(driveConstants)
+            builder = builder.OTOSLocalizer(otosLocalizerConstants);
+        } else {
+            builder = builder.driveEncoderLocalizer(driveEncoderConstants);
+        }
+        return builder.mecanumDrivetrain(driveConstants)
             .build();
     }
 }

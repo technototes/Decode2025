@@ -106,7 +106,9 @@ public class JustDrivingTeleOp extends CommandOpMode {
         /*
          * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
          */
-        limelight.start();
+        if (Setup.Connected.LIMELIGHT) {
+            limelight.start();
+        }
 
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
@@ -154,10 +156,11 @@ public class JustDrivingTeleOp extends CommandOpMode {
         if (Setup.Connected.LIMELIGHT) {
             status = limelight.getStatus();
             limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
-            if (Setup.Connected.LAUNCHER) {
-                controlsDriver.bindLaunchControls();
-            }
             controlsDriver.bindPipelineControls();
+        }
+
+        if (Setup.Connected.LAUNCHER) {
+            controlsDriver.bindLaunchControls();
         }
         // For Panels controller widget until
 //        Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
