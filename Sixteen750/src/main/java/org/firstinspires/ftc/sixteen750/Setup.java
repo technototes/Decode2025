@@ -7,6 +7,7 @@ public class Setup {
     @Config
     public static class Connected {
 
+        public static final boolean LIMELIGHT = true;
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = false;
         public static boolean SAFETYSUBSYSTEM = false;
@@ -36,6 +37,14 @@ public class Setup {
         public static String BRAKE_SERVO = "brake";
         public static String HOOD_SERVO = "hood";
         public static String LEVER_SERVO = "lever";
+        public static String LIMELIGHT = "limelight";
+        public static int Green_Color_Pipeline = 0;
+        //        public static int Classifier_Pipeline = 2;
+//        public static int Object_Detection_Pipeline = 3;
+        public static int AprilTag_Pipeline = 1;
+        public static int Purple_Color_Pipeline = 2;
+        public static String[] Motif = {"1", "2", "3"};
+
     }
 
     @Config

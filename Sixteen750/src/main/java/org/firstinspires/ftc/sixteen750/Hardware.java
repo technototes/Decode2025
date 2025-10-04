@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.sixteen750;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -29,6 +30,7 @@ public class Hardware implements Loggable {
     public Servo lever;
     public MotorEncoder odoF, odoR;
     public SparkFunOTOS odo;
+    public Limelight3A limelight;
 
     /* Put other hardware here! */
 
@@ -69,6 +71,9 @@ public class Hardware implements Loggable {
         }
         if (Setup.Connected.BRAKESUBSYSTEM){
             brake = new Servo(Setup.HardwareNames.BRAKE_SERVO);
+        }
+        if (Setup.Connected.LIMELIGHT) {
+            limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         }
     }
 
