@@ -2,6 +2,7 @@ package org.firstinspires.ftc.sixteen750;
 
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.FL_DRIVE_MOTOR;
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.FR_DRIVE_MOTOR;
+import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.OTOS;
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.RL_DRIVE_MOTOR;
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.RR_DRIVE_MOTOR;
 
@@ -27,31 +28,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class AutoConstants {
 
+    // note these need to be tuned
     public static double botWeightKg = 0.0;
     public static double xvelocity = 0.0;
     public static double yvelocity = 0.0;
-    public static double fdeceleration = 0.0;
-    public static double ldeceleration = 0.0;
-    public static double fti = 0.0;
-    public static double sti = 0.0;
-    public static double rti = 0.0;
-    public static double ls = 0.0;
-    public static double as = 0.0;
+    public static double fowarddeceleration = 0.0;
+    public static double lateraldeceleration = 0.0;
+    public static double linearscalar = 0.0;
+    public static double angularscalar = 0.0;
 
-    public static FollowerConstants getFollowerConstants() {
-        return new FollowerConstants()
+    public static FollowerConstants followerConstants = new FollowerConstants()
             // tune these
             .mass(botWeightKg)
-            .forwardZeroPowerAcceleration(fdeceleration)
-            .lateralZeroPowerAcceleration(ldeceleration);
-    }
+            .forwardZeroPowerAcceleration(fowarddeceleration)
+            .lateralZeroPowerAcceleration(lateraldeceleration);
 
-    public static PathConstraints getPathConstraints() {
-        return new PathConstraints(0.99, 100, 1, 1);
-    }
-
-    public static MecanumConstants getDriveConstants() {
-        return new MecanumConstants()
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+    public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
             .leftFrontMotorName(FL_DRIVE_MOTOR)
             .leftRearMotorName(RL_DRIVE_MOTOR)
@@ -63,39 +56,24 @@ public class AutoConstants {
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .xVelocity(xvelocity)
             .yVelocity(yvelocity);
-    }
-
     // for drive encoder localization
-    public static DriveEncoderConstants getDriveLocalizerConstants() {
-        return new DriveEncoderConstants()
-            .leftFrontMotorName(FL_DRIVE_MOTOR)
-            .leftRearMotorName(RL_DRIVE_MOTOR)
-            .rightFrontMotorName(FR_DRIVE_MOTOR)
-            .rightRearMotorName(RR_DRIVE_MOTOR)
-            .leftFrontEncoderDirection(Encoder.FORWARD)
-            .leftRearEncoderDirection(Encoder.FORWARD)
-            .rightFrontEncoderDirection(Encoder.REVERSE)
-            .rightRearEncoderDirection(Encoder.REVERSE)
-            // need to tune for drive encoder localization
-            .forwardTicksToInches(fti)
-            .strafeTicksToInches(sti)
-            .turnTicksToInches(rti);
-    }
+
+    public static OTOSConstants otosLocalizerConstants = new OTOSConstants()
+            .hardwareMapName(OTOS)
+            .linearUnit(DistanceUnit.INCH)
+            .angleUnit(AngleUnit.RADIANS)
+            // need to tune for OTOS localization
+            .linearScalar(linearscalar)
+            .angularScalar(angularscalar);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
-        return new FollowerBuilder(getFollowerConstants(), hardwareMap)
-            .pathConstraints(getPathConstraints())
-            .OTOSLocalizer(getLocalizerConstants())
-            .build();
+        return new FollowerBuilder(followerConstants, hardwareMap)
+                .pathConstraints(pathConstraints)
+                // uncomment for otos localization and vice versa
+                .OTOSLocalizer(otosLocalizerConstants)
+                .mecanumDrivetrain(driveConstants)
+                .build();
     }
-
-    public static OTOSConstants getLocalizerConstants() {
-        return new OTOSConstants()
-            .hardwareMapName("otos")
-            .linearUnit(DistanceUnit.INCH)
-            .angleUnit(AngleUnit.RADIANS);
-    }
-
     //New testing constants for this year's game
     public static ConfigurablePoseD SPLINETEST1 = new ConfigurablePoseD(0, -55, 0);
     public static ConfigurablePoseD SPLINETEST2 = new ConfigurablePoseD(55, 0, 0);
