@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.sixteen750.controls;
 
 import com.technototes.library.command.CommandScheduler;
-
 import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
@@ -19,13 +18,22 @@ public class DriverController {
     public CommandGamepad gamepad;
 
     public Stick driveLeftStick, driveRightStick;
-    public CommandButton resetGyroButton, turboButton, snailButton, launchButton, leverButton, brakeButton, hoodButton, hooddownButton, leverdownButton, leverupButton;
+    // Need to explain why this is better than a single line to students:
+    public CommandButton resetGyroButton;
+    public CommandButton turboButton;
+    public CommandButton snailButton;
+    public CommandButton launchButton;
+    public CommandButton leverButton;
+    public CommandButton brakeButton;
+    public CommandButton hoodButton;
+    public CommandButton hooddownButton;
+    public CommandButton leverdownButton;
+    public CommandButton leverupButton;
     public CommandButton override;
     public CommandAxis intakeTrigger;
     public CommandAxis spitTrigger;
     public CommandButton AutoOrient;
     public static double triggerThreshold = 0.1;
-
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
@@ -71,27 +79,27 @@ public class DriverController {
 
     public void bindDriveControls() {
         CommandScheduler.scheduleJoystick(
-            new JoystickDriveCommand(
-                robot.drivebase,
-                driveLeftStick,
-                driveRightStick
-            )
+            new JoystickDriveCommand(robot.drivebase, driveLeftStick, driveRightStick)
         );
 
-//        turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
-//        turboButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
-//        snailButton.whenPressed(DrivingCommands.SnailDriving(robot.drivebase));
-//        snailButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
+        //        turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
+        //        turboButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
+        //        snailButton.whenPressed(DrivingCommands.SnailDriving(robot.drivebase));
+        //        snailButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(robot.drivebase));
-        if (Setup.Connected.LIMELIGHT){
+        if (Setup.Connected.LIMELIGHT) {
             AutoOrient.whenPressed(DrivingCommands.AutoOrient(robot.drivebase));
         }
     }
+
     public void bindLaunchControls() {
         launchButton.whenPressed(TeleCommands.Launch(robot.launcherSubsystem));
         launchButton.whenReleased(TeleCommands.Stop(robot.launcherSubsystem));
     }
+
     public void bindIntakeControls() {
+        /* Need to explain why this doesn't work to students:
+      
         if (spitTrigger.getAsDouble() > triggerThreshold) {
             TeleCommands.Spit(robot.intakeSubsystem);
         } else {
@@ -102,37 +110,55 @@ public class DriverController {
         } else {
             TeleCommands.IntakeStop(robot.intakeSubsystem);
         }
-//        spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
-//        spitTrigger.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
+        
+        Instead, we do this:
+        (getAsButton creates a button that is "pressed" when the axis is above the threshold)
+        */
+        spitTrigger
+            .getAsButton(triggerThreshold)
+            .whenPressed(TeleCommands.Spit(robot.intakeSubsystem));
+        spitTrigger
+            .getAsButton(triggerThreshold)
+            .whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
+        intakeTrigger
+            .getAsButton(triggerThreshold)
+            .whenPressed(TeleCommands.Intake(robot.intakeSubsystem));
+        intakeTrigger
+            .getAsButton(triggerThreshold)
+            .whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
+        //        spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
+        //        spitTrigger.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
     }
+
     public void bindBrakeControls() {
-        brakeButton.whenPressed(new CycleCommandGroup(
+        brakeButton.whenPressed(
+            new CycleCommandGroup(
                 TeleCommands.EngageBrake(robot.brakeSubsystem),
                 TeleCommands.DisengageBrake(robot.brakeSubsystem)
-        ));
+            )
+        );
     }
-    boolean yippee = true;
-    public void bindAimControls(){
 
-//                if(yippee) {
-//                    leverButton.whenPressed(
-//                    TeleCommands.LeverStop(robot.aimingSubsystem));
-//                    yippee = false;
-//                }
-//                else {
-//                    leverButton.whenPressed(
-//                    TeleCommands.LeverGo(robot.aimingSubsystem));
-//                    yippee = true;
-//                }
+    boolean yippee = true;
+
+    public void bindAimControls() {
+        //                if(yippee) {
+        //                    leverButton.whenPressed(
+        //                    TeleCommands.LeverStop(robot.aimingSubsystem));
+        //                    yippee = false;
+        //                }
+        //                else {
+        //                    leverButton.whenPressed(
+        //                    TeleCommands.LeverGo(robot.aimingSubsystem));
+        //                    yippee = true;
+        //                }
         leverdownButton.whenPressed(TeleCommands.LeverGo(robot.aimingSubsystem));
         leverupButton.whenPressed(TeleCommands.LeverStop(robot.aimingSubsystem));
 
-
-
-//        hoodButton.whenPressed(new CycleCommandGroup(
-//                TeleCommands.HoodUp(robot.aimingSubsystem),
-//                TeleCommands.HoodDown(robot.aimingSubsystem)
-//        ));
+        //        hoodButton.whenPressed(new CycleCommandGroup(
+        //                TeleCommands.HoodUp(robot.aimingSubsystem),
+        //                TeleCommands.HoodDown(robot.aimingSubsystem)
+        //        ));
         hoodButton.whenPressed(TeleCommands.HoodUp(robot.aimingSubsystem));
         hooddownButton.whenPressed(TeleCommands.HoodDown(robot.aimingSubsystem));
     }
