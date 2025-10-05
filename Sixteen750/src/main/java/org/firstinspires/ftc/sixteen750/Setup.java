@@ -7,15 +7,18 @@ public class Setup {
     @Config
     public static class Connected {
 
+        public static final boolean TESTSUBSYSTEM = true;
+        public static final boolean LIMELIGHT = false;
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = false;
         public static boolean SAFETYSUBSYSTEM = false;
-        public static boolean EXTERNAL_IMU = true;
+        public static boolean EXTERNAL_IMU = false  ;
         public static boolean OTOS = true;
-        public static boolean INTAKESUBSYSTEM = false;
-        public static boolean LAUNCHERSUBSYSTEM = false;
-        public static boolean AIMINGSUBSYSTEM = false;
+        public static boolean INTAKESUBSYSTEM = true;
+        public static boolean LAUNCHERSUBSYSTEM = true;
+        public static boolean AIMINGSUBSYSTEM = true;
         public static boolean BRAKESUBSYSTEM = false;
+
     }
 
     @Config
@@ -36,6 +39,9 @@ public class Setup {
         public static String BRAKE_SERVO = "brake";
         public static String HOOD_SERVO = "hood";
         public static String LEVER_SERVO = "lever";
+        public static String TESTSERVO = "testservo";
+        public static String TESTMOTOR = "testmotor";
+        public static String TESTCRSERVO = "testcrservo";
     }
 
     @Config
