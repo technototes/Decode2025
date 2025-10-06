@@ -20,22 +20,26 @@ public class DriverController {
 
     public Stick driveLeftStick, driveRightStick;
     public CommandButton resetGyroButton;
-    public CommandButton turboButton;
     public CommandButton snailButton;
     public CommandButton launchButton;
     public CommandButton spitButton;
-    public CommandButton leverButton;
+    public CommandButton gateButton;
     public CommandButton brakeButton;
     public CommandButton hoodButton;
     public CommandButton override;
+    public CommandButton hooddownButton;
+    public CommandButton holdButton;
     public CommandAxis intakeTrigger;
-    public CommandAxis driveStraighten;
-    public CommandAxis drive45;
+    public CommandAxis spitTrigger;
+    public CommandAxis AutoOrient;
+
+    public static double triggerThreshold = 0.1;
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
         gamepad = g;
         override = g.leftTrigger.getAsButton(0.5);
+        override = g.rightTrigger.getAsButton(0.5);
 
         AssignNamedControllerButton();
         if (Setup.Connected.DRIVEBASE) {
@@ -59,34 +63,33 @@ public class DriverController {
         resetGyroButton = gamepad.ps_options;
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
-        driveStraighten = gamepad.rightTrigger;
-        intakeTrigger = gamepad.leftTrigger;
-        //drive45 = gamepad.leftTrigger;
-        turboButton = gamepad.leftBumper;
-        snailButton = gamepad.rightBumper;
-        launchButton = gamepad.ps_circle;
+        intakeTrigger = gamepad.rightTrigger;
+        // drive45 = gamepad.leftTrigger;
+        // turboButton = gamepad.leftBumper;
+        snailButton = gamepad.leftBumper;
+        launchButton = gamepad.rightBumper;
         spitButton = gamepad.ps_square;
-        leverButton = gamepad.ps_cross;
         brakeButton = gamepad.ps_triangle;
         hoodButton = gamepad.dpadUp;
+        hooddownButton = gamepad.dpadDown;
+        AutoOrient = gamepad.leftTrigger;
+        gateButton = gamepad.ps_cross;
+        holdButton = gamepad.ps_circle;
     }
 
     public void bindDriveControls() {
         CommandScheduler.scheduleJoystick(
-            new JoystickDriveCommand(
-                robot.drivebase,
-                driveLeftStick,
-                driveRightStick,
-                driveStraighten,
-                drive45
-            )
+            new JoystickDriveCommand(robot.drivebase, driveLeftStick, driveRightStick)
         );
 
-        turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
-        turboButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
+        // turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
+        // turboButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
         snailButton.whenPressed(DrivingCommands.SnailDriving(robot.drivebase));
         snailButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(robot.drivebase));
+        if (Setup.Connected.LIMELIGHT) {
+            AutoOrient.whenPressed(DrivingCommands.AutoOrient(robot.drivebase));
+        }
     }
 
     public void bindLaunchControls() {
@@ -95,15 +98,14 @@ public class DriverController {
     }
 
     public void bindIntakeControls() {
-        spitButton.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
-        spitButton.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
-        intakeTrigger
-            .getAsButton(OtherSettings.TRIGGER_THRESHOLD)
-            .whilePressed(TeleCommands.Intake(robot.intakeSubsystem));
-        intakeTrigger
-            .getAsButton(OtherSettings.TRIGGER_THRESHOLD)
-            .whileReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
+        spitButton.whenPressed(TeleCommands.Spit(robot.intakeSubsystem));
+        spitButton.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
+        intakeTrigger.whenPressed(TeleCommands.Intake(robot.intakeSubsystem));
+        intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
     }
+
+    // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
+    // spitTrigger.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
 
     public void bindBrakeControls() {
         brakeButton.whenPressed(
@@ -115,21 +117,25 @@ public class DriverController {
     }
 
     public void bindAimControls() {
-        boolean yippee = true;
+        // if(yippee) {
+        //     leverButton.whenPressed(
+        //     TeleCommands.LeverStop(robot.aimingSubsystem));
+        //     yippee = false;
+        // } else {
+        //     leverButton.whenPressed(
+        //     TeleCommands.LeverGo(robot.aimingSubsystem));
+        //     yippee = true;
+        // }
+        gateButton.whenPressed(TeleCommands.LeverGo(robot.aimingSubsystem));
+        gateButton.whenReleased(TeleCommands.LeverStop(robot.aimingSubsystem));
+        // hoodButton.whenPressed(new CycleCommandGroup(
+        //         TeleCommands.HoodUp(robot.aimingSubsystem),
+        //         TeleCommands.HoodDown(robot.aimingSubsystem)
+        // ));
+        hoodButton.whenPressed(TeleCommands.HoodUp(robot.aimingSubsystem));
+        hooddownButton.whenPressed(TeleCommands.HoodDown(robot.aimingSubsystem));
 
-        if (yippee) {
-            leverButton.whenPressed(TeleCommands.LeverStop(robot.aimingSubsystem));
-            yippee = false;
-        } else {
-            leverButton.whenPressed(TeleCommands.LeverGo(robot.aimingSubsystem));
-            yippee = true;
-        }
-
-        hoodButton.whenPressed(
-            new CycleCommandGroup(
-                TeleCommands.HoodUp(robot.aimingSubsystem),
-                TeleCommands.HoodDown(robot.aimingSubsystem)
-            )
-        );
+        holdButton.whenPressed(TeleCommands.Hold(robot.intakeSubsystem));
+        holdButton.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
     }
 }
