@@ -41,7 +41,12 @@ public class IntakeSubsystem {
             intake.setVelocity(MOTOR_VELOCITY);
         }
     }
-
+    public void Hold() {
+        if (hasHardware) {
+            intake.setDirection(DcMotorSimple.Direction.REVERSE);
+            intake.setVelocity(MOTOR_VELOCITY / 2);
+        }
+    }
     public void StopIntake() {
         if (hasHardware) {
             intake.setVelocity(0);
