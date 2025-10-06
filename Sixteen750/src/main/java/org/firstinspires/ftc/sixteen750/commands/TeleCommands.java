@@ -31,6 +31,9 @@ public class TeleCommands {
     public static Command EngageBrake(BrakeSubsystem bs) {
         return Command.create(bs::Engage);
     }
+    public static Command Hold(IntakeSubsystem bs) {
+        return Command.create(bs::Hold);
+    }
 
     public static Command DisengageBrake(BrakeSubsystem bs) {
         return Command.create(bs::Disengage);
