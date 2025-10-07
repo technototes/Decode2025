@@ -2,6 +2,7 @@ package org.firstinspires.ftc.sixteen750;
 
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.FL_DRIVE_MOTOR;
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.FR_DRIVE_MOTOR;
+import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.OTOS;
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.RL_DRIVE_MOTOR;
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.RR_DRIVE_MOTOR;
 
@@ -30,35 +31,40 @@ public class AutoConstants {
     public static double botWeightKg = 9.44;
     public static double xvelocity = 0.0;
     public static double yvelocity = 0.0;
-    public static double fdeceleration = 0.0;
-    public static double ldeceleration = 0.0;
-    public static double fti = 0.0;
-    public static double sti = 0.0;
-    public static double rti = 0.0;
-    public static double ls = 0.0;
-    public static double as = 0.0;
-    public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
-            .forwardTicksToInches(0.6)
-            .strafeTicksToInches(-0.19)
-            .turnTicksToInches(-0.018) //-0.018
-            .robotLength(10.28)
-            .robotWidth(7.625)
-            .rightFrontMotorName("fr")
-            .rightRearMotorName("rr")
-            .leftRearMotorName("rl")
-            .leftFrontMotorName("fl")
+    // Need to talk about naming constants with students:
+    public static double fwdDeceleration = 0.0;
+    public static double latDeceleration = 0.0;
+    public static double fwdTicksToInches = 0.6;
+    public static double strafeTicksToInches = -0.19;
+    public static double turnTicksToInches = -0.018;
+    public static double robotLength = 10.28;
+    public static double robotWidth = 7.625;
+
+    // Need to explain SIOF to students.
+    // (Hurray for programming languages never quite doing what you expect)
+    public static DriveEncoderConstants getEncoderConstants() {
+        return new DriveEncoderConstants()
+            .forwardTicksToInches(fwdTicksToInches)
+            .strafeTicksToInches(strafeTicksToInches)
+            .turnTicksToInches(turnTicksToInches)
+            .robotLength(robotLength)
+            .robotWidth(robotWidth)
+            .rightFrontMotorName(FR_DRIVE_MOTOR)
+            .rightRearMotorName(RR_DRIVE_MOTOR)
+            .leftRearMotorName(RL_DRIVE_MOTOR)
+            .leftFrontMotorName(FL_DRIVE_MOTOR)
             .leftFrontEncoderDirection(Encoder.FORWARD)
             .leftRearEncoderDirection(Encoder.FORWARD)
             .rightFrontEncoderDirection(Encoder.REVERSE)
             .rightRearEncoderDirection(Encoder.REVERSE);
-
+    }
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
             // tune these
             .mass(botWeightKg)
-            .forwardZeroPowerAcceleration(fdeceleration)
-            .lateralZeroPowerAcceleration(ldeceleration);
+            .forwardZeroPowerAcceleration(fwdDeceleration)
+            .lateralZeroPowerAcceleration(latDeceleration);
     }
 
     public static PathConstraints getPathConstraints() {
@@ -92,23 +98,23 @@ public class AutoConstants {
             .rightFrontEncoderDirection(Encoder.REVERSE)
             .rightRearEncoderDirection(Encoder.REVERSE)
             // need to tune for drive encoder localization
-            .forwardTicksToInches(fti)
-            .strafeTicksToInches(sti)
-            .turnTicksToInches(rti);
+            .forwardTicksToInches(fwdTicksToInches)
+            .strafeTicksToInches(strafeTicksToInches)
+            .turnTicksToInches(turnTicksToInches);
     }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
-            //.OTOSLocalizer(getLocalizerConstants())
-                .mecanumDrivetrain(getDriveConstants())
-                .driveEncoderLocalizer(localizerConstants)
+            //.OTOSLocalizer(getOTOSConstants())
+            .mecanumDrivetrain(getDriveConstants())
+            .driveEncoderLocalizer(getEncoderConstants())
             .build();
     }
 
-    public static OTOSConstants getLocalizerConstants() {
+    public static OTOSConstants getOTOSConstants() {
         return new OTOSConstants()
-            .hardwareMapName("otos")
+            .hardwareMapName(OTOS)
             .linearUnit(DistanceUnit.INCH)
             .angleUnit(AngleUnit.RADIANS);
     }
