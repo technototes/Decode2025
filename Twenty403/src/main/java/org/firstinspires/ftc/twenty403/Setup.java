@@ -2,7 +2,6 @@ package org.firstinspires.ftc.twenty403;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.logger.Log;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -41,13 +40,13 @@ public class Setup {
         public static String TESTMOTOR = "testmotor";
         public static String TESTCRSERVO = "testcrservo";
 
-//        public static int Barcode_Pipeline = 0;
+        //        public static int Barcode_Pipeline = 0;
         public static int Green_Color_Pipeline = 0;
-//        public static int Classifier_Pipeline = 2;
-//        public static int Object_Detection_Pipeline = 3;
+        //        public static int Classifier_Pipeline = 2;
+        //        public static int Object_Detection_Pipeline = 3;
         public static int AprilTag_Pipeline = 1;
         public static int Purple_Color_Pipeline = 2;
-        public static String[] Motif = {"1", "2", "3"};
+        public static String[] Motif = { "1", "2", "3" };
     }
 
     @Configurable
@@ -63,5 +62,6 @@ public class Setup {
 
         public static int AUTOTIME = 25;
         public static double STRAIGHTEN_DEAD_ZONE = 0.01;
+        public static double TRIGGER_THRESHOLD = 0.3;
     }
 }
