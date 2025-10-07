@@ -122,6 +122,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void runLoop() {
+        robot.launcherSubsystem.readMotorVelocity();
         follower.update();
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
