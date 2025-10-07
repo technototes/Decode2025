@@ -85,6 +85,7 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
 
     @Override
     public void runLoop() {
+        robot.launcherSubsystem.readMotorVelocity();
         LLStatus status = null;
         if (Setup.Connected.LAUNCHER) {
             controls.Launch();
