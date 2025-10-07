@@ -4,6 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
+import com.technototes.library.logger.Log;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.twenty403.Hardware;
@@ -17,8 +18,9 @@ public class LauncherSubsystem {
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
     CRServo bottomLeft, bottomRight;
-
     private double currentTargetVelocity = TARGET_MOTOR_VELOCITY;
+    @Log(name = "Launcher Velo: ")
+    public static double READ_MOTOR_VELOCITY;
     private boolean launching = false;
 
     public LauncherSubsystem(Hardware h) {
@@ -57,6 +59,9 @@ public class LauncherSubsystem {
 
     public void RunLoop(Telemetry telemetry) {
         telemetry.addData("Launcher", launching ? currentTargetVelocity : "0.0");
+    }
+    public void readMotorVelocity(){
+        READ_MOTOR_VELOCITY = top.getVelocity();
     }
 
     public double GetCurrentTargetVelocity() {
