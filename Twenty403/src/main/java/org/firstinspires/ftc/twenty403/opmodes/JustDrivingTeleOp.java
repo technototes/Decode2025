@@ -122,7 +122,6 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void runLoop() {
-        robot.launcherSubsystem.readMotorVelocity();
         follower.update();
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
@@ -162,6 +161,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
         if (Setup.Connected.LAUNCHER) {
             controlsDriver.bindLaunchControls();
+            robot.launcherSubsystem.readMotorVelocity();
         }
         // For Panels controller widget until
 //        Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
