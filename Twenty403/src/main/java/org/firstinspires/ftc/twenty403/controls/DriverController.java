@@ -31,6 +31,7 @@ public class DriverController {
     public CommandButton launchFaster;
     public CommandButton launchSlower;
     public CommandButton moveballup;
+    public CommandButton moveballslow;
     public CommandButton pipelineMode;
     public CommandButton barcodePipeline;
     public CommandButton GreencolorPipeline;
@@ -76,12 +77,11 @@ public class DriverController {
         moveballup = gamepad.ps_square;
         launch = gamepad.ps_triangle;
         pipelineMode = gamepad.dpadUp;
-        GreencolorPipeline = gamepad.ps_cross;
         launchSlower = gamepad.ps_cross;
-        PurplecolorPipeline = gamepad.ps_circle;
         launchFaster = gamepad.ps_circle;
         apriltagPipeline = gamepad.dpadRight;
         AutoAim = gamepad.dpadDown;
+        moveballslow = gamepad.dpadLeft;
 
     }
 
@@ -114,8 +114,11 @@ public class DriverController {
         launchFaster.whenPressed(this::launchFaster);
     }
     public void bindFeedControls() {
-        moveballup.whilePressed(robot.feedingSubsystem::moveball);
+        moveballup.whenPressed(robot.feedingSubsystem::moveball);
         moveballup.whenReleased(robot.feedingSubsystem::stop);
+        moveballslow.whenPressed(robot.feedingSubsystem::moveballslow);
+        moveballslow.whenReleased(robot.feedingSubsystem::stop);
+
     }
     public void bindPipelineControls() {
         pipelineMode.whenPressed(this::togglePipelineMode);
