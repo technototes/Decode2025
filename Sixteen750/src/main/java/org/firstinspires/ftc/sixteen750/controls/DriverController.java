@@ -101,7 +101,7 @@ public class DriverController {
             .whilePressed(TeleCommands.Intake(robot.intakeSubsystem));
         intakeTrigger
             .getAsButton(OtherSettings.TRIGGER_THRESHOLD)
-            .whileReleased(TeleCommands.StopIntake(robot.intakeSubsystem));
+            .whileReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
     }
 
     public void bindBrakeControls() {

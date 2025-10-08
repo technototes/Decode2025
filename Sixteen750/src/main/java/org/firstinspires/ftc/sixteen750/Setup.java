@@ -48,5 +48,7 @@ public class Setup {
     public static class OtherSettings {
 
         public static double STRAIGHTEN_DEAD_ZONE = 0.08;
+        public static double TRIGGER_THRESHOLD = 0.3;
     }
+
 }
