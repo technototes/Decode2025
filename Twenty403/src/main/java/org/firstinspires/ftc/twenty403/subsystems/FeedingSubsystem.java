@@ -13,7 +13,8 @@ import org.firstinspires.ftc.twenty403.Setup;
 public class FeedingSubsystem {
 
 
-    public static double CRSERVO_SPEED = -1; // 0.15 0.25
+    public static double CRSERVO_SPEED = 1; // 0.15 0.25
+    public static double CRSERVO_SPEED_SLOW = .7;
 
     boolean hasHardware;
     CRServo bottomLeft, bottomRight;
@@ -41,12 +42,17 @@ public class FeedingSubsystem {
 //                // target velocity. We don't want bland throws.
 //                return;
 //            }
-            bottomRight.setPower(CRSERVO_SPEED);
-            bottomLeft.setPower(-CRSERVO_SPEED);
+            bottomRight.setPower(-CRSERVO_SPEED);
+            bottomLeft.setPower(CRSERVO_SPEED);
         }
     }
 
-
+    public void moveballslow() {
+        if (hasHardware) {
+            bottomRight.setPower(-CRSERVO_SPEED_SLOW);
+            bottomLeft.setPower(CRSERVO_SPEED_SLOW);
+        }
+    }
 
     public void stop() {
         if (hasHardware) {
