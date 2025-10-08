@@ -4,10 +4,8 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.hardware.motor.EncodedMotor;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
@@ -16,13 +14,13 @@ public class LauncherSubsystem {
 
     public static double MOTOR_VELOCITY = 0.55; // 0.5 1.0
     boolean hasHardware;
-    public com.qualcomm.robotcore.hardware.PIDFCoefficients launcherPIDF = new PIDFCoefficients(10.0, 0.0, 0.0, 10.0);
+    public PIDFCoefficients launcherPIDF = new PIDFCoefficients(10.0, 0.0, 0.0, 10.0);
     public PIDFController launcherPIDFController;
     public static double FEEDFORWARD_COEFFICIENT = 0.0;
     public double launcherPow;
+    // not tested just placeholder but should be used
     EncodedMotor<DcMotorEx> launcher1;
     EncodedMotor<DcMotorEx> launcher2;
-
 
     public LauncherSubsystem(Hardware h) {
         hasHardware = Setup.Connected.LAUNCHERSUBSYSTEM;
@@ -49,8 +47,6 @@ public class LauncherSubsystem {
             launcher2.setVelocity(MOTOR_VELOCITY);
         }
     }
-
-
 
     public void Stop() {
         if (hasHardware) {
