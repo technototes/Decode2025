@@ -65,15 +65,18 @@ public class JoystickDriveCommand implements Command, Loggable {
         if (faceTagMode) {
 
             // --- Face AprilTag using Limelight ---
-            LLResult result = limelight.getLatestResult();
-            if (result != null && result.isValid()) {
-                double tx = result.getTx(); // horizontal offset in degrees
-                double kP_TagAlign = 0.03;  // tune this gain
-                return -kP_TagAlign * tx;   // rotate until tx ~ 0
-            } else {
-                return 0.0; // no target → don't spin
-            }
+//            LLResult result = limelight.getLatestResult();
+//            if (result != null && result.isValid()) {
+//                double tx = result.getTx(); // horizontal offset in degrees
+//                double kP_TagAlign = 0.03;  // tune this gain
+//                return -kP_TagAlign * tx;   // rotate until tx ~ 0
+//            } else {
+//                return 0.0; // no target → don't spin
+//            }
+           return calculateHeadingToCircle(subsystem.getPoseEstimate().getX(), subsystem.getPoseEstimate().getY());
+
         }
+
         if (!straightTrigger && !fortyfiveTrigger) {
             // No straighten override: return the stick value
             // (with some adjustment...)
@@ -115,6 +118,29 @@ public class JoystickDriveCommand implements Command, Loggable {
             return false;
         }
         return true;
+    }
+    public static double calculateHeadingToCircle(double robotX, double robotY) {
+        // circle x & y are theoretical which might work but i don't know
+        double circleX = 0;
+        double circleY = 1.5;
+        double radius = 101.8234;
+        // Vector from circle center to robot
+        double dx = robotX - circleX;
+        double dy = robotY - circleY;
+
+        // Distance from robot to circle center
+        double dist = Math.hypot(dx, dy);
+
+        // Normalize that vector
+        double nx = dx / dist;
+        double ny = dy / dist;
+
+        // Find the closest point on the circle
+        double closestX = circleX + nx * radius;
+        double closestY = circleY + ny * radius;
+
+        // Heading from robot to that closest point (radians)
+        return Math.atan2(closestY - robotY, closestX - robotX);
     }
 
     @Override
