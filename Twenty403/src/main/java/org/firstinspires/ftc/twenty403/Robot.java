@@ -12,6 +12,7 @@ import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.FeedingSubsystem;
 import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.twenty403.subsystems.RROTOSLocalizer;
 import org.firstinspires.ftc.twenty403.subsystems.SafetySubsystem;
 
 @Configurable
@@ -40,15 +41,20 @@ public class Robot implements Loggable {
     public SafetySubsystem safetySubsystem;
     public LauncherSubsystem launcherSubsystem;
     public FeedingSubsystem feedingSubsystem;
+    public RROTOSLocalizer localizer;
     public Follower follower;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
         this.position = pos;
         this.alliance = team;
         this.initialVoltage = hw.voltage();
-
+        if (Setup.Connected.ODOSUBSYSTEM) {
+            this.localizer = new RROTOSLocalizer(hw.odo);
+        } else {
+            this.localizer = null;
+        }
         if (Setup.Connected.DRIVEBASE) {
-            this.drivebaseSubsystem = new DrivebaseSubsystem(hw.fl, hw.fr, hw.rl, hw.rr, hw.imu);
+            this.drivebaseSubsystem = new DrivebaseSubsystem(hw.fl, hw.fr, hw.rl, hw.rr, hw.imu, localizer);
         }
         if (Setup.Connected.LAUNCHER) {
             this.launcherSubsystem = new LauncherSubsystem(hw);

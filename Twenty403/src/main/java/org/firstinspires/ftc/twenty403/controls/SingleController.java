@@ -40,7 +40,7 @@ public class SingleController {
 
     public void bindDriveControls() {
         CommandScheduler.scheduleJoystick(
-            new JoystickDriveCommand(robot, driveLeftStick, driveRightStick)
+            new JoystickDriveCommand(robot.drivebaseSubsystem, driveLeftStick, driveRightStick)
         );
         // turboButton.whenPressed(EZCmd.Drive.TurboMode(robot.drivebaseSubsystem));
         // turboButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
