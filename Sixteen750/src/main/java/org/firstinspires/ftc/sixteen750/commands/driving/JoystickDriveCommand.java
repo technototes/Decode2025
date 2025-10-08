@@ -28,7 +28,6 @@ public class JoystickDriveCommand implements Command, Loggable {
     public boolean operatorDriving;
     private Limelight3A limelight;
 
-
     public JoystickDriveCommand(
         DrivebaseSubsystem sub,
         Stick xyStick,
@@ -63,18 +62,19 @@ public class JoystickDriveCommand implements Command, Loggable {
         straightTrigger = isTriggered(driveStraighten);
         fortyfiveTrigger = isTriggered(drive45);
         if (faceTagMode) {
-
             // --- Face AprilTag using Limelight ---
-//            LLResult result = limelight.getLatestResult();
-//            if (result != null && result.isValid()) {
-//                double tx = result.getTx(); // horizontal offset in degrees
-//                double kP_TagAlign = 0.03;  // tune this gain
-//                return -kP_TagAlign * tx;   // rotate until tx ~ 0
-//            } else {
-//                return 0.0; // no target → don't spin
-//            }
-           return calculateHeadingToCircle(subsystem.getPoseEstimate().getX(), subsystem.getPoseEstimate().getY());
-
+            // LLResult result = limelight.getLatestResult();
+            // if (result != null && result.isValid()) {
+            //     double tx = result.getTx(); // horizontal offset in degrees
+            //     double kP_TagAlign = 0.03;  // tune this gain
+            //     return -kP_TagAlign * tx;   // rotate until tx ~ 0
+            // } else {
+            //     return 0.0; // no target → don't spin
+            // }
+            return calculateHeadingToCircle(
+                subsystem.getPoseEstimate().getX(),
+                subsystem.getPoseEstimate().getY()
+            );
         }
 
         if (!straightTrigger && !fortyfiveTrigger) {
@@ -119,6 +119,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         }
         return true;
     }
+
     public static double calculateHeadingToCircle(double robotX, double robotY) {
         // circle x & y are theoretical which might work but i don't know
         double circleX = 0;
