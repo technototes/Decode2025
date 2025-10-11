@@ -42,8 +42,8 @@ public class AutoConstants {
     public static double turnTicksToInches = -0.018;
     public static double robotLength = 10.28;
     public static double robotWidth = 7.625;
-    public static SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 1.5,0);
-    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
+    public static SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(1.50, 0.0,180);
+    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(1, 0, 0, 0.01);
     public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
     //public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
     //public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
@@ -61,22 +61,20 @@ public class AutoConstants {
             .rightRearMotorName(RR_DRIVE_MOTOR)
             .leftRearMotorName(RL_DRIVE_MOTOR)
             .leftFrontMotorName(FL_DRIVE_MOTOR)
-            .leftFrontEncoderDirection(Encoder.FORWARD)
-            .leftRearEncoderDirection(Encoder.FORWARD)
-            .rightFrontEncoderDirection(Encoder.REVERSE)
-            .rightRearEncoderDirection(Encoder.REVERSE);
+            .leftFrontEncoderDirection(Encoder.REVERSE)
+            .leftRearEncoderDirection(Encoder.REVERSE)
+            .rightFrontEncoderDirection(Encoder.FORWARD)
+            .rightRearEncoderDirection(Encoder.FORWARD);
     }
 
     public static FollowerConstants getFollowerConstants() {
             // tune these
-        FollowerConstants res = new FollowerConstants()
+        return new FollowerConstants()
             .mass(botWeightKg)
-                .forwardZeroPowerAcceleration(fwdDeceleration)
-            .lateralZeroPowerAcceleration(latDeceleration);
-            res.setCoefficientsHeadingPIDF(headingPIDF);
-            res.setCoefficientsTranslationalPIDF(translationPIDF);
-            //res.setCoefficientsDrivePIDF(drivePIDF);
-            return res;
+            .forwardZeroPowerAcceleration(fwdDeceleration)
+            .lateralZeroPowerAcceleration(latDeceleration)
+            .headingPIDFCoefficients(headingPIDF)
+            .translationalPIDFCoefficients(translationPIDF);
     }
 
     public static PathConstraints getPathConstraints() {
@@ -90,30 +88,14 @@ public class AutoConstants {
             .leftRearMotorName(RL_DRIVE_MOTOR)
             .rightFrontMotorName(FR_DRIVE_MOTOR)
             .rightRearMotorName(RR_DRIVE_MOTOR)
-            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .xVelocity(xvelocity)
             .yVelocity(yvelocity);
     }
 
-    // for drive encoder localization
-    public static DriveEncoderConstants getDriveLocalizerConstants() {
-        return new DriveEncoderConstants()
-            .leftFrontMotorName(FL_DRIVE_MOTOR)
-            .leftRearMotorName(RL_DRIVE_MOTOR)
-            .rightFrontMotorName(FR_DRIVE_MOTOR)
-            .rightRearMotorName(RR_DRIVE_MOTOR)
-            .leftFrontEncoderDirection(Encoder.FORWARD)
-            .leftRearEncoderDirection(Encoder.FORWARD)
-            .rightFrontEncoderDirection(Encoder.REVERSE)
-            .rightRearEncoderDirection(Encoder.REVERSE)
-            // need to tune for drive encoder localization
-            .forwardTicksToInches(fwdTicksToInches)
-            .strafeTicksToInches(strafeTicksToInches)
-            .turnTicksToInches(turnTicksToInches);
-    }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, OTOS);
@@ -130,8 +112,8 @@ public class AutoConstants {
         return new OTOSConstants()
             .hardwareMapName(OTOS)
             .linearUnit(DistanceUnit.INCH)
-            .linearScalar(75)
-            .angularScalar(0.9)
+            .linearScalar(-1.08)
+            .angularScalar(0.9) // 0.9 1.08
             .offset(offset)
             .angleUnit(AngleUnit.RADIANS);
     }
