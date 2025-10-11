@@ -60,7 +60,8 @@ public class DriverController {
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
         driveStraighten = gamepad.rightTrigger;
-        drive45 = gamepad.leftTrigger;
+        intakeTrigger = gamepad.leftTrigger;
+        //drive45 = gamepad.leftTrigger;
         turboButton = gamepad.leftBumper;
         snailButton = gamepad.rightBumper;
         launchButton = gamepad.ps_circle;
