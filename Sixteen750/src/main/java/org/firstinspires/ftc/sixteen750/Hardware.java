@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.sixteen750;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -16,6 +17,7 @@ import com.technototes.library.logger.Loggable;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 
+@Configurable
 public class Hardware implements Loggable {
 
     public List<LynxModule> hubs;
@@ -42,7 +44,7 @@ public class Hardware implements Loggable {
         } else {
             imu = new IMU(
                 Setup.HardwareNames.IMU,
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP
             );
         }

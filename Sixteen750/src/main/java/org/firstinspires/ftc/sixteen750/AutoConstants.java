@@ -8,6 +8,8 @@ import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.RR_DRIVE_MOTO
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.pedropathing.control.FilteredPIDFCoefficients;
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -16,6 +18,7 @@ import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
 import com.pedropathing.ftc.localization.constants.OTOSConstants;
 import com.pedropathing.paths.PathConstraints;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.technototes.path.geometry.ConfigurablePoseD;
@@ -39,6 +42,11 @@ public class AutoConstants {
     public static double turnTicksToInches = -0.018;
     public static double robotLength = 10.28;
     public static double robotWidth = 7.625;
+    public static SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 1.5,0);
+    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
+    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
+    //public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
+    //public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
 
     // Need to explain SIOF to students.
     // (Hurray for programming languages never quite doing what you expect)
@@ -60,11 +68,15 @@ public class AutoConstants {
     }
 
     public static FollowerConstants getFollowerConstants() {
-        return new FollowerConstants()
             // tune these
+        FollowerConstants res = new FollowerConstants()
             .mass(botWeightKg)
-            .forwardZeroPowerAcceleration(fwdDeceleration)
+                .forwardZeroPowerAcceleration(fwdDeceleration)
             .lateralZeroPowerAcceleration(latDeceleration);
+            res.setCoefficientsHeadingPIDF(headingPIDF);
+            res.setCoefficientsTranslationalPIDF(translationPIDF);
+            //res.setCoefficientsDrivePIDF(drivePIDF);
+            return res;
     }
 
     public static PathConstraints getPathConstraints() {
@@ -104,11 +116,13 @@ public class AutoConstants {
     }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
+        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, OTOS);
+        otos.calibrateImu();
         return new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
-            //.OTOSLocalizer(getOTOSConstants())
+            .OTOSLocalizer(getOTOSConstants())
             .mecanumDrivetrain(getDriveConstants())
-            .driveEncoderLocalizer(getEncoderConstants())
+            //.driveEncoderLocalizer(getEncoderConstants())
             .build();
     }
 
@@ -116,6 +130,9 @@ public class AutoConstants {
         return new OTOSConstants()
             .hardwareMapName(OTOS)
             .linearUnit(DistanceUnit.INCH)
+            .linearScalar(75)
+            .angularScalar(0.9)
+            .offset(offset)
             .angleUnit(AngleUnit.RADIANS);
     }
 
