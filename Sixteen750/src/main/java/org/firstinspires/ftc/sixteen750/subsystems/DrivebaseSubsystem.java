@@ -30,7 +30,7 @@ public class DrivebaseSubsystem
 
         public static double SLOW_MOTOR_SPEED = 0.6;
         public static double FAST_MOTOR_SPEED = 1.0;
-        public static double AUTO_MOTOR_SPEED = 0.9;
+        public static double AUTO_MOTOR_SPEED = 0.95;
         public static double TRIGGER_THRESHOLD = 0.7;
         public static double MOTOR_THRESHOLD = 0.2;
         public static boolean faceTagMode = false;

@@ -38,13 +38,13 @@ public class AutoConstants {
     // Need to talk about naming constants with students:
     public static double fwdDeceleration = 0.0;
     public static double latDeceleration = 0.0;
-    public static double fwdTicksToInches = 0.6;
-    public static double strafeTicksToInches = -0.19;
-    public static double turnTicksToInches = -0.018;
+    public static double fwdTicksToInches = 0.008;
+    public static double strafeTicksToInches = -0.009;
+    public static double turnTicksToInches = 0.018;
     public static double robotLength = 10.28;
     public static double robotWidth = 7.625;
     public static SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(1.50, 0.0, 180);
-    public static double linearscalar = -1.08;
+    public static double linearscalar = -1.08; //1.9
     public static double angularscalar = 0.9;
     public static PIDFCoefficients headingPIDF = new PIDFCoefficients(1, 0, 0, 0.01);
     public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
@@ -69,9 +69,9 @@ public class AutoConstants {
             .rightRearMotorName(RR_DRIVE_MOTOR)
             .leftRearMotorName(RL_DRIVE_MOTOR)
             .leftFrontMotorName(FL_DRIVE_MOTOR)
-            .leftFrontEncoderDirection(Encoder.REVERSE)
+            .leftFrontEncoderDirection(Encoder.FORWARD)
             .leftRearEncoderDirection(Encoder.REVERSE)
-            .rightFrontEncoderDirection(Encoder.FORWARD)
+            .rightFrontEncoderDirection(Encoder.REVERSE)
             .rightRearEncoderDirection(Encoder.FORWARD);
     }
 
@@ -124,9 +124,9 @@ public class AutoConstants {
         otos.calibrateImu();
         return new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
-            .OTOSLocalizer(getOTOSConstants())
+            //.OTOSLocalizer(getOTOSConstants())
             .mecanumDrivetrain(getDriveConstants())
-            //.driveEncoderLocalizer(getEncoderConstants())
+            .driveEncoderLocalizer(getEncoderConstants())
             .build();
     }
 

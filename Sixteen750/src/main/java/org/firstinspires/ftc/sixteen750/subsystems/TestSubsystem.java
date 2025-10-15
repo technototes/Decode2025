@@ -5,12 +5,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.hardware.servo.Servo;
+import com.technototes.library.logger.Loggable;
 
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
 @Configurable
-public class TestSubsystem {
+public class TestSubsystem implements Loggable {
 
     public static double TESTMOTOR_VELOCITY = 0.25; // 0.5 1.0
 
