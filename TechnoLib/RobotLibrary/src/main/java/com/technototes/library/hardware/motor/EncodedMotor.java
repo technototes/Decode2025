@@ -275,6 +275,10 @@ public class EncodedMotor<T extends DcMotorSimple> extends Motor<T> implements S
      * @return the power for the motor
      */
     public double getVelocity() {
+        T device = getRawDevice();
+        if (device instanceof DcMotorEx) {
+            return ((DcMotorEx) device).getVelocity();
+        }
         return getPower();
     }
 
