@@ -386,13 +386,18 @@ class ForwardVelocityTuner extends OpMode {
 
 
         if (!end) {
-            if (Math.abs(follower.getPose().getX()) > DISTANCE) {
+            Pose p = follower.getPose();
+            telemetry.addData("PoseX", p.getX());
+            telemetry.addData("PoseY", p.getY());
+            telemetry.addData("PoseHeading", p.getHeading());
+            telemetry.update();
+            if (Math.abs(follower.getPose().getY()) > DISTANCE) {
                 end = true;
                 stopRobot();
             } else {
                 follower.setTeleOpDrive(1,0,0,true);
                 //double currentVelocity = Math.abs(follower.getVelocity().getXComponent());
-                double currentVelocity = Math.abs(follower.poseTracker.getLocalizer().getVelocity().getX());
+                double currentVelocity = Math.abs(follower.poseTracker.getLocalizer().getVelocity().getY());
                 velocities.add(currentVelocity);
                 velocities.remove(0);
             }
@@ -493,12 +498,12 @@ class LateralVelocityTuner extends OpMode {
         draw();
 
         if (!end) {
-            if (Math.abs(follower.getPose().getY()) > DISTANCE) {
+            if (Math.abs(follower.getPose().getX()) > DISTANCE) {
                 end = true;
                 stopRobot();
             } else {
                 follower.setTeleOpDrive(0,1,0,true);
-                double currentVelocity = Math.abs(follower.getVelocity().dot(new Vector(1, Math.PI / 2)));
+                double currentVelocity = Math.abs(follower.poseTracker.getLocalizer().getVelocity().getX());
                 velocities.add(currentVelocity);
                 velocities.remove(0);
             }
@@ -516,7 +521,7 @@ class LateralVelocityTuner extends OpMode {
             telemetryM.update(telemetry);
 
             if (gamepad1.aWasPressed()) {
-                follower.setYVelocity(average);
+                follower.setXVelocity(average);
                 String message = "YMovement: " + average;
                 changes.add(message);
             }

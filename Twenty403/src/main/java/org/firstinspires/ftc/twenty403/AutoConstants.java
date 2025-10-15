@@ -27,8 +27,8 @@ public class AutoConstants {
 
     // measured 10/14
     public static double botWeightKg = 9.0;
-    public static double xvelocity = 0.0;
-    public static double yvelocity = 0.0;
+    public static double xvelocity = 77.84;
+    public static double yvelocity = 61.23;
     public static double fowarddeceleration = 0.0;
     public static double lateraldeceleration = 0.0;
     public static double linearscalar = 57;
