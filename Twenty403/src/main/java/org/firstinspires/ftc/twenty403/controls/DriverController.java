@@ -105,8 +105,9 @@ public class DriverController {
             AutoAim.whenPressed(EZCmd.Drive.AutoAim(robot.drivebaseSubsystem));
         }
 
-        // resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
+         resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
     }
+
 
     public void bindLaunchControls() {
         launch.whenPressed(this::setLaunch);

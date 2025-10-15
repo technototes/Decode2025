@@ -16,8 +16,6 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import com.bylazar.gamepad.PanelsGamepad;
@@ -26,18 +24,13 @@ import com.bylazar.telemetry.PanelsTelemetry;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.firstinspires.ftc.robotcore.external.Supplier;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.twenty403.AutoConstants;
-import org.firstinspires.ftc.twenty403.Constants;
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
-import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
@@ -99,7 +92,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
             limelight.pipelineSwitch(AprilTag_Pipeline);
         }
-        follower = Constants.createFollower(hardwareMap);
+        follower = AutoConstants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
         follower.update();
 
