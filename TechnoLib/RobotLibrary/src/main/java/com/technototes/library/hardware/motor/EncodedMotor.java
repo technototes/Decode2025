@@ -263,7 +263,10 @@ public class EncodedMotor<T extends DcMotorSimple> extends Motor<T> implements S
      */
     public void setVelocity(double tps) {
         T device = getRawDevice();
-        if (device instanceof DcMotor) {
+        if (device instanceof DcMotorEx) {
+            setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            ((DcMotorEx) device).setVelocity(tps);
+        } else if (device instanceof DcMotor) {
             setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
             device.setPower(tps);
         }
@@ -275,6 +278,10 @@ public class EncodedMotor<T extends DcMotorSimple> extends Motor<T> implements S
      * @return the power for the motor
      */
     public double getVelocity() {
+        T device = getRawDevice();
+        if (device instanceof DcMotorEx) {
+            return ((DcMotorEx) device).getVelocity();
+        }
         return getPower();
     }
 

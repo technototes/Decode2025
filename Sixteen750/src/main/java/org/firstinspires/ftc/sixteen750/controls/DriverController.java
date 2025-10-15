@@ -23,6 +23,10 @@ public class DriverController {
     public CommandButton snailButton;
     public CommandButton launchButton;
     public CommandButton spitButton;
+    public CommandButton intakeButton;
+
+    public CommandButton gateButtonOpen;
+    public CommandButton gateButtonClosed;
     public CommandButton gateButton;
     public CommandButton brakeButton;
     public CommandButton hoodButton;
@@ -64,6 +68,7 @@ public class DriverController {
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
         intakeTrigger = gamepad.rightTrigger;
+        intakeButton = gamepad.ps_cross;
         // drive45 = gamepad.leftTrigger;
         // turboButton = gamepad.leftBumper;
         snailButton = gamepad.leftBumper;
@@ -73,8 +78,10 @@ public class DriverController {
         hoodButton = gamepad.dpadUp;
         hooddownButton = gamepad.dpadDown;
         AutoOrient = gamepad.leftTrigger;
-        gateButton = gamepad.ps_cross;
-        holdButton = gamepad.ps_circle;
+        //gateButtonOpen = gamepad.dpadLeft;
+        //gateButtonClosed = gamepad.dpadRight;
+        gateButton = gamepad.ps_circle;
+        holdButton = gamepad.dpadLeft;
     }
 
     public void bindDriveControls() {
@@ -102,6 +109,8 @@ public class DriverController {
         spitButton.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
         intakeTrigger.whenPressed(TeleCommands.Intake(robot.intakeSubsystem));
         intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
+        intakeButton.whenPressed(TeleCommands.Intake(robot.intakeSubsystem));
+        intakeButton.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
     }
 
     // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
@@ -128,6 +137,7 @@ public class DriverController {
         // }
         gateButton.whenPressed(TeleCommands.LeverGo(robot.aimingSubsystem));
         gateButton.whenReleased(TeleCommands.LeverStop(robot.aimingSubsystem));
+
         // hoodButton.whenPressed(new CycleCommandGroup(
         //         TeleCommands.HoodUp(robot.aimingSubsystem),
         //         TeleCommands.HoodDown(robot.aimingSubsystem)
