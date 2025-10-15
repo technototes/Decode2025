@@ -3,12 +3,13 @@ package org.firstinspires.ftc.sixteen750.subsystems;
 import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Log;
+import com.technototes.library.logger.Loggable;
 
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
 @Configurable
-public class BrakeSubsystem {
+public class BrakeSubsystem implements Loggable {
 
     public static double BRAKE_POS = 0.7; // 0.5 1.0
     public static double GO_POS = 0.5;
