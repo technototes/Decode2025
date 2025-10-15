@@ -22,10 +22,12 @@ import com.pedropathing.math.*;
 import com.pedropathing.paths.*;
 import com.pedropathing.telemetry.SelectableOpMode;
 import com.pedropathing.util.*;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.twenty403.Constants;
+import org.firstinspires.ftc.twenty403.AutoConstants;
+import org.firstinspires.ftc.twenty403.Setup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,10 +83,10 @@ public class Tuning extends SelectableOpMode {
     @Override
     public void onSelect() {
         if (follower == null) {
-            follower = Constants.createFollower(hardwareMap);
+            follower = AutoConstants.createFollower(hardwareMap);
             PanelsConfigurables.INSTANCE.refreshClass(this);
         } else {
-            follower = Constants.createFollower(hardwareMap);
+            follower = AutoConstants.createFollower(hardwareMap);
         }
 
         follower.setStartingPose(new Pose());
@@ -128,7 +130,9 @@ public class Tuning extends SelectableOpMode {
  */
 class LocalizationTest extends OpMode {
     @Override
-    public void init() {}
+    public void init() {
+        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /** This initializes the PoseUpdater, the mecanum drive motors, and the Panels telemetry. */
     @Override
@@ -183,6 +187,8 @@ class ForwardTuner extends OpMode {
 
     @Override
     public void init() {
+        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();
         follower.update();
         drawOnlyCurrent();
     }
@@ -230,6 +236,8 @@ class LateralTuner extends OpMode {
 
     @Override
     public void init() {
+        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();
         follower.update();
         drawOnlyCurrent();
     }
@@ -277,6 +285,8 @@ class TurnTuner extends OpMode {
 
     @Override
     public void init() {
+        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();
         follower.update();
         drawOnlyCurrent();
     }
@@ -284,7 +294,7 @@ class TurnTuner extends OpMode {
     /** This initializes the PoseUpdater as well as the Panels telemetry. */
     @Override
     public void init_loop() {
-        telemetryM.debug("Turn your robot " + ANGLE + " radians. Your turn ticks to inches will be shown on the telemetry.");
+        telemetryM.debug("Turn your robot " + Math.toDegrees(ANGLE) + " Degrees. Your turn ticks to inches will be shown on the telemetry.");
         telemetryM.update(telemetry);
 
         drawOnlyCurrent();
@@ -330,7 +340,8 @@ class ForwardVelocityTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /** This initializes the drive motors as well as the cache of velocities and the Panels telemetry. */
     @Override
@@ -436,7 +447,8 @@ class LateralVelocityTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /**
      * This initializes the drive motors as well as the cache of velocities and the Panels
@@ -538,7 +550,8 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /** This initializes the drive motors as well as the Panels telemetryM. */
     @Override
@@ -640,7 +653,8 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /** This initializes the drive motors as well as the Panels telemetry. */
     @Override
@@ -736,7 +750,8 @@ class TranslationalTuner extends OpMode {
     private Path backwards;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /** This initializes the Follower and creates the forward and backward Paths. */
     @Override
@@ -800,7 +815,8 @@ class HeadingTuner extends OpMode {
     private Path backwards;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /**
      * This initializes the Follower and creates the forward and backward Paths. Additionally, this
@@ -868,7 +884,8 @@ class DriveTuner extends OpMode {
     private PathChain backwards;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /**
      * This initializes the Follower and creates the forward and backward Paths. Additionally, this
@@ -946,7 +963,8 @@ class Line extends OpMode {
     private Path backwards;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /** This initializes the Follower and creates the forward and backward Paths. */
     @Override
@@ -1011,7 +1029,8 @@ class CentripetalTuner extends OpMode {
     private Path backwards;
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /**
      * This initializes the Follower and creates the forward and backward Paths.
@@ -1093,7 +1112,8 @@ class Triangle extends OpMode {
     }
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     @Override
     public void init_loop() {
@@ -1162,7 +1182,8 @@ class Circle extends OpMode {
     }
 
     @Override
-    public void init() {}
+    public void init() {SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();}
 
     /**
      * This runs the OpMode, updating the Follower as well as printing out the debug statements to

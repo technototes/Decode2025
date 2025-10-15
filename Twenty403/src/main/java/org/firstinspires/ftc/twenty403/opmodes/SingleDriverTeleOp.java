@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.twenty403.opmodes;
 
 import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.AprilTag_Pipeline;
-import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
-import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.Motif;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -15,25 +13,18 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
-import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
-import org.firstinspires.ftc.twenty403.controls.SingleController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
-import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
-import org.firstinspires.ftc.twenty403.subsystems.FeedingSubsystem;
-import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +50,8 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
+        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class,Setup.HardwareNames.OTOS);
+        otos.calibrateImu();
         if (Setup.Connected.LIMELIGHT) {
             limelight = hardware.limelight;
             limelight.setPollRateHz(100);

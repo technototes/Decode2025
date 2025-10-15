@@ -29,11 +29,11 @@ public class JoystickDriveCommand implements Command, Loggable {
     private Limelight3A limelight;
 
     public JoystickDriveCommand(
-        DrivebaseSubsystem sub,
-        Stick xyStick,
-        Stick rotStick,
-        DoubleSupplier strtDrive,
-        DoubleSupplier angleDrive
+            DrivebaseSubsystem sub,
+            Stick xyStick,
+            Stick rotStick,
+            DoubleSupplier strtDrive,
+            DoubleSupplier angleDrive
     ) {
         addRequirements(sub);
         subsystem = sub;
@@ -72,10 +72,11 @@ public class JoystickDriveCommand implements Command, Loggable {
             //     return 0.0; // no target → don't spin
             // }
             return calculateHeadingToCircle(
-                subsystem.getPoseEstimate().getX(),
-                subsystem.getPoseEstimate().getY()
+                    subsystem.getPoseEstimate().getX(),
+                    subsystem.getPoseEstimate().getY()
             );
         }
+
         if (!straightTrigger && !fortyfiveTrigger) {
             // No straighten override: return the stick value
             // (with some adjustment...)
@@ -160,12 +161,12 @@ public class JoystickDriveCommand implements Command, Loggable {
                 }
             }
             Vector2d input = new Vector2d(
-                yvalue * subsystem.speed,
-                xvalue * subsystem.speed
+                    yvalue * subsystem.speed,
+                    xvalue * subsystem.speed
             ).rotated(curHeading);
 
             subsystem.setWeightedDrivePower(
-                new Pose2d(input.getX(), input.getY(), getRotation(curHeading))
+                    new Pose2d(input.getX(), input.getY(), getRotation(curHeading))
             );
         }
         subsystem.update();
