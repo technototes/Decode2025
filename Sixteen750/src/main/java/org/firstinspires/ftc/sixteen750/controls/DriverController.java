@@ -6,9 +6,11 @@ import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
+
+import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.Setup.OtherSettings;
+import org.firstinspires.ftc.sixteen750.commands.LLPipelineChangeCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
@@ -16,6 +18,7 @@ import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
 public class DriverController {
 
     public Robot robot;
+    public Hardware hardware;
     public CommandGamepad gamepad;
 
     public Stick driveLeftStick, driveRightStick;
@@ -34,6 +37,7 @@ public class DriverController {
     public CommandButton hooddownButton;
     public CommandButton holdButton;
     public CommandAxis intakeTrigger;
+    public CommandAxis autoAim;
     public CommandAxis spitTrigger;
     public CommandAxis AutoOrient;
 
@@ -69,7 +73,7 @@ public class DriverController {
         driveRightStick = gamepad.rightStick;
         intakeTrigger = gamepad.rightTrigger;
         intakeButton = gamepad.ps_cross;
-        // drive45 = gamepad.leftTrigger;
+        //autoAim = gamepad.leftTrigger;
         // turboButton = gamepad.leftBumper;
         snailButton = gamepad.leftBumper;
         launchButton = gamepad.rightBumper;
@@ -97,6 +101,7 @@ public class DriverController {
         if (Setup.Connected.LIMELIGHT) {
             AutoOrient.whenPressed(DrivingCommands.AutoOrient(robot.drivebase));
         }
+       // autoAim.whilePressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.AprilTag_Pipeline));
     }
 
     public void bindLaunchControls() {

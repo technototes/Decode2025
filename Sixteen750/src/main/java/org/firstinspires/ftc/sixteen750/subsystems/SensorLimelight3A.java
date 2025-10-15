@@ -46,7 +46,7 @@ public class SensorLimelight3A extends LinearOpMode {
 
         telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);
+        limelight.pipelineSwitch(1);
 
         /*
          * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.

@@ -340,6 +340,12 @@ class TurnTuner extends OpMode {
      */
     @Override
     public void loop() {
+        Tuning.follower.setTeleOpDrive(
+                -gamepad1.left_stick_y,
+                -gamepad1.left_stick_x,
+                -gamepad1.right_stick_x,
+                true
+        );
         Tuning.follower.update();
 
         Tuning.telemetryM.debug("Total Angle: " + Tuning.follower.getTotalHeading());
@@ -357,6 +363,11 @@ class TurnTuner extends OpMode {
         Tuning.telemetryM.update(telemetry);
 
         Tuning.drawCurrentAndHistory();
+    }
+    @Override
+    public void start() {
+        Tuning.follower.startTeleopDrive(true);
+        Tuning.follower.update();
     }
 }
 
