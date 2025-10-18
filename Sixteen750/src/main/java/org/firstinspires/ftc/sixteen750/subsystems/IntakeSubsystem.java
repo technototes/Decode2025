@@ -32,25 +32,25 @@ public class IntakeSubsystem implements Loggable {
         // Spin the motors
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake.setVelocity(MOTOR_VELOCITY);
+            intake.setPower(MOTOR_VELOCITY);
         }
     }
     public void Spit() {
         // Spin the motors
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.FORWARD);
-            intake.setVelocity(MOTOR_VELOCITY);
+            intake.setPower(MOTOR_VELOCITY);
         }
     }
     public void Hold() {
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake.setVelocity(MOTOR_VELOCITY / 2);
+            intake.setPower(MOTOR_VELOCITY / 2);
         }
     }
     public void StopIntake() {
         if (hasHardware) {
-            intake.setVelocity(0);
+            intake.setPower(0);
         }
     }
 }

@@ -13,12 +13,15 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.MathUtils;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+
+import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
 
 public class JoystickDriveCommand implements Command, Loggable {
 
     public DrivebaseSubsystem subsystem;
+    public Hardware hardware;
     public DoubleSupplier x, y, r;
     public BooleanSupplier watchTrigger;
     public double targetHeadingRads;
@@ -26,7 +29,8 @@ public class JoystickDriveCommand implements Command, Loggable {
     public DoubleSupplier drive45;
     public boolean driverDriving;
     public boolean operatorDriving;
-    private Limelight3A limelight;
+    public Limelight3A limelight;
+
 
     public JoystickDriveCommand(
         DrivebaseSubsystem sub,
