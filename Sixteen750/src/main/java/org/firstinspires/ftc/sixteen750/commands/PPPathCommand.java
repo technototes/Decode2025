@@ -10,13 +10,14 @@ public class PPPathCommand implements Command {
 
     public PathChain pathChain;
     public Follower follower;
-    public PathBuilder pb;
+    public PathBuilder pathBuilder;
 
     public boolean currentPose;
 
-    public PPPathCommand(Follower f, PathChain p) {
+    public PPPathCommand(Follower f, PathChain p, PathBuilder pb) {
         follower = f;
         pathChain = p;
+        pathBuilder = pb;
     }
 
     public PathChain toPathChain(Path path) {
