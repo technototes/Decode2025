@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.sixteen750.controls;
 
+import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandAxis;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.sixteen750.commands.LLPipelineChangeCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
 public class DriverController {
 
@@ -28,8 +30,8 @@ public class DriverController {
     public CommandButton spitButton;
     public CommandButton intakeButton;
 
-    public CommandButton gateButtonOpen;
-    public CommandButton gateButtonClosed;
+    public CommandButton MotorDecrease;
+    public CommandButton MotorIncrease;
     public CommandButton gateButton;
     public CommandButton brakeButton;
     public CommandButton hoodButton;
@@ -82,8 +84,8 @@ public class DriverController {
         hoodButton = gamepad.dpadUp;
         hooddownButton = gamepad.dpadDown;
         AutoOrient = gamepad.leftTrigger;
-        //gateButtonOpen = gamepad.dpadLeft;
-        //gateButtonClosed = gamepad.dpadRight;
+        MotorDecrease = gamepad.dpadLeft;
+        MotorIncrease = gamepad.dpadRight;
         gateButton = gamepad.ps_circle;
         holdButton = gamepad.dpadLeft;
     }
@@ -98,6 +100,9 @@ public class DriverController {
         snailButton.whenPressed(DrivingCommands.SnailDriving(robot.drivebase));
         snailButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(robot.drivebase));
+        MotorDecrease.whenPressed(TeleCommands.DecreaseMotor(robot));
+        MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));
+
         if (Setup.Connected.LIMELIGHT) {
             AutoOrient.whenPressed(DrivingCommands.AutoOrient(robot.drivebase));
         }
@@ -105,17 +110,17 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-        launchButton.whenPressed(TeleCommands.Launch(robot.launcherSubsystem));
-        launchButton.whenReleased(TeleCommands.Stop(robot.launcherSubsystem));
+        launchButton.whenPressed(TeleCommands.Launch(robot));
+        launchButton.whenReleased(TeleCommands.Stop(robot));
     }
 
     public void bindIntakeControls() {
-        spitButton.whenPressed(TeleCommands.Spit(robot.intakeSubsystem));
-        spitButton.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
-        intakeTrigger.whenPressed(TeleCommands.Intake(robot.intakeSubsystem));
-        intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
-        intakeButton.whenPressed(TeleCommands.Intake(robot.intakeSubsystem));
-        intakeButton.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
+        spitButton.whenPressed(TeleCommands.Spit(robot));
+        spitButton.whenReleased(TeleCommands.IntakeStop(robot));
+        intakeTrigger.whenPressed(TeleCommands.Intake(robot));
+        intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot));
+        intakeButton.whenPressed(TeleCommands.Intake(robot));
+        intakeButton.whenReleased(TeleCommands.IntakeStop(robot));
     }
 
     // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
@@ -124,8 +129,8 @@ public class DriverController {
     public void bindBrakeControls() {
         brakeButton.whenPressed(
             new CycleCommandGroup(
-                TeleCommands.EngageBrake(robot.brakeSubsystem),
-                TeleCommands.DisengageBrake(robot.brakeSubsystem)
+                TeleCommands.EngageBrake(robot),
+                TeleCommands.DisengageBrake(robot)
             )
         );
     }
@@ -140,17 +145,17 @@ public class DriverController {
         //     TeleCommands.LeverGo(robot.aimingSubsystem));
         //     yippee = true;
         // }
-        gateButton.whenPressed(TeleCommands.LeverGo(robot.aimingSubsystem));
-        gateButton.whenReleased(TeleCommands.LeverStop(robot.aimingSubsystem));
+        gateButton.whenPressed(TeleCommands.LeverGo(robot));
+        gateButton.whenReleased(TeleCommands.LeverStop(robot));
 
         // hoodButton.whenPressed(new CycleCommandGroup(
         //         TeleCommands.HoodUp(robot.aimingSubsystem),
         //         TeleCommands.HoodDown(robot.aimingSubsystem)
         // ));
-        hoodButton.whenPressed(TeleCommands.HoodUp(robot.aimingSubsystem));
-        hooddownButton.whenPressed(TeleCommands.HoodDown(robot.aimingSubsystem));
+        hoodButton.whenPressed(TeleCommands.HoodUp(robot));
+        hooddownButton.whenPressed(TeleCommands.HoodDown(robot));
 
-        holdButton.whenPressed(TeleCommands.Hold(robot.intakeSubsystem));
-        holdButton.whenReleased(TeleCommands.IntakeStop(robot.intakeSubsystem));
+        holdButton.whenPressed(TeleCommands.Hold(robot));
+        holdButton.whenReleased(TeleCommands.IntakeStop(robot));
     }
 }

@@ -445,14 +445,19 @@ class ForwardVelocityTuner extends OpMode {
         Tuning.drawCurrentAndHistory();
 
         if (!end) {
-            if (Math.abs(Tuning.follower.getPose().getX()) > DISTANCE) {
+            Pose p = Tuning.follower.getPose();
+            telemetry.addData("PoseX", p.getX());
+            telemetry.addData("PoseY", p.getY());
+            telemetry.addData("PoseHeading", p.getHeading());
+            telemetry.update();
+            if (Math.abs(Tuning.follower.getPose().getY()) > DISTANCE)  {
                 end = true;
                 Tuning.stopRobot();
             } else {
                 Tuning.follower.setTeleOpDrive(1, 0, 0, true);
                 //double currentVelocity = Math.abs(follower.getVelocity().getXComponent());
                 double currentVelocity = Math.abs(
-                    Tuning.follower.poseTracker.getLocalizer().getVelocity().getX()
+                    Tuning.follower.poseTracker.getLocalizer().getVelocity().getY()
                 );
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -562,14 +567,12 @@ class LateralVelocityTuner extends OpMode {
         Tuning.drawCurrentAndHistory();
 
         if (!end) {
-            if (Math.abs(Tuning.follower.getPose().getY()) > DISTANCE) {
+            if (Math.abs(Tuning.follower.getPose().getX()) > DISTANCE) {
                 end = true;
                 Tuning.stopRobot();
             } else {
                 Tuning.follower.setTeleOpDrive(0, 1, 0, true);
-                double currentVelocity = Math.abs(
-                    Tuning.follower.getVelocity().dot(new Vector(1, Math.PI / 2))
-                );
+                double currentVelocity = Math.abs(Tuning.follower.poseTracker.getLocalizer().getVelocity().getX());
                 velocities.add(currentVelocity);
                 velocities.remove(0);
             }
@@ -589,7 +592,7 @@ class LateralVelocityTuner extends OpMode {
             Tuning.telemetryM.update(telemetry);
 
             if (gamepad1.aWasPressed()) {
-                Tuning.follower.setYVelocity(average);
+                Tuning.follower.setXVelocity(average);
                 String message = "YMovement: " + average;
                 Tuning.changes.add(message);
             }

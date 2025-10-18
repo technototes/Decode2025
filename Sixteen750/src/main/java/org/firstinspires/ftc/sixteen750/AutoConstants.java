@@ -139,6 +139,7 @@ public class AutoConstants {
     public static ConfigurablePoseD BACKWARD = new ConfigurablePoseD(0, 0, 0);
     public static ConfigurablePoseD SIDE_RIGHT = new ConfigurablePoseD(0, -48, 0);
     public static ConfigurablePoseD SIDE_LEFT = new ConfigurablePoseD(0, 0, 0);
+    public static ConfigurablePoseD BLUE_LAUNCH_ZONE = new ConfigurablePoseD(0, 0, 0);
 
     // These are 'trajectory pieces' which should be named like this:
     // {STARTING_POSITION}_TO_{ENDING_POSITION}
@@ -175,4 +176,9 @@ public class AutoConstants {
         TrajectorySequence
     > SIDE_RIGHT_TO_SIDE_LEFT = b ->
         b.apply(SIDE_RIGHT.toPose()).lineToLinearHeading(SIDE_LEFT.toPose()).build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > BLUE_SCORING = b ->
+            b.apply(BLUE_LAUNCH_ZONE.toPose()).lineToLinearHeading(BLUE_LAUNCH_ZONE.toPose()).build();
 }
