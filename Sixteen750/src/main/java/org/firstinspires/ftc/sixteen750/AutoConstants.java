@@ -17,6 +17,7 @@ import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
 import com.pedropathing.ftc.localization.constants.OTOSConstants;
+import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -131,6 +132,9 @@ public class AutoConstants {
     }
 
     //New testing constants for this year's game
+    public static Pose scorePose = new Pose(0.0, 0.0, 0.0);
+    public static Pose pickup1Pose = new Pose(0.0, 0.0, 0.0);
+
     public static ConfigurablePoseD SPLINETEST1 = new ConfigurablePoseD(0, -55, 0);
     public static ConfigurablePoseD SPLINETEST2 = new ConfigurablePoseD(55, 0, 0);
 

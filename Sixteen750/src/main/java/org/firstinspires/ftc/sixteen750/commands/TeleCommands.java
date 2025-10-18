@@ -3,18 +3,13 @@ package org.firstinspires.ftc.sixteen750.commands;
 import com.technototes.library.command.Command;
 
 import org.firstinspires.ftc.sixteen750.Robot;
-import org.firstinspires.ftc.sixteen750.subsystems.AimingSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.BrakeSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
 public class TeleCommands {
 
     public static Command Launch(Robot r) {
         return Command.create(r.launcherSubsystem::Launch);
     }
-    public static Command Stop(Robot r) {
+    public static Command StopLaunch(Robot r) {
         return Command.create(r.launcherSubsystem::Stop);
     }
     public static Command IncreaseMotor(Robot r) {
@@ -37,7 +32,7 @@ public class TeleCommands {
     public static Command EngageBrake(Robot r) {
         return Command.create(r.brakeSubsystem::Engage);
     }
-    public static Command Hold(Robot r) {
+    public static Command HoldIntake(Robot r) {
         return Command.create(r.intakeSubsystem::Hold);
     }
 
@@ -52,11 +47,11 @@ public class TeleCommands {
     public static Command HoodDown(Robot r){ return Command.create(r.aimingSubsystem::testHoodDown);}
 
 
-    public static Command LeverStop(Robot r) {
+    public static Command GateUp(Robot r) {
         return Command.create(r.aimingSubsystem::StopBall);
     }
 
-    public static Command LeverGo(Robot r) {
+    public static Command GateDown(Robot r) {
         return Command.create(r.aimingSubsystem::GoBall);
     }
 }

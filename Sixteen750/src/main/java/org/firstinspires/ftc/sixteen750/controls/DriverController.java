@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.sixteen750.controls;
 
-import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandAxis;
@@ -11,11 +10,9 @@ import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.LLPipelineChangeCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
 public class DriverController {
 
@@ -111,7 +108,7 @@ public class DriverController {
 
     public void bindLaunchControls() {
         launchButton.whenPressed(TeleCommands.Launch(robot));
-        launchButton.whenReleased(TeleCommands.Stop(robot));
+        launchButton.whenReleased(TeleCommands.StopLaunch(robot));
     }
 
     public void bindIntakeControls() {
@@ -127,12 +124,8 @@ public class DriverController {
     // spitTrigger.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
 
     public void bindBrakeControls() {
-        brakeButton.whenPressed(
-            new CycleCommandGroup(
-                TeleCommands.EngageBrake(robot),
-                TeleCommands.DisengageBrake(robot)
-            )
-        );
+        brakeButton.whenPressed(TeleCommands.EngageBrake(robot));
+        brakeButton.whenReleased(TeleCommands.DisengageBrake(robot));
     }
 
     public void bindAimControls() {
@@ -145,8 +138,8 @@ public class DriverController {
         //     TeleCommands.LeverGo(robot.aimingSubsystem));
         //     yippee = true;
         // }
-        gateButton.whenPressed(TeleCommands.LeverGo(robot));
-        gateButton.whenReleased(TeleCommands.LeverStop(robot));
+        gateButton.whenPressed(TeleCommands.GateDown(robot));
+        gateButton.whenReleased(TeleCommands.GateUp(robot));
 
         // hoodButton.whenPressed(new CycleCommandGroup(
         //         TeleCommands.HoodUp(robot.aimingSubsystem),
@@ -155,7 +148,7 @@ public class DriverController {
         hoodButton.whenPressed(TeleCommands.HoodUp(robot));
         hooddownButton.whenPressed(TeleCommands.HoodDown(robot));
 
-        holdButton.whenPressed(TeleCommands.Hold(robot));
+        holdButton.whenPressed(TeleCommands.HoldIntake(robot));
         holdButton.whenReleased(TeleCommands.IntakeStop(robot));
     }
 }
