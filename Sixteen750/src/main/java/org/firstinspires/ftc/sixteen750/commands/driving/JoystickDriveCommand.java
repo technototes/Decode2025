@@ -13,7 +13,6 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.MathUtils;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
@@ -30,7 +29,6 @@ public class JoystickDriveCommand implements Command, Loggable {
     public boolean driverDriving;
     public boolean operatorDriving;
     public Limelight3A limelight;
-
 
     public JoystickDriveCommand(
         DrivebaseSubsystem sub,
@@ -66,19 +64,22 @@ public class JoystickDriveCommand implements Command, Loggable {
         straightTrigger = isTriggered(driveStraighten);
         fortyfiveTrigger = isTriggered(drive45);
         if (faceTagMode) {
-            // --- Face AprilTag using Limelight ---
-            // LLResult result = limelight.getLatestResult();
-            // if (result != null && result.isValid()) {
-            //     double tx = result.getTx(); // horizontal offset in degrees
-            //     double kP_TagAlign = 0.03;  // tune this gain
-            //     return -kP_TagAlign * tx;   // rotate until tx ~ 0
-            // } else {
-            //     return 0.0; // no target → don't spin
-            // }
-            return calculateHeadingToCircle(
-                subsystem.getPoseEstimate().getX(),
-                subsystem.getPoseEstimate().getY()
-            );
+            if (Setup.Connected.LIMELIGHT) {
+                // --- Face AprilTag using Limelight ---
+                LLResult result = limelight.getLatestResult();
+                if (result != null && result.isValid()) {
+                    double tx = result.getTx(); // horizontal offset in degrees
+                    double kP_TagAlign = 0.03; // tune this gain
+                    return -kP_TagAlign * tx; // rotate until tx ~ 0
+                } else {
+                    return 0.0; // no target → don't spin
+                }
+            } else {
+                return calculateHeadingToCircle(
+                    subsystem.getPoseEstimate().getX(),
+                    subsystem.getPoseEstimate().getY()
+                );
+            }
         }
 
         if (!straightTrigger && !fortyfiveTrigger) {
