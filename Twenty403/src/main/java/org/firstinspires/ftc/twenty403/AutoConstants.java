@@ -33,7 +33,7 @@ public class AutoConstants {
     public static double linearscalar20403 = 57;
     public static double angularscalar20403 = 0.982;
     public static SparkFunOTOS.Pose2D OTOS_OFFSET_20403 = new SparkFunOTOS.Pose2D(4.75,0,Math.PI/2);
-    public static double botWeightKgPtechno;
+    public static double botWeightKgPtechno = 4.85;
     public static double xvelocityPtechno;
     public static double yvelocityPtechno;
     public static double fowarddecelerationPtechno = 0.0;
