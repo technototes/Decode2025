@@ -15,6 +15,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.RROTOSLocalizer;
 import org.firstinspires.ftc.sixteen750.subsystems.SafetySubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.TestSubsystem;
 
 public class Robot implements Loggable {
 
@@ -30,6 +31,7 @@ public class Robot implements Loggable {
     public IntakeSubsystem intakeSubsystem;
     public BrakeSubsystem brakeSubsystem;
     public AimingSubsystem aimingSubsystem;
+    public TestSubsystem testSubsystem;
     public Follower follower;
     public FollowerConstants followerConstants;
     public FollowerBuilder followerBuilder;
@@ -70,6 +72,9 @@ public class Robot implements Loggable {
         }
         if (Setup.Connected.AIMINGSUBSYSTEM) {
             this.aimingSubsystem = new AimingSubsystem(hw);
+        }
+        if (Setup.Connected.TESTSUBSYSTEM){
+            this.testSubsystem = new TestSubsystem(hw);
         }
     }
     public Follower getFollower() {

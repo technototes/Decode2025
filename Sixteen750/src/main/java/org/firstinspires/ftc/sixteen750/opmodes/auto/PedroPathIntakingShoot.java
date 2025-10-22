@@ -21,7 +21,7 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "DriveForward", preselectTeleOp = "Dual Control")
+@Autonomous(name = "IntakeShoot", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 public class PedroPathIntakingShoot extends CommandOpMode {
 

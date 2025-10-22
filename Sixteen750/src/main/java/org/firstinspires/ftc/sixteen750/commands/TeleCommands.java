@@ -54,4 +54,6 @@ public class TeleCommands {
     public static Command GateDown(Robot r) {
         return Command.create(r.aimingSubsystem::GoBall);
     }
+    public static Command MotorPowerTest(Robot r){return Command.create(r.testSubsystem::setMotorPowerTest);}
+    public static Command MotorVelocityTest(Robot r){return Command.create(r.testSubsystem::setMotorVelocityTest);}
 }

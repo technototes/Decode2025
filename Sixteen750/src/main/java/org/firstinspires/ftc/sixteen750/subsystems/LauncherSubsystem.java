@@ -1,23 +1,30 @@
 package org.firstinspires.ftc.sixteen750.subsystems;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.hardware.motor.EncodedMotor;
+import com.technototes.library.hardware.motor.Motor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import org.firstinspires.ftc.sixteen750.Hardware;
+import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
 public class LauncherSubsystem implements Loggable {
 
+    @Log.Number(name = "Motor Power")
+    public static double MOTOR_POWER = 0.65; // 0.5 1.0
+
+    public static double TARGET_LAUNCH_VELOCITY = 6000;
     @Log.Number(name = "Motor Velocity")
-    public static double MOTOR_VELOCITY = 0.65; // 0.5 1.0
+    public static double CURRENT_LAUNCH_VELOCITY = 0.0;
     boolean hasHardware;
+    public Robot robot;
     public PIDFCoefficients launcherPIDF = new PIDFCoefficients(1.0, 0.0, 0.0, 10.0);
     public PIDFController launcherPIDFController;
     public static double FEEDFORWARD_COEFFICIENT = 0.0;
@@ -47,8 +54,8 @@ public class LauncherSubsystem implements Loggable {
     public void Launch() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            launcher1.setPower(MOTOR_VELOCITY);
-            launcher2.setPower(MOTOR_VELOCITY);
+            launcher1.setPower(MOTOR_POWER);
+            launcher2.setPower(MOTOR_POWER);
         }
     }
 
@@ -61,13 +68,33 @@ public class LauncherSubsystem implements Loggable {
     public void IncreaseMotorSpeed() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            MOTOR_VELOCITY += 0.05;
+            MOTOR_POWER += 0.05;
         }
     }
     public void DecreaseMotorSpeed() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            MOTOR_VELOCITY -= 0.05;
+            MOTOR_POWER -= 0.05;
+        }
+    }
+    public void setMotorVelocityTest(){
+        launcher1.setVelocity(TARGET_LAUNCH_VELOCITY);
+    }
+    public void setMotorPowerTest(){
+        launcher1.setPower(MOTOR_POWER);
+        CURRENT_LAUNCH_VELOCITY = getMotor1Velocity();
+    }
+    public double getMotor1Velocity(){
+        return launcher1.getVelocity();
+    }
+
+    public double getMotor2Velocity(){
+        return launcher2.getVelocity();
+    }
+
+    public void VelocityShoot(){
+        if (getMotor1Velocity() == TARGET_LAUNCH_VELOCITY && getMotor2Velocity() == TARGET_LAUNCH_VELOCITY){
+            TeleCommands.GateDown(robot);
         }
     }
 }

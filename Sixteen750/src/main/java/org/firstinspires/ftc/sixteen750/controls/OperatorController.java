@@ -5,6 +5,7 @@ import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 public class OperatorController {
 
@@ -15,10 +16,9 @@ public class OperatorController {
         robot = r;
         gamepad = g;
         AssignNamedControllerButton();
-        bindSlidesControls();
+        bindButtonControls();
     }
 
     private void AssignNamedControllerButton() {}
-
-    private void bindSlidesControls() {}
+    private void bindButtonControls() {}
 }
