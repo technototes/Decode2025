@@ -15,15 +15,13 @@ import com.pedropathing.math.Vector;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
-import com.pedropathing.telemetry.SelectableOpMode;
 import com.pedropathing.util.PoseHistory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.sixteen750.AutoConstants;
-
+import com.technototes.library.structure.BetterSelectableOpMode;
 import java.util.ArrayList;
 import java.util.List;
+import org.firstinspires.ftc.sixteen750.AutoConstants;
 
 /**
  * This is the Tuning class. It contains a selection menu for various tuning OpModes.
@@ -33,7 +31,7 @@ import java.util.List;
  */
 
 @TeleOp(name = "Tuning", group = "Pedro Pathing")
-public class Tuning extends SelectableOpMode {
+public class Tuning extends BetterSelectableOpMode {
 
     public static Follower follower;
 
@@ -341,10 +339,10 @@ class TurnTuner extends OpMode {
     @Override
     public void loop() {
         Tuning.follower.setTeleOpDrive(
-                -gamepad1.left_stick_y,
-                -gamepad1.left_stick_x,
-                -gamepad1.right_stick_x,
-                true
+            -gamepad1.left_stick_y,
+            -gamepad1.left_stick_x,
+            -gamepad1.right_stick_x,
+            true
         );
         Tuning.follower.update();
 
@@ -364,6 +362,7 @@ class TurnTuner extends OpMode {
 
         Tuning.drawCurrentAndHistory();
     }
+
     @Override
     public void start() {
         Tuning.follower.startTeleopDrive(true);
@@ -450,7 +449,7 @@ class ForwardVelocityTuner extends OpMode {
             telemetry.addData("PoseY", p.getY());
             telemetry.addData("PoseHeading", p.getHeading());
             telemetry.update();
-            if (Math.abs(Tuning.follower.getPose().getY()) > DISTANCE)  {
+            if (Math.abs(Tuning.follower.getPose().getY()) > DISTANCE) {
                 end = true;
                 Tuning.stopRobot();
             } else {
@@ -572,7 +571,9 @@ class LateralVelocityTuner extends OpMode {
                 Tuning.stopRobot();
             } else {
                 Tuning.follower.setTeleOpDrive(0, 1, 0, true);
-                double currentVelocity = Math.abs(Tuning.follower.poseTracker.getLocalizer().getVelocity().getX());
+                double currentVelocity = Math.abs(
+                    Tuning.follower.poseTracker.getLocalizer().getVelocity().getX()
+                );
                 velocities.add(currentVelocity);
                 velocities.remove(0);
             }
@@ -924,7 +925,9 @@ class HeadingTuner extends OpMode {
         Tuning.telemetryM.debug(
             "The robot will try to stay at a constant heading while you try to turn it."
         );
-        Tuning.telemetryM.debug("You can adjust the PIDF values to tune the robot's heading PIDF(s).");
+        Tuning.telemetryM.debug(
+            "You can adjust the PIDF values to tune the robot's heading PIDF(s)."
+        );
         Tuning.telemetryM.update(telemetry);
         Tuning.follower.update();
         Tuning.drawCurrent();
@@ -994,7 +997,9 @@ class DriveTuner extends OpMode {
         Tuning.telemetryM.debug(
             "This will run the robot in a straight line going " + DISTANCE + "inches forward."
         );
-        Tuning.telemetryM.debug("The robot will go forward and backward continuously along the path.");
+        Tuning.telemetryM.debug(
+            "The robot will go forward and backward continuously along the path."
+        );
         Tuning.telemetryM.debug("Make sure you have enough room.");
         Tuning.telemetryM.update(telemetry);
         Tuning.follower.update();
@@ -1075,7 +1080,9 @@ class Line extends OpMode {
         Tuning.telemetryM.debug(
             "The robot will go forward and backward continuously along the path while correcting."
         );
-        Tuning.telemetryM.debug("You can adjust the PIDF values to tune the robot's drive PIDF(s).");
+        Tuning.telemetryM.debug(
+            "You can adjust the PIDF values to tune the robot's drive PIDF(s)."
+        );
         Tuning.telemetryM.update(telemetry);
         Tuning.follower.update();
         Tuning.drawCurrent();
