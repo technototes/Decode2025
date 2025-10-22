@@ -20,24 +20,31 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 @Configurable
 public class AutoConstants {
 
     // measured 10/14
-    public static double botWeightKg = 9.0;
-    public static double xvelocity = 77.84;
-    public static double yvelocity = 61.23;
-    public static double fowarddeceleration = 0.0;
-    public static double lateraldeceleration = 0.0;
-    public static double linearscalar = 57;
-    public static double angularscalar = 0.982;
-    public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(4.75,0,Math.PI/2);
+    public static double botWeightKg20403 = 9.0;
+    public static double xvelocity20403 = 77.84;
+    public static double yvelocity20403 = 61.23;
+    public static double fowarddeceleration20403 = 0.0;
+    public static double lateraldeceleration20403 = 0.0;
+    public static double linearscalar20403 = 57;
+    public static double angularscalar20403 = 0.982;
+    public static SparkFunOTOS.Pose2D OTOS_OFFSET_20403 = new SparkFunOTOS.Pose2D(4.75,0,Math.PI/2);
+    public static double botWeightKgPtechno;
+    public static double xvelocityPtechno;
+    public static double yvelocityPtechno;
+    public static double fowarddecelerationPtechno = 0.0;
+    public static double lateraldecelerationPtechno = 0.0;
+    public static double linearscalarPtechno;
+    public static double angularscalarPtechno;
+    public static SparkFunOTOS.Pose2D OTOS_OFFSET_Ptechno;
 
     public static FollowerConstants followerConstants = new FollowerConstants()
         // tune these
-        .mass(botWeightKg);
+        .mass(1);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
     public static MecanumConstants driveConstants = new MecanumConstants()
@@ -56,8 +63,7 @@ public class AutoConstants {
     public static OTOSConstants otosLocalizerConstants = new OTOSConstants()
         .hardwareMapName(OTOS)
         .linearUnit(DistanceUnit.INCH)
-        .angleUnit(AngleUnit.RADIANS)
-            .offset(OTOS_OFFSET).angularScalar(angularscalar).linearScalar(linearscalar);
+        .angleUnit(AngleUnit.RADIANS);
         // need to tune for OTOS localization
 
 
