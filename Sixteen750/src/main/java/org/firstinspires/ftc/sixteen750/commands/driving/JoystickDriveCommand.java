@@ -20,7 +20,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
 public class JoystickDriveCommand implements Command, Loggable {
 
     public DrivebaseSubsystem subsystem;
-    public Hardware hardware;
+    public static Hardware hardware;
     public DoubleSupplier x, y, r;
     public BooleanSupplier watchTrigger;
     public double targetHeadingRads;
@@ -29,6 +29,7 @@ public class JoystickDriveCommand implements Command, Loggable {
     public boolean driverDriving;
     public boolean operatorDriving;
     public Limelight3A limelight;
+
 
     public JoystickDriveCommand(
         DrivebaseSubsystem sub,
@@ -65,6 +66,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         fortyfiveTrigger = isTriggered(drive45);
         if (faceTagMode) {
             if (Setup.Connected.LIMELIGHT) {
+                limelight = hardware.limelight;
                 // --- Face AprilTag using Limelight ---
                 LLResult result = limelight.getLatestResult();
                 if (result != null && result.isValid()) {
