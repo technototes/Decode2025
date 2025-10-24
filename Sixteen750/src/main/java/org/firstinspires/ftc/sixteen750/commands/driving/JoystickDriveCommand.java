@@ -20,7 +20,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
 public class JoystickDriveCommand implements Command, Loggable {
 
     public DrivebaseSubsystem subsystem;
-    public static Hardware hardware;
+    public Hardware hardware;
     public DoubleSupplier x, y, r;
     public BooleanSupplier watchTrigger;
     public double targetHeadingRads;
@@ -29,7 +29,6 @@ public class JoystickDriveCommand implements Command, Loggable {
     public boolean driverDriving;
     public boolean operatorDriving;
     public Limelight3A limelight;
-
 
     public JoystickDriveCommand(
         DrivebaseSubsystem sub,
@@ -50,9 +49,41 @@ public class JoystickDriveCommand implements Command, Loggable {
         operatorDriving = false;
     }
 
+    public JoystickDriveCommand(
+        DrivebaseSubsystem sub,
+        Stick xyStick,
+        Stick rotStick,
+        DoubleSupplier strtDrive,
+        DoubleSupplier angleDrive,
+        Limelight3A limelight
+    ) {
+        addRequirements(sub);
+        subsystem = sub;
+        x = xyStick.getXSupplier();
+        y = xyStick.getYSupplier();
+        r = rotStick.getXSupplier();
+        targetHeadingRads = -sub.getExternalHeading();
+        driveStraighten = strtDrive;
+        drive45 = angleDrive;
+        driverDriving = true;
+        operatorDriving = false;
+        if (Setup.Connected.LIMELIGHT) {
+            this.limelight = limelight;
+        }
+    }
+
     // Use this constructor if you don't want auto-straightening
+    public JoystickDriveCommand(
+        DrivebaseSubsystem sub,
+        Stick xyStick,
+        Stick rotStick,
+        Limelight3A limelight
+    ) {
+        this(sub, xyStick, rotStick, null, null, limelight);
+    }
+
     public JoystickDriveCommand(DrivebaseSubsystem sub, Stick xyStick, Stick rotStick) {
-        this(sub, xyStick, rotStick, null, null);
+        this(sub, xyStick, rotStick, null, null, null);
     }
 
     // This will make the bot snap to an angle, if the 'straighten' button is pressed
@@ -66,21 +97,22 @@ public class JoystickDriveCommand implements Command, Loggable {
         fortyfiveTrigger = isTriggered(drive45);
         if (faceTagMode) {
             if (Setup.Connected.LIMELIGHT) {
-                limelight = hardware.limelight;
-                // --- Face AprilTag using Limelight ---
-                LLResult result = limelight.getLatestResult();
-                if (result != null && result.isValid()) {
-                    double tx = result.getTx(); // horizontal offset in degrees
-                    double kP_TagAlign = 0.03; // tune this gain
-                    return -kP_TagAlign * tx; // rotate until tx ~ 0
+                if (limelight != null) {
+                    // --- Face AprilTag using Limelight ---
+                    LLResult result = limelight.getLatestResult();
+                    if (result != null && result.isValid()) {
+                        double tx = result.getTx(); // horizontal offset in degrees
+                        double kP_TagAlign = 0.03; // tune this gain
+                        return -kP_TagAlign * tx; // rotate until tx ~ 0
+                    } else {
+                        return 0.0; // no target → don't spin
+                    }
                 } else {
-                    return 0.0; // no target → don't spin
+                    return calculateHeadingToCircle(
+                        subsystem.getPoseEstimate().getX(),
+                        subsystem.getPoseEstimate().getY()
+                    );
                 }
-            } else {
-                return calculateHeadingToCircle(
-                    subsystem.getPoseEstimate().getX(),
-                    subsystem.getPoseEstimate().getY()
-                );
             }
         }
 

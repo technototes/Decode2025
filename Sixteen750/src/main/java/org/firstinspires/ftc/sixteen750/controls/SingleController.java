@@ -4,6 +4,7 @@ import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
+import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
@@ -15,9 +16,10 @@ public class SingleController {
     public Setup setup;
     public CommandGamepad gamepad;
     public Stick driveLeftStick, driveRightStick;
+    public Hardware hardware;
     public CommandButton resetGyroButton, driveStraight, turboButton, snailButton;
 
-    public SingleController(CommandGamepad g, Robot r, Setup s) {
+    public SingleController(CommandGamepad g, Robot r, Setup s, Hardware hardware) {
         this.robot = r;
         this.setup = s;
         gamepad = g;
@@ -27,6 +29,7 @@ public class SingleController {
         if (Setup.Connected.DRIVEBASE) {
             bindDriveControls();
         }
+        this.hardware = hardware;
     }
 
     private void AssignNamedControllerButton() {

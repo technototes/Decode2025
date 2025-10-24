@@ -39,7 +39,7 @@ public class SingleTeleOp extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
-        controls = new SingleController(driverGamepad, robot, setup);
+        controls = new SingleController(driverGamepad, robot, setup, hardware);
         robot.drivebase.setPoseEstimate(HeadingHelper.getSavedPose());
         //CommandScheduler.scheduleInit(HorizontalSlidesCommands.transferring(robot));
         CommandScheduler.scheduleForState(

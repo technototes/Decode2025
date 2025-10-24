@@ -41,7 +41,7 @@ public class DriverController {
 
     public static double triggerThreshold = 0.1;
 
-    public DriverController(CommandGamepad g, Robot r) {
+    public DriverController(CommandGamepad g, Robot r, Hardware hardware) {
         this.robot = r;
         gamepad = g;
         override = g.leftTrigger.getAsButton(0.5);
@@ -63,6 +63,7 @@ public class DriverController {
         if (Setup.Connected.AIMINGSUBSYSTEM) {
             bindAimControls();
         }
+        this.hardware = hardware;
     }
 
     private void AssignNamedControllerButton() {
@@ -88,7 +89,12 @@ public class DriverController {
 
     public void bindDriveControls() {
         CommandScheduler.scheduleJoystick(
-            new JoystickDriveCommand(robot.drivebase, driveLeftStick, driveRightStick)
+            new JoystickDriveCommand(
+                robot.drivebase,
+                driveLeftStick,
+                driveRightStick,
+                hardware.limelight
+            )
         );
 
         // turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));

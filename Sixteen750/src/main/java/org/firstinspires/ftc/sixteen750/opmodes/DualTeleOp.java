@@ -43,7 +43,7 @@ public class DualTeleOp extends CommandOpMode {
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controlsOperator = new OperatorController(codriverGamepad, robot);
         if (Setup.Connected.DRIVEBASE) {
-            controlsDriver = new DriverController(driverGamepad, robot);
+            controlsDriver = new DriverController(driverGamepad, robot, hardware);
             // Just pick a starting point
             robot.drivebase.setPoseEstimate(HeadingHelper.getSavedPose());
             CommandScheduler.scheduleForState(
