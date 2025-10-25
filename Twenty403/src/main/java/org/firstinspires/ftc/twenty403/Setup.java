@@ -16,8 +16,8 @@ public class Setup {
         public static boolean SAFETYSUBSYSTEM = false;
         public static boolean EXTERNALIMU = false;
         public static boolean OCTOQUAD = false;
-        public static boolean LAUNCHER = false;
-        public static boolean FEED = false;
+        public static boolean LAUNCHER = true;
+        public static boolean FEED = true;
         public static boolean LIMELIGHT = false;
         public static boolean OTOS = true;
     }

@@ -27,10 +27,10 @@ public class DriveBaseValidation extends LinearOpMode {
             fl = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.FLMOTOR);
             rr = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.RRMOTOR);
             rl = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.RLMOTOR);
-            fl.setDirection(DcMotorSimple.Direction.FORWARD);
-            rl.setDirection(DcMotorSimple.Direction.FORWARD);
-            rr.setDirection(DcMotorSimple.Direction.REVERSE);
-            fr.setDirection(DcMotorSimple.Direction.REVERSE);
+            fl.setDirection(DcMotorSimple.Direction.REVERSE);
+            rl.setDirection(DcMotorSimple.Direction.REVERSE);
+            rr.setDirection(DcMotorSimple.Direction.FORWARD);
+            fr.setDirection(DcMotorSimple.Direction.FORWARD);
         } else {
             fl = null;
             fr = null;
@@ -84,7 +84,6 @@ public class DriveBaseValidation extends LinearOpMode {
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());
                 telemetry.addData("RR", rr.getCurrentPosition());
-
             }
             if (Setup.Connected.LAUNCHER) {
                 if (gamepad1.cross) {
