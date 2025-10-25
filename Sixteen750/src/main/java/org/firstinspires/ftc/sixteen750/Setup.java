@@ -30,9 +30,9 @@ public class Setup {
         public static String IMU = "imu";
         public static String EXTERNAL_IMU = "adafruit-imu";
         public static String ODOF = "odof";
-        public static String ODOR = "odor";
+        public static String ODOR = "intake/odo";
         public static String OTOS = "sparky";
-        public static String INTAKE_MOTOR = "intake";
+        public static String INTAKE_MOTOR = "intake/odo";
         public static String LAUNCHER_MOTOR1 = "launcher1";
         public static String LAUNCHER_MOTOR2 = "launcher2";
         public static String BRAKE_SERVO = "brake";
