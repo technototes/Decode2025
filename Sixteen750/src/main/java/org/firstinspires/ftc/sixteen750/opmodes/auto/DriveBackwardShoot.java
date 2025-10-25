@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
@@ -38,23 +39,25 @@ public class DriveBackwardShoot extends CommandOpMode {
         hardware.fr.setDirection(DcMotorSimple.Direction.REVERSE);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                TeleCommands.Intake(robot),
-                TeleCommands.GateUp(robot),
-                new DriveAutoCommand(robot.drivebase, 0.5),
+                    new ParallelCommandGroup(
+                            new DriveAutoCommand(robot.drivebase, 0.5),
+                            TeleCommands.Intake(robot),
+                            TeleCommands.GateUp(robot),
+                            TeleCommands.HoodUp(robot)),
                 new WaitCommand(1),
-                new DriveAutoCommand(robot.drivebase, 0),
-                TeleCommands.Launch(robot),
+                new ParallelCommandGroup(new DriveAutoCommand(robot.drivebase, 0),
+                        TeleCommands.Launch(robot)),
                 new WaitCommand(4),
                 TeleCommands.GateDown(robot),
-                new WaitCommand(0.5),
-                TeleCommands.GateUp(robot),
-                new WaitCommand(1),
-                TeleCommands.GateDown(robot),
-                new WaitCommand(0.5),
+                new WaitCommand(0.1),
                 TeleCommands.GateUp(robot),
                 new WaitCommand(0.5),
                 TeleCommands.GateDown(robot),
+                new WaitCommand(0.1),
+                TeleCommands.GateUp(robot),
                 new WaitCommand(0.5),
+                TeleCommands.GateDown(robot),
+                new WaitCommand(2),
                 TeleCommands.StopLaunch(robot),
                 TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode

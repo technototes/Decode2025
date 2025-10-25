@@ -6,6 +6,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.technototes.library.command.Command;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.path.command.TrajectorySequenceCommand;
 import org.firstinspires.ftc.sixteen750.AutoConstants;
@@ -17,6 +18,52 @@ public class Paths {
     public static PathChain pathChain;
     public static Command splineTestCommand(Robot r) {
         return new TrajectorySequenceCommand(r.drivebase, AutoConstants.SPLINETEST1_TO_SPLINETEST2);
+    }
+    public static Command PickupShootCommand(Robot r){
+        return new TrajectorySequenceCommand(r.drivebase, AutoConstants.START_TO_LAUNCH)
+                //need to create a fast and a slow version of the intake
+                .alongWith(TeleCommands.GateUp(r))
+                .alongWith(TeleCommands.Intake(r))
+                .alongWith(TeleCommands.Launch(r))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.LAUNCH_TO_PICKUP1))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP1_TO_PICKUP1END))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP1END_TO_LAUNCH))
+                .alongWith(Launching3Balls(r))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.LAUNCH_TO_PICKUP2))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP2_TO_PICKUP2END))
+                .alongWith(TeleCommands.Intake(r))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP2END_TO_LAUNCH))
+                .alongWith(TeleCommands.Launch(r))
+                .andThen(Launching3Balls(r))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.LAUNCH_TO_PICKUP3))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP3_TO_PICKUP3END))
+                .alongWith(TeleCommands.Intake(r))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP3END_TO_LAUNCH))
+                .alongWith(TeleCommands.Launch(r))
+                .andThen(Launching3Balls(r));
+    }
+
+    public static Command Launching3Balls(Robot r) {
+        return new SequentialCommandGroup(
+                TeleCommands.Intake(r),
+                TeleCommands.GateUp(r),
+                TeleCommands.Launch(r),
+                new WaitCommand(4),
+                TeleCommands.GateDown(r),
+                new WaitCommand(0.5),
+                TeleCommands.GateUp(r),
+                new WaitCommand(1),
+                TeleCommands.GateDown(r),
+                new WaitCommand(0.5),
+                TeleCommands.GateUp(r),
+                new WaitCommand(0.5),
+                TeleCommands.GateDown(r),
+                new WaitCommand(0.5),
+                TeleCommands.GateUp(r),
+                TeleCommands.StopLaunch(r),
+                TeleCommands.IntakeStop(r));
+
+
     }
     public void PedroPathTestCommand(Robot r){
         pathChain = follower.pathBuilder()
