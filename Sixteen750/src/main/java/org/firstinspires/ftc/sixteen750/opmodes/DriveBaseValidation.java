@@ -65,6 +65,7 @@ public class DriveBaseValidation extends LinearOpMode {
             if (gamepad1.cross){
                 ts.Stop();
             }
+
         }
     }
 }
