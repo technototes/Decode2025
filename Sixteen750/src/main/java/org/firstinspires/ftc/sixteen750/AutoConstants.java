@@ -17,8 +17,10 @@ import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
 import com.pedropathing.ftc.localization.constants.OTOSConstants;
+import com.pedropathing.ftc.localization.constants.TwoWheelConstants;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathConstraints;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -34,8 +36,8 @@ public class AutoConstants {
 
     // note these need to be tuned
     public static double botWeightKg = 9.44;
-    public static double xvelocity = 0.0;
-    public static double yvelocity = 0.0;
+    public static double xvelocity = 10.0;
+    public static double yvelocity = 10.0;
     // Need to talk about naming constants with students:
     public static double fwdDeceleration = 0.0;
     public static double latDeceleration = 0.0;
@@ -75,6 +77,20 @@ public class AutoConstants {
             .rightFrontEncoderDirection(Encoder.REVERSE)
             .rightRearEncoderDirection(Encoder.FORWARD);
     }
+    public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
+            .forwardEncoder_HardwareMapName(Setup.HardwareNames.ODOF) //odo name
+            .strafeEncoder_HardwareMapName(Setup.HardwareNames.ODOR) //odo name
+            .IMU_HardwareMapName("imu")
+            .forwardPodY(4.27)//offset
+            .strafePodX(-4.006)//offset
+            .forwardTicksToInches(5.47)//5.42, 5.47, 5.49
+            .strafeTicksToInches(5.38)//5.37, 5.39, 5.38
+            .IMU_Orientation(
+                    new RevHubOrientationOnRobot(
+                            RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                            RevHubOrientationOnRobot.UsbFacingDirection.LEFT
+                    )
+            );
 
     public static FollowerConstants getFollowerConstants() {
         // tune these
@@ -127,7 +143,8 @@ public class AutoConstants {
             .pathConstraints(getPathConstraints())
             //.OTOSLocalizer(getOTOSConstants())
             .mecanumDrivetrain(getDriveConstants())
-            .driveEncoderLocalizer(getEncoderConstants())
+            .twoWheelLocalizer(localizerConstants)
+            //.driveEncoderLocalizer(getEncoderConstants())
             .build();
     }
 

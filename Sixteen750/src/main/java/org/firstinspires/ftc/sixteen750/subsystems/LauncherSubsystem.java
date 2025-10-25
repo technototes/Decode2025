@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.hardware.motor.EncodedMotor;
-import com.technototes.library.hardware.motor.Motor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import org.firstinspires.ftc.sixteen750.Hardware;
@@ -20,7 +19,7 @@ public class LauncherSubsystem implements Loggable {
     @Log.Number(name = "Motor Power")
     public static double MOTOR_POWER = 0.65; // 0.5 1.0
 
-    public static double TARGET_LAUNCH_VELOCITY = 6000;
+    public static double  TARGET_LAUNCH_VELOCITY = 6000;
     @Log.Number(name = "Motor Velocity")
     public static double CURRENT_LAUNCH_VELOCITY = 0.0;
     boolean hasHardware;
@@ -65,16 +64,16 @@ public class LauncherSubsystem implements Loggable {
             launcher2.setPower(0);
         }
     }
-    public void IncreaseMotorSpeed() {
+    public void IncreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            MOTOR_POWER += 0.05;
+            TARGET_LAUNCH_VELOCITY += 100;
         }
     }
-    public void DecreaseMotorSpeed() {
+    public void DecreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            MOTOR_POWER -= 0.05;
+            TARGET_LAUNCH_VELOCITY -= 100;
         }
     }
     public void setMotorVelocityTest(){

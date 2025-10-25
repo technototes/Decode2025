@@ -13,10 +13,10 @@ public class TeleCommands {
         return Command.create(r.launcherSubsystem::Stop);
     }
     public static Command IncreaseMotor(Robot r) {
-        return Command.create(r.launcherSubsystem::IncreaseMotorSpeed);
+        return Command.create(r.launcherSubsystem::IncreaseMotorVelocity);
     }
     public static Command DecreaseMotor(Robot r) {
-        return Command.create(r.launcherSubsystem::DecreaseMotorSpeed);
+        return Command.create(r.launcherSubsystem::DecreaseMotorVelocity);
     }
     public static Command Intake(Robot r) {
         return Command.create(r.intakeSubsystem::Intake);
