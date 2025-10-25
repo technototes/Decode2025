@@ -136,8 +136,10 @@ class LocalizationTest extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /** This initializes the PoseUpdater, the mecanum drive motors, and the Panels telemetry. */
@@ -454,14 +456,14 @@ class ForwardVelocityTuner extends OpMode {
             telemetry.addData("PoseY", p.getY());
             telemetry.addData("PoseHeading", p.getHeading());
             telemetry.update();
-            if (Math.abs(follower.getPose().getY()) > DISTANCE) {
+            if (Math.abs(follower.getPose().getX()) > DISTANCE) {
                 end = true;
                 stopRobot();
             } else {
                 follower.setTeleOpDrive(1, 0, 0, true);
                 //double currentVelocity = Math.abs(follower.getVelocity().getXComponent());
                 double currentVelocity = Math.abs(
-                    follower.poseTracker.getLocalizer().getVelocity().getY()
+                    follower.poseTracker.getLocalizer().getVelocity().getX()
                 );
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -574,13 +576,13 @@ class LateralVelocityTuner extends OpMode {
         draw();
 
         if (!end) {
-            if (Math.abs(follower.getPose().getX()) > DISTANCE) {
+            if (Math.abs(follower.getPose().getY()) > DISTANCE) {
                 end = true;
                 stopRobot();
             } else {
                 follower.setTeleOpDrive(0, 1, 0, true);
                 double currentVelocity = Math.abs(
-                    follower.poseTracker.getLocalizer().getVelocity().getX()
+                    follower.poseTracker.getLocalizer().getVelocity().getY()
                 );
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -601,7 +603,7 @@ class LateralVelocityTuner extends OpMode {
             telemetryM.update(telemetry);
 
             if (gamepad1.aWasPressed()) {
-                follower.setXVelocity(average);
+                follower.setYVelocity(average);
                 String message = "YMovement: " + average;
                 changes.add(message);
             }
