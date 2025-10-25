@@ -27,6 +27,8 @@ public class AutoConstants {
     public static boolean ptechno = true;
     // measured 10/14
     public static double botWeightKg20403 = 9.0;
+    public static double botWidth = 17.75;
+    public static double botLength = 17.75;
     public static double xvelocity20403 = 77.84;
     public static double yvelocity20403 = 61.23;
     public static double fowarddeceleration20403 = 0.0;
@@ -39,13 +41,21 @@ public class AutoConstants {
         Math.PI / 2
     );
     public static double botWeightKgPtechno = 4.85;
-    public static double xvelocityPtechno;
-    public static double yvelocityPtechno;
-    public static double fowarddecelerationPtechno = 0.0;
-    public static double lateraldecelerationPtechno = 0.0;
-    public static double linearscalarPtechno;
-    public static double angularscalarPtechno;
-    public static SparkFunOTOS.Pose2D OTOS_OFFSET_Ptechno;
+    public static double xvelocityPtechno = 75.0;
+    public static double yvelocityPtechno = 50.0;
+    public static double fowarddecelerationPtechno = 0.50;
+    public static double lateraldecelerationPtechno = 0.50;
+    public static double linearscalarPtechno = 1.25;
+    public static double angularscalarPtechno = 1.0;
+    public static SparkFunOTOS.Pose2D OTOS_OFFSET_Ptechno = new SparkFunOTOS.Pose2D(
+        -5.75,
+        0,
+        -Math.PI / 2.0
+    );
+
+    public static double fwdTicksToInchesPtechno = 135;
+    public static double latTicksToInchesPtechno = 150;
+    public static double turnTicksToInchesPtechno = 100;
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
@@ -115,7 +125,7 @@ public class AutoConstants {
     }
 
     public static PathConstraints getPathConstraints() {
-        return new PathConstraints(0.99, 100, 1, 1);
+        return new PathConstraints(0.99, 100, .5, .5);
     }
 
     public static MecanumConstants getDriveConstants() {
@@ -125,10 +135,10 @@ public class AutoConstants {
             .leftRearMotorName(RLMOTOR)
             .rightFrontMotorName(FRMOTOR)
             .rightRearMotorName(RRMOTOR)
-            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .xVelocity(ptechno ? xvelocityPtechno : xvelocity20403)
             .yVelocity(ptechno ? yvelocityPtechno : yvelocity20403);
     }
@@ -153,14 +163,20 @@ public class AutoConstants {
             .leftFrontEncoderDirection(Encoder.FORWARD)
             .leftRearEncoderDirection(Encoder.FORWARD)
             .rightFrontEncoderDirection(Encoder.FORWARD)
-            .rightRearEncoderDirection(Encoder.FORWARD);
+            .rightRearEncoderDirection(Encoder.FORWARD)
+            .forwardTicksToInches(fwdTicksToInchesPtechno)
+            .strafeTicksToInches(latTicksToInchesPtechno)
+            .turnTicksToInches(turnTicksToInchesPtechno)
+            .robotLength(botLength)
+            .robotWidth(botWidth);
     }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
             .mecanumDrivetrain(getDriveConstants())
-            .OTOSLocalizer(getOtosLocalizerConstants())
+            //.OTOSLocalizer(getOtosLocalizerConstants())
+            .driveEncoderLocalizer(getDriveEncoderConstants())
             .build();
     }
 }
