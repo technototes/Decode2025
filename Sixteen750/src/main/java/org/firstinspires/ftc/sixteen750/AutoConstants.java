@@ -49,8 +49,13 @@ public class AutoConstants {
     public static SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(1.50, 0.0, 180);
     public static double linearscalar = -1.08; //1.9
     public static double angularscalar = 0.9;
-    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(1, 0, 0, 0.01);
-    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
+    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
+    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
+    public static PIDFCoefficients secondaryheadingPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
+    public static PIDFCoefficients secondarytranslationPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
+    public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.025, 0, 0.00001, 0.6, 0.01);
+
+
     //public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
     //public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
 
@@ -80,15 +85,17 @@ public class AutoConstants {
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
             .forwardEncoder_HardwareMapName(Setup.HardwareNames.ODOF) //odo name
             .strafeEncoder_HardwareMapName(Setup.HardwareNames.ODOR) //odo name
-            .IMU_HardwareMapName("imu")
+            .IMU_HardwareMapName(Setup.HardwareNames.EXTERNAL_IMU)
             .forwardPodY(4.27)//offset
             .strafePodX(-4.006)//offset
             .forwardTicksToInches(5.47)//5.42, 5.47, 5.49
             .strafeTicksToInches(5.38)//5.37, 5.39, 5.38
+            .forwardEncoderDirection(Encoder.REVERSE)
+            .strafeEncoderDirection(Encoder.FORWARD)
             .IMU_Orientation(
                     new RevHubOrientationOnRobot(
-                            RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                            RevHubOrientationOnRobot.UsbFacingDirection.LEFT
+                            RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                            RevHubOrientationOnRobot.UsbFacingDirection.DOWN
                     )
             );
 
@@ -98,7 +105,11 @@ public class AutoConstants {
             .mass(botWeightKg)
             .forwardZeroPowerAcceleration(fwdDeceleration)
             .lateralZeroPowerAcceleration(latDeceleration)
+                .holdPointTranslationalScaling(1)
             .headingPIDFCoefficients(headingPIDF)
+                .drivePIDFCoefficients(drivePIDF)
+            .secondaryHeadingPIDFCoefficients(secondaryheadingPIDF)
+            .secondaryTranslationalPIDFCoefficients(secondarytranslationPIDF)
             .translationalPIDFCoefficients(translationPIDF);
     }
 
@@ -154,6 +165,14 @@ public class AutoConstants {
 
     public static ConfigurablePoseD SPLINETEST1 = new ConfigurablePoseD(0, -55, 0);
     public static ConfigurablePoseD SPLINETEST2 = new ConfigurablePoseD(55, 0, 0);
+    public static ConfigurablePoseD START_LAUNCHZONE = new ConfigurablePoseD(21.613, 121.866, 140);
+    public static ConfigurablePoseD LAUNCHING = new ConfigurablePoseD(57.743, 86.258, 140);
+    public static ConfigurablePoseD PICKUP1_START = new ConfigurablePoseD(57.964, 72.541 ,180);
+    public static ConfigurablePoseD PICKUP1_END = new ConfigurablePoseD(22.346, 72.763, 180);
+    public static ConfigurablePoseD PICKUP2_START = new ConfigurablePoseD(56.637, 44.887, 180);
+    public static ConfigurablePoseD PICKUP2_END = new ConfigurablePoseD(19.912, 44.223, 180);
+    public static ConfigurablePoseD PICKUP3_START = new ConfigurablePoseD(56.195, 15.463, 180);
+    public static ConfigurablePoseD PICKUP3_END = new ConfigurablePoseD(18.585, 15.020, 180);
 
     public static ConfigurablePoseD TELESTART = new ConfigurablePoseD(0, 0, 90);
     public static ConfigurablePoseD FORWARD = new ConfigurablePoseD(48, 0, 0);
@@ -165,6 +184,86 @@ public class AutoConstants {
     // These are 'trajectory pieces' which should be named like this:
     // {STARTING_POSITION}_TO_{ENDING_POSITION}
 
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > START_TO_LAUNCH = b ->
+            b
+                    .apply(START_LAUNCHZONE.toPose())
+                    .lineToLinearHeading(LAUNCHING.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > LAUNCH_TO_PICKUP1 = b ->
+            b
+                    .apply(LAUNCHING.toPose())
+                    .lineToLinearHeading(PICKUP1_START.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > PICKUP1_TO_PICKUP1END = b ->
+            b
+                    .apply(PICKUP1_START.toPose())
+                    .lineToLinearHeading(PICKUP1_END.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > PICKUP1END_TO_LAUNCH = b ->
+            b
+                    .apply(PICKUP1_END.toPose())
+                    .lineToLinearHeading(LAUNCHING.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > LAUNCH_TO_PICKUP2 = b ->
+            b
+                    .apply(LAUNCHING.toPose())
+                    .lineToLinearHeading(PICKUP2_START.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > PICKUP2_TO_PICKUP2END = b ->
+            b
+                    .apply(PICKUP2_START.toPose())
+                    .lineToLinearHeading(PICKUP2_END.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > PICKUP2END_TO_LAUNCH = b ->
+            b
+                    .apply(PICKUP2_END.toPose())
+                    .lineToLinearHeading(LAUNCHING.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > LAUNCH_TO_PICKUP3 = b ->
+            b
+                    .apply(LAUNCHING.toPose())
+                    .lineToLinearHeading(PICKUP3_START.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > PICKUP3_TO_PICKUP3END= b ->
+            b
+                    .apply(PICKUP3_START.toPose())
+                    .lineToLinearHeading(PICKUP3_END.toPose())
+                    .build();
+    public static final Function<
+            Function<Pose2d, TrajectorySequenceBuilder>,
+            TrajectorySequence
+            > PICKUP3END_TO_LAUNCH = b ->
+            b
+                    .apply(PICKUP3_END.toPose())
+                    .lineToLinearHeading(LAUNCHING.toPose())
+                    .build();
     public static final Function<
         Function<Pose2d, TrajectorySequenceBuilder>,
         TrajectorySequence
