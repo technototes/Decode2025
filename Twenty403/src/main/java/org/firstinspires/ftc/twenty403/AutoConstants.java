@@ -33,18 +33,22 @@ public class AutoConstants {
     public static double botLength = 17.75;
     public static double xVelocity = 77.84;
     public static double yVelocity = 61.23;
-    public static double forwardDeceleration = -30.0;
-    public static double lateralDeceleration = -44.0;
+    public static double forwardDeceleration = -25.0;
+    public static double lateralDeceleration = -30.0;
     public static double linearScalar = 1.4;
     public static double angularScalar = 1.0;
-    public static double brakingStrength = 0.5;
-    public static double brakingStart = 0.5;
+    public static double brakingStrength = 0.005;
+    public static double brakingStart = 0.1;
+    public static double centripetalScale = 0.0005;
     public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(4.75, 0, -Math.PI / 2);
-    public static PIDFCoefficients translationPID = new PIDFCoefficients(0.02, 0, 0, 0.015);
-    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.2, 0, 0, 0.01);
+    public static PIDFCoefficients translationPID = new PIDFCoefficients(0.06, 0.00001, 0, 0.015);
+    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.4, 0.0008, 0, 0.01);
 
+    // "Kalman filtering": T in this constructor is the % of the previous
+    // derivative that should be used to calculate the derivative.
+    // (D is "Derivative" in PIDF...)
     public static FilteredPIDFCoefficients drivePID = new FilteredPIDFCoefficients(
-        0.05,
+        0.005,
         0,
         0.00035,
         0.6,
@@ -55,12 +59,12 @@ public class AutoConstants {
     public static class PtechnoConst {
 
         public static double botWeightKg = 4.85;
-        public static double xvelocity = 61.5;
-        public static double yvelocity = 53.3;
-        public static double fowarddeceleration = -35.0;
-        public static double lateraldeceleration = -44.0;
-        public static double linearscalar = 1.1;
-        public static double angularscalar = 1.0;
+        public static double xVelocity = 61.5;
+        public static double yVelocity = 53.3;
+        public static double forwardDeceleration = -35.0;
+        public static double lateralDeceleration = -44.0;
+        public static double linearScale = 1.1;
+        public static double angularScale = 1.0;
         public static double brakingStrength = 0.1;
         public static double brakingStart = 0.1;
         public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(
@@ -81,10 +85,10 @@ public class AutoConstants {
             // tune these
             .mass(ptechno ? PtechnoConst.botWeightKg : botWeightKg)
             .forwardZeroPowerAcceleration(
-                ptechno ? PtechnoConst.fowarddeceleration : forwardDeceleration
+                ptechno ? PtechnoConst.forwardDeceleration : forwardDeceleration
             )
             .lateralZeroPowerAcceleration(
-                ptechno ? PtechnoConst.lateraldeceleration : lateralDeceleration
+                ptechno ? PtechnoConst.lateralDeceleration : lateralDeceleration
             )
             .useSecondaryDrivePIDF(false)
             .useSecondaryHeadingPIDF(false)
@@ -92,7 +96,7 @@ public class AutoConstants {
             .translationalPIDFCoefficients(translationPID)
             .headingPIDFCoefficients(headingPID)
             .drivePIDFCoefficients(drivePID)
-            .centripetalScaling(0.0005);
+            .centripetalScaling(centripetalScale);
     }
 
     public static PathConstraints getPathConstraints() {
@@ -115,8 +119,8 @@ public class AutoConstants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(ptechno ? PtechnoConst.xvelocity : xVelocity)
-            .yVelocity(ptechno ? PtechnoConst.yvelocity : yVelocity);
+            .xVelocity(ptechno ? PtechnoConst.xVelocity : xVelocity)
+            .yVelocity(ptechno ? PtechnoConst.yVelocity : yVelocity);
     }
 
     public static OTOSConstants getOtosLocalizerConstants() {
@@ -124,8 +128,8 @@ public class AutoConstants {
             .hardwareMapName(OTOS)
             .linearUnit(DistanceUnit.INCH)
             .angleUnit(AngleUnit.RADIANS)
-            .linearScalar(ptechno ? PtechnoConst.linearscalar : linearScalar)
-            .angularScalar(ptechno ? PtechnoConst.angularscalar : angularScalar)
+            .linearScalar(ptechno ? PtechnoConst.linearScale : linearScalar)
+            .angularScalar(ptechno ? PtechnoConst.angularScale : angularScalar)
             .offset(ptechno ? PtechnoConst.OTOS_OFFSET : OTOS_OFFSET);
         // need to tune for OTOS localization
     }
