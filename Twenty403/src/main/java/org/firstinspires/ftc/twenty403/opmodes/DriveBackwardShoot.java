@@ -11,7 +11,6 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.commands.auto.DriveAutoCommand;
@@ -35,10 +34,11 @@ public class DriveBackwardShoot extends CommandOpMode {
         //robot.drivebase.setPoseEstimate(AutoConstants.BACKWARD.toPose());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                    //might not need to run the drive command depending on where the bot launches from
-                    new ParallelCommandGroup(
-                        new DriveAutoCommand(robot.drivebaseSubsystem, 0.5),
-                        Command.create(robot.launcherSubsystem::Launch)),
+                //might not need to run the drive command depending on where the bot launches from
+                new ParallelCommandGroup(
+                    new DriveAutoCommand(robot.drivebaseSubsystem, 0.5),
+                    Command.create(robot.launcherSubsystem::Launch)
+                ),
                 new DriveAutoCommand(robot.drivebaseSubsystem, 0),
                 new WaitCommand(1),
                 Command.create(robot.feedingSubsystem::moveball),

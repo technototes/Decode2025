@@ -20,5 +20,6 @@ public class OperatorController {
     }
 
     private void AssignNamedControllerButton() {}
+
     private void bindButtonControls() {}
 }

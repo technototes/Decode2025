@@ -17,8 +17,10 @@ import java.util.function.DoubleConsumer;
 public class Differential {
 
     private final DoubleConsumer input1, input2;
-    private double average = 0, deviation = 0;
-    private double inputMin = -1, inputMax = 1;
+    private double average = 0,
+        deviation = 0;
+    private double inputMin = -1,
+        inputMax = 1;
 
     /**
      * Enum for the priority of the differential. This means that it will prioritize one of the

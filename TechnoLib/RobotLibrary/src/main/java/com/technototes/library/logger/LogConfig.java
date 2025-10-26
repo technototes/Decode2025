@@ -63,6 +63,5 @@ public @interface LogConfig {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(value = { FIELD, LOCAL_VARIABLE, METHOD })
-    @interface Disabled {
-    }
+    @interface Disabled {}
 }

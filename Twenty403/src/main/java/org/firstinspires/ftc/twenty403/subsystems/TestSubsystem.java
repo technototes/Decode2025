@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.hardware.servo.Servo;
-
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Setup;
 
@@ -49,6 +48,7 @@ public class TestSubsystem {
             //Decide how the servo works later xD
         }
     }
+
     public void spinCRServo() {
         if (hasHardware) {
             testcrservo.setPower(TESTCRSERVO_SPEED);

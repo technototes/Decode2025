@@ -26,7 +26,6 @@ public class TestingController {
         motorVelocityButton = gamepad.ps_triangle;
     }
 
-
     private void bindButtonControls() {
         motorPowerButton.whenPressed(TeleCommands.MotorPowerTest(robot));
         // motorPowerButton.whenReleased(TeleCommands.)/

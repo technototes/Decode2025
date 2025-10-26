@@ -3,6 +3,7 @@ package org.firstinspires.ftc.twenty403.helpers;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.digitalchickenlabs.OctoQuad;
 import com.qualcomm.hardware.digitalchickenlabs.OctoQuad.EncoderDirection;
+
 @Configurable
 public class OctoquadEncoder implements IEncoder {
 

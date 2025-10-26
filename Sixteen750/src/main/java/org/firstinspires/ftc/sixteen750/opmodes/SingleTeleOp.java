@@ -83,10 +83,10 @@ public class SingleTeleOp extends CommandOpMode {
             telemetry.addData(
                 "Motif:",
                 Setup.HardwareNames.Motif[0] +
-                " " +
-                Setup.HardwareNames.Motif[1] +
-                " " +
-                Setup.HardwareNames.Motif[2]
+                    " " +
+                    Setup.HardwareNames.Motif[1] +
+                    " " +
+                    Setup.HardwareNames.Motif[2]
             );
             telemetry.addData(
                 "Pipeline",

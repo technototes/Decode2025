@@ -10,7 +10,6 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
@@ -39,14 +38,17 @@ public class DriveBackwardShoot extends CommandOpMode {
         hardware.fr.setDirection(DcMotorSimple.Direction.REVERSE);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                    new ParallelCommandGroup(
-                            new DriveAutoCommand(robot.drivebase, 0.5),
-                            TeleCommands.Intake(robot),
-                            TeleCommands.GateUp(robot),
-                            TeleCommands.HoodUp(robot)),
+                new ParallelCommandGroup(
+                    new DriveAutoCommand(robot.drivebase, 0.5),
+                    TeleCommands.Intake(robot),
+                    TeleCommands.GateUp(robot),
+                    TeleCommands.HoodUp(robot)
+                ),
                 new WaitCommand(1),
-                new ParallelCommandGroup(new DriveAutoCommand(robot.drivebase, 0),
-                        TeleCommands.Launch(robot)),
+                new ParallelCommandGroup(
+                    new DriveAutoCommand(robot.drivebase, 0),
+                    TeleCommands.Launch(robot)
+                ),
                 new WaitCommand(4),
                 TeleCommands.GateDown(robot),
                 new WaitCommand(0.1),

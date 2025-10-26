@@ -123,7 +123,8 @@ public class TrajectorySequenceBuilder {
     }
 
     public TrajectorySequenceBuilder lineTo(Vector2d endPosition) {
-        return addPath(() -> currentTrajectoryBuilder.lineTo(endPosition, currentVelConstraint, currentAccelConstraint)
+        return addPath(() ->
+            currentTrajectoryBuilder.lineTo(endPosition, currentVelConstraint, currentAccelConstraint)
         );
     }
 
@@ -146,7 +147,8 @@ public class TrajectorySequenceBuilder {
         TrajectoryVelocityConstraint velConstraint,
         TrajectoryAccelerationConstraint accelConstraint
     ) {
-        return addPath(() -> currentTrajectoryBuilder.lineToConstantHeading(endPosition, velConstraint, accelConstraint)
+        return addPath(() ->
+            currentTrajectoryBuilder.lineToConstantHeading(endPosition, velConstraint, accelConstraint)
         );
     }
 
@@ -217,7 +219,8 @@ public class TrajectorySequenceBuilder {
     }
 
     public TrajectorySequenceBuilder strafeLeft(double distance) {
-        return addPath(() -> currentTrajectoryBuilder.strafeLeft(distance, currentVelConstraint, currentAccelConstraint)
+        return addPath(() ->
+            currentTrajectoryBuilder.strafeLeft(distance, currentVelConstraint, currentAccelConstraint)
         );
     }
 
@@ -255,7 +258,8 @@ public class TrajectorySequenceBuilder {
         TrajectoryVelocityConstraint velConstraint,
         TrajectoryAccelerationConstraint accelConstraint
     ) {
-        return addPath(() -> currentTrajectoryBuilder.splineTo(endPosition, endHeading, velConstraint, accelConstraint)
+        return addPath(() ->
+            currentTrajectoryBuilder.splineTo(endPosition, endHeading, velConstraint, accelConstraint)
         );
     }
 

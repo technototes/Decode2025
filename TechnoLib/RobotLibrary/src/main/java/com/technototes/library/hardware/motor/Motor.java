@@ -15,7 +15,8 @@ import java.util.function.Supplier;
 @SuppressWarnings("unused")
 public class Motor<T extends DcMotorSimple> extends HardwareDevice<T> implements Supplier<Double> {
 
-    private double min = -1, max = 1;
+    private double min = -1,
+        max = 1;
     protected double power;
     protected DcMotorSimple.Direction dir;
     protected DcMotor.ZeroPowerBehavior zeroBehavior;

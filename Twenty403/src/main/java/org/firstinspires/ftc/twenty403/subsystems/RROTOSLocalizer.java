@@ -2,7 +2,6 @@ package org.firstinspires.ftc.twenty403.subsystems;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.Localizer;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;

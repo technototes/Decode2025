@@ -6,7 +6,6 @@ import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
-
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
@@ -43,6 +42,7 @@ public class DriverController {
     public static boolean pipelineToggle = false;
     public static boolean launchOn = false;
     private boolean faceTagMode = false;
+
     public void togglePipelineMode() {
         pipelineToggle = !pipelineToggle;
     }
@@ -58,10 +58,10 @@ public class DriverController {
         if (Setup.Connected.LAUNCHER) {
             bindLaunchControls();
         }
-        if (Setup.Connected.FEED){
+        if (Setup.Connected.FEED) {
             bindFeedControls();
         }
-        if (Setup.Connected.LIMELIGHT){
+        if (Setup.Connected.LIMELIGHT) {
             bindPipelineControls();
         }
     }
@@ -82,7 +82,6 @@ public class DriverController {
         apriltagPipeline = gamepad.dpadRight;
         AutoAim = gamepad.dpadDown;
         moveballslow = gamepad.dpadLeft;
-
     }
 
     public void bindDriveControls() {
@@ -101,49 +100,63 @@ public class DriverController {
 
         snailButton.whenPressed(EZCmd.Drive.SnailMode(robot.drivebaseSubsystem));
         snailButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
-        if (Setup.Connected.LIMELIGHT){
+        if (Setup.Connected.LIMELIGHT) {
             AutoAim.whenPressed(EZCmd.Drive.AutoAim(robot.drivebaseSubsystem));
         }
 
-         resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
+        resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
     }
-
 
     public void bindLaunchControls() {
         launch.whenPressed(this::setLaunch);
         launchSlower.whenPressed(this::launchSlower);
         launchFaster.whenPressed(this::launchFaster);
     }
+
     public void bindFeedControls() {
         moveballup.whenPressed(robot.feedingSubsystem::moveball);
         moveballup.whenReleased(robot.feedingSubsystem::stop);
         moveballslow.whenPressed(robot.feedingSubsystem::moveballslow);
         moveballslow.whenReleased(robot.feedingSubsystem::stop);
-
     }
+
     public void bindPipelineControls() {
         pipelineMode.whenPressed(this::togglePipelineMode);
         if (pipelineToggle) {
-//            barcodePipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Barcode_Pipeline));
-            GreencolorPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Green_Color_Pipeline));
-            PurplecolorPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Purple_Color_Pipeline));
-//            classifierPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Classifier_Pipeline));
-//            objectPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Object_Detection_Pipeline));
-            apriltagPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.AprilTag_Pipeline));
+            //            barcodePipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Barcode_Pipeline));
+            GreencolorPipeline.whenPressed(
+                new LLPipelineChangeCommand(
+                    hardware.limelight,
+                    Setup.HardwareNames.Green_Color_Pipeline
+                )
+            );
+            PurplecolorPipeline.whenPressed(
+                new LLPipelineChangeCommand(
+                    hardware.limelight,
+                    Setup.HardwareNames.Purple_Color_Pipeline
+                )
+            );
+            //            classifierPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Classifier_Pipeline));
+            //            objectPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Object_Detection_Pipeline));
+            apriltagPipeline.whenPressed(
+                new LLPipelineChangeCommand(
+                    hardware.limelight,
+                    Setup.HardwareNames.AprilTag_Pipeline
+                )
+            );
         }
     }
-    public void setLaunch(){
+
+    public void setLaunch() {
         launchOn = !launchOn;
         Launch();
     }
 
-    public void launchFaster()
-    {
+    public void launchFaster() {
         robot.launcherSubsystem.IncreaseVelocity();
     }
 
-    public void launchSlower()
-    {
+    public void launchSlower() {
         robot.launcherSubsystem.DecreaseVelocity();
     }
 
@@ -154,5 +167,4 @@ public class DriverController {
             robot.launcherSubsystem.Stop();
         }
     }
-
 }

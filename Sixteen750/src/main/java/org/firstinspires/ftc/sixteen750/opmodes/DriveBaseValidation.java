@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.subsystems.TestSubsystem;
 
@@ -28,7 +27,6 @@ public class DriveBaseValidation extends LinearOpMode {
         rl.setDirection(DcMotorSimple.Direction.FORWARD);
         rr.setDirection(DcMotorSimple.Direction.REVERSE);
         fr.setDirection(DcMotorSimple.Direction.REVERSE);
-
 
         waitForStart();
         while (opModeIsActive()) {
@@ -56,13 +54,13 @@ public class DriveBaseValidation extends LinearOpMode {
             if (gamepad1.circle) {
                 ts.setServo();
             }
-            if(gamepad1.square){
+            if (gamepad1.square) {
                 ts.spinCRServo();
             }
-            if (gamepad1.triangle){
+            if (gamepad1.triangle) {
                 ts.spinMotor();
             }
-            if (gamepad1.cross){
+            if (gamepad1.cross) {
                 ts.Stop();
             }
         }

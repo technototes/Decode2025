@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Loggable;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
@@ -35,6 +34,7 @@ public class IntakeSubsystem implements Loggable {
             intake.setPower(MOTOR_VELOCITY);
         }
     }
+
     public void Spit() {
         // Spin the motors
         if (hasHardware) {
@@ -42,12 +42,14 @@ public class IntakeSubsystem implements Loggable {
             intake.setPower(MOTOR_VELOCITY);
         }
     }
+
     public void Hold() {
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
             intake.setPower(MOTOR_VELOCITY / 2);
         }
     }
+
     public void StopIntake() {
         if (hasHardware) {
             intake.setPower(0);
