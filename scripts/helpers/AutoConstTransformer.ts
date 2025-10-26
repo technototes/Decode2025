@@ -393,9 +393,7 @@ export function MakeAutoConstantsTransformer(): AutoConstantsTransformer {
         !(
           ctx.AssignmentOperator ||
           ctx.BinaryOperator ||
-          ctx.Greater ||
           ctx.Instanceof ||
-          ctx.Less ||
           ctx.pattern ||
           ctx.referenceType
         ),

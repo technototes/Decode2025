@@ -1,0 +1,101 @@
+apply plugin: 'java-library'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
+
+    // Specifically for MeepMeep
+    maven { url 'https://maven.brott.dev/' }
+    // don't remove this extra maven url unless maven.brott.dev is redirecting to something else
+    // `maven.brott.dev` is 302 redirecting to `acmerobotics.z13.web.core.windows.net`
+    // if unable to access `maven.brott.dev` the above code can fail-over to `acmerobotics.z13.web.core.windows.net`
+    // if experiencing DNS poisoning, try to add this to etc/hosts `52.239.247.97 acmerobotics.z13.web.core.windows.net`
+    // alternatively you can add `142.251.33.115 maven.brott.dev` to your etc/hosts, `nslookup ghs.googlehosted.com` to get the latest IP address
+    maven { url 'https://acmerobotics.z13.web.core.windows.net/' }
+}
+
+// Do not use apply from here
+// Include common definitions from above.
+//apply from: '../build.common.gradle'
+//apply from: '../build.dependencies.gradle'
+
+def buildDirLoc = layout.buildDirectory.get().getAsFile().getAbsolutePath()
+def processedLocation16750 = "${buildDirLoc}/generated-sources-16750"
+// def processedLocation20403 = "${buildDirLoc}/generated-sources-20403"
+def frontSlashed16750 = processedLocation16750.replaceAll("\\\\", "/")
+// def frontSlashed20403 = processedLocation20403.replaceAll("\\\\", "/")
+
+// This needs to point to the bun binary. You can find it by typing 
+// 'which bun' in your terminal. It generally installs itself to '/.bun/bin/bun'
+def bunBinary = System.properties['user.home'] + '/.bun/bin/bun'
+
+sourceSets.main.java.srcDirs += 'src/main/java'
+sourceSets.main.java.srcDirs += processedLocation16750
+// sourceSets.main.java.srcDirs += processedLocation20403
+
+// This is a custom gradle task to copy constants into the MeepMeep code base
+// and manipulate them to make it all buildable
+task makeMeepMeep16750Java {
+
+    def fileList = [
+        // '../Sixteen750/src/main/java/org/firstinspires/ftc/sixteen750/subsystems/DrivebaseSubsystem.java',
+        '../Sixteen750/src/main/java/org/firstinspires/ftc/sixteen750/PathConstants.java'
+    ]
+
+    def theFiles = files(fileList)
+
+    inputs.files theFiles.asFileTree.files
+    outputs.dir processedLocation16750
+
+    doLast {
+        exec {
+            commandLine bunBinary, 'meep', frontSlashed16750, 'DO_NOT_EDIT_16750', "\"" + fileList.join('" "').replace("\\\\", "/") + "\""
+        }
+    }
+}
+
+/*
+task makeMeepMeep20403Java {
+
+    def fileList =    [
+        '../Twenty403/src/main/java/org/firstinspires/ftc/twenty403/subsystems/DrivebaseSubsystem.java',
+        '../Twenty403/src/main/java/org/firstinspires/ftc/twenty403/AutoConstants.java'
+    ]
+
+    def theFiles = files(fileList)
+
+    inputs.files theFiles.asFileTree.files
+    outputs.dir processedLocation20403
+
+    doLast {
+        exec {
+            commandLine bunBinary, 'meep', frontSlashed20403, 'DO_NOT_EDIT_20403',  "\"" + fileList.join('" "').replace("\\\\", "/") + "\""
+        }
+    }
+}
+*/
+
+task cleanMeepMeep {
+    delete processedLocation16750
+    // delete processedLocation20403
+}
+
+compileJava {
+    dependsOn makeMeepMeep16750Java // , makeMeepMeep20403Java
+}
+
+clean {
+    dependsOn cleanMeepMeep
+}
+
+// makeMeepMeep20403Java.mustRunAfter cleanMeepMeep
+makeMeepMeep16750Java.mustRunAfter cleanMeepMeep
+
+dependencies {
+    implementation 'com.github.rh-robotics:MeepMeep:v1.1.1' // FLIP: MeepMeepLocal
+    // implementation project(':MeepMeep') // FLIP: MeepMeepLocal
+}

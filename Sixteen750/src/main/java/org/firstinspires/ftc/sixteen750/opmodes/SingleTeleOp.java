@@ -16,7 +16,6 @@ import com.technototes.library.util.Alliance;
 import java.util.Arrays;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.sixteen750.AutoConstants;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;

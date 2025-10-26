@@ -7,10 +7,9 @@ import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-import org.firstinspires.ftc.sixteen750.AutoConstants;
 import org.firstinspires.ftc.sixteen750.Hardware;
+import org.firstinspires.ftc.sixteen750.PathConstants;
 import org.firstinspires.ftc.sixteen750.Robot;
-import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.auto.ForwardBackwardCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
@@ -29,7 +28,7 @@ public class ForwardBackwardSide extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Observation);
-        robot.drivebase.setPoseEstimate(AutoConstants.FORWARD.toPose());
+        robot.drivebase.setPoseEstimate(PathConstants.FORWARD.toPose());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 new ForwardBackwardCommand(robot),

@@ -47,10 +47,11 @@ if (resolvedFiles.length === 0) {
 }
 filesAsString = resolvedFiles;
 // console.log(filesAsString);
-// We're only finding files that include "auto" and "const" in their paths.
+// We're only finding files that include "path" or "auto" and "const" in their paths.
 const constantsFiles = filesAsString.filter(
   (val) =>
-    val.toLocaleLowerCase().indexOf('auto') >= 0 &&
+    (val.toLocaleLowerCase().indexOf('path') >= 0 ||
+      val.toLocaleLowerCase().indexOf('auto') >= 0) &&
     val.toLocaleLowerCase().indexOf('const') >= 0 &&
     val.toLocaleLowerCase().indexOf('meepmeep') < 0,
 );
@@ -101,6 +102,7 @@ async function main(): Promise<void> {
  * If you're not using fully qualified names, and things are still messed up
  * you should reach out to Kevin to figure out what's going on.
  *
+ * (This file was generated ${new Date()})
  */
 `;
 
