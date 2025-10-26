@@ -10,6 +10,7 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.path.command.TrajectorySequenceCommand;
 import org.firstinspires.ftc.sixteen750.AutoConstants;
+import org.firstinspires.ftc.sixteen750.PathConstants;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
@@ -19,35 +20,35 @@ public class Paths {
     public static PathChain pathChain;
 
     public static Command splineTestCommand(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, AutoConstants.SPLINETEST1_TO_SPLINETEST2);
+        return new TrajectorySequenceCommand(r.drivebase, PathConstants.SPLINETEST1_TO_SPLINETEST2);
     }
 
     public static Command PickupShootCommand(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, AutoConstants.START_TO_LAUNCH)
+        return new TrajectorySequenceCommand(r.drivebase, PathConstants.START_TO_LAUNCH)
             //need to create a fast and a slow version of the intake
             .alongWith(TeleCommands.GateUp(r))
             .alongWith(TeleCommands.Intake(r))
             .alongWith(TeleCommands.Launch(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.LAUNCH_TO_PICKUP1))
+            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.LAUNCH_TO_PICKUP1))
             .andThen(
-                new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP1_TO_PICKUP1END)
+                new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP1_TO_PICKUP1END)
             )
-            .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP1END_TO_LAUNCH))
+            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP1END_TO_LAUNCH))
             .alongWith(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.LAUNCH_TO_PICKUP2))
+            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.LAUNCH_TO_PICKUP2))
             .andThen(
-                new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP2_TO_PICKUP2END)
+                new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP2_TO_PICKUP2END)
             )
             .alongWith(TeleCommands.Intake(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP2END_TO_LAUNCH))
+            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP2END_TO_LAUNCH))
             .alongWith(TeleCommands.Launch(r))
             .andThen(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.LAUNCH_TO_PICKUP3))
+            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.LAUNCH_TO_PICKUP3))
             .andThen(
-                new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP3_TO_PICKUP3END)
+                new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP3_TO_PICKUP3END)
             )
             .alongWith(TeleCommands.Intake(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, AutoConstants.PICKUP3END_TO_LAUNCH))
+            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP3END_TO_LAUNCH))
             .alongWith(TeleCommands.Launch(r))
             .andThen(Launching3Balls(r));
     }
@@ -92,7 +93,7 @@ public class Paths {
     }
 
     public static Command JustShootCommand(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, AutoConstants.BLUE_SCORING)
+        return new TrajectorySequenceCommand(r.drivebase, PathConstants.BLUE_SCORING)
             .alongWith(TeleCommands.Launch(r))
             .andThen(new WaitCommand(3));
         //.andThen(TeleCommands.)

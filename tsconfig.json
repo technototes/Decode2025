@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "pretty": true,
+    "skipLibCheck": true
+  },
+  "include": ["scripts/*.ts", "scripts/helpers/*.ts"]
+}
