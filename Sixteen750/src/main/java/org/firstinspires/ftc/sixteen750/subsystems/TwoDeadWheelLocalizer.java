@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.technototes.library.hardware.sensor.IGyro;
+import com.technototes.library.hardware.sensor.encoder.MotorEncoder;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -108,12 +109,12 @@ public class TwoDeadWheelLocalizer
         wheelRadius = OdoDeadWheelConstants.WheelRadius;
     }
 
-    public TwoDeadWheelLocalizer(IEncoder fbEncoder, IEncoder rlEncoder, IGyro g) {
+    public TwoDeadWheelLocalizer(MotorEncoder fbEncoder, MotorEncoder rlEncoder, IGyro g) {
         this(g);
-        fbEnc = fbEncoder;
-        rlEnc = rlEncoder;
-        fbEncoder.setDirection(OdoDeadWheelConstants.perpReverse);
-        rlEncoder.setDirection(OdoDeadWheelConstants.paraReverse);
+        fbEnc = new EncoderFromMotorEncoder(fbEncoder);
+        rlEnc = new EncoderFromMotorEncoder(rlEncoder);
+        fbEnc.setDirection(OdoDeadWheelConstants.perpReverse);
+        rlEnc.setDirection(OdoDeadWheelConstants.paraReverse);
     }
 
     public double encoderTicksToInches(double ticks) {
@@ -160,5 +161,46 @@ public class TwoDeadWheelLocalizer
     @Override
     public Double getHeadingVelocity() {
         return gyro.getVelocity();
+    }
+
+    static class EncoderFromMotorEncoder implements IEncoder {
+
+        protected final MotorEncoder motor;
+
+        public EncoderFromMotorEncoder(MotorEncoder motor) {
+            this.motor = motor;
+        }
+
+        @Override
+        public double getSensorValue() {
+            return motor.getSensorValue();
+        }
+
+        @Override
+        public double getAsDouble() {
+            return motor.getSensorValue();
+        }
+
+        @Override
+        public void zeroEncoder() {
+            motor.zeroEncoder();
+        }
+
+        @Override
+        public void setDirection(boolean reversed) {
+            motor.setDirection(
+                reversed ? MotorEncoder.Direction.REVERSE : MotorEncoder.Direction.FORWARD
+            );
+        }
+
+        @Override
+        public double getPosition() {
+            return motor.getPosition();
+        }
+
+        @Override
+        public double getVelocity() {
+            return motor.getCorrectedVelocity();
+        }
     }
 }
