@@ -18,8 +18,8 @@ import java.util.function.Supplier;
 import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 
 public class DrivebaseSubsystem
-        extends PathingMecanumDrivebaseSubsystem
-        implements Supplier<Pose2d>, Loggable {
+    extends PathingMecanumDrivebaseSubsystem
+    implements Supplier<Pose2d>, Loggable {
 
     // Notes from Kevin:
     // The 5203 motors when direct driven
@@ -48,10 +48,10 @@ public class DrivebaseSubsystem
 
         @MotorVeloPID
         public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(
-                20,
-                0,
-                3,
-                MecanumConstants.getMotorVelocityF((MAX_RPM / 60) * TICKS_PER_REV)
+            20,
+            0,
+            3,
+            MecanumConstants.getMotorVelocityF((MAX_RPM / 60) * TICKS_PER_REV)
         );
 
         @WheelRadius
@@ -69,7 +69,7 @@ public class DrivebaseSubsystem
 
         @KV
         public static double kV =
-                1.0 / MecanumConstants.rpmToVelocity(MAX_RPM, WHEEL_RADIUS, GEAR_RATIO);
+            1.0 / MecanumConstants.rpmToVelocity(MAX_RPM, WHEEL_RADIUS, GEAR_RATIO);
 
         @KA
         public static double kA = 0;
@@ -151,12 +151,12 @@ public class DrivebaseSubsystem
     public String locState = "none";
 
     public DrivebaseSubsystem(
-            EncodedMotor<DcMotorEx> fl,
-            EncodedMotor<DcMotorEx> fr,
-            EncodedMotor<DcMotorEx> rl,
-            EncodedMotor<DcMotorEx> rr,
-            IGyro i,
-            RROTOSLocalizer l
+        EncodedMotor<DcMotorEx> fl,
+        EncodedMotor<DcMotorEx> fr,
+        EncodedMotor<DcMotorEx> rl,
+        EncodedMotor<DcMotorEx> rr,
+        IGyro i,
+        RROTOSLocalizer l
     ) {
         super(fl, fr, rl, rr, i, () -> DriveConstants.class);
         fl2 = fl;
@@ -195,9 +195,9 @@ public class DrivebaseSubsystem
             Pose2d pose = getPoseEstimate();
             Pose2d poseVelocity = getPoseVelocity();
             poseDisplay =
-                    pose.toString() +
-                            " : " +
-                            (poseVelocity != null ? poseVelocity.toString() : "<null>");
+                pose.toString() +
+                " : " +
+                (poseVelocity != null ? poseVelocity.toString() : "<null>");
         }
     }
 
@@ -219,16 +219,16 @@ public class DrivebaseSubsystem
             maxall = 1.0 / AUTO_MOTOR_SPEED;
         }
         leftFront.setVelocity(
-                (lfv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.AFL_SCALE) / maxall
+            (lfv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.AFL_SCALE) / maxall
         );
         leftRear.setVelocity(
-                (lrv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.ARL_SCALE) / maxall
+            (lrv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.ARL_SCALE) / maxall
         );
         rightRear.setVelocity(
-                (rrv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.ARR_SCALE) / maxall
+            (rrv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.ARR_SCALE) / maxall
         );
         rightFront.setVelocity(
-                (rfv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.AFR_SCALE) / maxall
+            (rfv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.AFR_SCALE) / maxall
         );
     }
 
@@ -246,6 +246,7 @@ public class DrivebaseSubsystem
         Snail = false;
         Turbo = false;
     }
+
     // Stuff below is used for tele-op trajectory motion
 
     public void enableFaceTagMode() {

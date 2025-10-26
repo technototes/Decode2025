@@ -258,13 +258,17 @@ public class TankDrivebaseSubsystem extends TankDrive implements Subsystem {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
-        double leftSum = 0, rightSum = 0;
+        double leftSum = 0,
+            rightSum = 0;
         for (EncodedMotor<DcMotorEx> leftMotor : leftMotors) {
-            leftSum +=
-            TankConstants.encoderTicksToInches(leftMotor.getSensorValue(), WHEEL_RADIUS, GEAR_RATIO, TICKS_PER_REV);
+            leftSum += TankConstants.encoderTicksToInches(
+                leftMotor.getSensorValue(),
+                WHEEL_RADIUS,
+                GEAR_RATIO,
+                TICKS_PER_REV
+            );
             for (EncodedMotor<DcMotorEx> rightMotor : rightMotors) {
-                rightSum +=
-                TankConstants.encoderTicksToInches(
+                rightSum += TankConstants.encoderTicksToInches(
                     rightMotor.getSensorValue(),
                     WHEEL_RADIUS,
                     GEAR_RATIO,
@@ -276,14 +280,23 @@ public class TankDrivebaseSubsystem extends TankDrive implements Subsystem {
     }
 
     public List<Double> getWheelVelocities() {
-        double leftSum = 0, rightSum = 0;
+        double leftSum = 0,
+            rightSum = 0;
         for (EncodedMotor<DcMotorEx> leftMotor : leftMotors) {
-            leftSum +=
-            TankConstants.encoderTicksToInches(leftMotor.getVelocity(), WHEEL_RADIUS, GEAR_RATIO, TICKS_PER_REV);
+            leftSum += TankConstants.encoderTicksToInches(
+                leftMotor.getVelocity(),
+                WHEEL_RADIUS,
+                GEAR_RATIO,
+                TICKS_PER_REV
+            );
         }
         for (EncodedMotor<DcMotorEx> rightMotor : rightMotors) {
-            rightSum +=
-            TankConstants.encoderTicksToInches(rightMotor.getVelocity(), WHEEL_RADIUS, GEAR_RATIO, TICKS_PER_REV);
+            rightSum += TankConstants.encoderTicksToInches(
+                rightMotor.getVelocity(),
+                WHEEL_RADIUS,
+                GEAR_RATIO,
+                TICKS_PER_REV
+            );
         }
         return Arrays.asList(leftSum / leftMotors.size(), rightSum / rightMotors.size());
     }

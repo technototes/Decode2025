@@ -27,8 +27,8 @@ import org.firstinspires.ftc.sixteen750.helpers.IEncoder;
  *
  */
 public class TwoDeadWheelLocalizer
-        extends TwoTrackingWheelLocalizer
-        implements Subsystem, Loggable {
+    extends TwoTrackingWheelLocalizer
+    implements Subsystem, Loggable {
 
     @Config
     public abstract static class OdoDeadWheelConstants implements DeadWheelConstants {
@@ -86,18 +86,18 @@ public class TwoDeadWheelLocalizer
 
     protected TwoDeadWheelLocalizer(IGyro g) {
         super(
-                Arrays.asList(
-                        new Pose2d(
-                                OdoDeadWheelConstants.PARALLEL_X,
-                                OdoDeadWheelConstants.PARALLEL_Y,
-                                Math.toRadians(OdoDeadWheelConstants.paraAngle)
-                        ),
-                        new Pose2d(
-                                OdoDeadWheelConstants.PERPENDICULAR_X,
-                                OdoDeadWheelConstants.PERPENDICULAR_Y,
-                                Math.toRadians(OdoDeadWheelConstants.perpAngle)
-                        )
+            Arrays.asList(
+                new Pose2d(
+                    OdoDeadWheelConstants.PARALLEL_X,
+                    OdoDeadWheelConstants.PARALLEL_Y,
+                    Math.toRadians(OdoDeadWheelConstants.paraAngle)
+                ),
+                new Pose2d(
+                    OdoDeadWheelConstants.PERPENDICULAR_X,
+                    OdoDeadWheelConstants.PERPENDICULAR_Y,
+                    Math.toRadians(OdoDeadWheelConstants.perpAngle)
                 )
+            )
         );
         gyro = g;
         lateralDistance = OdoDeadWheelConstants.LateralDistance;
@@ -135,8 +135,8 @@ public class TwoDeadWheelLocalizer
         //  competing magnetic encoders), change Encoder.getRawVelocity() to Encoder.getCorrectedVelocity() to enable a
         //  compensation method
         return Arrays.asList(
-                encoderTicksToInches(rlEnc.getVelocity()),
-                encoderTicksToInches(fbEnc.getVelocity())
+            encoderTicksToInches(rlEnc.getVelocity()),
+            encoderTicksToInches(fbEnc.getVelocity())
         );
     }
 

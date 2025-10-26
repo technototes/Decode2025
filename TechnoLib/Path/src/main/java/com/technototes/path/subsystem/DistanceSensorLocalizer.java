@@ -50,8 +50,10 @@ public class DistanceSensorLocalizer implements Localizer, Subsystem {
 
     public void update(@Nullable Pose2d old) {
         double heading = getHeading();
-        double accumX = 0, accumY = 0;
-        int totalX = 0, totalY = 0;
+        double accumX = 0,
+            accumY = 0;
+        int totalX = 0,
+            totalY = 0;
         for (Map.Entry<IDistanceSensor, Pose2d> entry : sensorMap.entrySet()) {
             IDistanceSensor sensor = entry.getKey();
             Pose2d sensorPose = entry.getValue();

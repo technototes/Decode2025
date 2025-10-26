@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.sixteen750.commands;
 
 import com.technototes.library.command.Command;
-
 import org.firstinspires.ftc.sixteen750.Robot;
 
 public class TeleCommands {
@@ -9,18 +8,23 @@ public class TeleCommands {
     public static Command Launch(Robot r) {
         return Command.create(r.launcherSubsystem::Launch);
     }
+
     public static Command StopLaunch(Robot r) {
         return Command.create(r.launcherSubsystem::Stop);
     }
+
     public static Command IncreaseMotor(Robot r) {
         return Command.create(r.launcherSubsystem::IncreaseMotorVelocity);
     }
+
     public static Command DecreaseMotor(Robot r) {
         return Command.create(r.launcherSubsystem::DecreaseMotorVelocity);
     }
+
     public static Command Intake(Robot r) {
         return Command.create(r.intakeSubsystem::Intake);
     }
+
     public static Command IntakeStop(Robot r) {
         return Command.create(r.intakeSubsystem::StopIntake);
     }
@@ -32,6 +36,7 @@ public class TeleCommands {
     public static Command EngageBrake(Robot r) {
         return Command.create(r.brakeSubsystem::Engage);
     }
+
     public static Command HoldIntake(Robot r) {
         return Command.create(r.intakeSubsystem::Hold);
     }
@@ -43,9 +48,14 @@ public class TeleCommands {
     public static Command Aim(Robot r) {
         return Command.create(r.aimingSubsystem::Aim);
     }
-    public static Command HoodUp(Robot r){ return Command.create(r.aimingSubsystem::testHoodUp);}
-    public static Command HoodDown(Robot r){ return Command.create(r.aimingSubsystem::testHoodDown);}
 
+    public static Command HoodUp(Robot r) {
+        return Command.create(r.aimingSubsystem::testHoodUp);
+    }
+
+    public static Command HoodDown(Robot r) {
+        return Command.create(r.aimingSubsystem::testHoodDown);
+    }
 
     public static Command GateUp(Robot r) {
         return Command.create(r.aimingSubsystem::StopBall);
@@ -54,6 +64,12 @@ public class TeleCommands {
     public static Command GateDown(Robot r) {
         return Command.create(r.aimingSubsystem::GoBall);
     }
-    public static Command MotorPowerTest(Robot r){return Command.create(r.testSubsystem::setMotorPowerTest);}
-    public static Command MotorVelocityTest(Robot r){return Command.create(r.testSubsystem::setMotorVelocityTest);}
+
+    public static Command MotorPowerTest(Robot r) {
+        return Command.create(r.testSubsystem::setMotorPowerTest);
+    }
+
+    public static Command MotorVelocityTest(Robot r) {
+        return Command.create(r.testSubsystem::setMotorVelocityTest);
+    }
 }

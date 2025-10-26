@@ -73,14 +73,14 @@ public class Robot implements Loggable {
         if (Setup.Connected.AIMINGSUBSYSTEM) {
             this.aimingSubsystem = new AimingSubsystem(hw);
         }
-        if (Setup.Connected.TESTSUBSYSTEM){
+        if (Setup.Connected.TESTSUBSYSTEM) {
             this.testSubsystem = new TestSubsystem(hw);
         }
     }
+
     public Follower getFollower() {
         return follower;
     }
-
 
     public void prepForStart() {}
 }

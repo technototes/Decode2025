@@ -4,7 +4,6 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
@@ -13,8 +12,10 @@ public class BrakeSubsystem implements Loggable {
 
     public static double BRAKE_POS = 0.5; // 0.5 1.0
     public static double GO_POS = 0.7;
+
     @Log(name = "brakePos")
     public double brakePos;
+
     boolean hasHardware;
     Servo brake;
 
@@ -27,7 +28,8 @@ public class BrakeSubsystem implements Loggable {
             brake = null;
         }
     }
-    public void setBrakePos(double w){
+
+    public void setBrakePos(double w) {
         if (hasHardware) {
             brakePos = w;
             brake.setPosition(w);
@@ -37,8 +39,8 @@ public class BrakeSubsystem implements Loggable {
     public void Engage() {
         setBrakePos(BRAKE_POS);
     }
+
     public void Disengage() {
         setBrakePos(GO_POS);
-
     }
 }

@@ -86,108 +86,87 @@ public interface TankConstants {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface TicksPerRev {
-    }
+    @interface TicksPerRev {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface MaxRPM {
-    }
+    @interface MaxRPM {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface UseDriveEncoder {
-    }
+    @interface UseDriveEncoder {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface MotorVeloPID {
-    }
+    @interface MotorVeloPID {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface WheelRadius {
-    }
+    @interface WheelRadius {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface GearRatio {
-    }
+    @interface GearRatio {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface TrackWidth {
-    }
+    @interface TrackWidth {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface KV {
-    }
+    @interface KV {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface KA {
-    }
+    @interface KA {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface KStatic {
-    }
+    @interface KStatic {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface MaxVelo {
-    }
+    @interface MaxVelo {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface MaxAccel {
-    }
+    @interface MaxAccel {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface MaxAngleVelo {
-    }
+    @interface MaxAngleVelo {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface MaxAngleAccel {
-    }
+    @interface MaxAngleAccel {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface CrossPID {
-    }
+    @interface CrossPID {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface AxialPID {
-    }
+    @interface AxialPID {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface HeadPID {
-    }
+    @interface HeadPID {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface LateralMult {
-    }
+    @interface LateralMult {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface VXWeight {
-    }
+    @interface VXWeight {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface OmegaWeight {
-    }
+    @interface OmegaWeight {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    @interface PoseLimit {
-    }
+    @interface PoseLimit {}
 
     static double encoderTicksToInches(double ticks, double rad, double rat, double rev) {
         return (rad * 2 * Math.PI * rat * ticks) / rev;

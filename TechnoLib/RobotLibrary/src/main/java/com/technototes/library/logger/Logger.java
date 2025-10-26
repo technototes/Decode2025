@@ -195,7 +195,8 @@ public class Logger {
 
     @SuppressWarnings({ "unchecked" })
     private void set(Annotation[] a, Supplier<?> m) {
-        boolean init = false, run = true;
+        boolean init = false,
+            run = true;
         Entry<?> e = null;
         for (Annotation as : a) {
             if (as instanceof Log.Number) {

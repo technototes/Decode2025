@@ -3,6 +3,7 @@ package com.technototes.library.command;
 import java.util.function.Consumer;
 
 public class LinearRangeCommand extends TimedCommand {
+
     double startVal, endVal;
 
     public LinearRangeCommand(double time, double start, double end, Consumer<Double> func) {

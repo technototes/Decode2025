@@ -10,6 +10,7 @@ package com.technototes.library.command;
  * clawToggle = new CycleCommandGroup(claw::open, claw::close);
  */
 public class CycleCommandGroup implements Command {
+
     protected Command[] commands;
     protected int currentState = 0;
 

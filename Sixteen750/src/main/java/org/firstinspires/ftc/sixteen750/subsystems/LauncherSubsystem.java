@@ -19,9 +19,11 @@ public class LauncherSubsystem implements Loggable {
     @Log.Number(name = "Motor Power")
     public static double MOTOR_POWER = 0.65; // 0.5 1.0
 
-    public static double  TARGET_LAUNCH_VELOCITY = 2700;
+    public static double TARGET_LAUNCH_VELOCITY = 2700;
+
     @Log.Number(name = "Motor Velocity")
     public static double CURRENT_LAUNCH_VELOCITY = 0.0;
+
     boolean hasHardware;
     public Robot robot;
     public PIDFCoefficients launcherPIDF = new PIDFCoefficients(1.0, 0.0, 0.0, 10.0);
@@ -64,35 +66,43 @@ public class LauncherSubsystem implements Loggable {
             launcher2.setPower(0);
         }
     }
+
     public void IncreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
             TARGET_LAUNCH_VELOCITY += 100;
         }
     }
+
     public void DecreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
             TARGET_LAUNCH_VELOCITY -= 100;
         }
     }
-    public void setMotorVelocityTest(){
+
+    public void setMotorVelocityTest() {
         launcher1.setVelocity(TARGET_LAUNCH_VELOCITY);
     }
-    public void setMotorPowerTest(){
+
+    public void setMotorPowerTest() {
         launcher1.setPower(MOTOR_POWER);
         CURRENT_LAUNCH_VELOCITY = getMotor1Velocity();
     }
-    public double getMotor1Velocity(){
+
+    public double getMotor1Velocity() {
         return launcher1.getVelocity();
     }
 
-    public double getMotor2Velocity(){
+    public double getMotor2Velocity() {
         return launcher2.getVelocity();
     }
 
-    public void VelocityShoot(){
-        if (getMotor1Velocity() == TARGET_LAUNCH_VELOCITY && getMotor2Velocity() == TARGET_LAUNCH_VELOCITY){
+    public void VelocityShoot() {
+        if (
+            getMotor1Velocity() == TARGET_LAUNCH_VELOCITY &&
+            getMotor2Velocity() == TARGET_LAUNCH_VELOCITY
+        ) {
             TeleCommands.GateDown(robot);
         }
     }
