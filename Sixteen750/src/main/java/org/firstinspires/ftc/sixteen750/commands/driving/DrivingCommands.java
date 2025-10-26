@@ -18,7 +18,7 @@ public class DrivingCommands {
     }
 
     public static Command AutoOrient(DrivebaseSubsystem ds) {
-        return Command.create(ds::enableFaceTagMode);
+        return Command.create(ds::toggleFaceTagMode);
     }
 
     public static Command NormalSpeed(DrivebaseSubsystem ds) {

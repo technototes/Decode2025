@@ -118,10 +118,10 @@ public class DrivebaseSubsystem
         // FR - 0.8
         // RL - 0.1
         // RR - 0.74
-        public static double AFR_SCALE = 0.85;
-        public static double AFL_SCALE = 0.873;
-        public static double ARR_SCALE = 0.864;
-        public static double ARL_SCALE = 0.9;
+        public static double AFR_SCALE = 1.0; // 0.85;
+        public static double AFL_SCALE = 1.0; // 0.873;
+        public static double ARR_SCALE = 1.0; // 0.864;
+        public static double ARL_SCALE = 1.0; // 0.9;
     }
 
     private static final boolean ENABLE_POSE_DIAGNOSTICS = true;
@@ -155,8 +155,7 @@ public class DrivebaseSubsystem
         EncodedMotor<DcMotorEx> fr,
         EncodedMotor<DcMotorEx> rl,
         EncodedMotor<DcMotorEx> rr,
-        IGyro i,
-        RROTOSLocalizer l
+        IGyro i
     ) {
         super(fl, fr, rl, rr, i, () -> DriveConstants.class);
         fl2 = fl;
@@ -184,7 +183,6 @@ public class DrivebaseSubsystem
     }
 
     public void saveHeading() {
-        IMU imu;
         HeadingHelper.saveHeading(get().getX(), get().getY(), gyro.getHeading());
     }
 
@@ -201,7 +199,7 @@ public class DrivebaseSubsystem
         }
     }
 
-    // Velocity driving, in the hopes that the bot with drive straight ;)
+    // Velocity driving, in the hopes that the bot will drive straight ;)
     @Override
     public void setMotorPowers(double lfv, double lrv, double rrv, double rfv) {
         // TODO: Use the stick position to determine how to scale these values
@@ -209,26 +207,25 @@ public class DrivebaseSubsystem
         // going to max out at sqrt(2)/2, rather than: We can go faster, but we don't
         // *always* want to scale faster, only when we're it turbo mode, and when one (or more)
         // of the control sticks are at their limit
-        double maxlfvlrv = Math.max(Math.abs(lfv), Math.abs(lrv));
-        double maxrfvrrv = Math.max(Math.abs(rfv), Math.abs(rrv));
-        double maxall = Math.max(maxlfvlrv, maxrfvrrv);
+        double maxall = AUTO_MOTOR_SPEED;
         if (Snail) {
-            maxall = 1.0 / DriveConstants.SLOW_MOTOR_SPEED;
-        }
-        if (!Turbo && !Snail) {
-            maxall = 1.0 / AUTO_MOTOR_SPEED;
+            maxall = DriveConstants.SLOW_MOTOR_SPEED;
+        } else if (Turbo) {
+            double maxlfvlrv = Math.max(Math.abs(lfv), Math.abs(lrv));
+            double maxrfvrrv = Math.max(Math.abs(rfv), Math.abs(rrv));
+            maxall = 1.0 / Math.max(maxlfvlrv, maxrfvrrv);
         }
         leftFront.setVelocity(
-            (lfv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.AFL_SCALE) / maxall
+            (lfv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.AFL_SCALE) * maxall
         );
         leftRear.setVelocity(
-            (lrv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.ARL_SCALE) / maxall
+            (lrv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.ARL_SCALE) * maxall
         );
         rightRear.setVelocity(
-            (rrv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.ARR_SCALE) / maxall
+            (rrv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.ARR_SCALE) * maxall
         );
         rightFront.setVelocity(
-            (rfv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.AFR_SCALE) / maxall
+            (rfv * DriveConstants.MAX_TICKS_PER_SEC * DriveConstants.AFR_SCALE) * maxall
         );
     }
 
@@ -249,7 +246,7 @@ public class DrivebaseSubsystem
 
     // Stuff below is used for tele-op trajectory motion
 
-    public void enableFaceTagMode() {
+    public void toggleFaceTagMode() {
         DriveConstants.faceTagMode = !DriveConstants.faceTagMode;
     }
 }
