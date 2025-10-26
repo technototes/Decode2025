@@ -44,8 +44,8 @@ dependencies {
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
 
     // Adding support for Pedro Pathing
-    implementation 'com.pedropathing:ftc:2.0.2'
+    implementation 'com.pedropathing:ftc:2.0.3'
     implementation 'com.pedropathing:telemetry:1.0.0'
-    implementation 'com.bylazar:fullpanels:1.0.6'
+    implementation 'com.bylazar:fullpanels:1.0.7'
 
 }
