@@ -83,5 +83,12 @@
     "prettier-plugin-java": "^2.7.7",
     "simple-git": "^3.28.0",
     "typescript": "^5.9.3"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
   }
 }

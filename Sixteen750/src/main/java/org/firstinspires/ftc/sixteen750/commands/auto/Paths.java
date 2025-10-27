@@ -10,6 +10,8 @@ import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.path.command.TrajectorySequenceCommand;
+import com.technototes.path.trajectorysequence.TrajectorySequence;
+
 import org.firstinspires.ftc.sixteen750.AutoConstants;
 import org.firstinspires.ftc.sixteen750.PathConstants;
 import org.firstinspires.ftc.sixteen750.Robot;
@@ -24,6 +26,21 @@ public class Paths {
         return new TrajectorySequenceCommand(r.drivebase, PathConstants.SPLINETEST1_TO_SPLINETEST2);
     }
 
+    public static Command NineArtiRedNear(Robot r) {
+        return new TrajectorySequenceCommand(r.drivebase, (TrajectorySequence) PathConstants.STARTNEAR_TO_SCORENEAR)
+                //need to create a fast and a slow version of the intake
+                .andThen(AutoLaunching3Balls(r))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, (TrajectorySequence) PathConstants.SCORENEAR_TO_INTAKESTART1))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, (TrajectorySequence) PathConstants.INTAKESTART1_TO_INTAKEDONE1))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, (TrajectorySequence) PathConstants.INTAKEDONE1_TO_SCORENEAR))
+                .andThen(AutoLaunching3Balls(r))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, (TrajectorySequence) PathConstants.SCORENEAR_TO_INTAKESTART2))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, (TrajectorySequence) PathConstants.INTAKESTART2_TO_INTAKEDONE2))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, (TrajectorySequence) PathConstants.INTAKEDONE2_TO_SCORENEAR))
+                .andThen(AutoLaunching3Balls(r))
+                .andThen(new TrajectorySequenceCommand(r.drivebase, (TrajectorySequence) PathConstants.SCORENEAR_TO_PARKNEAR))
+                .andThen(TeleCommands.StopLaunch(r));
+    }
     public static Command BluePickupShootCommand(Robot r) {
         return new TrajectorySequenceCommand(r.drivebase, PathConstants.START_TO_LAUNCH)
             //need to create a fast and a slow version of the intake
@@ -119,8 +136,8 @@ public class Paths {
                 .andThen(Launching3Balls(r));
     }
 
-    public static Command Launching3Balls(Robot r) {
-        return new SequentialCommandGroup(
+        public static Command Launching3Balls(Robot r) {
+            return new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         TeleCommands.Intake(r),
                         TeleCommands.GateUp(r),
@@ -138,7 +155,27 @@ public class Paths {
                 new WaitCommand(2),
             TeleCommands.GateUp(r),
             TeleCommands.StopLaunch(r),
-            TeleCommands.IntakeStop(r)
+            TeleCommands.IntakeStop(r));
+    }
+            public static Command AutoLaunching3Balls(Robot r) {
+                return new SequentialCommandGroup(
+            TeleCommands.Intake(r),
+            TeleCommands.GateUp(r),
+            TeleCommands.Launch(r),
+            // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
+            new WaitCommand(0.2),
+            TeleCommands.GateDown(r),
+            new WaitCommand(0.5),
+            TeleCommands.GateUp(r),
+            new WaitCommand(1),
+            TeleCommands.GateDown(r),
+            new WaitCommand(0.5),
+            TeleCommands.GateUp(r),
+            new WaitCommand(0.5),
+            TeleCommands.GateDown(r),
+            new WaitCommand(0.5),
+            TeleCommands.GateUp(r)
+            // want to keep launcher running during auto also no need to stop intake
         );
     }
     public static Command SidetoSideCommand(Robot r) {
