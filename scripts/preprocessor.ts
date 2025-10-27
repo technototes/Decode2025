@@ -14,6 +14,8 @@ const packageDir = ['com', 'robotcode', 'shared'];
 // The first two command line arguments are the bun binary and this script
 const [, , outDir, className, ...maybeFiles] = process.argv;
 const outputLocation = path.join(outDir, ...packageDir);
+console.error('maybeFiles');
+console.error(maybeFiles);
 
 // Linux doesn't appear to generate quite the same list of files :/
 let filesAsString: string[] = [];
@@ -21,15 +23,24 @@ if (maybeFiles.length === 1) {
   const theStr = maybeFiles[0];
   const len = theStr.length;
   if (
-    theStr.length > 5 &&
+    len > 5 &&
     theStr.charAt(0) === '"' &&
     theStr.charAt(len - 1) === '"' &&
     theStr.indexOf('" "') >= 0
   ) {
+    console.error('the str before', theStr);
     filesAsString.push(...theStr.substring(1, len - 1).split('" "'));
+  } else if (
+    len > 2 &&
+    theStr.charAt(0) === '"' &&
+    theStr.charAt(len - 1) === '"'
+  ) {
+    filesAsString.push(theStr.substring(1, len - 1));
   } else {
+    console.error('the str', theStr);
     filesAsString.push(theStr);
   }
+  console.error('filesAsString', filesAsString);
 } else {
   filesAsString = maybeFiles;
 }
