@@ -61,9 +61,18 @@ public class Sixteen750Testing {
 
     private static TrajectorySequence getRedTrajectory(DriveShim drive) {
         return drive
-            .trajectorySequenceBuilder(PathConstants.PICKUP1_START)
-            .addTrajectory(PathConstants.PICKUP1_TO_PICKUP1END.get())
-            .build();
+            .trajectorySequenceBuilder(PathConstants.RSTART_FAR_LAUNCHZONE)
+            .addTrajectory(PathConstants.RFARSTART_TO_LAUNCH.get())
+                .addTrajectory(PathConstants.RLAUNCH_TO_PICKUP1.get())
+                .addTrajectory(PathConstants.RPICKUP1_TO_PICKUP1END.get())
+                .addTrajectory(PathConstants.RPICKUP1END_TO_LAUNCH.get())
+                .addTrajectory(PathConstants.RLAUNCH_TO_PICKUP2.get())
+                .addTrajectory(PathConstants.RPICKUP2_TO_PICKUP2END.get())
+                .addTrajectory(PathConstants.RPICKUP2END_TO_LAUNCH.get())
+                .addTrajectory(PathConstants.RLAUNCH_TO_PICKUP3.get())
+                .addTrajectory(PathConstants.RPICKUP3_TO_PICKUP3END.get())
+                .addTrajectory(PathConstants.RPICKUP3END_TO_LAUNCH.get())
+                .build();
     }
 
     private static TrajectorySequence getParkingTrajectory(DriveShim drive) {
