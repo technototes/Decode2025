@@ -9,6 +9,8 @@ project(':Path').projectDir = new File('TechnoLib/Path')                 // FLIP
 include ':Sixteen750'
 include ':Twenty403'
 
+include ':RRQuickStart'
+
 // These are other 'bots' that we should build until we're at competitions
 // include ':LearnBot'                                                      // FLIP: BUILD ALL BOTS
 
