@@ -31,7 +31,6 @@ import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
-import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 // unicode is moai emoji
 @Configurable

@@ -16,6 +16,7 @@ import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
 import com.pedropathing.ftc.localization.constants.OTOSConstants;
+import com.pedropathing.paths.PathBuilder;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -27,6 +28,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class AutoConstants {
 
     public static boolean ptechno = false;
+
     // measured 10/14
     public static double botWeightKg = 8.50;
     public static double botWidth = 17.75;
@@ -35,7 +37,7 @@ public class AutoConstants {
     public static double yVelocity = 61.23;
     public static double forwardDeceleration = -25.0;
     public static double lateralDeceleration = -30.0;
-    public static double linearScalar = 1.4;
+    public static double linearScalar = 1.0;
     public static double angularScalar = 1.0;
     public static double brakingStrength = 0.005;
     public static double brakingStart = 0.1;

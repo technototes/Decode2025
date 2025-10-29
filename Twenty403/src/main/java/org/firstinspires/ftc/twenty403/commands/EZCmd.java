@@ -1,35 +1,35 @@
 package org.firstinspires.ftc.twenty403.commands;
 
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.technototes.library.command.Command;
+
 import org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand;
-import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 public class EZCmd {
 
     public static class Drive {
 
-        public static Command NormalMode(DrivebaseSubsystem drive) {
-            return Command.create(drive::setNormalMode);
+        public static Command NormalMode(Follower follower) {
+            return Command.create(() -> follower.setMaxPowerScaling(0.85));
         }
 
-        public static Command SnailMode(DrivebaseSubsystem drive) {
-            return Command.create(drive::setSnailMode);
+        public static Command SnailMode(Follower follower) {
+            return Command.create(() -> follower.setMaxPowerScaling(0.4));
         }
 
-        public static Command TurboMode(DrivebaseSubsystem drive) {
-            return Command.create(drive::setTurboMode);
+        public static Command TurboMode(Follower follower) {
+            return Command.create(() -> follower.setMaxPowerScaling(1));
         }
 
-        public static Command AutoAim(DrivebaseSubsystem drive) {
-            return Command.create(drive::enableFaceTagMode);
+        public static Command AutoAim() {
+            return Command.create(() -> JoystickDriveCommand.faceTagMode = !JoystickDriveCommand.faceTagMode);
         }
 
-        public static Command ResetGyro(DrivebaseSubsystem drive) {
-            return Command.create(drive::setExternalHeading, 0.0);
+        public static Command ResetGyro(Follower follower) {
+            return Command.create(() -> follower.setPose(new Pose(follower.getPose().getX(), follower.getPose().getY(), 0.0)));
         }
 
-        public static Command RecordHeading(DrivebaseSubsystem drive) {
-            return Command.create(drive::saveHeading);
-        }
+
     }
 }
