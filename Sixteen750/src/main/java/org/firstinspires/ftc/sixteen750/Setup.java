@@ -10,14 +10,14 @@ public class Setup {
         public static final boolean TESTSUBSYSTEM = true;
         public static final boolean LIMELIGHT = false;
         public static boolean DRIVEBASE = true;
-        public static boolean ODOSUBSYSTEM = false;
+        public static boolean ODOSUBSYSTEM = true;
         public static boolean SAFETYSUBSYSTEM = false;
-        public static boolean EXTERNAL_IMU = false;
-        public static boolean OTOS = true;
+        public static boolean EXTERNAL_IMU = true;
+        public static boolean OTOS = false;
         public static boolean INTAKESUBSYSTEM = true;
         public static boolean LAUNCHERSUBSYSTEM = true;
         public static boolean AIMINGSUBSYSTEM = true;
-        public static boolean BRAKESUBSYSTEM = false;
+        public static boolean BRAKESUBSYSTEM = true;
     }
 
     @Config

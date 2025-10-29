@@ -32,6 +32,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -82,7 +83,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private List<Integer> lastEncPositions = new ArrayList<>();
     private List<Integer> lastEncVels = new ArrayList<>();
 
-    public SampleMecanumDrive(HardwareMap hardwareMap) {
+    public  SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
         follower = new HolonomicPIDVAFollower(
             TRANSLATIONAL_PID,
@@ -101,7 +102,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(IMU.class, "imu");
+        imu = hardwareMap.get(IMU.class, "adafruit-imu");
         IMU.Parameters parameters = new IMU.Parameters(
             new RevHubOrientationOnRobot(
                 DriveConstants.LOGO_FACING_DIR,
@@ -110,10 +111,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         );
         imu.initialize(parameters);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "fl");
+        leftRear = hardwareMap.get(DcMotorEx.class, "rl");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rr");
+        rightFront = hardwareMap.get(DcMotorEx.class, "fr");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -121,6 +122,10 @@ public class SampleMecanumDrive extends MecanumDrive {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
             motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
             motor.setMotorType(motorConfigurationType);
+            rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
+            rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
+            leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+            leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
         if (RUN_USING_ENCODER) {

@@ -123,7 +123,7 @@ public class DriverController {
     // spitTrigger.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
 
     public void bindBrakeControls() {
-        brakeButton.whenPressed(TeleCommands.EngageBrake(robot));
+        brakeButton.whilePressed(TeleCommands.EngageBrake(robot));
         brakeButton.whenReleased(TeleCommands.DisengageBrake(robot));
     }
 
