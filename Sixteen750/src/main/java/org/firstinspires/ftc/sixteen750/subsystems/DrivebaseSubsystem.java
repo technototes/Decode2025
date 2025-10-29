@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem.Dri
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.localization.Localizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.hardware.motor.EncodedMotor;
@@ -14,6 +15,8 @@ import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.path.subsystem.MecanumConstants;
 import com.technototes.path.subsystem.PathingMecanumDrivebaseSubsystem;
+import com.technototes.path.subsystem.TwoDeadWheelLocalizer;
+
 import java.util.function.Supplier;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 
@@ -155,9 +158,10 @@ public class DrivebaseSubsystem
         EncodedMotor<DcMotorEx> fr,
         EncodedMotor<DcMotorEx> rl,
         EncodedMotor<DcMotorEx> rr,
-        IGyro i
+        IGyro i,
+        Localizer l
     ) {
-        super(fl, fr, rl, rr, i, () -> DriveConstants.class);
+        super(fl, fr, rl, rr, i, () -> DriveConstants.class, l);
         fl2 = fl;
         fr2 = fr;
         rl2 = rl;

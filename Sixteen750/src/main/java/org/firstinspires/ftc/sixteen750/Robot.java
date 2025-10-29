@@ -49,7 +49,7 @@ public class Robot implements Loggable {
             this.localizer = new TwoDeadWheelLocalizer(hw.odoF, hw.odoR, hw.imu);
         }
         if (Setup.Connected.DRIVEBASE) {
-            drivebase = new DrivebaseSubsystem(hw.fl, hw.fr, hw.rl, hw.rr, hw.imu);
+            drivebase = new DrivebaseSubsystem(hw.fl, hw.fr, hw.rl, hw.rr, hw.imu, this.localizer);
         }
         if (Setup.Connected.SAFETYSUBSYSTEM) {
             this.safetySubsystem = new SafetySubsystem(hw);
