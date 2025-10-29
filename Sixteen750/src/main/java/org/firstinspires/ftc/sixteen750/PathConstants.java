@@ -13,18 +13,18 @@ import java.util.function.Supplier;
 
 public class PathConstants {
 
-    public static ConfigurablePoseD STARTNEAR = new ConfigurablePoseD(-66, 35, 0);
-    public static ConfigurablePoseD STARTFAR = new ConfigurablePoseD(66, 17, 0);
-    public static ConfigurablePoseD SCORENEAR = new ConfigurablePoseD(-24, 24, 45);
-    public static ConfigurablePoseD SCOREFAR = new ConfigurablePoseD(55, 17, 63.6);
-    public static ConfigurablePoseD INTAKESTART1 = new ConfigurablePoseD(-12, 30, 0);
-    public static ConfigurablePoseD INTAKEDONE1 = new ConfigurablePoseD(-12, 48, 0);
-    public static ConfigurablePoseD INTAKESTART2 = new ConfigurablePoseD(12, 30, 0);
-    public static ConfigurablePoseD INTAKEDONE2 = new ConfigurablePoseD(12, 56, 0);
-    public static ConfigurablePoseD INTAKESTART3 = new ConfigurablePoseD(36, 30, 0);
-    public static ConfigurablePoseD INTAKEDONE3 = new ConfigurablePoseD(36, 56, 0);
-    public static ConfigurablePoseD PARKNEAR = new ConfigurablePoseD(-11, 22, 45);
-    public static ConfigurablePoseD PARKFAR = new ConfigurablePoseD(24, 12, 0);
+    public static ConfigurablePoseD STARTNEAR = new ConfigurablePoseD(-66, 35, 90);
+    public static ConfigurablePoseD STARTFAR = new ConfigurablePoseD(66, 17, 90);
+    public static ConfigurablePoseD SCORENEAR = new ConfigurablePoseD(-24, 24, 135);
+    public static ConfigurablePoseD SCOREFAR = new ConfigurablePoseD(55, 17, 153.6);
+    public static ConfigurablePoseD INTAKESTART1 = new ConfigurablePoseD(-12, 30, 90);
+    public static ConfigurablePoseD INTAKEDONE1 = new ConfigurablePoseD(-12, 48, 90);
+    public static ConfigurablePoseD INTAKESTART2 = new ConfigurablePoseD(12, 30, 90);
+    public static ConfigurablePoseD INTAKEDONE2 = new ConfigurablePoseD(12, 56, 90);
+    public static ConfigurablePoseD INTAKESTART3 = new ConfigurablePoseD(36, 30, 90);
+    public static ConfigurablePoseD INTAKEDONE3 = new ConfigurablePoseD(36, 56, 90);
+    public static ConfigurablePoseD PARKNEAR = new ConfigurablePoseD(-11, 22, 135);
+    public static ConfigurablePoseD PARKFAR = new ConfigurablePoseD(24, 12, 90);
     public static final Function<
         Function<Pose2d, TrajectorySequenceBuilder>,
         TrajectorySequence
