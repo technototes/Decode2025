@@ -13,7 +13,6 @@ import org.firstinspires.ftc.sixteen750.subsystems.BrakeSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.RROTOSLocalizer;
 import org.firstinspires.ftc.sixteen750.subsystems.SafetySubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.TestSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.TwoDeadWheelLocalizer;
@@ -46,7 +45,7 @@ public class Robot implements Loggable {
         // this.follower = new Follower(followerConstants, localizer, drivetrain, pathConstraints);
 
         if (Setup.Connected.ODOSUBSYSTEM) {
-            this.localizer = new TwoDeadWheelLocalizer(hw.odoF, hw.odoR, hw.imu);
+            this.localizer = new TwoDeadWheelLocalizer(hw.odoFB, hw.odoRL, hw.imu);
         }
         if (Setup.Connected.DRIVEBASE) {
             drivebase = new DrivebaseSubsystem(hw.fl, hw.fr, hw.rl, hw.rr, hw.imu, this.localizer);

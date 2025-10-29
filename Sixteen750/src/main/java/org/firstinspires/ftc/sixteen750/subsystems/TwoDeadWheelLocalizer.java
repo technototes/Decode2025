@@ -55,7 +55,7 @@ public class TwoDeadWheelLocalizer
         public static double perpAngle = 90;
         public static double paraAngle = 0;
 
-        public static boolean perpReverse = false;
+        public static boolean perpReverse = true;
         public static boolean paraReverse = true;
 
         // Parallel/Perpendicular to the forward axis
