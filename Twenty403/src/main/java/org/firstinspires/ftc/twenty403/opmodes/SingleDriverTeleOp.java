@@ -38,6 +38,8 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
     public Hardware hardware;
     private Limelight3A limelight;
     // For Panels controller widget the two lines below
+    private boolean got_motif = false;
+    private LLStatus status = null;
     private final GamepadManager driverManager = PanelsGamepad.INSTANCE.getFirstManager();
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -61,6 +63,7 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
              * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
              */
             limelight.start();
+
         }
 
         telemetry.addData(">", "Robot Ready.  Press Play.");
@@ -74,7 +77,6 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
 
     @Override
     public void runLoop() {
-        LLStatus status = null;
         if (Setup.Connected.LAUNCHER) {
             robot.launcherSubsystem.readMotorVelocity();
             controls.Launch();
@@ -141,38 +143,41 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
                                 Arrays.equals(
                                     Setup.HardwareNames.Motif,
                                     new String[] { "1", "2", "3" }
-                                )
+                                ) && !got_motif
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE2";
+                                got_motif = true;
                             } else if (
                                 fr.getFiducialId() == 22 &&
                                 Arrays.equals(
                                     Setup.HardwareNames.Motif,
                                     new String[] { "1", "2", "3" }
-                                )
+                                ) && !got_motif
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE3";
+                                got_motif = true;
                             } else if (
                                 fr.getFiducialId() == 21 &&
                                 Arrays.equals(
                                     Setup.HardwareNames.Motif,
                                     new String[] { "1", "2", "3" }
-                                )
+                                ) && !got_motif
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE3";
+                                got_motif = true;
                             }
                             Pose3D targetPose = fr.getCameraPoseTargetSpace();
                             double tx = targetPose.getPosition().x;
                             double ty = targetPose.getPosition().y;
                             double tz = targetPose.getPosition().z;
                             // supposedly distance to apriltag
-                            double distance = Math.sqrt(tx * tx + ty * ty + tz * tz);
+                            double distance = Math.sqrt((tx * tx) + (ty * ty) + (tz * tz));
                             telemetry.addData("Distance to AprilTag", String.valueOf(distance));
                         }
                     } else if (

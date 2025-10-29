@@ -123,9 +123,9 @@ public class JustDrivingTeleOp extends CommandOpMode {
             );
             //This is how it looks with slowMode on
             else follower.setTeleOpDrive(
-                -gamepad1.left_stick_y * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
-                -gamepad1.left_stick_x * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
-                -gamepad1.right_stick_x * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
+                -gamepad1.left_stick_y * 0.4,
+                -gamepad1.left_stick_x * 0.4,
+                -gamepad1.right_stick_x * 0.4,
                 false // Robot Centric
             );
         }
