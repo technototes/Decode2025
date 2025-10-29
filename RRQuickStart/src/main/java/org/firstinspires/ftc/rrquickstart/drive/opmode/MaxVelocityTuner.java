@@ -63,7 +63,8 @@ public class MaxVelocityTuner extends LinearOpMode {
         while (!isStopRequested() && timer.seconds() < RUNTIME) {
             drive.updatePoseEstimate();
 
-            Pose2d poseVelo = Objects.requireNonNull(
+            Pose2d poseVelo = //drive.getPoseVelocity();
+                    Objects.requireNonNull(
                 drive.getPoseVelocity(),
                 "poseVelocity() must not be null. Ensure that the getWheelVelocities() method has been overridden in your localizer."
             );
