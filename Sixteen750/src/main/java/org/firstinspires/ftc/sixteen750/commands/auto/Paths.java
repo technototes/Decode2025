@@ -25,8 +25,70 @@ public class Paths {
     public static Command splineTestCommand(Robot r) {
         return new TrajectorySequenceCommand(r.drivebase, PathConstants.SPLINETEST1_TO_SPLINETEST2);
     }
+    public static Command NineArtiRedNear(Robot r) {
+        return new TrajectorySequenceCommand(r.drivebase, PathConstants.STARTNEAR_TO_SCORENEAR)
+                // need to create a fast and a slow version of the intake
+                .andThen(AutoLaunching3Balls(r))
+                .andThen(
+                        new TrajectorySequenceCommand(r.drivebase, PathConstants.SCORENEAR_TO_INTAKESTART1)
+                )
+                .andThen(
+                        new TrajectorySequenceCommand(
+                                r.drivebase,
+                                PathConstants.INTAKESTART1_TO_INTAKEDONE1
+                        )
+                )
+                .andThen(
+                        new TrajectorySequenceCommand(r.drivebase, PathConstants.INTAKEDONE1_TO_SCORENEAR)
+                )
+                .andThen(AutoLaunching3Balls(r))
+                .andThen(
+                        new TrajectorySequenceCommand(r.drivebase, PathConstants.SCORENEAR_TO_INTAKESTART2)
+                )
+                .andThen(
+                        new TrajectorySequenceCommand(
+                                r.drivebase,
+                                PathConstants.INTAKESTART2_TO_INTAKEDONE2
+                        )
+                )
+                .andThen(
+                        new TrajectorySequenceCommand(r.drivebase, PathConstants.INTAKEDONE2_TO_SCORENEAR)
+                )
+                .andThen(AutoLaunching3Balls(r))
+                .andThen(
+                        new TrajectorySequenceCommand(r.drivebase, PathConstants.SCORENEAR_TO_PARKNEAR)
+                )
+                .andThen(TeleCommands.StopLaunch(r));
+    }
 
-    public static Command BluePickupShootCommand(Robot r) {
+    public static Command PickupShootCommand(Robot r) {
+        DrivebaseSubsystem db = r.drivebase;
+        return new TrajectorySequenceCommand(db, PathConstants.START_TO_LAUNCH)
+                // need to create a fast and a slow version of the intake
+                .alongWith(TeleCommands.GateUp(r))
+                .alongWith(TeleCommands.Intake(r))
+                .alongWith(TeleCommands.Launch(r))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP1))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP1_TO_PICKUP1END))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP1END_TO_LAUNCH))
+                .alongWith(AutoLaunching3Balls(r))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP2))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP2_TO_PICKUP2END))
+                .alongWith(TeleCommands.Intake(r))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP2END_TO_LAUNCH))
+                .alongWith(TeleCommands.Launch(r))
+                .andThen(AutoLaunching3Balls(r))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP3))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP3_TO_PICKUP3END))
+                .alongWith(TeleCommands.Intake(r))
+                .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP3END_TO_LAUNCH))
+                .alongWith(TeleCommands.Launch(r))
+                .andThen(AutoLaunching3Balls(r));
+    }
+
+
+
+        public static Command BluePickupShootCommand(Robot r) {
         DrivebaseSubsystem db = r.drivebase;
         return new TrajectorySequenceCommand(db, PathConstants.START_TO_LAUNCH)
             // need to create a fast and a slow version of the intake
@@ -288,27 +350,6 @@ public class Paths {
             .addPath(new BezierLine(Pickup3, Score))
             .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140))
             .build();
-    }
-    public static Command AutoLaunching3Balls(Robot r) {
-        return new SequentialCommandGroup(
-                TeleCommands.Intake(r),
-                TeleCommands.GateUp(r),
-                TeleCommands.Launch(r),
-                // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
-                new WaitCommand(0.2),
-                TeleCommands.GateDown(r),
-                new WaitCommand(0.5),
-                TeleCommands.GateUp(r),
-                new WaitCommand(1),
-                TeleCommands.GateDown(r),
-                new WaitCommand(0.5),
-                TeleCommands.GateUp(r),
-                new WaitCommand(0.5),
-                TeleCommands.GateDown(r),
-                new WaitCommand(0.5),
-                TeleCommands.GateUp(r)
-                // want to keep launcher running during auto also no need to stop intake
-        );
     }
 }
 
