@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.twenty403.commands.driving;
 
-import static org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem.DriveConstants.faceTagMode;
 
-import com.acmerobotics.roadrunner.drive.DriveSignal;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.command.Command;
@@ -14,33 +12,30 @@ import com.technototes.library.util.MathUtils;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.twenty403.Setup;
-import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 public class JoystickDriveCommand implements Command, Loggable {
 
-    public DrivebaseSubsystem subsystem;
+    public Follower follower;
     public DoubleSupplier x, y, r;
     public BooleanSupplier watchTrigger;
-    public double targetHeadingRads;
     public DoubleSupplier driveStraighten;
     public DoubleSupplier drive45;
     public boolean driverDriving;
     public boolean operatorDriving;
     private Limelight3A limelight;
+    public static boolean faceTagMode = false;
 
     public JoystickDriveCommand(
-        DrivebaseSubsystem sub,
+        Follower follower,
         Stick xyStick,
         Stick rotStick,
         DoubleSupplier strtDrive,
         DoubleSupplier angleDrive
     ) {
-        addRequirements(sub);
-        subsystem = sub;
+        this.follower = follower;
         x = xyStick.getXSupplier();
         y = xyStick.getYSupplier();
         r = rotStick.getXSupplier();
-        targetHeadingRads = -sub.getExternalHeading();
         driveStraighten = strtDrive;
         drive45 = angleDrive;
         driverDriving = true;
@@ -48,8 +43,8 @@ public class JoystickDriveCommand implements Command, Loggable {
     }
 
     // Use this constructor if you don't want auto-straightening
-    public JoystickDriveCommand(DrivebaseSubsystem sub, Stick xyStick, Stick rotStick) {
-        this(sub, xyStick, rotStick, null, null);
+    public JoystickDriveCommand(Follower follower, Stick xyStick, Stick rotStick) {
+        this(follower, xyStick, rotStick, null, null);
     }
 
     // This will make the bot snap to an angle, if the 'straighten' button is pressed
@@ -63,24 +58,23 @@ public class JoystickDriveCommand implements Command, Loggable {
         fortyfiveTrigger = isTriggered(drive45);
         if (faceTagMode) {
             // --- Face AprilTag using Limelight ---
-            // LLResult result = limelight.getLatestResult();
-            // if (result != null && result.isValid()) {
-            //     double tx = result.getTx(); // horizontal offset in degrees
-            //     double kP_TagAlign = 0.03;  // tune this gain
-            //     return -kP_TagAlign * tx;   // rotate until tx ~ 0
-            // } else {
-            //     return 0.0; // no target → don't spin
-            // }
-            return calculateHeadingToCircle(
-                subsystem.getPoseEstimate().getX(),
-                subsystem.getPoseEstimate().getY()
-            );
+             LLResult result = limelight.getLatestResult();
+             if (result != null && result.isValid()) {
+                 double tx = result.getTx(); // horizontal offset in degrees
+                 double kP_TagAlign = 0.03;  // tune this gain
+                 return -kP_TagAlign * tx;   // rotate until tx ~ 0
+             } else {
+                 return 0.0; // no target → don't spin
+             }
+//            return calculateHeadingToCircle(
+//                follower.getPose().getX(), follower.getPose().getY()
+//            );
         }
 
         if (!straightTrigger && !fortyfiveTrigger) {
             // No straighten override: return the stick value
             // (with some adjustment...)
-            return -Math.pow(r.getAsDouble(), 3) * subsystem.speed;
+            return -Math.cbrt(r.getAsDouble());
         }
         if (straightTrigger) {
             // headingInRads is [0-2pi]
@@ -114,12 +108,11 @@ public class JoystickDriveCommand implements Command, Loggable {
     }
 
     public static boolean isTriggered(DoubleSupplier ds) {
-        if (ds == null || ds.getAsDouble() < DrivebaseSubsystem.DriveConstants.TRIGGER_THRESHOLD) {
+        if (ds == null || ds.getAsDouble() < 0.4) {
             return false;
         }
         return true;
     }
-
     public static double calculateHeadingToCircle(double robotX, double robotY) {
         // circle x & y are theoretical which might work but i don't know
         double circleX = 0;
@@ -147,8 +140,8 @@ public class JoystickDriveCommand implements Command, Loggable {
     @Override
     public void execute() {
         // If subsystem is busy it is running a trajectory.
-        if (!subsystem.isBusy()) {
-            double curHeading = -subsystem.getExternalHeading();
+        if (!follower.isBusy()) {
+            double curHeading = -follower.getHeading();
 
             // The math & signs looks wonky, because this makes things field-relative
             // (Remember that "3 O'Clock" is zero degrees)
@@ -161,15 +154,13 @@ public class JoystickDriveCommand implements Command, Loggable {
                 }
             }
             Vector2d input = new Vector2d(
-                yvalue * subsystem.speed,
-                xvalue * subsystem.speed
+                yvalue,
+                xvalue
             ).rotated(curHeading);
 
-            subsystem.setWeightedDrivePower(
-                new Pose2d(input.getX(), input.getY(), getRotation(curHeading))
-            );
+
         }
-        subsystem.update();
+        follower.update();
     }
 
     @Override
@@ -177,8 +168,5 @@ public class JoystickDriveCommand implements Command, Loggable {
         return false;
     }
 
-    @Override
-    public void end(boolean cancel) {
-        if (cancel) subsystem.setDriveSignal(new DriveSignal());
-    }
+
 }

@@ -18,7 +18,6 @@ import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
-import org.firstinspires.ftc.twenty403.subsystems.DrivebaseSubsystem;
 
 @TeleOp(name = "OTOS Testing TeleOp")
 @SuppressWarnings("unused")
@@ -92,9 +91,9 @@ public class OTOSTestingTeleOp extends OpMode implements Loggable {
             );
             //This is how it looks with slowMode on
             else follower.setTeleOpDrive(
-                -gamepad1.left_stick_y * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
-                -gamepad1.left_stick_x * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
-                -gamepad1.right_stick_x * DrivebaseSubsystem.DriveConstants.SLOW_MOTOR_SPEED,
+                -gamepad1.left_stick_y * 0.4,
+                -gamepad1.left_stick_x * 0.4,
+                -gamepad1.right_stick_x * 0.4,
                 false
             );
         }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.twenty403.controls;
 
+import com.pedropathing.follower.Follower;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandAxis;
@@ -87,7 +88,7 @@ public class DriverController {
     public void bindDriveControls() {
         CommandScheduler.scheduleJoystick(
             new JoystickDriveCommand(
-                robot.drivebaseSubsystem,
+                robot.follower,
                 driveLeftStick,
                 driveRightStick,
                 straightTrigger,
@@ -95,16 +96,16 @@ public class DriverController {
             )
         );
 
-        turboButton.whenPressed(EZCmd.Drive.TurboMode(robot.drivebaseSubsystem));
-        turboButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
+        turboButton.whenPressed(EZCmd.Drive.TurboMode(robot.follower));
+        turboButton.whenReleased(EZCmd.Drive.NormalMode(robot.follower));
 
-        snailButton.whenPressed(EZCmd.Drive.SnailMode(robot.drivebaseSubsystem));
-        snailButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
+        snailButton.whenPressed(EZCmd.Drive.SnailMode(robot.follower));
+        snailButton.whenReleased(EZCmd.Drive.NormalMode(robot.follower));
         if (Setup.Connected.LIMELIGHT) {
-            AutoAim.whenPressed(EZCmd.Drive.AutoAim(robot.drivebaseSubsystem));
+            AutoAim.whenPressed(EZCmd.Drive.AutoAim());
         }
 
-        resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
+        resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.follower));
     }
 
     public void bindLaunchControls() {
