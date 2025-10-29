@@ -35,19 +35,19 @@ public class Sixteen750Testing {
         // trackWidth: The width of our wheelbase (not clear what this really affects...) @TrackWidth
         MinVelocityConstraint min_vel = new MinVelocityConstraint(
             Arrays.asList(
-                new AngularVelocityConstraint(60 /* @MaxAngleVelo */),
-                new MecanumVelocityConstraint(60 /* @MaxVelo */, 7.625 /* @TrackWidth */)
+                new AngularVelocityConstraint(70 /* @MaxAngleVelo */),
+                new MecanumVelocityConstraint(70 /* @MaxVelo */, 7.625 /* @TrackWidth */)
             )
         );
         ProfileAccelerationConstraint prof_accel = new ProfileAccelerationConstraint(
-            30
+            60
             /* @MaxAccel */
         );
         PathConstants.fwdFunc = (Pose2d pose) -> new TrajectoryBuilder(pose, min_vel, prof_accel);
         PathConstants.revFunc = (Pose2d pose) ->
             new TrajectoryBuilder(pose, Math.PI + pose.getHeading(), min_vel, prof_accel);
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
-            .setDimensions(10.625, 13.28)
+            .setDimensions(10.625, 17.28)
             .followTrajectorySequence(Sixteen750Testing::getTrajectory);
         try {
             // Try to load the field image from the repo:
@@ -61,17 +61,17 @@ public class Sixteen750Testing {
 
     private static TrajectorySequence getTrajectory(DriveShim drive) {
         return drive
-            .trajectorySequenceBuilder(PathConstants.RSTART_FAR_LAUNCHZONE)
-            .addTrajectory(PathConstants.RFARSTART_TO_LAUNCH.get())
-            .addTrajectory(PathConstants.RLAUNCH_TO_PICKUP1.get())
-            .addTrajectory(PathConstants.RPICKUP1_TO_PICKUP1END.get())
-            .addTrajectory(PathConstants.RPICKUP1END_TO_LAUNCH.get())
-            .addTrajectory(PathConstants.RLAUNCH_TO_PICKUP2.get())
-            .addTrajectory(PathConstants.RPICKUP2_TO_PICKUP2END.get())
-            .addTrajectory(PathConstants.RPICKUP2END_TO_LAUNCH.get())
-            .addTrajectory(PathConstants.RLAUNCH_TO_PICKUP3.get())
-            .addTrajectory(PathConstants.RPICKUP3_TO_PICKUP3END.get())
-            .addTrajectory(PathConstants.RPICKUP3END_TO_LAUNCH.get())
+            .trajectorySequenceBuilder(PathConstants.STARTNEAR)
+            .addTrajectory(PathConstants.STARTNEAR_TO_SCORENEAR.get())
+            .addTrajectory(PathConstants.SCORENEAR_TO_INTAKESTART1.get())
+            .addTrajectory(PathConstants.INTAKESTART1_TO_INTAKEDONE1.get())
+            .addTrajectory(PathConstants.INTAKEDONE1_TO_SCORENEAR.get())
+            .addTrajectory(PathConstants.SCORENEAR_TO_INTAKESTART2.get())
+            .addTrajectory(PathConstants.INTAKESTART2_TO_INTAKEDONE2.get())
+            .addTrajectory(PathConstants.INTAKEDONE2_TO_SCORENEAR.get())
+            .addTrajectory(PathConstants.SCORENEAR_TO_PARKNEAR.get())
+         //   .addTrajectory(PathConstants.RPICKUP3_TO_PICKUP3END.get())
+           // .addTrajectory(PathConstants.RPICKUP3END_TO_LAUNCH.get())
             .build();
     }
 }
