@@ -7,7 +7,6 @@ import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.RL_DRIVE_MOTO
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.RR_DRIVE_MOTOR;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
@@ -24,10 +23,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.technototes.path.geometry.ConfigurablePoseD;
-import com.technototes.path.trajectorysequence.TrajectorySequence;
-import com.technototes.path.trajectorysequence.TrajectorySequenceBuilder;
-import java.util.function.Function;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -89,8 +85,8 @@ public class AutoConstants {
     }
 
     public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-        .forwardEncoder_HardwareMapName(Setup.HardwareNames.ODOF) //odo name
-        .strafeEncoder_HardwareMapName(Setup.HardwareNames.ODOR) //odo name
+        .forwardEncoder_HardwareMapName(Setup.HardwareNames.ODORL) //odo name
+        .strafeEncoder_HardwareMapName(Setup.HardwareNames.ODOFB) //odo name
         .IMU_HardwareMapName(Setup.HardwareNames.EXTERNAL_IMU)
         .forwardPodY(4.27) //offset
         .strafePodX(-4.006) //offset
