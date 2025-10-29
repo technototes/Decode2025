@@ -67,6 +67,8 @@ public class TwoDeadWheelLocalizer
 
         public static double PERPENDICULAR_X = -7.5 / 2.54; // X is the fwd/bkwd direction
         public static double PERPENDICULAR_Y = 16.5 / 2.54; // Y is the side-to-side/strafe direction
+        public static double X_MULTIPLIER = 1.22; // Multiplier in the X direction //42/39 = 1.23, 48/42 = 1.14, 48/37 = 1.29 = avg = 1.22
+        public static double Y_MULTIPLIER = 1; // Multiplier in the Y direction
     }
 
     protected IEncoder rlEnc, fbEnc;
@@ -124,8 +126,8 @@ public class TwoDeadWheelLocalizer
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
-        fbPos = encoderTicksToInches(fbEnc.getPosition());
-        strafePos = encoderTicksToInches(rlEnc.getPosition());
+        fbPos = encoderTicksToInches(fbEnc.getPosition()) * OdoDeadWheelConstants.X_MULTIPLIER;
+        strafePos = encoderTicksToInches(rlEnc.getPosition()) * OdoDeadWheelConstants.Y_MULTIPLIER;
         return Arrays.asList(strafePos, fbPos);
     }
 
@@ -136,8 +138,8 @@ public class TwoDeadWheelLocalizer
         //  competing magnetic encoders), change Encoder.getRawVelocity() to Encoder.getCorrectedVelocity() to enable a
         //  compensation method
         return Arrays.asList(
-            encoderTicksToInches(rlEnc.getVelocity()),
-            encoderTicksToInches(fbEnc.getVelocity())
+            encoderTicksToInches(rlEnc.getVelocity()) * OdoDeadWheelConstants.X_MULTIPLIER,
+            encoderTicksToInches(fbEnc.getVelocity()) * OdoDeadWheelConstants.Y_MULTIPLIER
         );
     }
 
