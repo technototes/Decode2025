@@ -21,7 +21,7 @@ public class DriveBaseValidation extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        // First, get the hardward
+        // First, get the hardware
         DcMotorEx fr, fl, rr, rl, launch;
         com.qualcomm.robotcore.hardware.CRServo bl, br;
         if (Setup.Connected.DRIVEBASE) {
@@ -38,24 +38,6 @@ public class DriveBaseValidation extends LinearOpMode {
             fr = null;
             rl = null;
             rr = null;
-        }
-        if (Setup.Connected.LAUNCHER) {
-            launch = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.TOP);
-        } else {
-            launch = null;
-        }
-        if (Setup.Connected.FEED) {
-            bl = this.hardwareMap.get(
-                com.qualcomm.robotcore.hardware.CRServo.class,
-                Setup.HardwareNames.BOTTOML
-            );
-            br = this.hardwareMap.get(
-                com.qualcomm.robotcore.hardware.CRServo.class,
-                Setup.HardwareNames.BOTTOMR
-            );
-        } else {
-            bl = null;
-            br = null;
         }
 
         waitForStart();
@@ -86,28 +68,6 @@ public class DriveBaseValidation extends LinearOpMode {
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());
                 telemetry.addData("RR", rr.getCurrentPosition());
-            }
-            if (Setup.Connected.LAUNCHER) {
-                if (gamepad1.cross) {
-                    launch.setPower(5);
-                } else {
-                    launch.setPower(0);
-                }
-                telemetry.addData("launch", gamepad1.cross);
-            }
-            if (Setup.Connected.FEED) {
-                if (gamepad1.square) {
-                    br.setPower(-1);
-                } else {
-                    br.setPower(0);
-                }
-                if (gamepad1.triangle) {
-                    bl.setPower(1);
-                } else {
-                    bl.setPower(0);
-                }
-                telemetry.addData("br", gamepad1.square);
-                telemetry.addData("bl", gamepad1.triangle);
             }
             telemetry.update();
         }

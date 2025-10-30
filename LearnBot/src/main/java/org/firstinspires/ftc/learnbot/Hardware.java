@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 public class Hardware implements Loggable {
 
     public List<LynxModule> hubs;
-
+    public HardwareMap map;
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top, testMotor;
     public IEncoder odoF, odoR;
@@ -35,6 +35,7 @@ public class Hardware implements Loggable {
     /* Put other hardware here! */
 
     public Hardware(HardwareMap hwmap) {
+        map = hwmap;
         hubs = hwmap.getAll(LynxModule.class);
         if (Setup.Connected.EXTERNALIMU) {
             imu = new AdafruitIMU(Setup.HardwareNames.EXTERNALIMU, AdafruitIMU.Orientation.Pitch);
@@ -62,20 +63,8 @@ public class Hardware implements Loggable {
         //                odoF = new OctoquadEncoder(octoquad, Setup.OctoQuadPorts.ODO_FWD_BK);
         //            }
         //        }
-        if (Setup.Connected.LAUNCHER) {
-            top = new EncodedMotor<>(Setup.HardwareNames.TOP);
-        }
-        if (Setup.Connected.FEED) {
-            bottomLeft = new CRServo(Setup.HardwareNames.BOTTOML);
-            bottomRight = new CRServo(Setup.HardwareNames.BOTTOMR);
-        }
         if (Setup.Connected.LIMELIGHT) {
             limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
-        }
-        if (Setup.Connected.TESTSUBSYSTEM) {
-            testMotor = new EncodedMotor<>(Setup.HardwareNames.TESTMOTOR);
-            testCRServo = new CRServo(Setup.HardwareNames.TESTCRSERVO);
-            testServo = new Servo(Setup.HardwareNames.TESTSERVO);
         }
     }
 

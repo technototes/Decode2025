@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.learnbot.commands.driving;
 
-import static org.firstinspires.ftc.learnbot.subsystems.DrivebaseSubsystem.DriveConstants.faceTagMode;
-
-import com.acmerobotics.roadrunner.drive.DriveSignal;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.command.Command;
@@ -13,43 +9,75 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.MathUtils;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import org.firstinspires.ftc.learnbot.Setup;
-import org.firstinspires.ftc.learnbot.subsystems.DrivebaseSubsystem;
+import org.firstinspires.ftc.learnbot.Setup.DriveSettings;
+import org.firstinspires.ftc.learnbot.Setup.OtherSettings;
+import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 
 public class JoystickDriveCommand implements Command, Loggable {
 
-    public DrivebaseSubsystem subsystem;
+    public Follower follower;
     public DoubleSupplier x, y, r;
-    public BooleanSupplier watchTrigger;
-    public double targetHeadingRads;
     public DoubleSupplier driveStraighten;
     public DoubleSupplier drive45;
+    public BooleanSupplier watchTrigger;
+    public double targetHeadingRads;
     public boolean driverDriving;
     public boolean operatorDriving;
+    public boolean faceTagMode = false;
     private Limelight3A limelight;
+    public double cur_speed;
+    public double heading_offset = 0.0;
+
+    public void enableFaceTagMode() {
+        // TODO
+    }
+
+    public void SaveHeading() {
+        HeadingHelper.saveHeading(
+            follower.getPose().getX(),
+            follower.getPose().getY(),
+            follower.getHeading()
+        );
+    }
+
+    public void ResetGyro() {
+        heading_offset = follower.getHeading();
+    }
 
     public JoystickDriveCommand(
-        DrivebaseSubsystem sub,
+        Follower fol,
         Stick xyStick,
         Stick rotStick,
         DoubleSupplier strtDrive,
         DoubleSupplier angleDrive
     ) {
-        addRequirements(sub);
-        subsystem = sub;
+        follower = fol;
         x = xyStick.getXSupplier();
         y = xyStick.getYSupplier();
         r = rotStick.getXSupplier();
-        targetHeadingRads = -sub.getExternalHeading();
+        targetHeadingRads = follower.getHeading();
         driveStraighten = strtDrive;
         drive45 = angleDrive;
         driverDriving = true;
         operatorDriving = false;
+        cur_speed = DriveSettings.NORMAL_SPEED;
+    }
+
+    public void SetSnail() {
+        cur_speed = DriveSettings.SNAIL_SPEED;
+    }
+
+    public void SetNormal() {
+        cur_speed = DriveSettings.NORMAL_SPEED;
+    }
+
+    public void SetTurbo() {
+        cur_speed = DriveSettings.TURBO_SPEED;
     }
 
     // Use this constructor if you don't want auto-straightening
-    public JoystickDriveCommand(DrivebaseSubsystem sub, Stick xyStick, Stick rotStick) {
-        this(sub, xyStick, rotStick, null, null);
+    public JoystickDriveCommand(Follower foll, Stick xyStick, Stick rotStick) {
+        this(foll, xyStick, rotStick, null, null);
     }
 
     // This will make the bot snap to an angle, if the 'straighten' button is pressed
@@ -63,24 +91,18 @@ public class JoystickDriveCommand implements Command, Loggable {
         fortyfiveTrigger = isTriggered(drive45);
         if (faceTagMode) {
             // --- Face AprilTag using Limelight ---
-            // LLResult result = limelight.getLatestResult();
-            // if (result != null && result.isValid()) {
-            //     double tx = result.getTx(); // horizontal offset in degrees
-            //     double kP_TagAlign = 0.03;  // tune this gain
-            //     return -kP_TagAlign * tx;   // rotate until tx ~ 0
-            // } else {
-            //     return 0.0; // no target → don't spin
-            // }
-            return calculateHeadingToCircle(
-                subsystem.getPoseEstimate().getX(),
-                subsystem.getPoseEstimate().getY()
-            );
+            LLResult result = limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+                double tx = result.getTx(); // horizontal offset in degrees
+                return -DriveSettings.TAG_ALIGNMENT_GAIN * tx; // rotate until tx ~ 0
+            }
+            return 0.0; // no target → don't spin
         }
 
         if (!straightTrigger && !fortyfiveTrigger) {
             // No straighten override: return the stick value
             // (with some adjustment...)
-            return -Math.pow(r.getAsDouble(), 3) * subsystem.speed;
+            return -Math.pow(r.getAsDouble(), 3) * DriveSettings.TURN_SCALING;
         }
         if (straightTrigger) {
             // headingInRads is [0-2pi]
@@ -91,7 +113,7 @@ public class JoystickDriveCommand implements Command, Loggable {
             // Normalize the error to -1 to 1
             normalized = Math.max(Math.min(offBy / 45, 1.), -1.);
             // Dead zone of 5 degreesLiftHighJunctionCommand(liftSubsystem)
-            if (Math.abs(normalized) < Setup.OtherSettings.STRAIGHTEN_DEAD_ZONE) {
+            if (Math.abs(normalized) < OtherSettings.STRAIGHTEN_DEAD_ZONE) {
                 return 0.0;
             }
         } else {
@@ -103,18 +125,18 @@ public class JoystickDriveCommand implements Command, Loggable {
             // Normalize the error to -1 to 1
             normalized = Math.max(Math.min(offBy45 / 45, 1.), -1.);
             // Dead zone of 5 degreesLiftHighJunctionCommand(liftSubsystem)
-            if (Math.abs(normalized) < Setup.OtherSettings.STRAIGHTEN_DEAD_ZONE) {
+            if (Math.abs(normalized) < OtherSettings.STRAIGHTEN_DEAD_ZONE) {
                 return 0.0;
             }
         }
         // Scale it by the cube root, the scale that down by 30%
         // .9 (about 40 degrees off) provides .96 power => .288
         // .1 (about 5 degrees off) provides .46 power => .14
-        return Math.cbrt(normalized) * 0.3;
+        return Math.cbrt(normalized) * DriveSettings.TURN_SCALING;
     }
 
     public static boolean isTriggered(DoubleSupplier ds) {
-        if (ds == null || ds.getAsDouble() < DrivebaseSubsystem.DriveConstants.TRIGGER_THRESHOLD) {
+        if (ds == null || ds.getAsDouble() < OtherSettings.TRIGGER_THRESHOLD) {
             return false;
         }
         return true;
@@ -145,40 +167,40 @@ public class JoystickDriveCommand implements Command, Loggable {
     }
 
     @Override
+    public void initialize() {
+        follower.startTeleOpDrive();
+    }
+
+    @Override
     public void execute() {
         // If subsystem is busy it is running a trajectory.
-        if (!subsystem.isBusy()) {
-            double curHeading = -subsystem.getExternalHeading();
+        if (!follower.isBusy()) {
+            double curHeading = follower.getHeading() - heading_offset;
 
             // The math & signs looks wonky, because this makes things field-relative
             // (Remember that "3 O'Clock" is zero degrees)
             double yvalue = -y.getAsDouble();
             double xvalue = -x.getAsDouble();
             if (driveStraighten != null) {
-                if (driveStraighten.getAsDouble() > 0.7) {
+                if (driveStraighten.getAsDouble() > OtherSettings.TRIGGER_THRESHOLD) {
                     if (Math.abs(yvalue) > Math.abs(xvalue)) xvalue = 0;
                     else yvalue = 0;
                 }
             }
-            Vector2d input = new Vector2d(
-                yvalue * subsystem.speed,
-                xvalue * subsystem.speed
-            ).rotated(curHeading);
 
-            subsystem.setWeightedDrivePower(
-                new Pose2d(input.getX(), input.getY(), getRotation(curHeading))
+            follower.setTeleOpDrive(
+                yvalue * cur_speed,
+                xvalue * cur_speed,
+                getRotation(curHeading),
+                false,
+                heading_offset
             );
         }
-        subsystem.update();
+        follower.update();
     }
 
     @Override
     public boolean isFinished() {
         return false;
-    }
-
-    @Override
-    public void end(boolean cancel) {
-        if (cancel) subsystem.setDriveSignal(new DriveSignal());
     }
 }

@@ -1,20 +1,24 @@
 package org.firstinspires.ftc.learnbot.commands.auto;
 
+import com.pedropathing.follower.Follower;
 import com.technototes.library.command.Command;
-import org.firstinspires.ftc.learnbot.subsystems.DrivebaseSubsystem;
 
 public class DriveAutoCommand implements Command {
 
-    public DrivebaseSubsystem drivebaseSubsystem;
-    double p;
+    public Follower follower;
+    double[] p;
 
-    public DriveAutoCommand(DrivebaseSubsystem s, double power) {
-        drivebaseSubsystem = s;
-        p = power;
+    public DriveAutoCommand(Follower f, double power) {
+        follower = f;
+        p = new double[4];
+        p[0] = power;
+        p[1] = power;
+        p[2] = power;
+        p[3] = power;
     }
 
     @Override
     public void execute() {
-        drivebaseSubsystem.setMotorPowers(p, p, p, p);
+        follower.drivetrain.runDrive(p);
     }
 }

@@ -26,15 +26,15 @@ public class AutoConstants {
     public static double botWeightKg = 4.90;
     public static double botWidth = 10.1;
     public static double botLength = 12.5;
-    public static double xVelocity = 77.84;
-    public static double yVelocity = 61.23;
-    public static double forwardDeceleration = -25.0;
-    public static double lateralDeceleration = -30.0;
+    public static double xVelocity = 62.3;
+    public static double yVelocity = 54.6;
+    public static double forwardDeceleration = -40.0;
+    public static double lateralDeceleration = -48.0;
     public static double brakingStrength = 0.005;
     public static double brakingStart = 0.1;
     public static double centripetalScale = 0.0005;
     public static PIDFCoefficients translationPID = new PIDFCoefficients(0.06, 0.00001, 0, 0.015);
-    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.4, 0.0008, 0, 0.01);
+    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.5, 0.0008, 0, 0.01);
 
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.

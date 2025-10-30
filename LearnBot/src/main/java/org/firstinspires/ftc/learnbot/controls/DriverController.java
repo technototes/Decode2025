@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.learnbot.controls;
 
 import com.technototes.library.command.CommandScheduler;
-import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
@@ -10,7 +9,6 @@ import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup;
 import org.firstinspires.ftc.learnbot.commands.EZCmd;
-import org.firstinspires.ftc.learnbot.commands.FeedCMD;
 import org.firstinspires.ftc.learnbot.commands.LLPipelineChangeCommand;
 import org.firstinspires.ftc.learnbot.commands.driving.JoystickDriveCommand;
 
@@ -39,6 +37,7 @@ public class DriverController {
     public CommandButton apriltagPipeline;
     public CommandButton PurplecolorPipeline;
     public CommandButton AutoAim;
+    public JoystickDriveCommand stickDriver;
     public static boolean pipelineToggle = false;
     public static boolean launchOn = false;
     private boolean faceTagMode = false;
@@ -54,12 +53,6 @@ public class DriverController {
         AssignNamedControllerButton();
         if (Setup.Connected.DRIVEBASE) {
             bindDriveControls();
-        }
-        if (Setup.Connected.LAUNCHER) {
-            bindLaunchControls();
-        }
-        if (Setup.Connected.FEED) {
-            bindFeedControls();
         }
         if (Setup.Connected.LIMELIGHT) {
             bindPipelineControls();
@@ -85,39 +78,25 @@ public class DriverController {
     }
 
     public void bindDriveControls() {
-        CommandScheduler.scheduleJoystick(
-            new JoystickDriveCommand(
-                robot.drivebaseSubsystem,
-                driveLeftStick,
-                driveRightStick,
-                straightTrigger,
-                angleTrigger
-            )
+        stickDriver = new JoystickDriveCommand(
+            robot.follower,
+            driveLeftStick,
+            driveRightStick,
+            straightTrigger,
+            angleTrigger
         );
+        CommandScheduler.scheduleJoystick(stickDriver);
 
-        turboButton.whenPressed(EZCmd.Drive.TurboMode(robot.drivebaseSubsystem));
-        turboButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
+        turboButton.whenPressed(EZCmd.Drive.TurboMode(stickDriver));
+        turboButton.whenReleased(EZCmd.Drive.NormalMode(stickDriver));
 
-        snailButton.whenPressed(EZCmd.Drive.SnailMode(robot.drivebaseSubsystem));
-        snailButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
+        snailButton.whenPressed(EZCmd.Drive.SnailMode(stickDriver));
+        snailButton.whenReleased(EZCmd.Drive.NormalMode(stickDriver));
         if (Setup.Connected.LIMELIGHT) {
-            AutoAim.whenPressed(EZCmd.Drive.AutoAim(robot.drivebaseSubsystem));
+            AutoAim.whenPressed(EZCmd.Drive.AutoAim(stickDriver));
         }
 
-        resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem));
-    }
-
-    public void bindLaunchControls() {
-        launch.whenPressed(this::setLaunch);
-        launchSlower.whenPressed(this::launchSlower);
-        launchFaster.whenPressed(this::launchFaster);
-    }
-
-    public void bindFeedControls() {
-        moveballup.whenPressed(robot.feedingSubsystem::moveball);
-        moveballup.whenReleased(robot.feedingSubsystem::stop);
-        moveballslow.whenPressed(robot.feedingSubsystem::moveballslow);
-        moveballslow.whenReleased(robot.feedingSubsystem::stop);
+        resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(stickDriver));
     }
 
     public void bindPipelineControls() {
@@ -144,27 +123,6 @@ public class DriverController {
                     Setup.HardwareNames.AprilTag_Pipeline
                 )
             );
-        }
-    }
-
-    public void setLaunch() {
-        launchOn = !launchOn;
-        Launch();
-    }
-
-    public void launchFaster() {
-        robot.launcherSubsystem.IncreaseVelocity();
-    }
-
-    public void launchSlower() {
-        robot.launcherSubsystem.DecreaseVelocity();
-    }
-
-    public void Launch() {
-        if (launchOn) {
-            robot.launcherSubsystem.Launch();
-        } else {
-            robot.launcherSubsystem.Stop();
         }
     }
 }

@@ -75,12 +75,6 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
     @Override
     public void runLoop() {
         LLStatus status = null;
-        if (Setup.Connected.LAUNCHER) {
-            robot.launcherSubsystem.readMotorVelocity();
-            controls.Launch();
-            robot.launcherVelociy = robot.launcherSubsystem.GetCurrentTargetVelocity();
-            //robot.launcherSubsystem.RunLoop(telemetry);
-        }
         if (Setup.Connected.LIMELIGHT) {
             status = limelight.getStatus();
             limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());

@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.learnbot.helpers;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.geometry.Pose;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,7 +26,7 @@ public class HeadingHelper {
         FtcRobotControllerActivity.SaveBetweenRuns = new HeadingHelper(x, y, h);
     }
 
-    public static void savePose(Pose2d p) {
+    public static void savePose(Pose p) {
         saveHeading(p.getX(), p.getY(), p.getHeading());
     }
 

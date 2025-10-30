@@ -4,12 +4,6 @@ import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup;
-import org.firstinspires.ftc.learnbot.commands.auto.SafetyTestOdoFCommand;
-import org.firstinspires.ftc.learnbot.commands.auto.SafetyTestOdoRCommand;
-import org.firstinspires.ftc.learnbot.commands.auto.SafetyTestWheelFLCommand;
-import org.firstinspires.ftc.learnbot.commands.auto.SafetyTestWheelFRCommand;
-import org.firstinspires.ftc.learnbot.commands.auto.SafetyTestWheelRLCommand;
-import org.firstinspires.ftc.learnbot.commands.auto.SafetyTestWheelRRCommand;
 
 public class SafetyTestController {
 
@@ -39,12 +33,5 @@ public class SafetyTestController {
         wheelrrFail = gamepad.ps_circle;
     }
 
-    public void bindDriveControls() {
-        odoFFail.whenPressed(new SafetyTestOdoFCommand(robot.safetySubsystem));
-        odoRFail.whenPressed(new SafetyTestOdoRCommand(robot.safetySubsystem));
-        wheelflFail.whenPressed(new SafetyTestWheelFLCommand(robot.safetySubsystem));
-        wheelfrFail.whenPressed(new SafetyTestWheelFRCommand(robot.safetySubsystem));
-        wheelrlFail.whenPressed(new SafetyTestWheelRLCommand(robot.safetySubsystem));
-        wheelrrFail.whenPressed(new SafetyTestWheelRRCommand(robot.safetySubsystem));
-    }
+    public void bindDriveControls() {}
 }
