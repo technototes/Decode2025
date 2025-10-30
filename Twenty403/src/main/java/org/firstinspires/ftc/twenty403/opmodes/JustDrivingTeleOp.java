@@ -17,7 +17,9 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import java.util.Arrays;
@@ -28,6 +30,7 @@ import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
+import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
@@ -48,12 +51,9 @@ public class JustDrivingTeleOp extends CommandOpMode {
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
     private Limelight3A limelight;
-    private Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
-    private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
     private TelemetryManager telemetryM;
-    private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
 
     /*
@@ -69,16 +69,13 @@ public class JustDrivingTeleOp extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
+        robot.follower = AutoConstants.createFollower(hardwareMap);
+        robot.follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
+        robot.follower.update();
         controlsOperator = new OperatorController(codriverGamepad, robot);
-        //    for pedro:    robot.getF().setStartingPose(whatever it is);
-        if (Setup.Connected.DRIVEBASE) {
-            controlsDriver = new DriverController(driverGamepad, robot);
-
-            //             CommandScheduler.scheduleForState(
-            //                 EZCmd.Drive.ResetGyro(robot.drivebaseSubsystem),
-            //                 OpModeState.INIT
-            //             );
-        }
+        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+        otos.calibrateImu();
+        controlsDriver = new DriverController(driverGamepad, robot);
         if (Setup.Connected.LIMELIGHT) {
             limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
             limelight.setPollRateHz(100);
@@ -87,9 +84,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
             limelight.pipelineSwitch(AprilTag_Pipeline);
         }
-        follower = AutoConstants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
-        follower.update();
+
 
         /*
          * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
@@ -104,42 +99,20 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void uponStart() {
-        follower.startTeleopDrive();
+        robot.follower.startTeleopDrive();
         robot.atStart();
     }
 
     @Override
     public void runLoop() {
-        follower.update();
-        if (!automatedDrive) {
-            //Make the last parameter false for field-centric
-            //In case the drivers want to use a "slowMode" you can scale the vectors
-            //This is the normal version to use in the TeleOp
-            if (!slowMode) follower.setTeleOpDrive(
+        robot.follower.update();
+
+            robot.follower.setTeleOpDrive(
                 -gamepad1.left_stick_y,
                 -gamepad1.left_stick_x,
                 -gamepad1.right_stick_x,
                 false // Robot Centric
             );
-            //This is how it looks with slowMode on
-            else follower.setTeleOpDrive(
-                -gamepad1.left_stick_y * 0.4,
-                -gamepad1.left_stick_x * 0.4,
-                -gamepad1.right_stick_x * 0.4,
-                false // Robot Centric
-            );
-        }
-        //Automated PathFollowing
-        //        if (gamepad1.aWasPressed()) {
-        //            follower.followPath(pathChain.get());
-        //            automatedDrive = true;
-        //        }
-
-        //Stop automated following if the follower is done
-        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
-            follower.startTeleopDrive();
-            automatedDrive = false;
-        }
         LLStatus status = null;
         if (Setup.Connected.LIMELIGHT) {
             status = limelight.getStatus();
@@ -148,36 +121,11 @@ public class JustDrivingTeleOp extends CommandOpMode {
         }
 
         if (Setup.Connected.LAUNCHER) {
-            controlsDriver.bindLaunchControls();
             robot.launcherSubsystem.readMotorVelocity();
+            controlsDriver.Launch();
+            robot.launcherVelociy = robot.launcherSubsystem.GetCurrentTargetVelocity();
+            //robot.launcherSubsystem.RunLoop(telemetry);
         }
-        // For Panels controller widget until
-        //        Gamepad Driver = driverManager.asCombinedFTCGamepad(gamepad1);
-        //        panelsTelemetry.debug("==== Buttons ====");
-        //        panelsTelemetry.debug("A: " + Driver.a);
-        //        panelsTelemetry.debug("B: " + Driver.b);
-        //        panelsTelemetry.debug("X: " + Driver.x);
-        //        panelsTelemetry.debug("Y: " + Driver.y);
-        //        panelsTelemetry.debug("DPad Up: " + Driver.dpad_up);
-        //        panelsTelemetry.debug("DPad Down: " + Driver.dpad_down);
-        //        panelsTelemetry.debug("DPad Left: " + Driver.dpad_left);
-        //        panelsTelemetry.debug("DPad Right: " + Driver.dpad_right);
-        //        panelsTelemetry.debug("Left Bumper: " + Driver.left_bumper);
-        //        panelsTelemetry.debug("Right Bumper: " + Driver.right_bumper);
-        //        panelsTelemetry.debug("Left Trigger: " + Driver.left_trigger);
-        //        panelsTelemetry.debug("Right Trigger: " + Driver.right_trigger);
-        //        panelsTelemetry.debug("Start / Options: " + Driver.options);
-        //        panelsTelemetry.debug("Back / Share: " + Driver.back);
-        //        panelsTelemetry.debug("Guide / PS: " + Driver.guide);
-        //        panelsTelemetry.debug("Touchpad: " + Driver.touchpad);
-        //        panelsTelemetry.debug("Left Stick Button: " + Driver.left_stick_button);
-        //        panelsTelemetry.debug("Right Stick Button: " + Driver.right_stick_button);
-        //        panelsTelemetry.debug("==== Sticks ====");
-        //        panelsTelemetry.debug("Left Stick X: " + Driver.left_stick_x);
-        //        panelsTelemetry.debug("Left Stick Y: " + Driver.left_stick_y);
-        //        panelsTelemetry.debug("Right Stick X: " + Driver.right_stick_x);
-        //        panelsTelemetry.debug("Right Stick Y: " + Driver.right_stick_y);
-        // here
 
         if (Setup.Connected.LIMELIGHT) {
             // here
