@@ -1,11 +1,5 @@
 package org.firstinspires.ftc.learnbot;
 
-import static org.firstinspires.ftc.learnbot.Setup.HardwareNames.FLMOTOR;
-import static org.firstinspires.ftc.learnbot.Setup.HardwareNames.FRMOTOR;
-import static org.firstinspires.ftc.learnbot.Setup.HardwareNames.OTOS;
-import static org.firstinspires.ftc.learnbot.Setup.HardwareNames.RLMOTOR;
-import static org.firstinspires.ftc.learnbot.Setup.HardwareNames.RRMOTOR;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
@@ -16,31 +10,29 @@ import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
 import com.pedropathing.ftc.localization.constants.OTOSConstants;
+import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.pedropathing.paths.PathConstraints;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.learnbot.Setup.HardwareNames;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Configurable
 public class AutoConstants {
 
-    public static boolean ptechno = false;
-    // measured 10/14
-    public static double botWeightKg = 8.50;
-    public static double botWidth = 17.75;
-    public static double botLength = 17.75;
+    public static double botWeightKg = 4.90;
+    public static double botWidth = 10.1;
+    public static double botLength = 12.5;
     public static double xVelocity = 77.84;
     public static double yVelocity = 61.23;
     public static double forwardDeceleration = -25.0;
     public static double lateralDeceleration = -30.0;
-    public static double linearScalar = 1.4;
-    public static double angularScalar = 1.0;
     public static double brakingStrength = 0.005;
     public static double brakingStart = 0.1;
     public static double centripetalScale = 0.0005;
-    public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(4.75, 0, -Math.PI / 2);
     public static PIDFCoefficients translationPID = new PIDFCoefficients(0.06, 0.00001, 0, 0.015);
     public static PIDFCoefficients headingPID = new PIDFCoefficients(0.4, 0.0008, 0, 0.01);
 
@@ -56,40 +48,48 @@ public class AutoConstants {
     );
 
     @Configurable
-    public static class PtechnoConst {
+    public static class OTOSConfig {
 
-        public static double botWeightKg = 4.85;
-        public static double xVelocity = 61.5;
-        public static double yVelocity = 53.3;
-        public static double forwardDeceleration = -35.0;
-        public static double lateralDeceleration = -44.0;
-        public static double linearScale = 1.1;
-        public static double angularScale = 1.0;
-        public static double brakingStrength = 0.1;
-        public static double brakingStart = 0.1;
-        public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(
-            -5.75,
+        public static double linearScalar = 1.4;
+        public static double angularScalar = 1.0;
+        public static SparkFunOTOS.Pose2D DEVICE_POSITION = new SparkFunOTOS.Pose2D(
+            4.75,
             0,
-            -Math.PI / 2.0
+            -Math.PI / 2
         );
+    }
+
+    @Configurable
+    public static class MotorLocConfig {
 
         public static double fwdTicksToInches = 135;
         public static double latTicksToInches = 150;
         public static double turnTicksToInches = 100;
     }
 
-    public static boolean USE_OTOS = true;
+    @Configurable
+    public static class PinpointConfig {
+
+        public static double ForwardPodY = -2.5;
+        public static double StrafePodX = 0.25;
+        public static GoBildaPinpointDriver.EncoderDirection ForwardDirection =
+            GoBildaPinpointDriver.EncoderDirection.REVERSED;
+        public static GoBildaPinpointDriver.EncoderDirection StrafeDirection =
+            GoBildaPinpointDriver.EncoderDirection.REVERSED;
+    }
+
+    // 0 = Motor Encoders, 1 = OTOS, 2 = PinPoint
+    public static final int USE_MOTORS = 0,
+        USE_OTOS = 1,
+        USE_PINPOINT = 2;
+    public static int WhichLocalizer = USE_PINPOINT;
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
             // tune these
-            .mass(ptechno ? PtechnoConst.botWeightKg : botWeightKg)
-            .forwardZeroPowerAcceleration(
-                ptechno ? PtechnoConst.forwardDeceleration : forwardDeceleration
-            )
-            .lateralZeroPowerAcceleration(
-                ptechno ? PtechnoConst.lateralDeceleration : lateralDeceleration
-            )
+            .mass(botWeightKg)
+            .forwardZeroPowerAcceleration(forwardDeceleration)
+            .lateralZeroPowerAcceleration(lateralDeceleration)
             .useSecondaryDrivePIDF(false)
             .useSecondaryHeadingPIDF(false)
             .useSecondaryTranslationalPIDF(false)
@@ -100,65 +100,76 @@ public class AutoConstants {
     }
 
     public static PathConstraints getPathConstraints() {
-        return new PathConstraints(
-            0.99,
-            0.1,
-            ptechno ? PtechnoConst.brakingStrength : brakingStrength,
-            ptechno ? PtechnoConst.brakingStart : brakingStart
-        );
+        return new PathConstraints(0.99, 0.1, brakingStrength, brakingStart);
     }
 
     public static MecanumConstants getDriveConstants() {
         return new MecanumConstants()
             .maxPower(1)
-            .leftFrontMotorName(FLMOTOR)
-            .leftRearMotorName(RLMOTOR)
-            .rightFrontMotorName(FRMOTOR)
-            .rightRearMotorName(RRMOTOR)
+            .leftFrontMotorName(HardwareNames.FLMOTOR)
+            .leftRearMotorName(HardwareNames.RLMOTOR)
+            .rightFrontMotorName(HardwareNames.FRMOTOR)
+            .rightRearMotorName(HardwareNames.RRMOTOR)
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(ptechno ? PtechnoConst.xVelocity : xVelocity)
-            .yVelocity(ptechno ? PtechnoConst.yVelocity : yVelocity);
+            .xVelocity(xVelocity)
+            .yVelocity(yVelocity);
     }
 
     public static OTOSConstants getOtosLocalizerConstants() {
         return new OTOSConstants()
-            .hardwareMapName(OTOS)
+            .hardwareMapName(HardwareNames.OTOS)
             .linearUnit(DistanceUnit.INCH)
             .angleUnit(AngleUnit.RADIANS)
-            .linearScalar(ptechno ? PtechnoConst.linearScale : linearScalar)
-            .angularScalar(ptechno ? PtechnoConst.angularScale : angularScalar)
-            .offset(ptechno ? PtechnoConst.OTOS_OFFSET : OTOS_OFFSET);
+            .linearScalar(OTOSConfig.linearScalar)
+            .angularScalar(OTOSConfig.angularScalar)
+            .offset(OTOSConfig.DEVICE_POSITION);
         // need to tune for OTOS localization
     }
 
     public static DriveEncoderConstants getDriveEncoderConstants() {
         return new DriveEncoderConstants()
-            .leftFrontMotorName(FLMOTOR)
-            .leftRearMotorName(RLMOTOR)
-            .rightFrontMotorName(FRMOTOR)
-            .rightRearMotorName(RRMOTOR)
+            .leftFrontMotorName(HardwareNames.FLMOTOR)
+            .leftRearMotorName(HardwareNames.RLMOTOR)
+            .rightFrontMotorName(HardwareNames.FRMOTOR)
+            .rightRearMotorName(HardwareNames.RRMOTOR)
             .leftFrontEncoderDirection(Encoder.FORWARD)
             .leftRearEncoderDirection(Encoder.FORWARD)
             .rightFrontEncoderDirection(Encoder.FORWARD)
             .rightRearEncoderDirection(Encoder.FORWARD)
-            .forwardTicksToInches(PtechnoConst.fwdTicksToInches)
-            .strafeTicksToInches(PtechnoConst.latTicksToInches)
-            .turnTicksToInches(PtechnoConst.turnTicksToInches)
+            .forwardTicksToInches(MotorLocConfig.fwdTicksToInches)
+            .strafeTicksToInches(MotorLocConfig.latTicksToInches)
+            .turnTicksToInches(MotorLocConfig.turnTicksToInches)
             .robotLength(botLength)
             .robotWidth(botWidth);
+    }
+
+    public static PinpointConstants getPinpointConstants() {
+        return new PinpointConstants()
+            .hardwareMapName(HardwareNames.PINPOINT)
+            .distanceUnit(DistanceUnit.INCH)
+            .forwardPodY(PinpointConfig.ForwardPodY)
+            .strafePodX(PinpointConfig.StrafePodX)
+            .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
+            .forwardEncoderDirection(PinpointConfig.ForwardDirection)
+            .strafeEncoderDirection(PinpointConfig.StrafeDirection);
     }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         FollowerBuilder fb = new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
             .mecanumDrivetrain(getDriveConstants());
-        if (USE_OTOS) {
-            return fb.OTOSLocalizer(getOtosLocalizerConstants()).build();
-        } else {
-            return fb.driveEncoderLocalizer(getDriveEncoderConstants()).build();
+        switch (WhichLocalizer) {
+            case USE_OTOS:
+                return fb.OTOSLocalizer(getOtosLocalizerConstants()).build();
+            case USE_MOTORS:
+                return fb.driveEncoderLocalizer(getDriveEncoderConstants()).build();
+            case USE_PINPOINT:
+                return fb.pinpointLocalizer(getPinpointConstants()).build();
+            default:
+                return fb.build();
         }
     }
 }

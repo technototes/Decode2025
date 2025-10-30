@@ -36,6 +36,7 @@ public class Setup {
         public static String BOTTOML = "bottoml";
         public static String BOTTOMR = "bottomr";
         public static String OTOS = "sparky";
+        public static String PINPOINT = "pinpoint";
         public static String LIMELIGHT = "limelight";
         public static String TESTSERVO = "testservo";
         public static String TESTMOTOR = "testmotor";
