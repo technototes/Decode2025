@@ -224,6 +224,27 @@ public class Paths {
             .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140))
             .build();
     }
+    public static Command AutoLaunching3Balls(Robot r) {
+        return new SequentialCommandGroup(
+                TeleCommands.Intake(r),
+                TeleCommands.GateUp(r),
+                TeleCommands.Launch(r),
+                // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
+                new WaitCommand(0.2),
+                TeleCommands.GateDown(r),
+                new WaitCommand(0.5),
+                TeleCommands.GateUp(r),
+                new WaitCommand(1),
+                TeleCommands.GateDown(r),
+                new WaitCommand(0.5),
+                TeleCommands.GateUp(r),
+                new WaitCommand(0.5),
+                TeleCommands.GateDown(r),
+                new WaitCommand(0.5),
+                TeleCommands.GateUp(r)
+                // want to keep launcher running during auto also no need to stop intake
+        );
+    }
 }
 
 //    public static Command Pedropathcommand(Robot r){
