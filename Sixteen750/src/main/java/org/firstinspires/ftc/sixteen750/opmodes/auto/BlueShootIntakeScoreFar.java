@@ -29,7 +29,7 @@ public class BlueShootIntakeScoreFar extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
-        robot.drivebase.setPoseEstimate(PathConstants.START_LAUNCHZONE.toPose());
+        robot.drivebase.setPoseEstimate(PathConstants.START_FAR_LAUNCHZONE.toPose());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                     Paths.BlueFarPickupShootCommand(robot),
