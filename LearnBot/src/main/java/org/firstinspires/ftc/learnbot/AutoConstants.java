@@ -23,23 +23,27 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Configurable
 public class AutoConstants {
 
+    // Measured by hoomans:
     public static double botWeightKg = 4.90;
     public static double botWidth = 10.1;
     public static double botLength = 12.5;
+    // Adjusted to be sensible (no good guidance on these :/ )
+    public static double brakingStrength = 0.5;
+    public static double brakingStart = 0.5;
+    // Values from tuners:
     public static double xVelocity = 59.2;
     public static double yVelocity = 51.7;
     public static double forwardDeceleration = -40.0;
     public static double lateralDeceleration = -48.0;
-    public static double brakingStrength = 0.5;
-    public static double brakingStart = 0.5;
     public static double centripetalScale = 0.0005;
+    // PIDs to be tuned:
     public static PIDFCoefficients translationPID = new PIDFCoefficients(
-            0.08,
-            0.000005,
-            0.008,
-            0.02);
+        0.08,
+        0.000005,
+        0.008,
+        0.02
+    );
     public static PIDFCoefficients headingPID = new PIDFCoefficients(0.9, 0.05, 0.05, 0.02);
-
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
@@ -47,7 +51,7 @@ public class AutoConstants {
         0.005,
         00.00001,
         0.0004,
-        0.6,
+        0.6, // Kalman filter: 60% of D will come from the *previous* derivative
         0.02
     );
 
@@ -67,6 +71,7 @@ public class AutoConstants {
     // The maximum heading error (in degrees) the bot can be from the path end
     // while still saying the path is complete.
     public static double acceptableHeading = 2.5;
+
     @Configurable
     public static class OTOSConfig {
 
@@ -120,7 +125,12 @@ public class AutoConstants {
     }
 
     public static PathConstraints getPathConstraints() {
-        PathConstraints pc = new PathConstraints(tValueContraint, timeoutConstraint, brakingStrength, brakingStart);
+        PathConstraints pc = new PathConstraints(
+            tValueContraint,
+            timeoutConstraint,
+            brakingStrength,
+            brakingStart
+        );
         pc.setVelocityConstraint(acceptableVelocity);
         pc.setTranslationalConstraint(acceptableDistance);
         pc.setHeadingConstraint(Math.toRadians(acceptableHeading));

@@ -1,46 +1,50 @@
 package org.firstinspires.ftc.sixteen750.commands;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathBuilder;
+import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.technototes.library.command.Command;
 
-public class PPPathCommand implements Command {
+public class PedroPathCommand implements Command {
 
     public PathChain pathChain;
     public Follower follower;
-    public PathBuilder pathBuilder;
+    public Pose begin;
 
     public boolean currentPose;
 
-    public PPPathCommand(Follower f, PathChain p, PathBuilder pb) {
+    public PedroPathCommand(Follower f, PathChain p) {
         follower = f;
         pathChain = p;
-        pathBuilder = pb;
     }
 
-    public PathChain toPathChain(Path path) {
-        return new PathChain(path);
-    }
-
-    public PPPathCommand(Follower f, Path p, boolean currPose) {
+    public PedroPathCommand(Follower f, Pose startPose, PathChain p) {
         follower = f;
+        pathChain = p;
+        currentPose = true;
+        begin = startPose;
+    }
+
+    public PedroPathCommand(Follower f, PathChain p, boolean currPose) {
+        follower = f;
+        pathChain = p;
         currentPose = currPose;
-        pathChain = toPathChain(p);
+        begin = null;
     }
 
     @Override
     public void initialize() {
-        follower.followPath(pathChain);
         if (currentPose) {
-            follower.setStartingPose(follower.getPose());
+            follower.setStartingPose(begin == null ? follower.getPose() : begin);
         }
+        follower.followPath(pathChain);
     }
 
-    // for getting if end im not sure how to get bot pose yet
     @Override
     public boolean isFinished() {
+        return !follower.isBusy();
+        // I *believe* that a properly tuned robot shouldn't need all this stuff
+        /*
         if (
             follower.atParametricEnd() &&
             follower.getHeadingError() < follower.getCurrentPath().getPathEndHeadingConstraint()
@@ -55,14 +59,11 @@ public class PPPathCommand implements Command {
             return true;
         } else {
             return false;
-        }
+        }*/
     }
 
     @Override
-    public void execute() {}
-
-    @Override
-    public void end(boolean cancel) {
-        if (cancel) follower.setMaxPowerScaling(0);
+    public void execute() {
+        follower.update();
     }
 }

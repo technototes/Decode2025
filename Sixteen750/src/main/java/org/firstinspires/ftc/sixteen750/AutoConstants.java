@@ -23,6 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.sixteen750.Setup.HardwareNames;
 
 @Config
+@Configurable
 public class AutoConstants {
 
     // note these need to be measured:
@@ -40,19 +41,33 @@ public class AutoConstants {
     // These are hand tuned to work how we want
     public static double brakingStrength = 0.5;
     public static double brakingStart = 0.5;
-    public static double TValueConstraint = 0.99;
-    public static double timeoutConstraint = 100;
     public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
     public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
-    // public static PIDFCoefficients secondaryheadingPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
-    // public static PIDFCoefficients secondarytranslationPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
+    // "Kalman filtering": T in this constructor is the % of the previous
+    // derivative that should be used to calculate the derivative.
+    // (D is "Derivative" in PIDF...)
     public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(
         0.025,
         0,
         0.00001,
-        0.6, // Kalman filter: 60% of D will come from the *previous* derivative
+        0.6,
         0.01
     );
+
+    // The percent of a path that must be complete for Pedro to decide it's done
+    public static double TValueConstraint = 0.99;
+    // Time, in *milliseconds*, to let the follower algorithm correct
+    // before the path is considered "complete".
+    public static double timeoutConstraint = 100;
+    // The maximum velocity (in inches/second) the bot can be moving while still
+    // saying the path is complete.
+    public static double acceptableVelocity = 1.0;
+    // The maximum distance (in inches) the bot can be from the path end
+    // while still saying the path is complete.
+    public static double acceptableDistance = 2.0;
+    // The maximum heading error (in degrees) the bot can be from the path end
+    // while still saying the path is complete.
+    public static double acceptableHeading = 2.5;
 
     //public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
     //public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
@@ -90,28 +105,10 @@ public class AutoConstants {
             RevHubOrientationOnRobot.UsbFacingDirection.DOWN;
     }
 
-    public static DriveEncoderConstants getEncoderConstants() {
-        return new DriveEncoderConstants()
-            .forwardTicksToInches(DriveEncoderConfig.fwdTicksToInches)
-            .strafeTicksToInches(DriveEncoderConfig.strafeTicksToInches)
-            .turnTicksToInches(DriveEncoderConfig.turnTicksToInches)
-            .robotLength(robotLength)
-            .robotWidth(robotWidth)
-            .rightFrontMotorName(HardwareNames.FR_DRIVE_MOTOR)
-            .rightRearMotorName(HardwareNames.RR_DRIVE_MOTOR)
-            .leftRearMotorName(HardwareNames.RL_DRIVE_MOTOR)
-            .leftFrontMotorName(HardwareNames.FL_DRIVE_MOTOR)
-            .leftFrontEncoderDirection(Encoder.FORWARD)
-            .leftRearEncoderDirection(Encoder.REVERSE)
-            .rightFrontEncoderDirection(Encoder.REVERSE)
-            .rightRearEncoderDirection(Encoder.FORWARD);
-    }
-
     public static TwoWheelConstants getTwoWheelLocalizerConstants() {
         return new TwoWheelConstants()
             .forwardEncoder_HardwareMapName(TwoWheelConfig.forwardName)
             .strafeEncoder_HardwareMapName(TwoWheelConfig.strafeName)
-            .IMU_HardwareMapName(Setup.HardwareNames.EXTERNAL_IMU)
             .forwardPodY(TwoWheelConfig.forwardPodYOffset)
             .strafePodX(TwoWheelConfig.strafePodXOffset)
             .forwardTicksToInches(TwoWheelConfig.forwardTicksToInches)
@@ -122,6 +119,7 @@ public class AutoConstants {
             .strafeEncoderDirection(
                 TwoWheelConfig.strafeReversed ? Encoder.REVERSE : Encoder.FORWARD
             )
+            .IMU_HardwareMapName(Setup.HardwareNames.EXTERNAL_IMU)
             .IMU_Orientation(
                 new RevHubOrientationOnRobot(TwoWheelConfig.logoDir, TwoWheelConfig.usbDir)
             );
@@ -133,22 +131,24 @@ public class AutoConstants {
             .mass(botWeightKg)
             .forwardZeroPowerAcceleration(fwdDeceleration)
             .lateralZeroPowerAcceleration(latDeceleration)
-            .holdPointTranslationalScaling(1)
+            // .holdPointTranslationalScaling(1)
             .headingPIDFCoefficients(headingPIDF)
             .drivePIDFCoefficients(drivePIDF)
-            // .secondaryHeadingPIDFCoefficients(secondaryheadingPIDF)
-            // .secondaryTranslationalPIDFCoefficients(secondarytranslationPIDF)
             .translationalPIDFCoefficients(translationPIDF)
             .centripetalScaling(centripetalScaling);
     }
 
     public static PathConstraints getPathConstraints() {
-        return new PathConstraints(
+        PathConstraints pc = new PathConstraints(
             TValueConstraint,
             timeoutConstraint,
             brakingStrength,
             brakingStart
         );
+        pc.setVelocityConstraint(acceptableVelocity);
+        pc.setTranslationalConstraint(acceptableDistance);
+        pc.setHeadingConstraint(Math.toRadians(acceptableHeading));
+        return pc;
     }
 
     public static MecanumConstants getDriveConstants() {
@@ -166,15 +166,33 @@ public class AutoConstants {
             .yVelocity(yvelocity);
     }
 
+    /*
+    public static DriveEncoderConstants getEncoderConstants() {
+        return new DriveEncoderConstants()
+                .forwardTicksToInches(DriveEncoderConfig.fwdTicksToInches)
+                .strafeTicksToInches(DriveEncoderConfig.strafeTicksToInches)
+                .turnTicksToInches(DriveEncoderConfig.turnTicksToInches)
+                .robotLength(robotLength)
+                .robotWidth(robotWidth)
+                .rightFrontMotorName(HardwareNames.FR_DRIVE_MOTOR)
+                .rightRearMotorName(HardwareNames.RR_DRIVE_MOTOR)
+                .leftRearMotorName(HardwareNames.RL_DRIVE_MOTOR)
+                .leftFrontMotorName(HardwareNames.FL_DRIVE_MOTOR)
+                .leftFrontEncoderDirection(Encoder.FORWARD)
+                .leftRearEncoderDirection(Encoder.REVERSE)
+                .rightFrontEncoderDirection(Encoder.REVERSE)
+                .rightRearEncoderDirection(Encoder.FORWARD);
+    }
+
     public static OTOSConstants getOTOSConstants() {
         return new OTOSConstants()
             .hardwareMapName(HardwareNames.OTOS)
             .linearUnit(DistanceUnit.INCH)
             .angleUnit(AngleUnit.RADIANS)
-            // need to tune for OTOS localization
             .linearScalar(OTOSConfig.linearscalar)
             .angularScalar(OTOSConfig.angularscalar);
     }
+    */
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         if (Setup.Connected.OTOS) {
