@@ -45,7 +45,7 @@ public class Robot implements Loggable {
         // this.follower = new Follower(followerConstants, localizer, drivetrain, pathConstraints);
 
         if (Setup.Connected.ODOSUBSYSTEM) {
-            this.localizer = new TwoDeadWheelLocalizer(hw.odoFB, hw.odoRL, hw.imu);
+            this.localizer = new TwoDeadWheelLocalizer(hw.odoRL, hw.odoRL, hw.imu);
         }
         if (Setup.Connected.DRIVEBASE) {
             drivebase = new DrivebaseSubsystem(hw.fl, hw.fr, hw.rl, hw.rr, hw.imu, this.localizer);

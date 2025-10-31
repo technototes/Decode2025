@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.sixteen750;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 
+@Configurable
 public class Setup {
 
-    @Config
+    @Configurable
     public static class Connected {
 
         public static final boolean TESTSUBSYSTEM = true;
@@ -12,7 +14,7 @@ public class Setup {
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = true;
         public static boolean SAFETYSUBSYSTEM = false;
-        public static boolean EXTERNAL_IMU = true;
+        public static boolean EXTERNAL_IMU = false;
         public static boolean OTOS = false;
         public static boolean INTAKESUBSYSTEM = true;
         public static boolean LAUNCHERSUBSYSTEM = true;
@@ -20,7 +22,7 @@ public class Setup {
         public static boolean BRAKESUBSYSTEM = true;
     }
 
-    @Config
+    @Configurable
     public static class HardwareNames {
 
         public static String FL_DRIVE_MOTOR = "fl";
@@ -50,7 +52,7 @@ public class Setup {
         public static String[] Motif = { "1", "2", "3" };
     }
 
-    @Config
+    @Configurable
     public static class OtherSettings {
 
         public static double AUTO_SCALING = 0.95;

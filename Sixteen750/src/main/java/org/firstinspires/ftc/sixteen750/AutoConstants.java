@@ -97,12 +97,12 @@ public class AutoConstants {
         public static double strafeTicksToInches = 5.38; // 5.37, 5.39, 5.38
         public static double forwardPodYOffset = 4.27;
         public static double strafePodXOffset = -4.006;
-        public static boolean forwardReversed = true;
+        public static boolean forwardReversed = false;
         public static boolean strafeReversed = false;
         public static RevHubOrientationOnRobot.LogoFacingDirection logoDir =
-            RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
+            RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         public static RevHubOrientationOnRobot.UsbFacingDirection usbDir =
-            RevHubOrientationOnRobot.UsbFacingDirection.DOWN;
+            RevHubOrientationOnRobot.UsbFacingDirection.UP;
     }
 
     public static TwoWheelConstants getTwoWheelLocalizerConstants() {
@@ -119,7 +119,7 @@ public class AutoConstants {
             .strafeEncoderDirection(
                 TwoWheelConfig.strafeReversed ? Encoder.REVERSE : Encoder.FORWARD
             )
-            .IMU_HardwareMapName(Setup.HardwareNames.EXTERNAL_IMU)
+            .IMU_HardwareMapName(Setup.HardwareNames.IMU)
             .IMU_Orientation(
                 new RevHubOrientationOnRobot(TwoWheelConfig.logoDir, TwoWheelConfig.usbDir)
             );
