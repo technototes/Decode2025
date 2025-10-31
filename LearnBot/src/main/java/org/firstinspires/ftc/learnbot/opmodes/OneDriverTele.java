@@ -29,8 +29,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 @Configurable
 @SuppressWarnings("unused")
-@TeleOp(name = "OneDriverTeleOp")
-public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
+@TeleOp(name = "OneDriver")
+public class OneDriverTele extends CommandOpMode implements Loggable {
 
     public Robot robot;
     public Setup setup;
