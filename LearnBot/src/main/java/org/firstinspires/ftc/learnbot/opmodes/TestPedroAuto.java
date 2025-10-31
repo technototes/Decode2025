@@ -10,14 +10,16 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
+import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
 import org.firstinspires.ftc.learnbot.commands.auto.DriveAutoCommand;
+import org.firstinspires.ftc.learnbot.commands.auto.Paths;
 import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
-@Autonomous(name = "DriveForward", preselectTeleOp = "Dual Control")
+@Autonomous(name = "TestPedro", preselectTeleOp = "OneDriver")
 @SuppressWarnings("unused")
-public class DriveForward extends CommandOpMode {
+public class TestPedroAuto extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -28,12 +30,19 @@ public class DriveForward extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
-        //robot.drivebase.setPoseEstimate(AutoConstants.BACKWARD.toPose());
+        Paths p = new Paths(robot.follower);
+        robot.follower.setStartingPose(p.getStart());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                new DriveAutoCommand(robot.follower, 0.5),
-                new WaitCommand(0.3),
-                new DriveAutoCommand(robot.follower, 0),
+                new PedroPathCommand(robot.follower, p.Path1),
+                // new WaitCommand(0.5),
+                new PedroPathCommand(robot.follower, p.Path2),
+                // new WaitCommand(1),
+                new PedroPathCommand(robot.follower, p.Path3),
+                // new WaitCommand(2),
+                new PedroPathCommand(robot.follower, p.Path4),
+                // new WaitCommand(4),
+                new PedroPathCommand(robot.follower, p.Path5),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN
