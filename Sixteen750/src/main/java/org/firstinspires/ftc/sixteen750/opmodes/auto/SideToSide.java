@@ -11,13 +11,14 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.PathConstants;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.auto.ForwardBackwardCommand;
+import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "Forward_Backward_Side", preselectTeleOp = "Dual Control")
+@Autonomous(name = "Side_to_Side", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class ForwardBackwardSide extends CommandOpMode {
+public class SideToSide extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -28,10 +29,10 @@ public class ForwardBackwardSide extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Observation);
-        robot.drivebase.setPoseEstimate(PathConstants.FORWARD.toPose());
+        robot.drivebase.setPoseEstimate(PathConstants.BACKWARD.toPose());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                new ForwardBackwardCommand(robot),
+                Paths.SidetoSideCommand(robot),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN
