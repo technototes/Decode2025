@@ -7,7 +7,6 @@ import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.PathConstants;
 import org.firstinspires.ftc.sixteen750.Robot;
@@ -32,7 +31,7 @@ public class BlueShootIntakeScoreFar extends CommandOpMode {
         robot.drivebase.setPoseEstimate(PathConstants.START_FAR_LAUNCHZONE.toPose());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                    Paths.BlueFarPickupShootCommand(robot),
+                Paths.BlueFarPickupShootCommand(robot),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN
