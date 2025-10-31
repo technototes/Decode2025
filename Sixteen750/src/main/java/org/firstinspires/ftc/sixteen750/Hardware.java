@@ -31,7 +31,7 @@ public class Hardware implements Loggable {
     public Servo brake;
     public Servo hood;
     public Servo lever;
-    public MotorEncoder odoFB, odoRL;
+    public MotorEncoder odoRL, odoFB;
     public SparkFunOTOS odo;
     public CRServo testCRServo;
     public Servo testServo;
@@ -57,8 +57,8 @@ public class Hardware implements Loggable {
             rr = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.RR_DRIVE_MOTOR);
         }
         if (Setup.Connected.ODOSUBSYSTEM) {
-            odoRL = new MotorEncoder(Setup.HardwareNames.ODOFB);
-            odoFB = new MotorEncoder(Setup.HardwareNames.ODORL);
+            odoFB = new MotorEncoder(Setup.HardwareNames.ODOFB);
+            odoRL = new MotorEncoder(Setup.HardwareNames.ODORL);
         }
         if (Setup.Connected.OTOS) {
             odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);

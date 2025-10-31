@@ -75,7 +75,7 @@ public class SafetySubsystem implements Subsystem, Loggable {
         if (failedPart == FailedPart.ODOF) {
             return 0;
         } else {
-            return myHw.odoFB.getCurrentPosition();
+            return myHw.odoRL.getCurrentPosition();
         }
     }
 

@@ -147,7 +147,7 @@ public class DriverController {
         hoodButton.whenPressed(TeleCommands.HoodUp(robot));
         hooddownButton.whenPressed(TeleCommands.HoodDown(robot));
 
-        holdButton.whenPressed(TeleCommands.HoldIntake(robot));
+        holdButton.whilePressed(TeleCommands.HoldIntake(robot));
         holdButton.whenReleased(TeleCommands.IntakeStop(robot));
     }
 }
