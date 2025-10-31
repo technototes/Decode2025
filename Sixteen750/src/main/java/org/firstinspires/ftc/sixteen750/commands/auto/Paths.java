@@ -141,6 +141,12 @@ public class Paths {
             TeleCommands.IntakeStop(r)
         );
     }
+    public static Command SidetoSideCommand(Robot r) {
+        return new SequentialCommandGroup(
+                new TrajectorySequenceCommand(r.drivebase, PathConstants.SIDE_LEFT_TO_SIDE_RIGHT),
+                        new TrajectorySequenceCommand(r.drivebase, PathConstants.SIDE_RIGHT_TO_SIDE_LEFT)
+        );
+    }
 
     public void PedroPathTestCommand(Robot r) {
         pathChain = follower
