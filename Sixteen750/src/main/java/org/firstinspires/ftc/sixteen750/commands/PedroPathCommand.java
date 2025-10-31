@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.technototes.library.command.Command;
+import org.firstinspires.ftc.sixteen750.Setup;
 
 public class PedroPathCommand implements Command {
 
@@ -34,6 +35,7 @@ public class PedroPathCommand implements Command {
 
     @Override
     public void initialize() {
+        follower.setMaxPowerScaling(Setup.OtherSettings.AUTO_SCALING);
         if (currentPose) {
             follower.setStartingPose(begin == null ? follower.getPose() : begin);
         }
