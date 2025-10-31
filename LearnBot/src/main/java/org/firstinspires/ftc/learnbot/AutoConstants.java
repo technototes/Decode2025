@@ -26,27 +26,47 @@ public class AutoConstants {
     public static double botWeightKg = 4.90;
     public static double botWidth = 10.1;
     public static double botLength = 12.5;
-    public static double xVelocity = 62.3;
-    public static double yVelocity = 54.6;
+    public static double xVelocity = 59.2;
+    public static double yVelocity = 51.7;
     public static double forwardDeceleration = -40.0;
     public static double lateralDeceleration = -48.0;
-    public static double brakingStrength = 0.005;
-    public static double brakingStart = 0.1;
+    public static double brakingStrength = 0.5;
+    public static double brakingStart = 0.5;
     public static double centripetalScale = 0.0005;
-    public static PIDFCoefficients translationPID = new PIDFCoefficients(0.06, 0.00001, 0, 0.015);
-    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.5, 0.0008, 0, 0.01);
+    public static PIDFCoefficients translationPID = new PIDFCoefficients(
+            0.08,
+            0.000005,
+            0.008,
+            0.02);
+    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.9, 0.05, 0.05, 0.02);
 
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
     public static FilteredPIDFCoefficients drivePID = new FilteredPIDFCoefficients(
         0.005,
-        0,
-        0.00035,
+        00.00001,
+        0.0004,
         0.6,
-        0.015
+        0.02
     );
 
+    // The percent of a path that must be complete for Pedro to decide it's done
+    public static double tValueContraint = 0.98;
+
+    // Time, in *milliseconds*, to let the follower algorithm correct
+    // before the path is considered "complete".
+    public static double timeoutConstraint = 250;
+
+    // The maximum velocity (in inches/second) the bot can be moving while still
+    // saying the path is complete.
+    public static double acceptableVelocity = 1.0;
+    // The maximum distance (in inches) the bot can be from the path end
+    // while still saying the path is complete.
+    public static double acceptableDistance = 2.0;
+    // The maximum heading error (in degrees) the bot can be from the path end
+    // while still saying the path is complete.
+    public static double acceptableHeading = 2.5;
     @Configurable
     public static class OTOSConfig {
 
@@ -100,7 +120,11 @@ public class AutoConstants {
     }
 
     public static PathConstraints getPathConstraints() {
-        return new PathConstraints(0.99, 0.1, brakingStrength, brakingStart);
+        PathConstraints pc = new PathConstraints(tValueContraint, timeoutConstraint, brakingStrength, brakingStart);
+        pc.setVelocityConstraint(acceptableVelocity);
+        pc.setTranslationalConstraint(acceptableDistance);
+        pc.setHeadingConstraint(Math.toRadians(acceptableHeading));
+        return pc;
     }
 
     public static MecanumConstants getDriveConstants() {
