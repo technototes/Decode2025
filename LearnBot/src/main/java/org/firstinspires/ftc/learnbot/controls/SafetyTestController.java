@@ -19,9 +19,6 @@ public class SafetyTestController {
         gamepad = g;
 
         AssignNamedControllerButton();
-        if (Setup.Connected.SAFETYSUBSYSTEM) {
-            bindDriveControls();
-        }
     }
 
     private void AssignNamedControllerButton() {

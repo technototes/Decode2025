@@ -37,8 +37,9 @@ public class Hardware implements Loggable {
     public Hardware(HardwareMap hwmap) {
         map = hwmap;
         hubs = hwmap.getAll(LynxModule.class);
-        if (Setup.Connected.EXTERNALIMU) {
-            imu = new AdafruitIMU(Setup.HardwareNames.EXTERNALIMU, AdafruitIMU.Orientation.Pitch);
+        if (false) {
+            // Setup.Connected.EXTERNALIMU) {
+            // imu = new AdafruitIMU(Setup.HardwareNames.EXTERNALIMU, AdafruitIMU.Orientation.Pitch);
         } else {
             imu = new IMU(
                 Setup.HardwareNames.IMU,
