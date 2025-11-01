@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.sixteen750.Setup.HardwareNames;
+import org.firstinspires.ftc.sixteen750.helpers.CustomAdafruitIMU;
 
 @Config
 @Configurable
@@ -28,21 +29,21 @@ public class AutoConstants {
 
     // note these need to be measured:
     public static double botWeightKg = 9.44;
-    public static double robotLength = 10.28; // This is clearly wrong
-    public static double robotWidth = 7.625; // This is also wrong
+    public static double robotLength = 17.5;
+    public static double robotWidth = 11.5;
 
     // These come from Tuners:
     public static double xvelocity = 10.0;
     public static double yvelocity = 10.0;
-    public static double fwdDeceleration = -1.0;
-    public static double latDeceleration = -1.0;
-    public static double centripetalScaling = 0.005;
+    public static double fwdDeceleration = -25.0;
+    public static double latDeceleration = -25.0;
+    public static double centripetalScaling = 0.00005;
 
     // These are hand tuned to work how we want
-    public static double brakingStrength = 0.5;
-    public static double brakingStart = 0.5;
-    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
-    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.0003, 0, 0, 0);
+    public static double brakingStrength = 0.1;
+    public static double brakingStart = 0.1;
+    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.0003, 0, 0, 0.08);
+    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.0003, 0, 0, 0.08);
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
@@ -51,7 +52,7 @@ public class AutoConstants {
         0,
         0.00001,
         0.6,
-        0.01
+        0.08
     );
 
     // The percent of a path that must be complete for Pedro to decide it's done
@@ -91,13 +92,13 @@ public class AutoConstants {
     @Configurable
     public static class TwoWheelConfig {
 
-        public static String forwardName = HardwareNames.ODORL;
-        public static String strafeName = HardwareNames.ODOFB;
-        public static double forwardTicksToInches = 5.47; // 5.42, 5.47, 5.49
-        public static double strafeTicksToInches = 5.38; // 5.37, 5.39, 5.38
-        public static double forwardPodYOffset = 4.27;
-        public static double strafePodXOffset = -4.006;
-        public static boolean forwardReversed = false;
+        public static String forwardName = HardwareNames.ODOFB;
+        public static String strafeName = HardwareNames.ODORL;
+        public static double forwardTicksToInches = ((17.5 / 25.4) * 2 * Math.PI) / 8192; // 5.42, 5.47, 5.49
+        public static double strafeTicksToInches = ((17.5 / 25.4) * 2 * Math.PI) / 8192; // 5.37, 5.39, 5.38
+        public static double forwardPodYOffset = -3.9; // From Colin's CAD 10/31
+        public static double strafePodXOffset = -4.124; // From Colin's CAD 10/31
+        public static boolean forwardReversed = true;
         public static boolean strafeReversed = false;
         public static RevHubOrientationOnRobot.LogoFacingDirection logoDir =
             RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
@@ -106,7 +107,7 @@ public class AutoConstants {
     }
 
     public static TwoWheelConstants getTwoWheelLocalizerConstants() {
-        return new TwoWheelConstants()
+        TwoWheelConstants tc = new TwoWheelConstants()
             .forwardEncoder_HardwareMapName(TwoWheelConfig.forwardName)
             .strafeEncoder_HardwareMapName(TwoWheelConfig.strafeName)
             .forwardPodY(TwoWheelConfig.forwardPodYOffset)
@@ -118,11 +119,17 @@ public class AutoConstants {
             )
             .strafeEncoderDirection(
                 TwoWheelConfig.strafeReversed ? Encoder.REVERSE : Encoder.FORWARD
-            )
-            .IMU_HardwareMapName(Setup.HardwareNames.IMU)
-            .IMU_Orientation(
-                new RevHubOrientationOnRobot(TwoWheelConfig.logoDir, TwoWheelConfig.usbDir)
             );
+        if (Setup.Connected.EXTERNAL_IMU) {
+            tc = tc.customIMU(new CustomAdafruitIMU());
+        } else {
+            tc = tc
+                .IMU_HardwareMapName(Setup.HardwareNames.IMU)
+                .IMU_Orientation(
+                    new RevHubOrientationOnRobot(TwoWheelConfig.logoDir, TwoWheelConfig.usbDir)
+                );
+        }
+        return tc;
     }
 
     public static FollowerConstants getFollowerConstants() {
