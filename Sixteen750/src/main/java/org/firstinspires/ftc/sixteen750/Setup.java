@@ -14,7 +14,7 @@ public class Setup {
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = true;
         public static boolean SAFETYSUBSYSTEM = false;
-        public static boolean EXTERNAL_IMU = false;
+        public static boolean EXTERNAL_IMU = true;
         public static boolean OTOS = false;
         public static boolean INTAKESUBSYSTEM = true;
         public static boolean LAUNCHERSUBSYSTEM = true;
