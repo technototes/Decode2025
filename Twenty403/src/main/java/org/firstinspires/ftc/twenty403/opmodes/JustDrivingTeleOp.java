@@ -69,9 +69,9 @@ public class JustDrivingTeleOp extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
-//        robot.follower = AutoConstants.createFollower(hardwareMap);
-////        robot.follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
-//        robot.follower.update();
+        robot.follower = AutoConstants.createFollower(hardwareMap);
+        robot.follower.setStartingPose(robot.follower.getPose());
+        robot.follower.update();
         controlsOperator = new OperatorController(codriverGamepad, robot);
         SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         otos.calibrateImu();
@@ -92,7 +92,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
         if (Setup.Connected.LIMELIGHT) {
             limelight.start();
         }
-
+        robot.follower.setPose(new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), robot.follower.getHeading()-90));
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
     }

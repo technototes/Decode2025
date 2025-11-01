@@ -37,14 +37,16 @@ public class AutoConstants {
     public static double yVelocity = 61.23;
     public static double forwardDeceleration = -25.0;
     public static double lateralDeceleration = -30.0;
+    public static double tValueConstraint = 0.98;
+    public static double timeoutConstraint = 250;
     public static double linearScalar = 1.0;
     public static double angularScalar = 1.0;
-    public static double brakingStrength = 0.005;
+    public static double brakingStrength = 0.0009;
     public static double brakingStart = 0.1;
     public static double centripetalScale = 0.0005;
     public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(4.75, 0, -Math.PI / 2);
-    public static PIDFCoefficients translationPID = new PIDFCoefficients(0.06, 0.00001, 0, 0.015);
-    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.4, 0.0008, 0, 0.01);
+    public static PIDFCoefficients translationPID = new PIDFCoefficients(0.08, 0.0, 0, 0.0);
+    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.8, 0.0, 0, 0.0);
 
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
