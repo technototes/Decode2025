@@ -5,10 +5,8 @@ import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.technototes.library.command.SequentialCommandGroup;
-import org.firstinspires.ftc.learnbot.Robot;
 
-public class Paths {
+public class TestPaths {
 
     public PathChain Path1;
     public PathChain Path2;
@@ -20,7 +18,7 @@ public class Paths {
         return new Pose(95.670, 7.725, Math.toRadians(90));
     }
 
-    public Paths(Follower follower) {
+    public TestPaths(Follower follower) {
         Path1 = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(95.670, 7.725), new Pose(95.868, 35.257)))

@@ -5,14 +5,12 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
-import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
-import org.firstinspires.ftc.learnbot.commands.auto.DriveAutoCommand;
-import org.firstinspires.ftc.learnbot.commands.auto.Paths;
+import org.firstinspires.ftc.learnbot.commands.auto.TestPaths;
 import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
@@ -30,7 +28,7 @@ public class TestPedroAuto extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
-        Paths p = new Paths(robot.follower);
+        TestPaths p = new TestPaths(robot.follower);
         robot.follower.setStartingPose(p.getStart());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
