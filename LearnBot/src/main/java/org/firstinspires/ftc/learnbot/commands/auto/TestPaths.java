@@ -15,7 +15,7 @@ public class TestPaths {
     public PathChain Path5;
 
     public Pose getStart() {
-        return new Pose(95.670, 7.725, Math.toRadians(90));
+        return new Pose(0, 0, 0);
     }
 
     public TestPaths(Follower follower) {
