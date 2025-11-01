@@ -68,6 +68,7 @@ public class Robot implements Loggable {
         if (Setup.Connected.TESTSUBSYSTEM) {
             this.testSubsystem = new TestSubsystem(hw);
         }
+        follower = AutoConstants.createFollower(hw.map);
     }
 
     public Follower getFollower() {

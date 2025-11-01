@@ -53,6 +53,10 @@ public class TeleCommands {
         return Command.create(r.aimingSubsystem::testHoodUp);
     }
 
+    public static Command HoodUpAutoOnly(Robot r) {
+        return Command.create(r.aimingSubsystem::testHoodUpAutoOnly);
+    }
+
     public static Command HoodDown(Robot r) {
         return Command.create(r.aimingSubsystem::testHoodDown);
     }
