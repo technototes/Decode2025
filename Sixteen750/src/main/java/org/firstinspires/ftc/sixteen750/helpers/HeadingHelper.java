@@ -2,6 +2,8 @@ package org.firstinspires.ftc.sixteen750.helpers;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.pedropathing.geometry.Pose;
+
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
 @Config
@@ -26,6 +28,10 @@ public class HeadingHelper {
 
     public static void saveHeading(double x, double y, double h) {
         FtcRobotControllerActivity.SaveBetweenRuns = new HeadingHelper(x, y, h);
+    }
+
+    public static void savePose(Pose p) {
+        saveHeading(p.getX(), p.getY(), p.getHeading());
     }
 
     public static void savePose(Pose2d p) {
