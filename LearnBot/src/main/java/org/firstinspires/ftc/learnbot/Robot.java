@@ -2,6 +2,7 @@ package org.firstinspires.ftc.learnbot;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
@@ -38,6 +39,13 @@ public class Robot implements Loggable {
     }
 
     public void atStart() {}
+
+    public void updatePose() {
+        Pose pose = getFollower().getPose();
+        gyro = pose.getHeading();
+        xv = pose.getX();
+        yv = pose.getY();
+    }
 
     public Follower getFollower() {
         return follower;

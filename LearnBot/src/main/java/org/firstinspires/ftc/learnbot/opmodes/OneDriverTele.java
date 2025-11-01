@@ -74,6 +74,7 @@ public class OneDriverTele extends CommandOpMode implements Loggable {
 
     @Override
     public void runLoop() {
+        robot.updatePose();
         LLStatus status = null;
         if (Setup.Connected.LIMELIGHT) {
             status = limelight.getStatus();
@@ -191,7 +192,6 @@ public class OneDriverTele extends CommandOpMode implements Loggable {
                 telemetry.addData("Limelight", "No data available");
             }
         }
-
         telemetry.update();
     }
 
