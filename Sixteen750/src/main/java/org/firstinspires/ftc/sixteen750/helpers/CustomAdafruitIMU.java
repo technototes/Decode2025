@@ -12,7 +12,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 @Configurable
 public class CustomAdafruitIMU implements CustomIMU {
 
-    public static double initialZeroDegrees = 90;
+    public static double initialZeroDegrees = 0;
     public double curZero;
     AdafruitIMU imu;
 
