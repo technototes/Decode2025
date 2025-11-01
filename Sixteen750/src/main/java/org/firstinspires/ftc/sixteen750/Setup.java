@@ -57,6 +57,7 @@ public class Setup {
 
         public static double AUTO_SCALING = 0.95;
         public static double STRAIGHTEN_DEAD_ZONE = 0.08;
+        public static double ANGULAR_VELOCITY_MAX = 0.6;
         public static double TRIGGER_THRESHOLD = 0.5;
     }
 }

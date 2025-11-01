@@ -10,7 +10,6 @@ import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.path.command.TrajectorySequenceCommand;
-import com.technototes.path.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.sixteen750.AutoConstants;
 import org.firstinspires.ftc.sixteen750.PathConstants;
 import org.firstinspires.ftc.sixteen750.Robot;
@@ -234,9 +233,7 @@ public class Paths {
             new WaitCommand(0.5),
             TeleCommands.GateDown(r),
             new WaitCommand(2),
-            TeleCommands.GateUp(r),
-            TeleCommands.StopLaunch(r),
-            TeleCommands.IntakeStop(r)
+            TeleCommands.GateUp(r)
         );
     }
 
@@ -244,19 +241,18 @@ public class Paths {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
             TeleCommands.GateUp(r),
-            TeleCommands.Launch(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             new WaitCommand(0.2),
             TeleCommands.GateDown(r),
-            new WaitCommand(0.5),
-            TeleCommands.GateUp(r),
-            new WaitCommand(1),
-            TeleCommands.GateDown(r),
-            new WaitCommand(0.5),
+            new WaitCommand(0.1),
             TeleCommands.GateUp(r),
             new WaitCommand(0.5),
             TeleCommands.GateDown(r),
+            new WaitCommand(0.1),
+            TeleCommands.GateUp(r),
             new WaitCommand(0.5),
+            TeleCommands.GateDown(r),
+            new WaitCommand(2),
             TeleCommands.GateUp(r)
             // want to keep launcher running during auto also no need to stop intake
         );
@@ -307,7 +303,7 @@ public class Paths {
     public PathChain Score_To_Pickup3;
     public PathChain Pickup3_To_Score;
 
-    public Paths(Follower follower) {
+    public void Paths1(Follower follower) {
         Start_To_Score = follower
             .pathBuilder()
             .addPath(new BezierLine(Start, Score))
@@ -349,6 +345,85 @@ public class Paths {
             .pathBuilder()
             .addPath(new BezierLine(Pickup3, Score))
             .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140))
+            .build();
+    }
+
+    public PathChain launch;
+    public PathChain launchtointake1;
+    public PathChain intake1tolaunch;
+    public PathChain launchtointake2;
+    public PathChain intake2tolaunch;
+    public PathChain launchtopark;
+    public PathChain intake3tolaunch;
+
+    public Pose getStart() {
+        return new Pose(32.671, 135.916, Math.toRadians(90));
+    }
+
+    public Paths(Follower follower) {
+        follower.setMaxPowerScaling(0.3);
+        launch = follower
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(32.671, 135.916), new Pose(51.249, 101.338)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(135))
+            .build();
+        follower.setMaxPowerScaling(1);
+        launchtointake1 = follower
+            .pathBuilder()
+            .addPath(
+                new BezierCurve(
+                    new Pose(51.249, 101.338),
+                    new Pose(73.411, 86.685),
+                    new Pose(18.135, 87.177)
+                )
+            )
+            .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+            .build();
+
+        intake1tolaunch = follower
+            .pathBuilder()
+            .addPath(
+                //changing all return-to-launch coordinate points except for the very first one cause its
+                //not touching the white line when shooting (x increases by 10, y decreases by 10)
+                new BezierLine(new Pose(18.135, 87.177), new Pose(51.464, 101.123))
+            )
+            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+            .build();
+
+        launchtointake2 = follower
+            .pathBuilder()
+            .addPath(
+                new BezierCurve(
+                    new Pose(51.464, 101.123),
+                    new Pose(80, 61),
+                    new Pose(18.400, 63.132)
+                )
+            )
+            .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+            .build();
+
+        intake2tolaunch = follower
+            .pathBuilder()
+            .addPath(
+                new BezierCurve(
+                    new Pose(18.400, 63.132),
+                    new Pose(62, 76),
+                    new Pose(51.407, 101.595)
+                )
+            )
+            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+            .build();
+
+        launchtopark = follower
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(51.407, 101.595), new Pose(29.192, 49.617)))
+            .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+            .build();
+
+        intake3tolaunch = follower
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(19.192, 39.617), new Pose(46.407, 96.652)))
+            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
             .build();
     }
 }

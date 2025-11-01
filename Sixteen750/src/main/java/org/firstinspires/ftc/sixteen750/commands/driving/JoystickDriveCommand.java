@@ -85,7 +85,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         if (!straightTrigger && !fortyfiveTrigger) {
             // No straighten override: return the stick value
             // (with some adjustment...)
-            return -Math.pow(r.getAsDouble(), 3) * subsystem.speed;
+            return -Math.pow(r.getAsDouble(), 3) * Setup.OtherSettings.ANGULAR_VELOCITY_MAX;
         }
         if (straightTrigger) {
             // headingInRads is [0-2pi]
@@ -115,7 +115,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         // Scale it by the cube root, the scale that down by 30%
         // .9 (about 40 degrees off) provides .96 power => .288
         // .1 (about 5 degrees off) provides .46 power => .14
-        return Math.cbrt(normalized) * 0.3;
+        return Math.cbrt(normalized) * Setup.OtherSettings.ANGULAR_VELOCITY_MAX;
     }
 
     public static boolean isTriggered(DoubleSupplier ds) {

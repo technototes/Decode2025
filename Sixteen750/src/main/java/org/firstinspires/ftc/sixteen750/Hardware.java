@@ -36,10 +36,12 @@ public class Hardware implements Loggable {
     public CRServo testCRServo;
     public Servo testServo;
     public Limelight3A limelight;
+    public HardwareMap map;
 
     /* Put other hardware here! */
 
     public Hardware(HardwareMap hwmap) {
+        map = hwmap;
         hubs = hwmap.getAll(LynxModule.class);
         if (Setup.Connected.EXTERNAL_IMU) {
             imu = new AdafruitIMU(Setup.HardwareNames.EXTERNAL_IMU, AdafruitIMU.Orientation.Pitch);
