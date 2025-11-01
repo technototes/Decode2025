@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.sixteen750.helpers;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.ftc.localization.CustomIMU;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
-import com.qualcomm.hardware.adafruit.AdafruitBNO055IMUNew;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.technototes.library.hardware.sensor.AdafruitIMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.sixteen750.Setup;
 
+@Configurable
 public class CustomAdafruitIMU implements CustomIMU {
 
+    public static double initialZeroDegrees = 90;
     public double curZero;
     AdafruitIMU imu;
 
@@ -29,7 +31,7 @@ public class CustomAdafruitIMU implements CustomIMU {
             Setup.HardwareNames.EXTERNAL_IMU,
             AdafruitIMU.Orientation.Pitch
         );
-        curZero = 0;
+        curZero = Math.toRadians(initialZeroDegrees);
     }
 
     @Override

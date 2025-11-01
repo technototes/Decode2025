@@ -33,26 +33,26 @@ public class AutoConstants {
     public static double robotWidth = 11.5;
 
     // These come from Tuners:
-    public static double xvelocity = 10.0;
-    public static double yvelocity = 10.0;
-    public static double fwdDeceleration = -25.0;
-    public static double latDeceleration = -25.0;
+    public static double xvelocity = 67.3;
+    public static double yvelocity = 62.4;
+    public static double fwdDeceleration = -42.8;
+    public static double latDeceleration = -71.1;
     public static double centripetalScaling = 0.00005;
 
     // These are hand tuned to work how we want
     public static double brakingStrength = 0.1;
     public static double brakingStart = 0.1;
-    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.0003, 0, 0, 0.08);
-    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.0003, 0, 0, 0.08);
+    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.5, 0.0001, 0.004, 0.001);
+    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.035, 0, 0.006, 0.05);
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
     public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(
-        0.025,
+        0.03,
         0,
-        0.00001,
-        0.6,
-        0.08
+        0.0001,
+        0.5,
+        0.07
     );
 
     // The percent of a path that must be complete for Pedro to decide it's done
