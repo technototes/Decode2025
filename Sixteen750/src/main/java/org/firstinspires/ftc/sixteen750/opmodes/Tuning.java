@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.firstinspires.ftc.sixteen750.AutoConstants;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.helpers.CustomAdafruitIMU;
 
 /**
  * This is the Tuning class. It contains a selection menu for various tuning OpModes.
@@ -203,8 +204,10 @@ class ForwardTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
         follower.update();
         drawOnlyCurrent();
     }
@@ -266,8 +269,10 @@ class LateralTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
         follower.update();
         drawOnlyCurrent();
     }
@@ -329,8 +334,10 @@ class TurnTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
         follower.update();
         drawOnlyCurrent();
     }
@@ -399,8 +406,10 @@ class ForwardVelocityTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /** This initializes the drive motors as well as the cache of velocities and the Panels telemetry. */
@@ -523,8 +532,10 @@ class LateralVelocityTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /**
@@ -639,8 +650,10 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /** This initializes the drive motors as well as the Panels telemetryM. */
@@ -754,8 +767,10 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /** This initializes the drive motors as well as the Panels telemetry. */
@@ -863,9 +878,14 @@ class TranslationalTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
-    }
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
+        else {
+            CustomAdafruitIMU imu = hardwareMap.get(CustomAdafruitIMU.class, Setup.HardwareNames.EXTERNAL_IMU);
+        }
+        }
 
     /** This initializes the Follower and creates the forward and backward Paths. */
     @Override
@@ -933,8 +953,10 @@ class HeadingTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /**
@@ -1007,8 +1029,10 @@ class DriveTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /**
@@ -1093,8 +1117,10 @@ class Line extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /** This initializes the Follower and creates the forward and backward Paths. */
@@ -1164,8 +1190,10 @@ class CentripetalTuner extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /**
@@ -1265,8 +1293,10 @@ class Triangle extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     @Override
@@ -1366,8 +1396,10 @@ class Circle extends OpMode {
 
     @Override
     public void init() {
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        if (Setup.Connected.OTOS) {
+            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            otos.calibrateImu();
+        }
     }
 
     /**
