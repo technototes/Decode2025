@@ -92,7 +92,8 @@ public class JustDrivingTeleOp extends CommandOpMode {
         if (Setup.Connected.LIMELIGHT) {
             limelight.start();
         }
-        robot.follower.setPose(new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), robot.follower.getHeading()-90));
+        // use only if useing Move foward auto that relys on just setting motor powers
+//        robot.follower.setPose(new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), robot.follower.getHeading()-90));
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
     }

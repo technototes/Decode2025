@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.twenty403.opmodes;
+package org.firstinspires.ftc.twenty403.opmodes.autos;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -16,7 +16,6 @@ import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
-import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
 @Autonomous(name = "DriveForward", preselectTeleOp = "Two Controller Drive \uD83D\uDDFF")
