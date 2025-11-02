@@ -44,7 +44,7 @@ public class DriveBackwardShoot extends CommandOpMode {
                     TeleCommands.GateUp(robot),
                     TeleCommands.HoodUp(robot)
                 ),
-                new WaitCommand(0.7),
+                new WaitCommand(0.5),
                 new ParallelCommandGroup(
                     new DriveAutoCommand(robot.drivebase, 0),
                     TeleCommands.Launch(robot)

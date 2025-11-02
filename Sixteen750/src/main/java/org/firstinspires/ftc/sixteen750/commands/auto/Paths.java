@@ -19,202 +19,6 @@ import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
 public class Paths {
 
     public static Follower follower;
-    public static PathChain pathChain;
-
-    public static Command splineTestCommand(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, PathConstants.SPLINETEST1_TO_SPLINETEST2);
-    }
-
-    public static Command NineArtiRedNear(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, PathConstants.STARTNEAR_TO_SCORENEAR)
-            // need to create a fast and a slow version of the intake
-            .andThen(AutoLaunching3Balls(r))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.SCORENEAR_TO_INTAKESTART1)
-            )
-            .andThen(
-                new TrajectorySequenceCommand(
-                    r.drivebase,
-                    PathConstants.INTAKESTART1_TO_INTAKEDONE1
-                )
-            )
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.INTAKEDONE1_TO_SCORENEAR)
-            )
-            .andThen(AutoLaunching3Balls(r))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.SCORENEAR_TO_INTAKESTART2)
-            )
-            .andThen(
-                new TrajectorySequenceCommand(
-                    r.drivebase,
-                    PathConstants.INTAKESTART2_TO_INTAKEDONE2
-                )
-            )
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.INTAKEDONE2_TO_SCORENEAR)
-            )
-            .andThen(AutoLaunching3Balls(r))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.SCORENEAR_TO_PARKNEAR)
-            )
-            .andThen(TeleCommands.StopLaunch(r));
-    }
-
-    public static Command PickupShootCommand(Robot r) {
-        DrivebaseSubsystem db = r.drivebase;
-        return new TrajectorySequenceCommand(db, PathConstants.START_TO_LAUNCH)
-            // need to create a fast and a slow version of the intake
-            .alongWith(TeleCommands.GateUp(r))
-            .alongWith(TeleCommands.Intake(r))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP1))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP1_TO_PICKUP1END))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP1END_TO_LAUNCH))
-            .alongWith(AutoLaunching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP2))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP2_TO_PICKUP2END))
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP2END_TO_LAUNCH))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(AutoLaunching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP3))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP3_TO_PICKUP3END))
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP3END_TO_LAUNCH))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(AutoLaunching3Balls(r));
-    }
-
-    public static Command BluePickupShootCommand(Robot r) {
-        DrivebaseSubsystem db = r.drivebase;
-        return new TrajectorySequenceCommand(db, PathConstants.START_TO_LAUNCH)
-            // need to create a fast and a slow version of the intake
-            .alongWith(TeleCommands.GateUp(r))
-            .alongWith(TeleCommands.Intake(r))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP1))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP1_TO_PICKUP1END))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP1END_TO_LAUNCH))
-            .alongWith(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP2))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP2_TO_PICKUP2END))
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP2END_TO_LAUNCH))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.LAUNCH_TO_PICKUP3))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP3_TO_PICKUP3END))
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(new TrajectorySequenceCommand(db, PathConstants.PICKUP3END_TO_LAUNCH))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(AutoLaunching3Balls(r));
-    }
-
-    public static Command BlueFarPickupShootCommand(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, PathConstants.FARSTART_TO_LAUNCH)
-            // need to create a fast and a slow version of the intake
-            .alongWith(TeleCommands.GateUp(r))
-            .alongWith(TeleCommands.Intake(r))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(new WaitCommand(3))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.LAUNCH_TO_PICKUP1))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP1_TO_PICKUP1END)
-            )
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP1END_TO_LAUNCH))
-            .alongWith(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.LAUNCH_TO_PICKUP2))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP2_TO_PICKUP2END)
-            )
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP2END_TO_LAUNCH))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.LAUNCH_TO_PICKUP3))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP3_TO_PICKUP3END)
-            )
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.PICKUP3END_TO_LAUNCH))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(Launching3Balls(r));
-    }
-
-    public static Command RedPickupShootCommand(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, PathConstants.RSTART_TO_LAUNCH)
-            // need to create a fast and a slow version of the intake
-            .alongWith(TeleCommands.GateUp(r))
-            .alongWith(TeleCommands.Intake(r))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.RLAUNCH_TO_PICKUP1))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP1_TO_PICKUP1END)
-            )
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP1END_TO_LAUNCH)
-            )
-            .alongWith(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.RLAUNCH_TO_PICKUP2))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP2_TO_PICKUP2END)
-            )
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP2END_TO_LAUNCH)
-            )
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.RLAUNCH_TO_PICKUP3))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP3_TO_PICKUP3END)
-            )
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP3END_TO_LAUNCH)
-            )
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(Launching3Balls(r));
-    }
-
-    public static Command RedFarPickupShootCommand(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, PathConstants.RFARSTART_TO_LAUNCH)
-            // need to create a fast and a slow version of the intake
-            .alongWith(TeleCommands.GateUp(r))
-            .alongWith(TeleCommands.Intake(r))
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(new WaitCommand(3))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.RLAUNCH_TO_PICKUP1))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP1_TO_PICKUP1END)
-            )
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP1END_TO_LAUNCH)
-            )
-            .alongWith(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.RLAUNCH_TO_PICKUP2))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP2_TO_PICKUP2END)
-            )
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP2END_TO_LAUNCH)
-            )
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(Launching3Balls(r))
-            .andThen(new TrajectorySequenceCommand(r.drivebase, PathConstants.RLAUNCH_TO_PICKUP3))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP3_TO_PICKUP3END)
-            )
-            .alongWith(TeleCommands.Intake(r))
-            .andThen(
-                new TrajectorySequenceCommand(r.drivebase, PathConstants.RPICKUP3END_TO_LAUNCH)
-            )
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(Launching3Balls(r));
-    }
-
     public static Command Launching3Balls(Robot r) {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
@@ -222,7 +26,7 @@ public class Paths {
                 TeleCommands.GateUp(r),
                 TeleCommands.Launch(r)
             ),
-            new WaitCommand(4),
+            new WaitCommand(2),
             TeleCommands.GateDown(r),
             new WaitCommand(0.1),
             TeleCommands.GateUp(r),
@@ -264,89 +68,33 @@ public class Paths {
             new TrajectorySequenceCommand(r.drivebase, PathConstants.SIDE_RIGHT_TO_SIDE_LEFT)
         );
     }
-
-    public void PedroPathTestCommand(Robot r) {
-        pathChain = follower
-            .pathBuilder()
-            .addPath(new BezierLine(AutoConstants.scorePose, AutoConstants.pickup1Pose))
-            .setLinearHeadingInterpolation(
-                AutoConstants.scorePose.getHeading(),
-                AutoConstants.pickup1Pose.getHeading()
-            )
-            .addPath(new BezierLine(AutoConstants.pickup1Pose, AutoConstants.scorePose))
-            .setLinearHeadingInterpolation(
-                AutoConstants.pickup1Pose.getHeading(),
-                AutoConstants.scorePose.getHeading()
-            )
-            .build();
-        follower.followPath(pathChain);
-    }
-
-    public static Command JustShootCommand(Robot r) {
-        return new TrajectorySequenceCommand(r.drivebase, PathConstants.BLUE_SCORING)
-            .alongWith(TeleCommands.Launch(r))
-            .andThen(new WaitCommand(3));
-        //.andThen(TeleCommands.)
-        // return new SequentialCommandGroup(TeleCommands.Launch(new LauncherSubsystem(Hardware h)));
-    }
-
-    public Pose Start = new Pose(21.613, 121.866);
-    public Pose Score = new Pose(57.743, 86.258);
-    public Pose Pickup1 = new Pose(20.355, 73.205);
-    public Pose Pickup2 = new Pose(23.010, 45.108);
-    public Pose Pickup3 = new Pose(22.567, 16.127);
-    public PathChain Start_To_Score;
-    public PathChain Score_To_Pickup1;
-    public PathChain Pickup1_To_Score;
-    public PathChain Score_To_Pickup2;
-    public PathChain Pickup2_To_Score;
-    public PathChain Score_To_Pickup3;
-    public PathChain Pickup3_To_Score;
-
-    public void Paths1(Follower follower) {
-        Start_To_Score = follower
-            .pathBuilder()
-            .addPath(new BezierLine(Start, Score))
-            .setTangentHeadingInterpolation()
-            .setReversed()
-            .build();
-
-        Score_To_Pickup1 = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(Score, new Pose(106.194, 69.665), Pickup1))
-            .setLinearHeadingInterpolation(Math.toRadians(140), Math.toRadians(180))
-            .build();
-
-        Pickup1_To_Score = follower
-            .pathBuilder()
-            .addPath(new BezierLine(Pickup1, Score))
-            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140))
-            .build();
-
-        Score_To_Pickup2 = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(Score, new Pose(135.839, 36.480), Pickup2))
-            .setLinearHeadingInterpolation(Math.toRadians(140), Math.toRadians(180))
-            .build();
-
-        Pickup2_To_Score = follower
-            .pathBuilder()
-            .addPath(new BezierLine(Pickup2, Score))
-            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140))
-            .build();
-
-        Score_To_Pickup3 = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(Score, new Pose(139.379, 8.383), Pickup3))
-            .setLinearHeadingInterpolation(Math.toRadians(140), Math.toRadians(180))
-            .build();
-
-        Pickup3_To_Score = follower
-            .pathBuilder()
-            .addPath(new BezierLine(Pickup3, Score))
-            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140))
-            .build();
-    }
+    public Pose Start = new Pose(30.748, 135.152);
+    public Pose Launch = new Pose(38.490, 105.512);
+    public Pose Intake1 = new Pose(41.808, 91.276);
+    public Pose Intake1ControlPoint = new Pose(61.273, 89.143);
+    public Pose Intake1end = new Pose(15.043, 90.276);
+    public Pose Intake2 = new Pose(40.038, 69.502);
+    public Pose Intake2ControlPoint = new Pose(71.891, 64.369);
+    public Pose Intake2end = new Pose(9.513, 69.281);
+    public Pose Intake2endControlPoint = new Pose(49.328, 65.696);
+    public Pose Intake3 = new Pose(38.923, 47.834);
+    public Pose Intake3ControlPoint = new Pose(76.536, 41.585);
+    public Pose Intake3end = new Pose(7.407, 47.834);
+    public Pose Intake3endControlPoint = new Pose(62.000, 84.000);
+    //Red poses reconfigure these
+    public Pose RStart = new Pose(114, 135.152);
+    public Pose RLaunch = new Pose(106, 105.512);
+    public Pose RIntake1 = new Pose(103, 84.276);
+    public Pose RIntake1ControlPoint = new Pose(83, 89.143);
+    public Pose RIntake1end = new Pose(129, 84.276);
+    public Pose RIntake2 = new Pose(104, 59.502);
+    public Pose RIntake2ControlPoint = new Pose(73, 64.369);
+    public Pose RIntake2end = new Pose(134, 59.281);
+    public Pose RIntake2endControlPoint = new Pose(95, 65.696);
+    public Pose RIntake3 = new Pose(104, 35.834);
+    public Pose RIntake3ControlPoint = new Pose(68, 41.585);
+    public Pose RIntake3end = new Pose(136, 35.613);
+    public Pose RIntake3endControlPoint = new Pose(82, 84.000);
 
     public PathChain launch;
     public PathChain launchtointake1;
@@ -355,9 +103,45 @@ public class Paths {
     public PathChain intake2tolaunch;
     public PathChain launchtopark;
     public PathChain intake3tolaunch;
+    public PathChain Rlaunch;
+    public PathChain Rlaunchtointake1;
+    public PathChain Rintake1tolaunch;
+    public PathChain Rlaunchtointake2;
+    public PathChain Rintake2tolaunch;
+    public PathChain Rlaunchtopark;
+    public PathChain Rintake3tolaunch;
+    public PathChain StarttoLaunch;
+    public PathChain LaunchtoIntake1;
+    public PathChain Intake1toIntake1end;
+    public PathChain Intake1endtoLaunch;
+    public PathChain LaunchtoIntake2;
+    public PathChain Intake2toIntake2end;
+    public PathChain Intake2endtoLaunch;
+    public PathChain LaunchtoIntake3;
+    public PathChain Intake3toIntake3end;
+    public PathChain Intake3endtoLaunch;
+    public PathChain RStarttoLaunch;
+    public PathChain RLaunchtoIntake1;
+    public PathChain RIntake1toIntake1end;
+    public PathChain RIntake1endtoLaunch;
+    public PathChain RLaunchtoIntake2;
+    public PathChain RIntake2toIntake2end;
+    public PathChain RIntake2endtoLaunch;
+    public PathChain RLaunchtoIntake3;
+    public PathChain RIntake3toIntake3end;
+    public PathChain RIntake3endtoLaunch;
 
     public Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
+    }
+    public Pose getRStart() {
+        return new Pose(112, 135.916, Math.toRadians(90));
+    }
+    public Pose getBSegmentedCurveStart() {
+        return new Pose(30.748, 135.152, Math.toRadians(90));
+    }
+    public Pose getRSegmentedCurveStart() {
+        return new Pose(114, 135.152, Math.toRadians(90));
     }
 
     public Paths(Follower follower) {
@@ -425,6 +209,266 @@ public class Paths {
             .addPath(new BezierLine(new Pose(19.192, 39.617), new Pose(46.407, 96.652)))
             .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
             .build();
+        //red zone autos
+        Rlaunch = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(112, 135.916), new Pose(93, 101.338)))
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(45))
+                .build();
+        follower.setMaxPowerScaling(1);
+        Rlaunchtointake1 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(93, 101.338),
+                                new Pose(71, 86.685),
+                                new Pose(126, 95)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                .build();
+
+        Rintake1tolaunch = follower
+                .pathBuilder()
+                .addPath(
+                        //changing all return-to-launch coordinate points except for the very first one cause its
+                        //not touching the white line when shooting (x increases by 10, y decreases by 10)
+                        new BezierLine(new Pose(126, 95), new Pose(93, 101.123))
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
+
+        Rlaunchtointake2 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(93, 101.123),
+                                new Pose(64, 61),
+                                new Pose(126, 70)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                .build();
+        Rintake2tolaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(126, 70),
+                                new Pose(82, 76),
+                                new Pose(93, 101.595)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
+        Rlaunchtopark = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(93, 101.595), new Pose(115, 49.617)))
+                .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                .build();
+
+        Rintake3tolaunch = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(125, 50), new Pose(118, 96.652)))
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
+        StarttoLaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(Start, Launch)
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(125))
+                .build();
+
+        LaunchtoIntake1 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                Launch,
+                                Intake1ControlPoint,
+                                Intake1
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(180))
+                .build();
+
+        Intake1toIntake1end = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(Intake1, Intake1end)
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        Intake1endtoLaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(Intake1end, Launch)
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(125))
+                .build();
+
+        LaunchtoIntake2 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                Launch,
+                                Intake2ControlPoint,
+                                Intake2
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(180))
+                .build();
+
+        Intake2toIntake2end = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(Intake2, Intake2end)
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        Intake2endtoLaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                Intake2end,
+                                Intake2endControlPoint,
+                                Launch
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(125))
+                .build();
+
+        LaunchtoIntake3 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                Launch,
+                                Intake3ControlPoint,
+                                Intake3
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(180))
+                .build();
+
+        Intake3toIntake3end = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(Intake3, Intake3end)
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        Intake3endtoLaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                Intake3end,
+                                Intake3endControlPoint,
+                                Launch
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(125))
+                .build();
+        RStarttoLaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(RStart, RLaunch)
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(45))
+                .build();
+
+        RLaunchtoIntake1 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                RLaunch,
+                                RIntake1ControlPoint,
+                                RIntake1
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                .build();
+
+        RIntake1toIntake1end = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(RIntake1, RIntake1end)
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        RIntake1endtoLaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(RIntake1end, RLaunch)
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
+
+        RLaunchtoIntake2 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                RLaunch,
+                                RIntake2ControlPoint,
+                                RIntake2
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                .build();
+
+        RIntake2toIntake2end = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(RIntake2, RIntake2end)
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        RIntake2endtoLaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                RIntake2end,
+                                RIntake2endControlPoint,
+                                RLaunch
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
+
+        RLaunchtoIntake3 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                RLaunch,
+                                RIntake3ControlPoint,
+                                RIntake3
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                .build();
+
+        RIntake3toIntake3end = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(RIntake3, RIntake3end)
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+
+        RIntake3endtoLaunch = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                RIntake3end,
+                                RIntake3endControlPoint,
+                                RLaunch
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
     }
 }
 
