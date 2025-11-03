@@ -42,14 +42,14 @@ public class BlueSmallTriMove extends CommandOpMode {
         SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         otos.calibrateImu();
        robot.follower = AutoConstants.createFollower(hardwareMap);
-       robot.follower.setStartingPose(new Pose(56.889, 9.067, 90));
+       robot.follower.setPose(new Pose(62.933, 9.422, 90));
         bluesmalltobluegoal = robot.follower
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(56.889, 9.067),
-                                new Pose(46.222, 27.911),
-                                new Pose(36.267, 11.022)
+                                new Pose(62.933, 9.422),
+                                new Pose(51.200, 25.778),
+                                new Pose(40.178, 15.111)
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
