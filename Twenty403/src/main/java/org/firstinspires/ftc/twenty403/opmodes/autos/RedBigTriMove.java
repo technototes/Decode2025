@@ -42,14 +42,14 @@ public class RedBigTriMove extends CommandOpMode {
         SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         otos.calibrateImu();
        robot.follower = AutoConstants.createFollower(hardwareMap);
-       robot.follower.setStartingPose(new Pose(109.867, 134.578, 270));
+       robot.follower.setPose(new Pose(109.867, 134.578, 270));
         bluesmalltobluegoal = robot.follower
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(109.867, 134.578),
-                                new Pose(85.333, 61.867),
-                                new Pose(82.667, 59.200)
+                                new Pose(80.889, 134.933),
+                                new Pose(87.111, 69.867),
+                                new Pose(86.933, 62.222)
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(0))

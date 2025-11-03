@@ -3,6 +3,8 @@ package org.firstinspires.ftc.twenty403.opmodes;
 import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.AprilTag_Pipeline;
 import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
 
+import android.app.appsearch.SearchResult;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
@@ -50,6 +52,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
     private final GamepadManager operatorManager = PanelsGamepad.INSTANCE.getSecondManager();
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
+
     private Limelight3A limelight;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
     private Supplier<PathChain> pathChain;
@@ -93,7 +96,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
             limelight.start();
         }
         // use only if useing Move foward auto that relys on just setting motor powers
-//        robot.follower.setPose(new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), robot.follower.getHeading()-90));
+        robot.follower.setPose(new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), robot.follower.getHeading()-90));
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
     }
