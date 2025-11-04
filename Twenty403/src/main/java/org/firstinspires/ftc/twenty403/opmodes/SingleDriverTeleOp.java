@@ -63,7 +63,6 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
              * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
              */
             limelight.start();
-
         }
 
         telemetry.addData(">", "Robot Ready.  Press Play.");
@@ -143,7 +142,8 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
                                 Arrays.equals(
                                     Setup.HardwareNames.Motif,
                                     new String[] { "1", "2", "3" }
-                                ) && !got_motif
+                                ) &&
+                                !got_motif
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
@@ -154,7 +154,8 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
                                 Arrays.equals(
                                     Setup.HardwareNames.Motif,
                                     new String[] { "1", "2", "3" }
-                                ) && !got_motif
+                                ) &&
+                                !got_motif
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE2";
@@ -165,7 +166,8 @@ public class SingleDriverTeleOp extends CommandOpMode implements Loggable {
                                 Arrays.equals(
                                     Setup.HardwareNames.Motif,
                                     new String[] { "1", "2", "3" }
-                                ) && !got_motif
+                                ) &&
+                                !got_motif
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
