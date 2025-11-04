@@ -10,6 +10,8 @@ include ':Sixteen750'
 include ':Twenty403'
 
 // These are other 'bots' that we should build until we're at competitions
-include ':RRQuickStart'                                                  // FLIP: BUILD ALL BOTS
 include ':LearnBot'                                                      // FLIP: BUILD ALL BOTS
-include ':MeepMeepTesting'                                               // FLIP: BUILD ALL BOTS
+
+// Stuff for road-runner, I think, is all dead:
+// include ':RRQuickStart'
+// include ':MeepMeepTesting'
