@@ -8,7 +8,6 @@ import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
@@ -49,18 +48,18 @@ public class RedIntakeandShootLinesOnlyPedro extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.RIntake1end_to_Launch),
                 Paths.AutoLaunching3Balls(robot),
                 new PedroPathCommand(robot.follower, p.RLaunch_to_Move),
-//                new PedroPathCommand(robot.follower, p.RLaunch_to_Intake2),
-//                // new WaitCommand(1),
-//                new PedroPathCommand(robot.follower, p.RIntake2_to_Intake2end),
-//                // new WaitCommand(2),
-//                new PedroPathCommand(robot.follower, p.RIntake1end_to_Launch),
-//                Paths.AutoLaunching3Balls(robot),
-//                new PedroPathCommand(robot.follower, p.RLaunch_to_Intake3),
-//                // new WaitCommand(1),
-//                new PedroPathCommand(robot.follower, p.RIntake3_to_Intake3end),
-//                // new WaitCommand(2),
-//                new PedroPathCommand(robot.follower, p.RIntake3end_to_Launch),
-//                Paths.AutoLaunching3Balls(robot),
+                //                new PedroPathCommand(robot.follower, p.RLaunch_to_Intake2),
+                //                // new WaitCommand(1),
+                //                new PedroPathCommand(robot.follower, p.RIntake2_to_Intake2end),
+                //                // new WaitCommand(2),
+                //                new PedroPathCommand(robot.follower, p.RIntake1end_to_Launch),
+                //                Paths.AutoLaunching3Balls(robot),
+                //                new PedroPathCommand(robot.follower, p.RLaunch_to_Intake3),
+                //                // new WaitCommand(1),
+                //                new PedroPathCommand(robot.follower, p.RIntake3_to_Intake3end),
+                //                // new WaitCommand(2),
+                //                new PedroPathCommand(robot.follower, p.RIntake3end_to_Launch),
+                //                Paths.AutoLaunching3Balls(robot),
                 TeleCommands.StopLaunch(robot),
                 TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode
