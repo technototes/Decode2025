@@ -31,19 +31,19 @@ public class TestPedroAuto extends CommandOpMode {
         TestPaths p = new TestPaths(robot.follower);
         robot.follower.setStartingPose(p.getStart());
         CommandScheduler.scheduleForState(
-                new SequentialCommandGroup(
-                        new PedroPathCommand(robot.follower, p.Path1),
-                        // new WaitCommand(0.5),
-                        new PedroPathCommand(robot.follower, p.Path2),
-                        // new WaitCommand(1),
-                        new PedroPathCommand(robot.follower, p.Path3),
-                        // new WaitCommand(2),
-                        new PedroPathCommand(robot.follower, p.Path4),
-                        // new WaitCommand(4),
-                        new PedroPathCommand(robot.follower, p.Path5),
-                        CommandScheduler::terminateOpMode
-                ),
-                OpModeState.RUN
+            new SequentialCommandGroup(
+                new PedroPathCommand(robot.follower, p.Path1),
+                // new WaitCommand(0.5),
+                new PedroPathCommand(robot.follower, p.Path2),
+                // new WaitCommand(1),
+                new PedroPathCommand(robot.follower, p.Path3),
+                // new WaitCommand(2),
+                new PedroPathCommand(robot.follower, p.Path4),
+                // new WaitCommand(4),
+                new PedroPathCommand(robot.follower, p.Path5),
+                CommandScheduler::terminateOpMode
+            ),
+            OpModeState.RUN
         );
     }
 

@@ -881,11 +881,13 @@ class TranslationalTuner extends OpMode {
         if (Setup.Connected.OTOS) {
             SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
             otos.calibrateImu();
+        } else {
+            CustomAdafruitIMU imu = hardwareMap.get(
+                CustomAdafruitIMU.class,
+                Setup.HardwareNames.EXTERNAL_IMU
+            );
         }
-        else {
-            CustomAdafruitIMU imu = hardwareMap.get(CustomAdafruitIMU.class, Setup.HardwareNames.EXTERNAL_IMU);
-        }
-        }
+    }
 
     /** This initializes the Follower and creates the forward and backward Paths. */
     @Override

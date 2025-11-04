@@ -20,46 +20,46 @@ public class TestPaths {
 
     public TestPaths(Follower follower) {
         Path1 = follower
-                .pathBuilder()
-                .addPath(new BezierLine(new Pose(95.670, 7.725), new Pose(95.868, 35.257)))
-                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
-                .build();
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(95.670, 7.725), new Pose(95.868, 35.257)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
+            .build();
 
         Path2 = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Pose(95.868, 35.257),
-                                new Pose(81.607, 37.040),
-                                new Pose(82.399, 27.730),
-                                new Pose(90.916, 28.721)
-                        )
+            .pathBuilder()
+            .addPath(
+                new BezierCurve(
+                    new Pose(95.868, 35.257),
+                    new Pose(81.607, 37.040),
+                    new Pose(82.399, 27.730),
+                    new Pose(90.916, 28.721)
                 )
-                .setConstantHeadingInterpolation(Math.PI)
-                .build();
+            )
+            .setConstantHeadingInterpolation(Math.PI)
+            .build();
 
         Path3 = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Pose(90.916, 28.721),
-                                new Pose(105.970, 26.542),
-                                new Pose(105.970, 34.663),
-                                new Pose(95.670, 35.257)
-                        )
+            .pathBuilder()
+            .addPath(
+                new BezierCurve(
+                    new Pose(90.916, 28.721),
+                    new Pose(105.970, 26.542),
+                    new Pose(105.970, 34.663),
+                    new Pose(95.670, 35.257)
                 )
-                .setConstantHeadingInterpolation(Math.PI)
-                .build();
+            )
+            .setConstantHeadingInterpolation(Math.PI)
+            .build();
 
         Path4 = follower
-                .pathBuilder()
-                .addPath(new BezierLine(new Pose(95.670, 35.257), new Pose(62.195, 35.257)))
-                .setConstantHeadingInterpolation(Math.PI)
-                .build();
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(95.670, 35.257), new Pose(62.195, 35.257)))
+            .setConstantHeadingInterpolation(Math.PI)
+            .build();
         Path5 = follower
-                .pathBuilder()
-                .addPath(new BezierLine(new Pose(62.195, 35.257), new Pose(95.670, 7.725)))
-                .setLinearHeadingInterpolation(Math.PI, Math.PI / 2)
-                .build();
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(62.195, 35.257), new Pose(95.670, 7.725)))
+            .setLinearHeadingInterpolation(Math.PI, Math.PI / 2)
+            .build();
     }
 }
