@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.twenty403.commands.driving;
 
-
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -58,17 +57,17 @@ public class JoystickDriveCommand implements Command, Loggable {
         fortyfiveTrigger = isTriggered(drive45);
         if (faceTagMode) {
             // --- Face AprilTag using Limelight ---
-             LLResult result = limelight.getLatestResult();
-             if (result != null && result.isValid()) {
-                 double tx = result.getTx(); // horizontal offset in degrees
-                 double kP_TagAlign = 0.03;  // tune this gain
-                 return -kP_TagAlign * tx;   // rotate until tx ~ 0
-             } else {
-                 return 0.0; // no target → don't spin
-             }
-//            return calculateHeadingToCircle(
-//                follower.getPose().getX(), follower.getPose().getY()
-//            );
+            LLResult result = limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+                double tx = result.getTx(); // horizontal offset in degrees
+                double kP_TagAlign = 0.03; // tune this gain
+                return -kP_TagAlign * tx; // rotate until tx ~ 0
+            } else {
+                return 0.0; // no target → don't spin
+            }
+            //            return calculateHeadingToCircle(
+            //                follower.getPose().getX(), follower.getPose().getY()
+            //            );
         }
 
         if (!straightTrigger && !fortyfiveTrigger) {
@@ -113,6 +112,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         }
         return true;
     }
+
     public static double calculateHeadingToCircle(double robotX, double robotY) {
         // circle x & y are theoretical which might work but i don't know
         double circleX = 0;
@@ -153,12 +153,7 @@ public class JoystickDriveCommand implements Command, Loggable {
                     else yvalue = 0;
                 }
             }
-            Vector2d input = new Vector2d(
-                yvalue,
-                xvalue
-            ).rotated(curHeading);
-
-
+            Vector2d input = new Vector2d(yvalue, xvalue).rotated(curHeading);
         }
         follower.update();
     }
@@ -167,6 +162,4 @@ public class JoystickDriveCommand implements Command, Loggable {
     public boolean isFinished() {
         return false;
     }
-
-
 }

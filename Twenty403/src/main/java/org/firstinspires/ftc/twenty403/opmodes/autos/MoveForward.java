@@ -9,7 +9,6 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-
 import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
@@ -36,27 +35,29 @@ public class MoveForward extends CommandOpMode {
         robot.follower = AutoConstants.createFollower(hardwareMap);
         //robot.drivebase.setPoseEstimate(AutoConstants.BACKWARD.toPose());
         CommandScheduler.scheduleForState(
-                new SequentialCommandGroup(
-                        new DriveAutoCommand(robot.follower, 0.5),
-                        new WaitCommand(0.3),
-                        new DriveAutoCommand(robot.follower, 0),
-                        CommandScheduler::terminateOpMode
-                ),
-                OpModeState.RUN
+            new SequentialCommandGroup(
+                new DriveAutoCommand(robot.follower, 0.5),
+                new WaitCommand(0.3),
+                new DriveAutoCommand(robot.follower, 0),
+                CommandScheduler::terminateOpMode
+            ),
+            OpModeState.RUN
         );
         robot.follower.update();
     }
+
     @Override
     public void uponStart() {
         robot.atStart();
     }
+
     @Override
-    public void runLoop(){
+    public void runLoop() {
         telemetry.addData("Pose:", robot.follower.getPose());
-//        if (robot.follower.getHeading() != robot.follower.getCurrentPath().getPose()) {}
+        //        if (robot.follower.getHeading() != robot.follower.getCurrentPath().getPose()) {}
         robot.follower.update();
     }
-//    public void end() {
-//        HeadingHelper.savePose(robot.follower.getPose());
-//    }
+    //    public void end() {
+    //        HeadingHelper.savePose(robot.follower.getPose());
+    //    }
 }
