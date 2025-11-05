@@ -42,8 +42,8 @@ public class AutoConstants {
     // These are hand tuned to work how we want
     public static double brakingStrength = 0.07;
     public static double brakingStart = 0.1;
-    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.06, 0.0001, 0.004, 0.05);
-    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.06, 0, 0.007, 0.03);
+    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.6, 0.00055, 0.055, 0.04); //11-4 tuning
+    public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.06, 0.00015, 0.006, 0.05); //11-4 tuning
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
