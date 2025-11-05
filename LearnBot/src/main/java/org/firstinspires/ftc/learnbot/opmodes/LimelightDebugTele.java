@@ -39,8 +39,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
  */
 @Disabled
 @Configurable
-@TeleOp(name = "Limelight Debug")
-public class SensorLimelight3A extends LinearOpMode {
+@TeleOp(name = "Limelight Debug", group = "--Testing--")
+public class LimelightDebugTele extends LinearOpMode {
 
     private Limelight3A limelight;
 

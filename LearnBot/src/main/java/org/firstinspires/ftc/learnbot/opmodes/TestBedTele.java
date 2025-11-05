@@ -1,25 +1,26 @@
 package org.firstinspires.ftc.learnbot.opmodes;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.technototes.library.hardware.motor.CRServo;
 import org.firstinspires.ftc.learnbot.Setup;
 import org.firstinspires.ftc.learnbot.subsystems.TestSubsystem;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-@Disabled
 @Configurable
-@TeleOp(name = "Drivebase Testbed")
-public class DriveBaseValidation extends LinearOpMode {
+@TeleOp(name = "Test Bed", group = "--Testing--")
+public class TestBedTele extends LinearOpMode {
 
     public static double motorPower = 0.2;
     public static double motorVelocity = Math.PI;
     public static double triggerThreshold = 0.1;
     public TestSubsystem ts;
+
+    public TelemetryManager ptel;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -42,6 +43,7 @@ public class DriveBaseValidation extends LinearOpMode {
             rr = null;
         }
 
+        ptel = PanelsTelemetry.INSTANCE.getTelemetry();
         waitForStart();
         while (opModeIsActive()) {
             sleep(5);
@@ -70,7 +72,20 @@ public class DriveBaseValidation extends LinearOpMode {
                 telemetry.addData("FR", fr.getCurrentPosition());
                 telemetry.addData("RL", rl.getCurrentPosition());
                 telemetry.addData("RR", rr.getCurrentPosition());
+                telemetry.addData("leftX", gamepad1.left_stick_x);
+                telemetry.addData("leftY", gamepad1.left_stick_y);
+                telemetry.addData("rightX", gamepad1.right_stick_x);
+                telemetry.addData("rightY", gamepad1.right_stick_y);
+                ptel.addData("FL", fl.getCurrentPosition());
+                ptel.addData("FR", fr.getCurrentPosition());
+                ptel.addData("RL", rl.getCurrentPosition());
+                ptel.addData("RR", rr.getCurrentPosition());
+                ptel.addData("leftX", gamepad1.left_stick_x);
+                ptel.addData("leftY", gamepad1.left_stick_y);
+                ptel.addData("rightX", gamepad1.right_stick_x);
+                ptel.addData("rightY", gamepad1.right_stick_y);
             }
+            ptel.update();
             telemetry.update();
         }
     }

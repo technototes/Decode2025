@@ -16,7 +16,7 @@ import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
-@Autonomous(name = "Test Follow Speeds", preselectTeleOp = "Just Drive")
+@Autonomous(name = "Test Pedro", preselectTeleOp = "Just Drive", group = "--Testing--")
 @SuppressWarnings("unused")
 public class TestPedroAuto extends CommandOpMode {
 

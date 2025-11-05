@@ -42,6 +42,7 @@ public class Setup {
         public static double TURBO_SPEED = 1.0;
         // The 'fastest' the robot can turn (0: not turning, 1.0: Fastest possible)
         public static double TURN_SCALING = 0.4;
+        public static double DEAD_ZONE = 0.1;
 
         // The amount to multiply the degrees of offset by to turn the bot to
         // face the apriltag for the target. This is effectively "P" in a PID,

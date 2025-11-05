@@ -6,7 +6,6 @@ import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup;
-import org.firstinspires.ftc.learnbot.commands.EZCmd;
 import org.firstinspires.ftc.learnbot.commands.driving.JoystickDriveCommand;
 
 public class SingleController {

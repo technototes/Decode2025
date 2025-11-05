@@ -8,7 +8,7 @@ import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup;
-import org.firstinspires.ftc.learnbot.commands.EZCmd;
+import org.firstinspires.ftc.learnbot.commands.DriveCmds;
 import org.firstinspires.ftc.learnbot.commands.LLPipelineChangeCommand;
 import org.firstinspires.ftc.learnbot.commands.driving.JoystickDriveCommand;
 
@@ -78,25 +78,19 @@ public class DriverController {
     }
 
     public void bindDriveControls() {
-        stickDriver = new JoystickDriveCommand(
-            robot.follower,
-            driveLeftStick,
-            driveRightStick,
-            straightTrigger,
-            angleTrigger
-        );
+        stickDriver = new JoystickDriveCommand(robot.follower, driveLeftStick, driveRightStick);
         CommandScheduler.scheduleJoystick(stickDriver);
 
-        turboButton.whenPressed(EZCmd.Drive.TurboMode(stickDriver));
-        turboButton.whenReleased(EZCmd.Drive.NormalMode(stickDriver));
+        turboButton.whenPressed(DriveCmds.TurboMode(stickDriver));
+        turboButton.whenReleased(DriveCmds.NormalMode(stickDriver));
 
-        snailButton.whenPressed(EZCmd.Drive.SnailMode(stickDriver));
-        snailButton.whenReleased(EZCmd.Drive.NormalMode(stickDriver));
+        snailButton.whenPressed(DriveCmds.SnailMode(stickDriver));
+        snailButton.whenReleased(DriveCmds.NormalMode(stickDriver));
         if (Setup.Connected.LIMELIGHT) {
-            AutoAim.whenPressed(EZCmd.Drive.AutoAim(stickDriver));
+            AutoAim.whenPressed(DriveCmds.AutoAim(stickDriver));
         }
 
-        resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(stickDriver));
+        resetGyroButton.whenPressed(DriveCmds.ResetGyro(stickDriver));
     }
 
     public void bindPipelineControls() {
