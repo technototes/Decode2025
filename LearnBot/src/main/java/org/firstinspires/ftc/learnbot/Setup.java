@@ -57,7 +57,6 @@ public class Setup {
     public static class OtherSettings {
 
         public static int AUTOTIME = 25;
-        public static double STRAIGHTEN_DEAD_ZONE = 0.01;
         public static double TRIGGER_THRESHOLD = 0.3;
     }
 }

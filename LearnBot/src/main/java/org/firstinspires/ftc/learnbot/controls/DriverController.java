@@ -5,6 +5,7 @@ import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
+import com.technototes.library.logger.Loggable;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup.Connected;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.learnbot.Setup.OtherSettings;
 import org.firstinspires.ftc.learnbot.commands.DriveCmds;
 import org.firstinspires.ftc.learnbot.commands.JoystickDriveCommand;
 
-public class DriverController {
+public class DriverController implements Loggable {
 
     public Robot robot;
     public CommandGamepad gamepad;
@@ -46,9 +47,9 @@ public class DriverController {
         driveRightStick = gamepad.rightStick;
 
         snap90Button = gamepad.rightBumper;
-        squareButton = gamepad.rightTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
+        squareButton = gamepad.rightTrigger.getAsButton();
         tangentButton = gamepad.leftBumper;
-        straightButton = gamepad.leftTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
+        straightButton = gamepad.leftTrigger.getAsButton();
 
         resetGyroButton = gamepad.ps_options;
         botFieldToggleButton = gamepad.ps_share;

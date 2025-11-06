@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.technototes.library.control.CommandAxis;
+import com.technototes.library.control.CommandButton;
 import org.firstinspires.ftc.learnbot.Setup;
 import org.firstinspires.ftc.learnbot.subsystems.TestSubsystem;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -16,17 +18,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class TestBedTele extends LinearOpMode {
 
     public static double motorPower = 0.2;
-    public static double motorVelocity = Math.PI;
-    public static double triggerThreshold = 0.1;
-    public TestSubsystem ts;
-
+    // Radians/second?
+    public static double motorVelocity = Math.PI / 2;
+    public static double triggerThreshold = 0.2;
     public TelemetryManager ptel;
+
+    public CommandAxis trigger;
+    public CommandButton button;
 
     @Override
     public void runOpMode() throws InterruptedException {
         // First, get the hardware
-        DcMotorEx fr, fl, rr, rl, launch;
-        com.qualcomm.robotcore.hardware.CRServo bl, br;
+        DcMotorEx fr, fl, rr, rl;
+        trigger = new CommandAxis(() -> gamepad1.left_trigger);
+        button = trigger.getAsButton(triggerThreshold);
         if (Setup.Connected.DRIVEBASE) {
             fr = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.FRMOTOR);
             fl = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.FLMOTOR);
@@ -76,6 +81,10 @@ public class TestBedTele extends LinearOpMode {
                 telemetry.addData("leftY", gamepad1.left_stick_y);
                 telemetry.addData("rightX", gamepad1.right_stick_x);
                 telemetry.addData("rightY", gamepad1.right_stick_y);
+                telemetry.addData("ltrig", gamepad1.left_trigger);
+                telemetry.addData("cmd trigger", trigger.getAsDouble());
+                telemetry.addData("cmd button", button.getAsBoolean() ? "true" : "false");
+
                 ptel.addData("FL", fl.getCurrentPosition());
                 ptel.addData("FR", fr.getCurrentPosition());
                 ptel.addData("RL", rl.getCurrentPosition());
@@ -84,6 +93,9 @@ public class TestBedTele extends LinearOpMode {
                 ptel.addData("leftY", gamepad1.left_stick_y);
                 ptel.addData("rightX", gamepad1.right_stick_x);
                 ptel.addData("rightY", gamepad1.right_stick_y);
+                ptel.addData("ltrig", gamepad1.left_trigger);
+                ptel.addData("cmd trigger", trigger.getAsDouble());
+                ptel.addData("cmd button", button.getAsBoolean() ? "true" : "false");
             }
             ptel.update();
             telemetry.update();

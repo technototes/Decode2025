@@ -5,6 +5,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
+import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
@@ -122,9 +123,11 @@ public class JoystickDriveCommand implements Command, Loggable {
 
     DrivingStyle driveStyle;
     DrivingMode driveMode;
+
     public DrivingStyle getCurrentDriveStyle() {
         return driveStyle;
     }
+
     public DrivingMode getCurrentDriveMode() {
         return driveMode;
     }
@@ -171,8 +174,10 @@ public class JoystickDriveCommand implements Command, Loggable {
     public void execute() {
         // If subsystem is busy it is running a path, just ignore the stick.
         if (follower.isBusy()) {
+            drvMode = "busy";
             return;
         }
+        ShowDriveMode(driveStyle, driveMode, follower);
 
         double curHeading = follower.getHeading() - headingOffset;
 
@@ -189,10 +194,12 @@ public class JoystickDriveCommand implements Command, Loggable {
             }
         }
         if (driveMode == DrivingMode.RobotCentric || driveMode == DrivingMode.FieldCentric) {
+            double rot = getRotation(curHeading, fwdVal, strafeVal);
+            ShowDriveVectors(fwdVal, strafeVal, rot);
             follower.setTeleOpDrive(
                 fwdVal,
                 strafeVal,
-                getRotation(curHeading, fwdVal, strafeVal),
+                rot,
                 driveMode == DrivingMode.RobotCentric,
                 headingOffset
             );
@@ -223,9 +230,12 @@ public class JoystickDriveCommand implements Command, Loggable {
                 break;
             case Tangential:
                 // Tangential is considered an angle-focused driving style, too
-
                 // Get the heading of the indicated vector of (fwd,strafe)
-                targetHeading = MathUtils.normalizeRadians(Math.atan2(fwdVal, strafeVal));
+                if (Math.abs(strafeVal) > 0 || Math.abs(fwdVal) > 0) {
+                    targetHeading = MathUtils.normalizeRadians(Math.atan2(strafeVal, fwdVal));
+                } else {
+                    return 0;
+                }
                 break;
             case Free:
             case Straight:
@@ -262,5 +272,56 @@ public class JoystickDriveCommand implements Command, Loggable {
                 (1.0 - DriveSettings.DEAD_ZONE)
             );
         };
+    }
+
+    @Log(name = "DrvMode")
+    public static String drvMode = "";
+
+    @Log(name = "DrvVec")
+    public static String drvVec = "";
+
+    private static void ShowDriveMode(DrivingStyle driveStyle, DrivingMode driveMode, Follower f) {
+        switch (driveStyle) {
+            case Free:
+                drvMode = "Free";
+                break;
+            case Straight:
+                drvMode = "Straight";
+                break;
+            case Right:
+                drvMode = "Right";
+                break;
+            case Square:
+                drvMode = "Square";
+                break;
+            case Tangential:
+                drvMode = "Tangential";
+                break;
+            case Vision_NYI:
+                drvMode = "Vision(NYI)";
+                break;
+            default:
+                drvMode = "Unknown";
+                break;
+        }
+        switch (driveMode) {
+            case RobotCentric:
+                drvMode += " Bot-Centric";
+                break;
+            case FieldCentric:
+                drvMode += " Field-Centric";
+                break;
+            case TargetBased_NYI:
+                drvMode += " Target-Based";
+                break;
+            default:
+                drvMode += " [Unknown]";
+                break;
+        }
+        drvMode += String.format(" Max %.2f", f.getMaxPowerScaling());
+    }
+
+    private static void ShowDriveVectors(double fwdVal, double strafeVal, double rot) {
+        drvVec = String.format("f %.2f s %.2f r %.2f", fwdVal, strafeVal, rot);
     }
 }

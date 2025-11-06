@@ -11,18 +11,6 @@ import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 @Configurable
 public class Robot implements Loggable {
 
-    @Log(name = "H")
-    public double gyro;
-
-    @Log(name = "X")
-    public double xv;
-
-    @Log(name = "Y")
-    public double yv;
-
-    @Log(name = "R")
-    public double rv;
-
     public StartingPosition position;
     public Alliance alliance;
 
@@ -39,13 +27,6 @@ public class Robot implements Loggable {
     }
 
     public void atStart() {}
-
-    public void updatePose() {
-        Pose pose = follower.getPose();
-        gyro = pose.getHeading();
-        xv = pose.getX();
-        yv = pose.getY();
-    }
 
     public Follower getFollower() {
         return follower;

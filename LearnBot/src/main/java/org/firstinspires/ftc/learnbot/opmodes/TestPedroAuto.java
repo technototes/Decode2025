@@ -34,7 +34,6 @@ public class TestPedroAuto extends CommandOpMode {
             () -> robot.follower.setStartingPose(p.getStart()),
             OpModeState.INIT
         );
-        CommandScheduler.scheduleForState(robot::updatePose, OpModeState.INIT, OpModeState.RUN);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 robot::normal,
