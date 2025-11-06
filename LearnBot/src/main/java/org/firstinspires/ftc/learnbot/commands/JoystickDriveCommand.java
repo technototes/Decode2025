@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.learnbot.commands.driving;
+package org.firstinspires.ftc.learnbot.commands;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
@@ -11,7 +11,6 @@ import com.technototes.library.util.MathUtils;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.learnbot.Setup.DriveSettings;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /* Recall, the Pedro Path coordinate system:
                  [Refs/score table]
@@ -253,7 +252,8 @@ public class JoystickDriveCommand implements Command, Loggable {
             }
             // If the value is outside the dead zone, scale it
             return (
-                (val - Math.signum(val) * DriveSettings.DEAD_ZONE) / (1.0 - DriveSettings.DEAD_ZONE)
+                (val - Math.copySign(DriveSettings.DEAD_ZONE, val)) /
+                (1.0 - DriveSettings.DEAD_ZONE)
             );
         };
     }

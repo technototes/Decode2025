@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.learnbot.controls;
 
 import com.technototes.library.command.CommandScheduler;
-import com.technototes.library.control.CommandAxis;
+import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
-import org.firstinspires.ftc.learnbot.Setup;
+import org.firstinspires.ftc.learnbot.Setup.Connected;
+import org.firstinspires.ftc.learnbot.Setup.OtherSettings;
 import org.firstinspires.ftc.learnbot.commands.DriveCmds;
-import org.firstinspires.ftc.learnbot.commands.LLPipelineChangeCommand;
-import org.firstinspires.ftc.learnbot.commands.driving.JoystickDriveCommand;
+import org.firstinspires.ftc.learnbot.commands.JoystickDriveCommand;
 
 public class DriverController {
 
@@ -20,61 +20,43 @@ public class DriverController {
 
     public Stick driveLeftStick, driveRightStick;
     public CommandButton resetGyroButton;
+    public CommandButton botFieldToggleButton;
     public CommandButton turboButton;
     public CommandButton snailButton;
-    public CommandAxis straightTrigger;
-    public CommandAxis angleTrigger;
-    public CommandButton launch;
-    public CommandButton launchFaster;
-    public CommandButton launchSlower;
-    public CommandButton moveballup;
-    public CommandButton moveballslow;
-    public CommandButton pipelineMode;
-    public CommandButton barcodePipeline;
-    public CommandButton GreencolorPipeline;
-    public CommandButton classifierPipeline;
-    public CommandButton objectPipeline;
-    public CommandButton apriltagPipeline;
-    public CommandButton PurplecolorPipeline;
-    public CommandButton AutoAim;
+    public CommandButton normalButton;
+    public CommandButton visionButton;
+    public CommandButton straightButton;
+    public CommandButton snap90Button;
+    public CommandButton squareButton;
+    public CommandButton tangentButton;
     public JoystickDriveCommand stickDriver;
-    public static boolean pipelineToggle = false;
-    public static boolean launchOn = false;
-    private boolean faceTagMode = false;
-
-    public void togglePipelineMode() {
-        pipelineToggle = !pipelineToggle;
-    }
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
         gamepad = g;
 
         AssignNamedControllerButton();
-        if (Setup.Connected.DRIVEBASE) {
+        if (Connected.DRIVEBASE) {
             bindDriveControls();
-        }
-        if (Setup.Connected.LIMELIGHT) {
-            bindPipelineControls();
         }
     }
 
     private void AssignNamedControllerButton() {
-        resetGyroButton = gamepad.ps_options;
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
-        turboButton = gamepad.rightBumper;
-        snailButton = gamepad.leftBumper;
-        straightTrigger = gamepad.rightTrigger;
-        angleTrigger = gamepad.leftTrigger;
-        moveballup = gamepad.ps_square;
-        launch = gamepad.ps_triangle;
-        pipelineMode = gamepad.dpadUp;
-        launchSlower = gamepad.ps_cross;
-        launchFaster = gamepad.ps_circle;
-        apriltagPipeline = gamepad.dpadRight;
-        AutoAim = gamepad.dpadDown;
-        moveballslow = gamepad.dpadLeft;
+
+        snap90Button = gamepad.rightBumper;
+        squareButton = gamepad.rightTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
+        tangentButton = gamepad.leftBumper;
+        straightButton = gamepad.leftTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
+
+        resetGyroButton = gamepad.ps_options;
+        botFieldToggleButton = gamepad.ps_share;
+
+        turboButton = gamepad.dpadUp;
+        normalButton = gamepad.dpadRight;
+        snailButton = gamepad.dpadDown;
+        visionButton = gamepad.dpadLeft;
     }
 
     public void bindDriveControls() {
@@ -82,41 +64,29 @@ public class DriverController {
         CommandScheduler.scheduleJoystick(stickDriver);
 
         turboButton.whenPressed(DriveCmds.TurboMode(stickDriver));
-        turboButton.whenReleased(DriveCmds.NormalMode(stickDriver));
-
+        normalButton.whenPressed(DriveCmds.NormalMode(stickDriver));
         snailButton.whenPressed(DriveCmds.SnailMode(stickDriver));
-        snailButton.whenReleased(DriveCmds.NormalMode(stickDriver));
-        if (Setup.Connected.LIMELIGHT) {
-            AutoAim.whenPressed(DriveCmds.AutoAim(stickDriver));
+
+        if (Connected.LIMELIGHT) {
+            visionButton.whenPressed(DriveCmds.AutoAim(stickDriver));
+            visionButton.whenReleased(DriveCmds.NormalMode(stickDriver));
         }
+
+        snap90Button.whenPressed(stickDriver::EnableSnap90Driving);
+        snap90Button.whenReleased(stickDriver::EnableFreeDriving);
+        squareButton.whenPressed(stickDriver::EnableSquareDriving);
+        squareButton.whenReleased(stickDriver::EnableFreeDriving);
+        straightButton.whenPressed(stickDriver::EnableStraightDriving);
+        straightButton.whenReleased(stickDriver::EnableFreeDriving);
+        tangentButton.whenPressed(stickDriver::EnableTangentialDriving);
+        tangentButton.whenReleased(stickDriver::EnableFreeDriving);
 
         resetGyroButton.whenPressed(DriveCmds.ResetGyro(stickDriver));
-    }
-
-    public void bindPipelineControls() {
-        pipelineMode.whenPressed(this::togglePipelineMode);
-        if (pipelineToggle) {
-            //            barcodePipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Barcode_Pipeline));
-            GreencolorPipeline.whenPressed(
-                new LLPipelineChangeCommand(
-                    hardware.limelight,
-                    Setup.HardwareNames.Green_Color_Pipeline
-                )
-            );
-            PurplecolorPipeline.whenPressed(
-                new LLPipelineChangeCommand(
-                    hardware.limelight,
-                    Setup.HardwareNames.Purple_Color_Pipeline
-                )
-            );
-            //            classifierPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Classifier_Pipeline));
-            //            objectPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Object_Detection_Pipeline));
-            apriltagPipeline.whenPressed(
-                new LLPipelineChangeCommand(
-                    hardware.limelight,
-                    Setup.HardwareNames.AprilTag_Pipeline
-                )
-            );
-        }
+        botFieldToggleButton.whenPressed(
+            new CycleCommandGroup(
+                stickDriver::SetRobotCentricDriveMode,
+                stickDriver::SetFieldCentricDriveMode
+            )
+        );
     }
 }
