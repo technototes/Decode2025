@@ -105,7 +105,7 @@ public class JoystickDriveCommand implements Command, Loggable {
     // used to keep the directions straight
     Alliance alliance;
 
-    enum DrivingStyle {
+    public enum DrivingStyle {
         Free, // Bot is free to move in all directions
         Straight, // Bot will only move along the X or Y axis, but not both
         Right, // Bot will hold a right angle while driving
@@ -114,7 +114,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         Vision_NYI, // Bot will use Vision to find the target and aim toward it
     }
 
-    enum DrivingMode {
+    public enum DrivingMode {
         RobotCentric,
         FieldCentric,
         TargetBased_NYI,
@@ -122,6 +122,12 @@ public class JoystickDriveCommand implements Command, Loggable {
 
     DrivingStyle driveStyle;
     DrivingMode driveMode;
+    public DrivingStyle getCurrentDriveStyle() {
+        return driveStyle;
+    }
+    public DrivingMode getCurrentDriveMode() {
+        return driveMode;
+    }
 
     public JoystickDriveCommand(
         Follower fol,
@@ -170,10 +176,10 @@ public class JoystickDriveCommand implements Command, Loggable {
 
         double curHeading = follower.getHeading() - headingOffset;
 
-        // Recall that pushing a stick forward goes *negative* and pushing a stick to the right
-        // goes *negative* as well.
+        // Recall that pushing a stick forward goes *negative* and pushing a stick to the left
+        // goes *negative* as well (both are opposite Pedro's coordinate system)
         double fwdVal = -y.getAsDouble();
-        double strafeVal = x.getAsDouble();
+        double strafeVal = -x.getAsDouble();
         if (driveStyle == DrivingStyle.Straight || driveStyle == DrivingStyle.Square) {
             // for straight/square driving, we only use one of the two translation directions:
             if (Math.abs(fwdVal) > Math.abs(strafeVal)) {
@@ -205,8 +211,8 @@ public class JoystickDriveCommand implements Command, Loggable {
     }
 
     double getRotation(double curHeading, double fwdVal, double strafeVal) {
-        // Negative, because pressing left is negative, but the heading changes positively in the
-        // counter-clockwise (left) direction.
+        // Negative, because pushing left is negative, but that is a positive change in Pedro's
+        // coordinate system.
         double rotation = -r.getAsDouble();
         double targetHeading = 0;
         switch (driveStyle) {
