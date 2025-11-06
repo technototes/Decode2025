@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.learnbot.controls;
 
-import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
@@ -47,9 +46,9 @@ public class DriverController implements Loggable {
         driveRightStick = gamepad.rightStick;
 
         snap90Button = gamepad.rightBumper;
-        squareButton = gamepad.rightTrigger.getAsButton();
+        squareButton = gamepad.rightTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
         tangentButton = gamepad.leftBumper;
-        straightButton = gamepad.leftTrigger.getAsButton();
+        straightButton = gamepad.leftTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
 
         resetGyroButton = gamepad.ps_options;
         botFieldToggleButton = gamepad.ps_share;
@@ -62,7 +61,6 @@ public class DriverController implements Loggable {
 
     public void bindDriveControls() {
         stickDriver = new JoystickDriveCommand(robot.follower, driveLeftStick, driveRightStick);
-        CommandScheduler.scheduleJoystick(stickDriver);
 
         turboButton.whenPressed(DriveCmds.TurboMode(stickDriver));
         normalButton.whenPressed(DriveCmds.NormalMode(stickDriver));

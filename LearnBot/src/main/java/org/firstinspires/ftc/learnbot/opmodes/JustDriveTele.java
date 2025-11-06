@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.learnbot.opmodes;
 
-import static org.firstinspires.ftc.learnbot.Setup.HardwareNames.AprilTag_Pipeline;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -10,6 +9,7 @@ import com.bylazar.gamepad.PanelsGamepad;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
@@ -20,7 +20,7 @@ import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
 @Configurable
 @SuppressWarnings("unused")
-@TeleOp(name = "Just Drive")
+@TeleOp(name = "JustDrive")
 public class JustDriveTele extends CommandOpMode implements Loggable {
 
     public Robot robot;
@@ -34,12 +34,13 @@ public class JustDriveTele extends CommandOpMode implements Loggable {
     public void uponInit() {
         telemetry = new MultipleTelemetry(
             telemetry,
-            FtcDashboard.getInstance().getTelemetry(),
-            PanelsTelemetry.INSTANCE.getFtcTelemetry()
+            FtcDashboard.getInstance().getTelemetry()
+            // PanelsTelemetry.INSTANCE.getFtcTelemetry()
         );
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
+        CommandScheduler.scheduleJoystick(controls.stickDriver);
     }
 
     @Override
