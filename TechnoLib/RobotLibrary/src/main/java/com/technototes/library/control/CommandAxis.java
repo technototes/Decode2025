@@ -1,6 +1,7 @@
 package com.technototes.library.control;
 
 import com.technototes.library.command.Command;
+import java.util.ArrayList;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
@@ -11,6 +12,9 @@ import java.util.function.Function;
  */
 public class CommandAxis extends AxisBase implements CommandInput<CommandAxis> {
 
+    private CommandButton button;
+    private ArrayList<CommandAxis> buttons;
+
     /**
      * Make a command axis
      *
@@ -18,6 +22,8 @@ public class CommandAxis extends AxisBase implements CommandInput<CommandAxis> {
      */
     public CommandAxis(DoubleSupplier supplier) {
         super(supplier);
+        button = null;
+        buttons = null;
     }
 
     /**
@@ -55,10 +61,40 @@ public class CommandAxis extends AxisBase implements CommandInput<CommandAxis> {
     }
 
     public CommandButton getAsButton() {
-        return new CommandButton(this);
+        if (button == null) {
+            button = new CommandButton(this);
+        }
+        return button;
     }
 
     public CommandButton getAsButton(double threshold) {
-        return new CommandButton(() -> (threshold >= 0) ? (getAsDouble() >= threshold) : (getAsDouble() < threshold));
+        if (buttons == null) {
+            buttons = new ArrayList<>(1);
+        }
+        for (CommandAxis b : buttons) {
+            if (Math.abs(b.getTriggerThreshold() - threshold) < 1e-5) {
+                return b.getAsButton();
+            }
+        }
+        CommandAxis a = new CommandAxis(this, threshold);
+        buttons.add(a);
+        return a.getAsButton();
+    }
+
+    // You have to manually schedule the 'getAsButton...' things, which is confusing for students
+    // (and Mentors :D ) so instead, I'm going to pass the periodic function on down the line.
+    // This does have the downsize of leaking any getAsButton objects, but I'm just not that
+    // worried about it...
+    @Override
+    public void periodic() {
+        super.periodic();
+        if (button != null) {
+            button.periodic();
+        }
+        if (buttons != null) {
+            for (CommandAxis b : buttons) {
+                b.periodic();
+            }
+        }
     }
 }
