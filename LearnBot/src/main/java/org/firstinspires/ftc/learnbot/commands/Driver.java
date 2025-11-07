@@ -31,7 +31,7 @@ import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
                    [Audience]
  */
 
-public class JoystickDriveCommand implements Command, Loggable {
+public class Driver implements Command, Loggable {
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -108,6 +108,27 @@ public class JoystickDriveCommand implements Command, Loggable {
         HeadingHelper.savePose(follower.getPose());
     }
 
+    // Some just slightly more complex commands:
+    public void StayPut() {
+        if (prevDriveStyle == DrivingStyle.None) {
+            prevDriveStyle = driveStyle;
+            prevDriveSpeed = follower.getMaxPowerScaling();
+        }
+        HoldCurrentPosition();
+        SetTurboSpeed();
+    }
+
+    public void ResumeDriving() {
+        if (prevDriveStyle == DrivingStyle.None) {
+            EnableFreeDriving();
+            SetNormalSpeed();
+        } else {
+            switchDriveStyle(prevDriveStyle);
+            follower.setMaxPowerScaling(prevDriveSpeed);
+            prevDriveStyle = DrivingStyle.None;
+        }
+    }
+
     // The PedroPath follower, to let us actually make the bot move:
     Follower follower;
     // The sticks (probably each are CommandAxis suppliers)
@@ -123,6 +144,9 @@ public class JoystickDriveCommand implements Command, Loggable {
     Limelight3A limelight;
     // used to keep the directions straight
     Alliance alliance;
+    // Used to keep track of the previous drive style when using the "StayPut" operation
+    private DrivingStyle prevDriveStyle = DrivingStyle.None;
+    private double prevDriveSpeed = 0;
 
     public enum DrivingStyle {
         Free, // Bot is free to move in all directions
@@ -132,6 +156,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         Tangential, // Stay tangent to the bot's direction
         HoldPosition, // Stay right where you are (just use Pedro)
         Vision_NYI, // Bot will use Vision to find the target and aim toward it
+        None,
     }
 
     public enum DrivingMode {
@@ -152,13 +177,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         return driveMode;
     }
 
-    public JoystickDriveCommand(
-        Follower fol,
-        Stick xyStick,
-        Stick rotStick,
-        Limelight3A ll,
-        Alliance all
-    ) {
+    public Driver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll, Alliance all) {
         // TODO: Throw an exception or log if there's some problem with constants.
         // i.e. DEAD_ZONE is negative, or greater than 1.0
         limelight = ll;
@@ -174,15 +193,15 @@ public class JoystickDriveCommand implements Command, Loggable {
         EnableFreeDriving();
     }
 
-    public JoystickDriveCommand(Follower fol, Stick xyStick, Stick rotStick) {
+    public Driver(Follower fol, Stick xyStick, Stick rotStick) {
         this(fol, xyStick, rotStick, null, Alliance.NONE);
     }
 
-    public JoystickDriveCommand(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll) {
+    public Driver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll) {
         this(fol, xyStick, rotStick, ll, Alliance.NONE);
     }
 
-    public JoystickDriveCommand(Follower fol, Stick xyStick, Stick rotStick, Alliance al) {
+    public Driver(Follower fol, Stick xyStick, Stick rotStick, Alliance al) {
         this(fol, xyStick, rotStick, null, al);
     }
 
@@ -261,16 +280,20 @@ public class JoystickDriveCommand implements Command, Loggable {
                     return 0;
                 }
                 break;
+            case Vision_NYI:
+                // TODO: Implement this (turn toward a target based on LimeLight)
+                return 0;
             case Free:
             case Straight:
-            case Vision_NYI:
             default:
                 if (driveMode != DrivingMode.TargetBased_NYI) {
                     return rotation * DriveSettings.TURN_SCALING;
                 } else {
-                    targetHeading = 0.0; // TODO: Get the target heading from the target...s
+                    // TODO: implement this (Turn toward the target)
+                    targetHeading = 0.0;
                 }
         }
+        // TODO: Use the Pedro heading PIDF to get this value?
         return Math.clamp(targetHeading - curHeading, -1, 1) * DriveSettings.TURN_SCALING;
     }
 
@@ -297,6 +320,8 @@ public class JoystickDriveCommand implements Command, Loggable {
             );
         };
     }
+
+    // Everything below here is just for displaying/diagnostics
 
     @Log(name = "DrvMode")
     public static String drvMode = "";

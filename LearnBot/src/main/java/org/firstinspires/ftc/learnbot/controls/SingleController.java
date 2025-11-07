@@ -6,7 +6,7 @@ import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup;
-import org.firstinspires.ftc.learnbot.commands.JoystickDriveCommand;
+import org.firstinspires.ftc.learnbot.commands.Driver;
 
 public class SingleController {
 
@@ -39,7 +39,7 @@ public class SingleController {
 
     public void bindDriveControls() {
         CommandScheduler.scheduleJoystick(
-            new JoystickDriveCommand(robot.follower, driveLeftStick, driveRightStick)
+            new Driver(robot.follower, driveLeftStick, driveRightStick)
         );
         // turboButton.whenPressed(EZCmd.Drive.TurboMode(robot.drivebaseSubsystem));
         // turboButton.whenReleased(EZCmd.Drive.NormalMode(robot.drivebaseSubsystem));
