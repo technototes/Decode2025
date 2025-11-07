@@ -26,7 +26,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.structure.BetterSelectableOpMode;
 import java.util.ArrayList;
 import java.util.List;
-import org.firstinspires.ftc.learnbot.AutoConstants;
+import org.firstinspires.ftc.learnbot.DrivingConstants;
 import org.firstinspires.ftc.learnbot.Setup;
 
 /**
@@ -87,10 +87,10 @@ public class Tuning extends BetterSelectableOpMode {
     @Override
     public void onSelect() {
         if (follower == null) {
-            follower = AutoConstants.createFollower(hardwareMap);
+            follower = DrivingConstants.createFollower(hardwareMap);
             PanelsConfigurables.INSTANCE.refreshClass(this);
         } else {
-            follower = AutoConstants.createFollower(hardwareMap);
+            follower = DrivingConstants.createFollower(hardwareMap);
         }
 
         follower.setStartingPose(new Pose());

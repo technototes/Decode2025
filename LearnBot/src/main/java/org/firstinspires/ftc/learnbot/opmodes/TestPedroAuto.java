@@ -36,13 +36,9 @@ public class TestPedroAuto extends CommandOpMode {
         );
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                robot::normal,
                 new PedroPathCommand(robot.follower, p.Path1),
-                robot::snail,
                 new PedroPathCommand(robot.follower, p.Path2),
-                robot::turbo,
                 new PedroPathCommand(robot.follower, p.Path3),
-                robot::auto,
                 new PedroPathCommand(robot.follower, p.Path4),
                 CommandScheduler::terminateOpMode
             ),

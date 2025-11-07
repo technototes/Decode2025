@@ -18,29 +18,30 @@ public class TestPaths {
         return new Pose(org, org, 0);
     }
 
+    private static final double halfPi = Math.PI / 2.0;
     public TestPaths(Follower follower) {
         Path1 = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(org, org), new Pose(org + dist, org)))
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
+            .setLinearHeadingInterpolation(0, halfPi)
             .build();
 
         Path2 = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(org + dist, org), new Pose(org, org)))
-            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
+            .setLinearHeadingInterpolation(halfPi, Math.PI)
             .build();
 
         Path3 = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(org, org), new Pose(org + dist, org)))
-            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(270))
+            .setLinearHeadingInterpolation(Math.PI, Math.PI + .6)
             .build();
 
         Path4 = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(org + dist, org), new Pose(org, org)))
-            .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(0))
+            .setLinearHeadingInterpolation(Math.PI + .6, 0)
             .build();
     }
 }

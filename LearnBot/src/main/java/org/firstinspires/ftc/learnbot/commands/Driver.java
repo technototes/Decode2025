@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.learnbot.commands;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.command.Command;
@@ -10,7 +11,7 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
 import java.util.function.DoubleSupplier;
-import org.firstinspires.ftc.learnbot.Setup.DriveSettings;
+import org.firstinspires.ftc.learnbot.DrivingConstants.Control;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 
 /* Recall, the Pedro Path coordinate system:
@@ -39,28 +40,34 @@ public class Driver implements Command, Loggable {
     }
 
     public void SetSnailSpeed() {
-        follower.setMaxPowerScaling(DriveSettings.SNAIL_SPEED);
+        follower.setMaxPowerScaling(Control.SNAIL_SPEED);
+        turnSpeed = Control.SNAIL_TURN;
     }
 
     public void SetNormalSpeed() {
-        follower.setMaxPowerScaling(DriveSettings.NORMAL_SPEED);
+        follower.setMaxPowerScaling(Control.NORMAL_SPEED);
+        turnSpeed = Control.NORMAL_TURN;
     }
 
     public void SetTurboSpeed() {
-        follower.setMaxPowerScaling(DriveSettings.TURBO_SPEED);
+        follower.setMaxPowerScaling(Control.TURBO_SPEED);
+        turnSpeed = Control.TURBO_TURN;
     }
 
     private void switchDriveStyle(DrivingStyle style) {
         if (driveStyle == style) {
             return;
         }
-        if (driveStyle == DrivingStyle.HoldPosition) {
+        if (driveStyle == DrivingStyle.Hold) {
             // If we're currently holding a position, stop doing so
             follower.startTeleOpDrive();
+            holdPose = null;
         }
         driveStyle = style;
-        if (style == DrivingStyle.HoldPosition) {
+        // If we've switched *to* holding a pose, start the follower
+        if (style == DrivingStyle.Hold) {
             holdPose = follower.getPose();
+            follower.holdPoint(new BezierPoint(holdPose), holdPose.getHeading(), false);
         }
     }
 
@@ -81,7 +88,7 @@ public class Driver implements Command, Loggable {
     }
 
     public void HoldCurrentPosition() {
-        switchDriveStyle(DrivingStyle.HoldPosition);
+        switchDriveStyle(DrivingStyle.Hold);
     }
 
     public void EnableVisionDriving() {
@@ -113,6 +120,7 @@ public class Driver implements Command, Loggable {
         if (prevDriveStyle == DrivingStyle.None) {
             prevDriveStyle = driveStyle;
             prevDriveSpeed = follower.getMaxPowerScaling();
+            prevTurnSpeed = turnSpeed;
         }
         HoldCurrentPosition();
         SetTurboSpeed();
@@ -125,6 +133,7 @@ public class Driver implements Command, Loggable {
         } else {
             switchDriveStyle(prevDriveStyle);
             follower.setMaxPowerScaling(prevDriveSpeed);
+            turnSpeed = prevTurnSpeed;
             prevDriveStyle = DrivingStyle.None;
         }
     }
@@ -140,6 +149,8 @@ public class Driver implements Command, Loggable {
     Pose targetPose;
     // The offset heading for field-relative controls
     double headingOffset;
+    // The current rotation scaling factor
+    double turnSpeed;
     // Camera, for future use:
     Limelight3A limelight;
     // used to keep the directions straight
@@ -147,14 +158,22 @@ public class Driver implements Command, Loggable {
     // Used to keep track of the previous drive style when using the "StayPut" operation
     private DrivingStyle prevDriveStyle = DrivingStyle.None;
     private double prevDriveSpeed = 0;
+    private double prevTurnSpeed = 0;
 
     public enum DrivingStyle {
+        // Validated:
         Free, // Bot is free to move in all directions
+        // Validated:
         Straight, // Bot will only move along the X or Y axis, but not both
+        // Validated:
         Right, // Bot will hold a right angle while driving
+        // Validated:
         Square, // Both Straight & Right driving styles
+        // Validated:
+        Hold, // Stay right where you are (just use Pedro)
+        // DOES NOT WORK:
         Tangential, // Stay tangent to the bot's direction
-        HoldPosition, // Stay right where you are (just use Pedro)
+        // NOT YET IMPLEMENTED
         Vision_NYI, // Bot will use Vision to find the target and aim toward it
         None,
     }
@@ -162,6 +181,7 @@ public class Driver implements Command, Loggable {
     public enum DrivingMode {
         RobotCentric,
         FieldCentric,
+        // NOT YET IMPLEMENTED
         TargetBased_NYI,
     }
 
@@ -213,16 +233,12 @@ public class Driver implements Command, Loggable {
     @Override
     public void execute() {
         // If subsystem is busy it is running a path, just ignore the stick.
-        if (follower.isBusy()) {
-            drvMode = "busy";
+        ShowDriveInfo(driveStyle, driveMode, follower);
+        if (follower.isBusy() || driveStyle == DrivingStyle.Hold) {
+            follower.update();
+            drvVec = "busy";
             return;
         }
-        ShowDriveMode(driveStyle, driveMode, follower);
-        if (driveStyle == DrivingStyle.HoldPosition) {
-            follower.holdPoint(holdPose);
-            return;
-        }
-        double curHeading = follower.getHeading() - headingOffset;
 
         // Recall that pushing a stick forward goes *negative* and pushing a stick to the left
         // goes *negative* as well (both are opposite Pedro's coordinate system)
@@ -237,8 +253,8 @@ public class Driver implements Command, Loggable {
             }
         }
         if (driveMode == DrivingMode.RobotCentric || driveMode == DrivingMode.FieldCentric) {
-            double rot = getRotation(curHeading, fwdVal, strafeVal);
-            ShowDriveVectors(fwdVal, strafeVal, rot);
+            double rot = getRotation(fwdVal, strafeVal);
+            ShowDriveVectors(fwdVal, strafeVal, rot, headingOffset);
             follower.setTeleOpDrive(
                 fwdVal,
                 strafeVal,
@@ -246,8 +262,8 @@ public class Driver implements Command, Loggable {
                 driveMode == DrivingMode.RobotCentric,
                 headingOffset
             );
-            follower.update();
         }
+
         // target based driving:
         // The idea is that we have a location along the edge of the field that indicates which
         // direction the bot should be move, along with a heading indicating the direction it
@@ -258,12 +274,15 @@ public class Driver implements Command, Loggable {
         // drivebase will compensate automatically. The hypothesis (not yet tested at all) is that
         // different friction between motors, motor speeds, etc... will be less frustrating to deal
         // with, as well..
+
+        follower.update();
     }
 
-    double getRotation(double curHeading, double fwdVal, double strafeVal) {
+    double getRotation(double fwdVal, double strafeVal) {
         // Negative, because pushing left is negative, but that is a positive change in Pedro's
         // coordinate system.
         double rotation = -r.getAsDouble();
+        double curHeading = follower.getHeading() - headingOffset;
         double targetHeading = 0;
         switch (driveStyle) {
             case Right:
@@ -272,10 +291,13 @@ public class Driver implements Command, Loggable {
                 targetHeading = MathUtils.snapToNearestRadiansMultiple(curHeading, Math.PI / 2);
                 break;
             case Tangential:
-                // Tangential is considered an angle-focused driving style, too
-                // Get the heading of the indicated vector of (fwd,strafe)
+                // Tangential is an angle-focused driving style, but the heading
+                // is strictly in the direction of the stick. Logically, this is an attempt to
+                // eliminate "actual" strafing: The robot should be oriented to drive forward in the
+                // direction of the stick
                 if (Math.abs(strafeVal) > 0 || Math.abs(fwdVal) > 0) {
-                    targetHeading = MathUtils.normalizeRadians(Math.atan2(strafeVal, fwdVal));
+                    targetHeading = MathUtils.posNegRadians(Math.atan2(fwdVal, strafeVal));
+                    curHeading = MathUtils.posNegRadians(curHeading);
                 } else {
                     return 0;
                 }
@@ -287,14 +309,14 @@ public class Driver implements Command, Loggable {
             case Straight:
             default:
                 if (driveMode != DrivingMode.TargetBased_NYI) {
-                    return rotation * DriveSettings.TURN_SCALING;
+                    return rotation * turnSpeed;
                 } else {
                     // TODO: implement this (Turn toward the target)
                     targetHeading = 0.0;
                 }
         }
         // TODO: Use the Pedro heading PIDF to get this value?
-        return Math.clamp(targetHeading - curHeading, -1, 1) * DriveSettings.TURN_SCALING;
+        return (Math.clamp(targetHeading - curHeading, -1, 1) * turnSpeed);
     }
 
     @Override
@@ -310,13 +332,13 @@ public class Driver implements Command, Loggable {
         return () -> {
             double val = ds.getAsDouble();
             // If the value is inside the dead zone, just make it zero
-            if (Math.abs(val) <= DriveSettings.DEAD_ZONE) {
+            if (Math.abs(val) <= Control.STICK_DEAD_ZONE) {
                 return 0.0;
             }
             // If the value is outside the dead zone, scale it
             return (
-                (val - Math.copySign(DriveSettings.DEAD_ZONE, val)) /
-                (1.0 - DriveSettings.DEAD_ZONE)
+                (val - Math.copySign(Control.STICK_DEAD_ZONE, val)) /
+                (1.0 - Control.STICK_DEAD_ZONE)
             );
         };
     }
@@ -329,7 +351,10 @@ public class Driver implements Command, Loggable {
     @Log(name = "DrvVec")
     public static String drvVec = "";
 
-    private static void ShowDriveMode(DrivingStyle driveStyle, DrivingMode driveMode, Follower f) {
+    @Log(name = "Pose")
+    public static String drvLoc = "";
+
+    private static void ShowDriveInfo(DrivingStyle driveStyle, DrivingMode driveMode, Follower f) {
         switch (driveStyle) {
             case Free:
                 drvMode = "Free";
@@ -343,14 +368,14 @@ public class Driver implements Command, Loggable {
             case Square:
                 drvMode = "Square";
                 break;
-            case Tangential:
-                drvMode = "Tangential";
+            case Hold:
+                drvMode = "!Hold!";
                 break;
-            case HoldPosition:
-                drvMode = "Hold Pos";
+            case Tangential:
+                drvMode = "Tangent[NYI]";
                 break;
             case Vision_NYI:
-                drvMode = "Vision(NYI)";
+                drvMode = "Vision[NYI]";
                 break;
             default:
                 drvMode = "Unknown";
@@ -364,16 +389,34 @@ public class Driver implements Command, Loggable {
                 drvMode += " Field-Centric";
                 break;
             case TargetBased_NYI:
-                drvMode += " Target-Based";
+                drvMode += " Target-Based[NYI]";
                 break;
             default:
                 drvMode += " [Unknown]";
                 break;
         }
-        drvMode += String.format(" Max %.2f", f.getMaxPowerScaling());
+        drvMode += String.format(" Max:%.2f", f.getMaxPowerScaling());
+        Pose curPose = f.getPose();
+        drvLoc = String.format(
+            "X:%.2f Y:%.2f H:%.1f°",
+            curPose.getX(),
+            curPose.getY(),
+            Math.toDegrees(curPose.getHeading())
+        );
     }
 
-    private static void ShowDriveVectors(double fwdVal, double strafeVal, double rot) {
-        drvVec = String.format("f %.2f s %.2f r %.2f", fwdVal, strafeVal, rot);
+    private static void ShowDriveVectors(
+        double fwdVal,
+        double strafeVal,
+        double rot,
+        double offset
+    ) {
+        drvVec = String.format(
+            "f %.2f s %.2f r %.2f [%.1f°]",
+            fwdVal,
+            strafeVal,
+            rot,
+            Math.toDegrees(offset)
+        );
     }
 }

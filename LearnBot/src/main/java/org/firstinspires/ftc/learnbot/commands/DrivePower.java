@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.learnbot.commands.auto;
+package org.firstinspires.ftc.learnbot.commands;
 
 import com.pedropathing.follower.Follower;
 import com.technototes.library.command.Command;
 
-public class DriveAutoCommand implements Command {
+public class DrivePower implements Command {
 
     public Follower follower;
     double[] p;
 
-    public DriveAutoCommand(Follower f, double power) {
+    public DrivePower(Follower f, double power) {
         follower = f;
         p = new double[4];
         p[0] = power;
@@ -17,8 +17,8 @@ public class DriveAutoCommand implements Command {
         p[3] = power;
     }
 
-    public DriveAutoCommand(Follower f, double p1, double p2, double p3, double p4) {
-        follower =f ;
+    public DrivePower(Follower f, double p1, double p2, double p3, double p4) {
+        follower = f;
         p = new double[4];
         p[0] = p1;
         p[1] = p2;

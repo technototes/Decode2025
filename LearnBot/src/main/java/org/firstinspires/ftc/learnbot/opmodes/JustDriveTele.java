@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.learnbot.opmodes;
 
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
@@ -20,7 +19,7 @@ import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
 @Configurable
 @SuppressWarnings("unused")
-@TeleOp(name = "JustDrive")
+@TeleOp(name = "Driving")
 public class JustDriveTele extends CommandOpMode implements Loggable {
 
     public Robot robot;
