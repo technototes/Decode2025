@@ -50,28 +50,46 @@ public class JoystickDriveCommand implements Command, Loggable {
         follower.setMaxPowerScaling(DriveSettings.TURBO_SPEED);
     }
 
+    private void switchDriveStyle(DrivingStyle style) {
+        if (driveStyle == style) {
+            return;
+        }
+        if (driveStyle == DrivingStyle.HoldPosition) {
+            // If we're currently holding a position, stop doing so
+            follower.startTeleOpDrive();
+        }
+        driveStyle = style;
+        if (style == DrivingStyle.HoldPosition) {
+            holdPose = follower.getPose();
+        }
+    }
+
     public void EnableStraightDriving() {
-        driveStyle = DrivingStyle.Straight;
+        switchDriveStyle(DrivingStyle.Straight);
     }
 
     public void EnableSnap90Driving() {
-        driveStyle = DrivingStyle.Right;
+        switchDriveStyle(DrivingStyle.Right);
     }
 
     public void EnableSquareDriving() {
-        driveStyle = DrivingStyle.Square;
+        switchDriveStyle(DrivingStyle.Square);
     }
 
     public void EnableTangentialDriving() {
-        driveStyle = DrivingStyle.Tangential;
+        switchDriveStyle(DrivingStyle.Tangential);
+    }
+
+    public void HoldCurrentPosition() {
+        switchDriveStyle(DrivingStyle.HoldPosition);
     }
 
     public void EnableVisionDriving() {
-        driveStyle = DrivingStyle.Vision_NYI;
+        switchDriveStyle(DrivingStyle.Vision_NYI);
     }
 
     public void EnableFreeDriving() {
-        driveStyle = DrivingStyle.Free;
+        switchDriveStyle(DrivingStyle.Free);
     }
 
     public void SetRobotCentricDriveMode() {
@@ -112,6 +130,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         Right, // Bot will hold a right angle while driving
         Square, // Both Straight & Right driving styles
         Tangential, // Stay tangent to the bot's direction
+        HoldPosition, // Stay right where you are (just use Pedro)
         Vision_NYI, // Bot will use Vision to find the target and aim toward it
     }
 
@@ -123,6 +142,7 @@ public class JoystickDriveCommand implements Command, Loggable {
 
     DrivingStyle driveStyle;
     DrivingMode driveMode;
+    Pose holdPose;
 
     public DrivingStyle getCurrentDriveStyle() {
         return driveStyle;
@@ -145,6 +165,7 @@ public class JoystickDriveCommand implements Command, Loggable {
         follower = fol;
         headingOffset = 0.0;
         alliance = all;
+        holdPose = null;
         x = DeadZoneScale(xyStick.getXSupplier());
         y = DeadZoneScale(xyStick.getYSupplier());
         r = DeadZoneScale(rotStick.getXSupplier());
@@ -178,7 +199,10 @@ public class JoystickDriveCommand implements Command, Loggable {
             return;
         }
         ShowDriveMode(driveStyle, driveMode, follower);
-
+        if (driveStyle == DrivingStyle.HoldPosition) {
+            follower.holdPoint(holdPose);
+            return;
+        }
         double curHeading = follower.getHeading() - headingOffset;
 
         // Recall that pushing a stick forward goes *negative* and pushing a stick to the left
@@ -296,6 +320,9 @@ public class JoystickDriveCommand implements Command, Loggable {
                 break;
             case Tangential:
                 drvMode = "Tangential";
+                break;
+            case HoldPosition:
+                drvMode = "Hold Pos";
                 break;
             case Vision_NYI:
                 drvMode = "Vision(NYI)";
