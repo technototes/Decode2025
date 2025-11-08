@@ -84,7 +84,7 @@ public class Hardware implements Loggable {
             testCRServo = new CRServo(Setup.HardwareNames.TESTCRSERVO);
             testServo = new Servo(Setup.HardwareNames.TESTSERVO);
         }
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         }
     }
