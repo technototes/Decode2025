@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.twenty403.commands.driving;
 
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -153,7 +152,7 @@ public class JoystickDriveCommand implements Command, Loggable {
                     else yvalue = 0;
                 }
             }
-            Vector2d input = new Vector2d(yvalue, xvalue).rotated(curHeading);
+            // Vector2d input = new Vector2d(yvalue, xvalue).rotated(curHeading);
         }
         follower.update();
     }
