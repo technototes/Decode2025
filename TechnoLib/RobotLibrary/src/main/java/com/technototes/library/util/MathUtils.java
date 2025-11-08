@@ -1,6 +1,7 @@
 package com.technototes.library.util;
 
 import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /**
  * Class with various math functions
@@ -150,5 +151,53 @@ public class MathUtils {
             if (Math.abs(values[lowestDif] - d) > Math.abs(values[i] - d)) lowestDif = i;
         }
         return values[lowestDif];
+    }
+
+    // Always returns a value between 0 and 359.999 (or 2pi, depending on AngleUnit)
+    public static double snapToNearestAngleMultiple(double input, double angleMultiple, AngleUnit angleUnit) {
+        int quadrant = (int) Math.round(input / angleMultiple);
+        return (quadrant * angleMultiple) % fullCircle(angleUnit);
+    }
+
+    public static double snapToNearestRadiansMultiple(double input, double angleMultiple) {
+        return snapToNearestAngleMultiple(input, angleMultiple, AngleUnit.RADIANS);
+    }
+
+    public static double snapToNearestDegreesMultiple(double input, double angleMultiple) {
+        return snapToNearestAngleMultiple(input, angleMultiple, AngleUnit.DEGREES);
+    }
+
+    public static double normalizeAngle(double angle, AngleUnit angleUnit) {
+        double twoPi = fullCircle(angleUnit);
+        return ((angle % twoPi) + twoPi) % twoPi;
+    }
+
+    public static double normalizeRadians(double radians) {
+        return normalizeAngle(radians, AngleUnit.RADIANS);
+    }
+
+    public static double normalizeDegrees(double degrees) {
+        return normalizeAngle(degrees, AngleUnit.DEGREES);
+    }
+
+    public static double posNegAngle(double angle, AngleUnit angleUnit) {
+        double half = halfCircle(angleUnit);
+        return normalizeAngle(angle + half, angleUnit) - half;
+    }
+
+    public static double posNegRadians(double randians) {
+        return posNegAngle(randians, AngleUnit.RADIANS);
+    }
+
+    public static double posNegDegrees(double randians) {
+        return posNegAngle(randians, AngleUnit.DEGREES);
+    }
+
+    public static double fullCircle(AngleUnit angleUnit) {
+        return angleUnit == AngleUnit.RADIANS ? Math.PI * 2 : 360;
+    }
+
+    public static double halfCircle(AngleUnit angleUnit) {
+        return angleUnit == AngleUnit.RADIANS ? Math.PI * 2 : 360;
     }
 }
