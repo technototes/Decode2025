@@ -121,6 +121,10 @@ public class Paths {
     public PathChain RLaunchtoIntake3;
     public PathChain RIntake3toIntake3end;
     public PathChain RIntake3endtoLaunch;
+    public PathChain Forward48;
+    public PathChain Backward48;
+    public PathChain SideLeft48;
+    public PathChain SideRight48;
 
     public Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
@@ -132,6 +136,9 @@ public class Paths {
 
     public Pose getBSegmentedCurveStart() {
         return new Pose(30.748, 135.152, Math.toRadians(90));
+    }
+    public Pose getForward48Start() {
+        return new Pose(56.000, 8.000, Math.toRadians(90));
     }
 
     public Pose getRSegmentedCurveStart() {
@@ -367,6 +374,34 @@ public class Paths {
             .addPath(new BezierCurve(RIntake3end, RIntake3endControlPoint, RLaunch))
             .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
             .build();
+
+        Forward48 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(new Pose(56.000, 8.000), new Pose(56.000, 56.000))
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+                .setVelocityConstraint(0.5)
+                .build();
+        Backward48 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierLine(new Pose(56.000, 56.000), new Pose(56.000, 8.000))
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+                .build();
+
+        SideLeft48 = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(56.000, 8.000), new Pose(8, 8.000)))
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+                .build();
+
+        SideRight48 = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(8, 8.000), new Pose(56.000, 8.000)))
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+                .build();
     }
 }
 
