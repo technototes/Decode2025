@@ -2,6 +2,7 @@ package org.firstinspires.ftc.twenty403.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
@@ -13,11 +14,12 @@ import org.firstinspires.ftc.twenty403.Setup;
 @Configurable
 public class LauncherSubsystem implements Loggable {
 
-    public static double TARGET_MOTOR_VELOCITY = .62; //.58; // 0.5 // /1.0
+    public static double TARGET_MOTOR_VELOCITY = 1300 ; //.58; // 0.5 // /1.0
 
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
     private double currentTargetVelocity = TARGET_MOTOR_VELOCITY;
+    public PIDFCoefficients launcherPIDF = new PIDFCoefficients(1.3, 0.0, 0.0, 13.44);
 
     @Log(name = "Launcher Velo: ")
     public static double READ_MOTOR_VELOCITY;
@@ -30,6 +32,7 @@ public class LauncherSubsystem implements Loggable {
         if (hasHardware) {
             top = h.top;
             top.coast();
+            top.setPIDFCoefficients(launcherPIDF);
         } else {
             top = null;
         }
@@ -39,7 +42,7 @@ public class LauncherSubsystem implements Loggable {
         // Spin the motors
         // TODO: make the motors spit the thing at the right angle
         if (hasHardware) {
-            top.setPower(currentTargetVelocity);
+            top.setVelocity(currentTargetVelocity);
         }
         launching = true;
     }
@@ -47,14 +50,14 @@ public class LauncherSubsystem implements Loggable {
     public void IncreaseVelocity() {
         currentTargetVelocity += 0.01;
         if (hasHardware && launching) {
-            top.setPower(currentTargetVelocity);
+            top.setVelocity(currentTargetVelocity);
         }
     }
 
     public void DecreaseVelocity() {
         currentTargetVelocity -= 0.01;
         if (hasHardware && launching) {
-            top.setPower(currentTargetVelocity);
+            top.setVelocity(currentTargetVelocity);
         }
     }
 
@@ -63,11 +66,12 @@ public class LauncherSubsystem implements Loggable {
     }
 
     public void readMotorVelocity() {
-        READ_MOTOR_VELOCITY = top.getPower();
+        READ_MOTOR_VELOCITY = top.getVelocity();
     }
 
-    public double GetCurrentTargetVelocity() {
-        return currentTargetVelocity;
+
+    public boolean GetCurrentTargetVelocity() {
+        return top.getVelocity() >= 1300;
     }
 
     public void Stop() {

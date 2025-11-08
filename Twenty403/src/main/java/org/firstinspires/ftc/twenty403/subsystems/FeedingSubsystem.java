@@ -17,6 +17,7 @@ public class FeedingSubsystem {
 
     boolean hasHardware;
     CRServo bottomLeft, bottomRight;
+    Hardware h;
 
     public FeedingSubsystem(Hardware h) {
         hasHardware = Setup.Connected.LAUNCHER;
@@ -24,6 +25,7 @@ public class FeedingSubsystem {
         if (hasHardware) {
             bottomLeft = h.bottomLeft;
             bottomRight = h.bottomRight;
+            this.h = h;
         } else {
             bottomLeft = null;
             bottomRight = null;
@@ -39,8 +41,10 @@ public class FeedingSubsystem {
             //                // target velocity. We don't want bland throws.
             //                return;
             //            }
-            bottomRight.setPower(-CRSERVO_SPEED);
-            bottomLeft.setPower(CRSERVO_SPEED);
+            if (h.top.getVelocity() >= TARGET_MOTOR_VELOCITY && h.top.getVelocity() < 1320 ) {
+                bottomRight.setPower(-CRSERVO_SPEED);
+                bottomLeft.setPower(CRSERVO_SPEED);
+            }
         }
     }
 
