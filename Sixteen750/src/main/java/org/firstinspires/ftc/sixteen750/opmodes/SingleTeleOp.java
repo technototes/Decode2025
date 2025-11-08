@@ -45,7 +45,7 @@ public class SingleTeleOp extends CommandOpMode {
             ),
             OpModeState.INIT
         );
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             limelight = hardware.limelight;
             limelight.setPollRateHz(100);
 
@@ -71,12 +71,12 @@ public class SingleTeleOp extends CommandOpMode {
     @Override
     public void runLoop() {
         LLStatus status = null;
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             status = limelight.getStatus();
             limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
         }
 
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             // here
             telemetry.addData("Name", "%s", status.getName());
             telemetry.addData(
@@ -192,7 +192,7 @@ public class SingleTeleOp extends CommandOpMode {
 
     @Override
     public void end() {
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             limelight.stop();
         }
     }

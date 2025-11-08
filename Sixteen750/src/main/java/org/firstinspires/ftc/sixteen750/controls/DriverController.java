@@ -88,7 +88,7 @@ public class DriverController {
     }
 
     public void bindDriveControls() {
-        pedroDriver = new PedroDriver(robot.follower, driveLeftStick, driveRightStick);
+        pedroDriver = new PedroDriver(robot.follower, driveLeftStick, driveRightStick, robot.limelightSubsystem);
         CommandScheduler.scheduleJoystick(pedroDriver);
 
         // turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
@@ -100,7 +100,7 @@ public class DriverController {
         MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));
 
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
-            AutoOrient.whenPressed(DrivingCommands.AutoOrient(pedroDriver));
+//            AutoOrient.whenPressed(DrivingCommands.AutoOrient(pedroDriver));
         }
         // autoAim.whilePressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.AprilTag_Pipeline));
     }
