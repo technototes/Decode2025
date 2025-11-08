@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.twenty403.opmodes;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
@@ -44,7 +42,6 @@ public class OTOSTestingTeleOp extends OpMode implements Loggable {
         follower.update();
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         hardware = new Hardware(hardwareMap);
         follower = AutoConstants.createFollower(hardwareMap);

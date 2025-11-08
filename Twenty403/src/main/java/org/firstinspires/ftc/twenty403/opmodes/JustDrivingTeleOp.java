@@ -4,8 +4,6 @@ import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.AprilTag_Pipel
 import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
 
 import android.app.appsearch.SearchResult;
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
@@ -67,7 +65,6 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void uponInit() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
         robot.follower = AutoConstants.createFollower(hardwareMap);
