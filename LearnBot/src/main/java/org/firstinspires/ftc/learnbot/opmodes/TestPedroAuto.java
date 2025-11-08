@@ -16,7 +16,7 @@ import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
-@Autonomous(name = "Test Pedro", preselectTeleOp = "Just Drive", group = "--Testing--")
+@Autonomous(name = "Test Pedro", preselectTeleOp = "Just Drive")
 @SuppressWarnings("unused")
 public class TestPedroAuto extends CommandOpMode {
 
@@ -40,6 +40,8 @@ public class TestPedroAuto extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.Path2),
                 new PedroPathCommand(robot.follower, p.Path3),
                 new PedroPathCommand(robot.follower, p.Path4),
+                new WaitCommand(1),
+                HeadingHelper.SaveCurrentPosition(robot.follower),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN

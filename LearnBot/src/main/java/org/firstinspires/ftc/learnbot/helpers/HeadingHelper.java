@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.learnbot.helpers;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
+import com.technototes.library.command.Command;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
 @Configurable
@@ -26,8 +25,29 @@ public class HeadingHelper {
         FtcRobotControllerActivity.SaveBetweenRuns = new HeadingHelper(x, y, h);
     }
 
+    public static Command SaveCurrentPosition(Follower f) {
+        return Command.create(() -> savePose(f.getPose()));
+    }
+
+    public static Command RestorePreviousPosition(Follower f) {
+        return Command.create(() -> {
+            Pose p = getSavedPose();
+            if (p != null) {
+                f.setPose(getSavedPose());
+            }
+        });
+    }
+
     public static void savePose(Pose p) {
         saveHeading(p.getX(), p.getY(), p.getHeading());
+    }
+
+    public static Pose getSavedPose() {
+        HeadingHelper hh = (HeadingHelper) FtcRobotControllerActivity.SaveBetweenRuns;
+        if (hh != null) {
+            return new Pose(hh.lastXPosition, hh.lastYPosition, hh.lastHeading);
+        }
+        return null;
     }
 
     public static void clearSavedInfo() {

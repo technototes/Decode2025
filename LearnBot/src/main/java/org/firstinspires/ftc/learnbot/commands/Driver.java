@@ -111,10 +111,6 @@ public class Driver implements Command, Loggable {
         driveMode = DrivingMode.TargetBased_NYI;
     }
 
-    public void SaveHeading() {
-        HeadingHelper.savePose(follower.getPose());
-    }
-
     // Some just slightly more complex commands:
     public void StayPut() {
         if (prevDriveStyle == DrivingStyle.None) {

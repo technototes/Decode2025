@@ -8,7 +8,7 @@ import com.pedropathing.paths.PathChain;
 public class TestPaths {
 
     public static double org = 72.0;
-    public static double dist = 36.0;
+    public static double dist = 2.0;
     public PathChain Path1;
     public PathChain Path2;
     public PathChain Path3;
@@ -18,7 +18,8 @@ public class TestPaths {
         return new Pose(org, org, 0);
     }
 
-    private static final double halfPi = Math.PI / 2.0;
+    private static final double halfPi = Math.PI / 6.0;
+
     public TestPaths(Follower follower) {
         Path1 = follower
             .pathBuilder()
@@ -29,19 +30,19 @@ public class TestPaths {
         Path2 = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(org + dist, org), new Pose(org, org)))
-            .setLinearHeadingInterpolation(halfPi, Math.PI)
+            .setLinearHeadingInterpolation(halfPi, 0)
             .build();
 
         Path3 = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(org, org), new Pose(org + dist, org)))
-            .setLinearHeadingInterpolation(Math.PI, Math.PI + .6)
+            .setLinearHeadingInterpolation(0, halfPi - 0.2)
             .build();
 
         Path4 = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(org + dist, org), new Pose(org, org)))
-            .setLinearHeadingInterpolation(Math.PI + .6, 0)
+            .setLinearHeadingInterpolation(halfPi - .2, halfPi)
             .build();
     }
 }

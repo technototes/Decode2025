@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.learnbot.opmodes;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
@@ -15,11 +13,12 @@ import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.controls.DriverController;
+import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
 @Configurable
 @SuppressWarnings("unused")
-@TeleOp(name = "Driving")
+@TeleOp(name = "Just Drive")
 public class JustDriveTele extends CommandOpMode implements Loggable {
 
     public Robot robot;
@@ -31,14 +30,10 @@ public class JustDriveTele extends CommandOpMode implements Loggable {
 
     @Override
     public void uponInit() {
-        telemetry = new MultipleTelemetry(
-            telemetry,
-            FtcDashboard.getInstance().getTelemetry()
-            // PanelsTelemetry.INSTANCE.getFtcTelemetry()
-        );
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
+        CommandScheduler.scheduleInit(HeadingHelper.RestorePreviousPosition(robot.follower));
         CommandScheduler.scheduleJoystick(controls.stickDriver);
     }
 
@@ -47,8 +42,8 @@ public class JustDriveTele extends CommandOpMode implements Loggable {
         robot.atStart();
     }
 
-    @Override
-    public void runLoop() {
-        telemetry.update();
-    }
+    //    @Override
+    //    public void runLoop() {
+    //        telemetry.update();
+    //    }
 }
