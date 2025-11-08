@@ -12,10 +12,8 @@ public class Setup {
 
         public static boolean DRIVEBASE = true;
         public static boolean TESTSUBSYSTEM = false;
-        public static boolean ODOSUBSYSTEM = false;
         public static boolean SAFETYSUBSYSTEM = false;
         public static boolean EXTERNALIMU = false;
-        public static boolean OCTOQUAD = false;
         public static boolean LAUNCHER = true;
         public static boolean FEED = true;
         public static boolean LIMELIGHT = false;
