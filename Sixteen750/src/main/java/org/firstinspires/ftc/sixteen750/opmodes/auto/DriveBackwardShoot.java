@@ -73,6 +73,6 @@ public class DriveBackwardShoot extends CommandOpMode {
     }
 
     public void end() {
-        HeadingHelper.savePose(robot.drivebase.getPoseEstimate());
+        HeadingHelper.savePose(robot.follower.getPose());
     }
 }

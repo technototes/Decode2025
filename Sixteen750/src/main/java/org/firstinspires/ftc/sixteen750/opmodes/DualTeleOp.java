@@ -10,6 +10,7 @@ import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
+import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
@@ -44,9 +46,11 @@ public class DualTeleOp extends CommandOpMode {
         if (Setup.Connected.DRIVEBASE) {
             controlsDriver = new DriverController(driverGamepad, robot);
             // Just pick a starting point
-            robot.drivebase.setPoseEstimate(HeadingHelper.getSavedPose());
             CommandScheduler.scheduleForState(
-                DrivingCommands.ResetGyro(robot.drivebase),
+                new SequentialCommandGroup(
+                    HeadingHelper.RestorePreviousPosition(robot.follower),
+                    DrivingCommands.ResetGyro(robot.drivebase)
+                ),
                 OpModeState.INIT
             );
             // CommandScheduler.scheduleForState(
