@@ -17,6 +17,7 @@ import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.commands.FeedCMD;
 import org.firstinspires.ftc.twenty403.commands.LLPipelineChangeCommand;
 import org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand;
+import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
 
 public class DriverController {
 
@@ -113,7 +114,7 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-        launch.whenPressed(this::setLaunch);
+        launch.toggle(robot.launcherSubsystem::Launch, robot.launcherSubsystem::Stop);
         launchSlower.whenPressed(this::launchSlower);
         launchFaster.whenPressed(this::launchFaster);
     }
@@ -121,7 +122,7 @@ public class DriverController {
     public void bindFeedControls() {
         moveballup.whenPressed(robot.feedingSubsystem::moveball);
         moveballup.whenReleased(robot.feedingSubsystem::stop);
-        compactScore.whenPressed(robot.launcherSubsystem::Launch);
+        compactScore.whenPressed(FeedCMD.Feed(robot));
     }
 
     public void bindPipelineControls() {
@@ -151,10 +152,10 @@ public class DriverController {
         }
     }
 
-    public void setLaunch() {
-        launchOn = !launchOn;
-        Launch();
-    }
+//    public void setLaunch() {
+//        launchOn = !launchOn;
+//        Launch();
+//    }
 
     public void launchFaster() {
         robot.launcherSubsystem.IncreaseVelocity();
@@ -164,11 +165,11 @@ public class DriverController {
         robot.launcherSubsystem.DecreaseVelocity();
     }
 
-    public void Launch() {
-        if (launchOn) {
-            robot.launcherSubsystem.Launch();
-        } else {
-            robot.launcherSubsystem.Stop();
-        }
-    }
+//    public void Launch() {
+//        if (launchOn) {
+//            robot.launcherSubsystem.Launch();
+//        } else {
+//            robot.launcherSubsystem.Stop();
+//        }
+//    }
 }

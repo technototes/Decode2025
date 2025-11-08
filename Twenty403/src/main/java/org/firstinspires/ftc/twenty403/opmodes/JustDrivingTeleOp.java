@@ -129,8 +129,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
         if (Setup.Connected.LAUNCHER) {
             robot.launcherSubsystem.readMotorVelocity();
-            controlsDriver.Launch();
-            robot.launcherVelociy = robot.launcherSubsystem.GetCurrentTargetVelocity();
+            robot.launcherVelociy = robot.launcherSubsystem.top.getVelocity();
             //robot.launcherSubsystem.RunLoop(telemetry);
         }
 
