@@ -29,8 +29,9 @@ public class HeadingHelper {
         FtcRobotControllerActivity.SaveBetweenRuns = new HeadingHelper(x, y, h);
     }
 
+    // Need to rotate this clockwise by 90 degrees to get to RR coordinates
     public static void savePose(Pose p) {
-        saveHeading(p.getX(), p.getY(), p.getHeading());
+        saveHeading(p.getY(), -p.getX(), p.getHeading() - Math.PI / 2);
     }
 
     public static void savePose(Pose2d p) {
@@ -51,7 +52,12 @@ public class HeadingHelper {
     }
 
     public static Pose2d getSavedPose() {
-        return new Pose2d(getSavedX(), getSavedY(), getSavedHeading());
+        return new Pose2d(-getSavedX(), getSavedY(), getSavedHeading());
+    }
+
+    // Rotate 90 degrees counter-clockwise to convert to Pedro
+    public static Pose getSavedPedroPose() {
+        return new Pose(-getSavedY(), getSavedX(), getSavedHeading() + Math.PI / 2);
     }
 
     public static double getSavedHeading() {

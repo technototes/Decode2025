@@ -21,12 +21,37 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Configurable
-public class AutoConstants {
+public class DrivingConstants {
+
+    @Configurable
+    public static class Control {
+
+        // Max power scaling for translational driving:
+        public static double SNAIL_SPEED = 0.35;
+        public static double NORMAL_SPEED = 0.75;
+        public static double TURBO_SPEED = 1.0;
+        public static double AUTO_SPEED = 0.95;
+
+        // The 'fastest' the robot can turn (0: not turning, 1.0: Fastest possible)
+        public static double SNAIL_TURN = 0.2;
+        public static double NORMAL_TURN = 0.4;
+        public static double TURBO_TURN = 1.0;
+
+        public static double STICK_DEAD_ZONE = 0.05;
+
+        // The amount to multiply the degrees of offset by to turn the bot to
+        // face the apriltag for the target. This is effectively "P" in a PID,
+        // but we don't have I or D implemented
+        public static double TAG_ALIGNMENT_GAIN = 0.03;
+    }
+
+    /**** Stuff for the PedroPathing follower ****/
 
     // Measured by hoomans:
     public static double botWeightKg = 4.90;
     public static double botWidth = 10.1;
     public static double botLength = 12.5;
+
     // Adjusted to be sensible (no good guidance on these :/ )
     public static double brakingStrength = 0.5;
     public static double brakingStart = 0.5;
@@ -43,7 +68,7 @@ public class AutoConstants {
         0.008,
         0.02
     );
-    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.9, 0.05, 0.05, 0.02);
+    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.9, 0.005, 0.05, 0.02);
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
@@ -103,11 +128,13 @@ public class AutoConstants {
             GoBildaPinpointDriver.EncoderDirection.REVERSED;
     }
 
-    // 0 = Motor Encoders, 1 = OTOS, 2 = PinPoint
-    public static final int USE_MOTORS = 0,
-        USE_OTOS = 1,
-        USE_PINPOINT = 2;
-    public static int WhichLocalizer = USE_PINPOINT;
+    public enum LocalizerSelection {
+        USE_MOTORS,
+        USE_OTOS,
+        USE_PINPOINT,
+    }
+
+    public static LocalizerSelection WhichLocalizer = LocalizerSelection.USE_PINPOINT;
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
@@ -197,13 +224,17 @@ public class AutoConstants {
             .mecanumDrivetrain(getDriveConstants());
         switch (WhichLocalizer) {
             case USE_OTOS:
-                return fb.OTOSLocalizer(getOtosLocalizerConstants()).build();
+                fb = fb.OTOSLocalizer(getOtosLocalizerConstants());
+                break;
             case USE_MOTORS:
-                return fb.driveEncoderLocalizer(getDriveEncoderConstants()).build();
+                fb = fb.driveEncoderLocalizer(getDriveEncoderConstants());
+                break;
             case USE_PINPOINT:
-                return fb.pinpointLocalizer(getPinpointConstants()).build();
-            default:
-                return fb.build();
+                fb = fb.pinpointLocalizer(getPinpointConstants());
+                break;
         }
+        Follower f = fb.build();
+        f.setMaxPowerScaling(Control.AUTO_SPEED);
+        return f;
     }
 }
