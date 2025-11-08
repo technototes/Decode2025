@@ -3,8 +3,6 @@ include ':FtcRobotController'
 // Or just try 'bun libflip' to let the script do it for you...
 include 'RobotLibrary'                                                   // FLIP: TechnoLibLocal
 project(':RobotLibrary').projectDir = new File('TechnoLib/RobotLibrary') // FLIP: TechnoLibLocal
-include 'Path'                                                           // FLIP: TechnoLibLocal
-project(':Path').projectDir = new File('TechnoLib/Path')                 // FLIP: TechnoLibLocal
 
 include ':Sixteen750'
 include ':Twenty403'
