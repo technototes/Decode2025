@@ -18,7 +18,7 @@ public class LimelightSubsystem implements Loggable {
 
     @Log.Number(name = "texas angle")
     public static double angle = 0.0;
-    Limelight3A limelight;
+    public static Limelight3A limelight;
 
     public LimelightSubsystem(Hardware h) {
         hasHardware = Setup.Connected.LIMELIGHTSUBSYSTEM;
@@ -30,11 +30,9 @@ public class LimelightSubsystem implements Loggable {
         }
     }
 
-    public LLResult getLatestResult(){
-//        return limelight.getLatestResult();
+    public static void getLatestResult(){
         LLResult result = limelight.getLatestResult();
         angle = result.getTx();
-        return result;
     }
 
     public void selectPipeline(int todo){

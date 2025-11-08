@@ -22,6 +22,7 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 @TeleOp(name = "Dual Control")
 @SuppressWarnings("unused")
@@ -79,12 +80,13 @@ public class DualTeleOp extends CommandOpMode {
         LLStatus status = null;
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             status = limelight.getStatus();
-            //limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
+            limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
         }
 
-        if (Setup.Connected.LIMELIGHTSUBSYSTEM && false) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             // here
             telemetry.addData("Name", "%s", status.getName());
+
             telemetry.addData(
                 "Motif:",
                 Setup.HardwareNames.Motif[0] +
@@ -103,34 +105,16 @@ public class DualTeleOp extends CommandOpMode {
             LLResult result = limelight.getLatestResult();
 
             if (result != null) {
-                long staleness = result.getStaleness();
-                if (staleness < 100) {
-                    // Less than 100 milliseconds old
-                    telemetry.addData("Data", "Good");
-                } else {
-                    telemetry.addData("Data", "Old (" + staleness + " ms)");
-                }
-                // Access general information
-                Pose3D botpose = result.getBotpose_MT2();
-                double captureLatency = result.getCaptureLatency();
-                double targetingLatency = result.getTargetingLatency();
-                double parseLatency = result.getParseLatency();
-                telemetry.addData("LL Latency", captureLatency + targetingLatency);
-                // telemetry.addData("Parse Latency", parseLatency);
 
                 if (result.isValid()) {
-                    // telemetry.addData("tx", result.getTx());
-                    // telemetry.addData("txnc", result.getTxNC());
-                    // telemetry.addData("ty", result.getTy());
-                    // telemetry.addData("tync", result.getTyNC());
-                    //
-                    // telemetry.addData("Botpose", botpose.toString());
 
                     if (result.getPipelineIndex() == Setup.HardwareNames.AprilTag_Pipeline) {
                         // Access fiducial results
                         List<LLResultTypes.FiducialResult> fiducialResults =
                             result.getFiducialResults();
                         for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                            int tag_id = fr.getFiducialId();
+                            telemetry.addData("Tag Id", tag_id);
                             if (
                                 fr.getFiducialId() == 23 &&
                                 Arrays.equals(
@@ -168,24 +152,14 @@ public class DualTeleOp extends CommandOpMode {
                             double tz = targetPose.getPosition().z;
                             // supposedly distance to apriltag
                             double distance = Math.sqrt(tx * tx + ty * ty + tz * tz);
-                            telemetry.addData("Distance to AprilTag", String.valueOf(distance));
+                            if (tag_id == 21 || tag_id == 22 || tag_id == 23) {
+                                telemetry.addData("Distance to AprilTag (Obelisk)", String.valueOf(distance));
+                            } else if (tag_id == 20) {
+                                telemetry.addData("Distance to AprilTag (Blue)", String.valueOf(distance));
+                            } else if (tag_id == 24) {
+                                telemetry.addData("Distance to AprilTag (Red)", String.valueOf(distance));
+                            }
                         }
-                    } else if (
-                        result.getPipelineIndex() == Setup.HardwareNames.Green_Color_Pipeline
-                    ) {
-                        // Access color results
-                        List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                        // for (LLResultTypes.ColorResult cr : colorResults) {
-                        //
-                        // }
-                    } else if (
-                        result.getPipelineIndex() == Setup.HardwareNames.Purple_Color_Pipeline
-                    ) {
-                        // Access color results
-                        List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                        // for (LLResultTypes.ColorResult cr : colorResults) {
-                        //
-                        // }
                     }
                 }
             } else {

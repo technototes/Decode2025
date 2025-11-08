@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.sixteen750.commands;
 
+import static org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem.limelight;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
@@ -11,8 +14,11 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
 import java.util.function.DoubleSupplier;
+
+import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.Setup.OtherSettings;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
+import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 /* Recall, the Pedro Path coordinate system:
                  [Refs/score table]
@@ -144,7 +150,7 @@ public class PedroDriver implements Command, Loggable {
     // The current rotation scaling factor
     double turnSpeed;
     // Camera, for future use:
-    Limelight3A limelight;
+    LimelightSubsystem limelightSubsystem;
     // used to keep the directions straight
     Alliance alliance;
     // Used to keep track of the previous drive style when using the "StayPut" operation
@@ -180,10 +186,10 @@ public class PedroDriver implements Command, Loggable {
         return driveMode;
     }
 
-    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll, Alliance all) {
+    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, LimelightSubsystem ls, Alliance all) {
         // TODO: Throw an exception or log if there's some problem with constants.
         // i.e. DEAD_ZONE is negative, or greater than 1.0
-        limelight = ll;
+        limelightSubsystem = ls;
         follower = fol;
         headingOffset = 0.0;
         alliance = all;
@@ -200,8 +206,8 @@ public class PedroDriver implements Command, Loggable {
         this(fol, xyStick, rotStick, null, Alliance.NONE);
     }
 
-    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll) {
-        this(fol, xyStick, rotStick, ll, Alliance.NONE);
+    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, LimelightSubsystem ls) {
+        this(fol, xyStick, rotStick, ls, Alliance.NONE);
     }
 
     public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, Alliance al) {
@@ -274,7 +280,18 @@ public class PedroDriver implements Command, Loggable {
                 targetHeading = MathUtils.snapToNearestRadiansMultiple(curHeading, Math.PI / 2);
                 break;
             case Vision_NYI:
-                // TODO: Implement this (turn toward a target based on LimeLight)
+                if (Setup.Connected.LIMELIGHTSUBSYSTEM && limelight != null) {
+                    // --- Face AprilTag using Limelight ---
+                    @Log(name = "latest_result")
+                    LLResult result = limelight.getLatestResult();
+                    if (result != null && result.isValid()) {
+                        double tx = result.getTx(); // horizontal offset in degrees
+                        double kP_TagAlign = 0.03; // tune this gain
+                        return -kP_TagAlign * tx; // rotate until tx ~ 0
+                    } else {
+                        return 0.0; // no target → don't spin
+                    }
+                }
                 return 0;
             case Free:
             case Straight:

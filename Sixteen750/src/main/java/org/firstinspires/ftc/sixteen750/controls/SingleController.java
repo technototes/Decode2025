@@ -42,7 +42,7 @@ public class SingleController {
     }
 
     public void bindDriveControls() {
-        pedroDriver = new PedroDriver(robot.follower, driveLeftStick, driveRightStick);
+        pedroDriver = new PedroDriver(robot.follower, driveLeftStick, driveRightStick, robot.limelightSubsystem);
         CommandScheduler.scheduleJoystick(pedroDriver);
         turboButton.whenPressed(DrivingCommands.TurboDriving(pedroDriver));
         turboButton.whenPressed(DrivingCommands.TurboDriving(pedroDriver));
