@@ -39,14 +39,14 @@ public class DriveBackwardShoot extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                    new DriveAutoCommand(robot.drivebase, 0.5),
+                    new DriveAutoCommand(robot.follower, 0.5),
                     TeleCommands.Intake(robot),
                     TeleCommands.GateUp(robot),
                     TeleCommands.HoodUp(robot)
                 ),
                 new WaitCommand(0.5),
                 new ParallelCommandGroup(
-                    new DriveAutoCommand(robot.drivebase, 0),
+                    new DriveAutoCommand(robot.follower, 0),
                     TeleCommands.Launch(robot)
                 ),
                 new WaitCommand(4),

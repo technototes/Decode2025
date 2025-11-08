@@ -1,21 +1,15 @@
 package org.firstinspires.ftc.sixteen750;
 
-import com.pedropathing.Drivetrain;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.follower.FollowerConstants;
-import com.pedropathing.ftc.FollowerBuilder;
-import com.pedropathing.paths.PathConstraints;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.AimingSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.BrakeSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.SafetySubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.TestSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.TwoDeadWheelLocalizer;
 
 public class Robot implements Loggable {
 
@@ -24,8 +18,6 @@ public class Robot implements Loggable {
 
     public double initialVoltage;
 
-    public DrivebaseSubsystem drivebase;
-    public TwoDeadWheelLocalizer localizer;
     public SafetySubsystem safetySubsystem;
     public LauncherSubsystem launcherSubsystem;
     public IntakeSubsystem intakeSubsystem;
@@ -33,23 +25,12 @@ public class Robot implements Loggable {
     public AimingSubsystem aimingSubsystem;
     public TestSubsystem testSubsystem;
     public Follower follower;
-    public FollowerConstants followerConstants;
-    public FollowerBuilder followerBuilder;
-    public PathConstraints pathConstraints;
-    public Drivetrain drivetrain;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
         this.position = pos;
         this.alliance = team;
         this.initialVoltage = hw.voltage();
-        // this.follower = new Follower(followerConstants, localizer, drivetrain, pathConstraints);
 
-        if (Setup.Connected.ODOSUBSYSTEM) {
-            this.localizer = new TwoDeadWheelLocalizer(hw.odoRL, hw.odoRL, hw.imu);
-        }
-        if (Setup.Connected.DRIVEBASE) {
-            drivebase = new DrivebaseSubsystem(hw.fl, hw.fr, hw.rl, hw.rr, hw.imu, this.localizer);
-        }
         if (Setup.Connected.SAFETYSUBSYSTEM) {
             this.safetySubsystem = new SafetySubsystem(hw);
         }
@@ -68,7 +49,9 @@ public class Robot implements Loggable {
         if (Setup.Connected.TESTSUBSYSTEM) {
             this.testSubsystem = new TestSubsystem(hw);
         }
-        follower = AutoConstants.createFollower(hw.map);
+        if (Setup.Connected.DRIVEBASE) {
+            follower = AutoConstants.createFollower(hw.map);
+        }
     }
 
     public Follower getFollower() {

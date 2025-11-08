@@ -6,8 +6,8 @@ import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
 
 public class SingleController {
 
@@ -16,6 +16,7 @@ public class SingleController {
     public CommandGamepad gamepad;
     public Stick driveLeftStick, driveRightStick;
     public CommandButton resetGyroButton, driveStraight, turboButton, snailButton;
+    public PedroDriver pedroDriver;
 
     public SingleController(CommandGamepad g, Robot r, Setup s) {
         this.robot = r;
@@ -41,14 +42,14 @@ public class SingleController {
     }
 
     public void bindDriveControls() {
-        CommandScheduler.scheduleJoystick(
-            new JoystickDriveCommand(robot.drivebase, driveLeftStick, driveRightStick)
-        );
-        turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
-        turboButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
-        snailButton.whenPressed(DrivingCommands.SnailDriving(robot.drivebase));
-        snailButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
+        pedroDriver = new PedroDriver(robot.follower, driveLeftStick, driveRightStick);
+        CommandScheduler.scheduleJoystick(pedroDriver);
+        turboButton.whenPressed(DrivingCommands.TurboDriving(pedroDriver));
+        turboButton.whenPressed(DrivingCommands.TurboDriving(pedroDriver));
+        turboButton.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
+        snailButton.whenPressed(DrivingCommands.SnailDriving(pedroDriver));
+        snailButton.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
 
-        resetGyroButton.whenPressed(DrivingCommands.ResetGyro(robot.drivebase));
+        resetGyroButton.whenPressed(DrivingCommands.ResetGyro(pedroDriver));
     }
 }

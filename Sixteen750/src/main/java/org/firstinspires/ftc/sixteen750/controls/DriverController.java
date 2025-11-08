@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.sixteen750.controls;
 
 import com.technototes.library.command.CommandScheduler;
-import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
@@ -9,9 +8,9 @@ import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
 
 public class DriverController {
 
@@ -38,6 +37,7 @@ public class DriverController {
     public CommandAxis autoAim;
     public CommandAxis spitTrigger;
     public CommandAxis AutoOrient;
+    public PedroDriver pedroDriver;
 
     public static double triggerThreshold = 0.1;
 
@@ -87,20 +87,19 @@ public class DriverController {
     }
 
     public void bindDriveControls() {
-        CommandScheduler.scheduleJoystick(
-            new JoystickDriveCommand(robot.drivebase, driveLeftStick, driveRightStick)
-        );
+        pedroDriver = new PedroDriver(robot.follower, driveLeftStick, driveRightStick);
+        CommandScheduler.scheduleJoystick(pedroDriver);
 
         // turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
         // turboButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
-        snailButton.whenPressed(DrivingCommands.SnailDriving(robot.drivebase));
-        snailButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
-        resetGyroButton.whenPressed(DrivingCommands.ResetGyro(robot.drivebase));
+        snailButton.whenPressed(DrivingCommands.SnailDriving(pedroDriver));
+        snailButton.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
+        resetGyroButton.whenPressed(DrivingCommands.ResetGyro(pedroDriver));
         MotorDecrease.whenPressed(TeleCommands.DecreaseMotor(robot));
         MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));
 
         if (Setup.Connected.LIMELIGHT) {
-            AutoOrient.whenPressed(DrivingCommands.AutoOrient(robot.drivebase));
+            AutoOrient.whenPressed(DrivingCommands.AutoOrient(pedroDriver));
         }
         // autoAim.whilePressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.AprilTag_Pipeline));
     }
