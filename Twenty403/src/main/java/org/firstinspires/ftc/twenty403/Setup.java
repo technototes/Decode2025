@@ -61,6 +61,14 @@ public class Setup {
 
         public static int AUTOTIME = 25;
         public static double STRAIGHTEN_DEAD_ZONE = 0.01;
+        public static double STICK_DEAD_ZONE = 0.05;
         public static double TRIGGER_THRESHOLD = 0.3;
+        public static double AUTO_SPEED = 0.95;
+        public static double SNAIL_SPEED = 0.35;
+        public static double SNAIL_TURN = 0.25;
+        public static double NORMAL_SPEED = 0.85;
+        public static double NORMAL_TURN = 0.4;
+        public static double TURBO_SPEED = 1.0;
+        public static double TURBO_TURN = 0.7;
     }
 }
