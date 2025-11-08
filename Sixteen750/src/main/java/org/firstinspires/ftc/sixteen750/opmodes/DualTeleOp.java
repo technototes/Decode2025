@@ -38,6 +38,7 @@ public class DualTeleOp extends CommandOpMode {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controlsOperator = new OperatorController(codriverGamepad, robot);
+//        limelight = hardwareMap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         if (Setup.Connected.DRIVEBASE) {
             controlsDriver = new DriverController(driverGamepad, robot);
             // Just pick a starting point
@@ -53,7 +54,7 @@ public class DualTeleOp extends CommandOpMode {
             //         OpModeState.RUN
             // );
         }
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             limelight = hardware.limelight;
             limelight.setPollRateHz(100);
 
@@ -76,12 +77,12 @@ public class DualTeleOp extends CommandOpMode {
     @Override
     public void runLoop() {
         LLStatus status = null;
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             status = limelight.getStatus();
-            limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
+            //limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
         }
 
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM && false) {
             // here
             telemetry.addData("Name", "%s", status.getName());
             telemetry.addData(
@@ -197,7 +198,7 @@ public class DualTeleOp extends CommandOpMode {
 
     @Override
     public void end() {
-        if (Setup.Connected.LIMELIGHT) {
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             limelight.stop();
         }
     }

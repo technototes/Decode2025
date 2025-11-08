@@ -9,7 +9,7 @@ public class Setup {
     public static class Connected {
 
         public static final boolean TESTSUBSYSTEM = true;
-        public static final boolean LIMELIGHT = false;
+        public static final boolean LIMELIGHTSUBSYSTEM = true;
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = true;
         public static boolean SAFETYSUBSYSTEM = false;

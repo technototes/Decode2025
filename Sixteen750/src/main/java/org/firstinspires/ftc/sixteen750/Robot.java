@@ -8,6 +8,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.AimingSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.BrakeSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.SafetySubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.TestSubsystem;
 
@@ -23,12 +24,15 @@ public class Robot implements Loggable {
     public IntakeSubsystem intakeSubsystem;
     public BrakeSubsystem brakeSubsystem;
     public AimingSubsystem aimingSubsystem;
+    public LimelightSubsystem limelightSubsystem;
     public TestSubsystem testSubsystem;
     public Follower follower;
+    private Hardware hardware;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
         this.position = pos;
         this.alliance = team;
+        this.hardware = hw;
         this.initialVoltage = hw.voltage();
 
         if (Setup.Connected.SAFETYSUBSYSTEM) {
@@ -49,9 +53,15 @@ public class Robot implements Loggable {
         if (Setup.Connected.TESTSUBSYSTEM) {
             this.testSubsystem = new TestSubsystem(hw);
         }
-        if (Setup.Connected.DRIVEBASE) {
-            follower = AutoConstants.createFollower(hw.map);
+            if (Setup.Connected.LIMELIGHTSUBSYSTEM){
+            this.limelightSubsystem = new LimelightSubsystem(hw);
         }
+        if (Setup.Connected.DRIVEBASE) {
+        follower = AutoConstants.createFollower(hw.map);
+        }
+    }
+    public Hardware getHardware() {
+        return hardware;
     }
 
     public Follower getFollower() {
