@@ -44,7 +44,7 @@ public class SingleTeleOp extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 HeadingHelper.RestorePreviousPosition(robot.follower),
-                DrivingCommands.ResetGyro(robot.drivebase)
+                DrivingCommands.ResetGyro(controls.pedroDriver)
             ),
             OpModeState.INIT
         );

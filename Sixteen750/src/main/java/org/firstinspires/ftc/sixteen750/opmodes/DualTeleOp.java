@@ -19,9 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.commands.driving.JoystickDriveCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
@@ -49,7 +47,7 @@ public class DualTeleOp extends CommandOpMode {
             CommandScheduler.scheduleForState(
                 new SequentialCommandGroup(
                     HeadingHelper.RestorePreviousPosition(robot.follower),
-                    DrivingCommands.ResetGyro(robot.drivebase)
+                    DrivingCommands.ResetGyro(controlsDriver.pedroDriver)
                 ),
                 OpModeState.INIT
             );

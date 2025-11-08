@@ -31,9 +31,9 @@ public class DriveForward extends CommandOpMode {
         // robot.drivebase.setPoseEstimate(PathConstants.BACKWARD.toPose());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                new DriveAutoCommand(robot.drivebase, 0.5),
+                new DriveAutoCommand(robot.follower, 0.5),
                 new WaitCommand(0.3),
-                new DriveAutoCommand(robot.drivebase, 0),
+                new DriveAutoCommand(robot.follower, 0),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN

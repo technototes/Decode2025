@@ -32,7 +32,7 @@ import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
                    [Audience]
  */
 
-public class Driver implements Command, Loggable {
+public class PedroDriver implements Command, Loggable {
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -180,7 +180,7 @@ public class Driver implements Command, Loggable {
         return driveMode;
     }
 
-    public Driver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll, Alliance all) {
+    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll, Alliance all) {
         // TODO: Throw an exception or log if there's some problem with constants.
         // i.e. DEAD_ZONE is negative, or greater than 1.0
         limelight = ll;
@@ -196,15 +196,15 @@ public class Driver implements Command, Loggable {
         EnableFreeDriving();
     }
 
-    public Driver(Follower fol, Stick xyStick, Stick rotStick) {
+    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick) {
         this(fol, xyStick, rotStick, null, Alliance.NONE);
     }
 
-    public Driver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll) {
+    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll) {
         this(fol, xyStick, rotStick, ll, Alliance.NONE);
     }
 
-    public Driver(Follower fol, Stick xyStick, Stick rotStick, Alliance al) {
+    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, Alliance al) {
         this(fol, xyStick, rotStick, null, al);
     }
 
