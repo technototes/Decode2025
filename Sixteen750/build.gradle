@@ -30,3 +30,4 @@ dependencies {
     implementation project(':FtcRobotController')
     // Uncomment this to use a local version of TechnoLib
     implementation project(':RobotLibrary') // FLIP: TechnoLibLocal
+}
