@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.twenty403.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.hardware.motor.CRServo;
@@ -19,7 +20,7 @@ public class LauncherSubsystem implements Loggable {
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
     private double currentTargetVelocity = TARGET_MOTOR_VELOCITY;
-    public PIDFCoefficients launcherPIDF = new PIDFCoefficients(1.3, 0.0, 0.0, 13.44);
+    public PIDFCoefficients launcherPIDF = new PIDFCoefficients(1.6 , 0.0, 0.0, 13 );
 
     @Log(name = "Launcher Velo: ")
     public static double READ_MOTOR_VELOCITY;
@@ -48,14 +49,14 @@ public class LauncherSubsystem implements Loggable {
     }
 
     public void IncreaseVelocity() {
-        currentTargetVelocity += 0.01;
+        currentTargetVelocity += 100;
         if (hasHardware && launching) {
             top.setVelocity(currentTargetVelocity);
         }
     }
 
     public void DecreaseVelocity() {
-        currentTargetVelocity -= 0.01;
+        currentTargetVelocity -= 100;
         if (hasHardware && launching) {
             top.setVelocity(currentTargetVelocity);
         }

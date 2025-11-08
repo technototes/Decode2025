@@ -39,7 +39,7 @@ public class FeedingSubsystem {
             //                // target velocity. We don't want bland throws.
             //                return;
             //            }
-            if (h.top.getVelocity() >= TARGET_MOTOR_VELOCITY && h.top.getVelocity() < 1320) {
+            if (h.top.getVelocity() >= TARGET_MOTOR_VELOCITY && h.top.getVelocity() < 1330) {
                 bottomRight.setPower(-CRSERVO_SPEED);
                 bottomLeft.setPower(CRSERVO_SPEED);
             }
