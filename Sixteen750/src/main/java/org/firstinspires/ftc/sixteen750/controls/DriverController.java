@@ -92,8 +92,8 @@ public class DriverController {
 
         // turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
         // turboButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
-        snailButton.whenPressed(DrivingCommands.SnailDriving(pedroDriver));
-        snailButton.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
+        snailButton.whenPressedReleased(DrivingCommands.SnailDriving(pedroDriver),
+                DrivingCommands.NormalDriving(pedroDriver));
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(pedroDriver));
         MotorDecrease.whenPressed(TeleCommands.DecreaseMotor(robot));
         MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));
