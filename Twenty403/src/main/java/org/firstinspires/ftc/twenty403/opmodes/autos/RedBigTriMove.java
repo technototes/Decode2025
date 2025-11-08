@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.twenty403.opmodes.autos;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.Pose;
@@ -32,7 +30,6 @@ public class RedBigTriMove extends CommandOpMode {
 
     @Override
     public void uponInit() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
         pathTimer = new Timer();
