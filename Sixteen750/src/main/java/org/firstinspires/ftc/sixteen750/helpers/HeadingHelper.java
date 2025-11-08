@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.sixteen750.helpers;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.technototes.library.command.Command;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
-@Config
+@Configurable
 public class HeadingHelper {
-
-    public static double DEFAULT_START_HEADING = 180;
-    public static double DEFAULT_START_X = 53;
-    public static double DEFAULT_START_Y = 63;
-    public static int EXPIRATION_TIME = 20;
 
     public double headingUpdateTime;
     public double lastHeading;
@@ -29,13 +25,29 @@ public class HeadingHelper {
         FtcRobotControllerActivity.SaveBetweenRuns = new HeadingHelper(x, y, h);
     }
 
-    // Need to rotate this clockwise by 90 degrees to get to RR coordinates
-    public static void savePose(Pose p) {
-        saveHeading(p.getY(), -p.getX(), p.getHeading() - Math.PI / 2);
+    public static Command SaveCurrentPosition(Follower f) {
+        return Command.create(() -> savePose(f.getPose()));
     }
 
-    public static void savePose(Pose2d p) {
+    public static Command RestorePreviousPosition(Follower f) {
+        return Command.create(() -> {
+            Pose p = getSavedPose();
+            if (p != null) {
+                f.setPose(getSavedPose());
+            }
+        });
+    }
+
+    public static void savePose(Pose p) {
         saveHeading(p.getX(), p.getY(), p.getHeading());
+    }
+
+    public static Pose getSavedPose() {
+        HeadingHelper hh = (HeadingHelper) FtcRobotControllerActivity.SaveBetweenRuns;
+        if (hh != null) {
+            return new Pose(hh.lastXPosition, hh.lastYPosition, hh.lastHeading);
+        }
+        return null;
     }
 
     public static void clearSavedInfo() {
@@ -48,16 +60,7 @@ public class HeadingHelper {
             return false;
         }
         double now = System.currentTimeMillis() / 1000.0;
-        return now < hh.headingUpdateTime + EXPIRATION_TIME;
-    }
-
-    public static Pose2d getSavedPose() {
-        return new Pose2d(-getSavedX(), getSavedY(), getSavedHeading());
-    }
-
-    // Rotate 90 degrees counter-clockwise to convert to Pedro
-    public static Pose getSavedPedroPose() {
-        return new Pose(-getSavedY(), getSavedX(), getSavedHeading() + Math.PI / 2);
+        return now < hh.headingUpdateTime + 45;
     }
 
     public static double getSavedHeading() {
@@ -65,7 +68,7 @@ public class HeadingHelper {
         if (hh != null) {
             return hh.lastHeading;
         }
-        return DEFAULT_START_HEADING;
+        return 0.0;
     }
 
     public static double getSavedX() {
@@ -73,7 +76,7 @@ public class HeadingHelper {
         if (hh != null) {
             return hh.lastXPosition;
         }
-        return DEFAULT_START_X;
+        return 0.0;
     }
 
     public static double getSavedY() {
@@ -81,6 +84,6 @@ public class HeadingHelper {
         if (hh != null) {
             return hh.lastYPosition;
         }
-        return DEFAULT_START_Y;
+        return 0.0;
     }
 }

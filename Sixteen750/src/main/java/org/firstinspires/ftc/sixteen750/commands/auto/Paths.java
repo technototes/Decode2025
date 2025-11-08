@@ -9,12 +9,8 @@ import com.technototes.library.command.Command;
 import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
-import com.technototes.path.command.TrajectorySequenceCommand;
-import org.firstinspires.ftc.sixteen750.AutoConstants;
-import org.firstinspires.ftc.sixteen750.PathConstants;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
-import org.firstinspires.ftc.sixteen750.subsystems.DrivebaseSubsystem;
 
 public class Paths {
 
@@ -60,13 +56,6 @@ public class Paths {
             new WaitCommand(2),
             TeleCommands.GateUp(r)
             // want to keep launcher running during auto also no need to stop intake
-        );
-    }
-
-    public static Command SidetoSideCommand(Robot r) {
-        return new SequentialCommandGroup(
-            new TrajectorySequenceCommand(r.drivebase, PathConstants.SIDE_LEFT_TO_SIDE_RIGHT),
-            new TrajectorySequenceCommand(r.drivebase, PathConstants.SIDE_RIGHT_TO_SIDE_LEFT)
         );
     }
 

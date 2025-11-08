@@ -11,6 +11,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import java.util.Arrays;
@@ -39,10 +40,12 @@ public class SingleTeleOp extends CommandOpMode {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new SingleController(driverGamepad, robot, setup);
-        robot.drivebase.setPoseEstimate(HeadingHelper.getSavedPose());
         //CommandScheduler.scheduleInit(HorizontalSlidesCommands.transferring(robot));
         CommandScheduler.scheduleForState(
-            DrivingCommands.ResetGyro(robot.drivebase),
+            new SequentialCommandGroup(
+                HeadingHelper.RestorePreviousPosition(robot.follower),
+                DrivingCommands.ResetGyro(robot.drivebase)
+            ),
             OpModeState.INIT
         );
         if (Setup.Connected.LIMELIGHT) {
