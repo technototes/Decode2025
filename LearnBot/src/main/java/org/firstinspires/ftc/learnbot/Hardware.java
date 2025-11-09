@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.learnbot;
 
+import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.digitalchickenlabs.OctoQuad;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -31,27 +32,25 @@ public class Hardware implements Loggable {
     public CRServo testCRServo;
     public Servo testServo;
     public SparkFunOTOS odo;
+    public Follower follower;
 
     /* Put other hardware here! */
 
     public Hardware(HardwareMap hwmap) {
         map = hwmap;
         hubs = hwmap.getAll(LynxModule.class);
-        if (false) {
-            // Setup.Connected.EXTERNALIMU) {
-            // imu = new AdafruitIMU(Setup.HardwareNames.EXTERNALIMU, AdafruitIMU.Orientation.Pitch);
-        } else {
-            imu = new IMU(
-                Setup.HardwareNames.IMU,
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
-            );
-        }
+        // imu = new AdafruitIMU(Setup.HardwareNames.EXTERNALIMU, AdafruitIMU.Orientation.Pitch);
+        imu = new IMU(
+            Setup.HardwareNames.IMU,
+            RevHubOrientationOnRobot.LogoFacingDirection.UP,
+            RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+        );
         if (Setup.Connected.DRIVEBASE) {
             fl = new EncodedMotor<>(Setup.HardwareNames.FLMOTOR);
             fr = new EncodedMotor<>(Setup.HardwareNames.FRMOTOR);
             rl = new EncodedMotor<>(Setup.HardwareNames.RLMOTOR);
             rr = new EncodedMotor<>(Setup.HardwareNames.RRMOTOR);
+            follower = DrivingConstants.createFollower(hwmap);
         }
         if (Setup.Connected.OTOS) {
             odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);

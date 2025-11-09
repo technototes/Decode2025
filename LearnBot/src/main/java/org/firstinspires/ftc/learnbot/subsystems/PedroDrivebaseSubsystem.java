@@ -1,38 +1,99 @@
-package org.firstinspires.ftc.learnbot.commands;
+package org.firstinspires.ftc.learnbot.subsystems;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.technototes.library.command.Command;
-import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
+import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
-import java.util.function.DoubleSupplier;
-import org.firstinspires.ftc.learnbot.DrivingConstants.Control;
-import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
+import org.firstinspires.ftc.learnbot.DrivingConstants;
 
-/* Recall, the Pedro Path coordinate system:
-                 [Refs/score table]
-+-------------------------------------------------+
-|(0,144)             ^ +y                (144,144)|
-|                                                 |
-|                    90 deg                       |
-|                                                 |
-|                                                 |
-| <== -x 180 deg     (72,72)        0 deg +x ==>  |
-|                                                 |
-|                                                 |
-| Red Drive Team                  Blue Drive Team |
-|                    270 deg                      |
-|(0,0)                v -y                 (144,0)|
-+-------------------------------------------------+
-                   [Audience]
- */
+public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
-public class Driver implements Command, Loggable {
+    public enum DrivingStyle {
+        Free, // Bot is free to move in all directions
+        Straight, // Bot will only move along the X or Y axis, but not both
+        Right, // Bot will hold a right angle while driving
+        Square, // Both Straight & Right driving styles
+        Hold, // Stay right where you are (just use Pedro)
+        Tangential_BORKED, // Aim tangent (inline) w/the bot's translational direction (NOT WORKING)
+        Vision_NYI, // Bot will use Vision to find the target & aim toward it (NOT YET IMPLEMENTED)
+        None,
+    }
+
+    public enum DrivingMode {
+        RobotCentric,
+        FieldCentric,
+        // NOT YET IMPLEMENTED
+        TargetBased_NYI,
+    }
+
+    // The PedroPath follower, to let us actually make the bot move:
+    public Follower follower;
+    // The vision subsystem, for vision-based driving stuff
+    public VisionSubsystem vision;
+
+    // The direction of the 3 axes for manual control
+    public double strafe, forward, rotation;
+
+    // This is the target Pose we're trying to reach
+    Pose targetPose;
+    // The offset heading for field-relative controls
+    double headingOffset;
+    // The current rotation scaling factor
+    double turnSpeed;
+    // used to keep the directions straight
+    Alliance alliance;
+    // Used to keep track of the previous drive style when using the "StayPut" operation
+    private DrivingStyle prevDriveStyle = DrivingStyle.None;
+    private double prevDriveSpeed = 0;
+    private double prevTurnSpeed = 0;
+
+    DrivingStyle driveStyle;
+    DrivingMode driveMode;
+    Pose holdPose;
+
+    public DrivingStyle getCurrentDriveStyle() {
+        return driveStyle;
+    }
+
+    public DrivingMode getCurrentDriveMode() {
+        return driveMode;
+    }
+
+    public PedroDrivebaseSubsystem(Follower f, VisionSubsystem viz, Alliance all) {
+        follower = f;
+        vision = viz;
+        headingOffset = 0.0;
+        alliance = all;
+        holdPose = null;
+        forward = 0;
+        strafe = 0;
+        rotation = 0;
+        SetNormalSpeed();
+        SetFieldCentricDriveMode();
+        EnableFreeDriving();
+    }
+
+    public PedroDrivebaseSubsystem(Follower f, Alliance all) {
+        this(f, null, all);
+    }
+
+    public PedroDrivebaseSubsystem(Follower f, VisionSubsystem viz) {
+        this(f, viz, Alliance.NONE);
+    }
+
+    public PedroDrivebaseSubsystem(Follower f) {
+        this(f, null, Alliance.NONE);
+    }
+
+    // Command to start autonomous driving)
+    // Command to start teleop driving
+    public void StartTele() {
+        follower.startTeleOpDrive();
+    }
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -40,18 +101,18 @@ public class Driver implements Command, Loggable {
     }
 
     public void SetSnailSpeed() {
-        follower.setMaxPowerScaling(Control.SNAIL_SPEED);
-        turnSpeed = Control.SNAIL_TURN;
+        follower.setMaxPowerScaling(DrivingConstants.Control.SNAIL_SPEED);
+        turnSpeed = DrivingConstants.Control.SNAIL_TURN;
     }
 
     public void SetNormalSpeed() {
-        follower.setMaxPowerScaling(Control.NORMAL_SPEED);
-        turnSpeed = Control.NORMAL_TURN;
+        follower.setMaxPowerScaling(DrivingConstants.Control.NORMAL_SPEED);
+        turnSpeed = DrivingConstants.Control.NORMAL_TURN;
     }
 
     public void SetTurboSpeed() {
-        follower.setMaxPowerScaling(Control.TURBO_SPEED);
-        turnSpeed = Control.TURBO_TURN;
+        follower.setMaxPowerScaling(DrivingConstants.Control.TURBO_SPEED);
+        turnSpeed = DrivingConstants.Control.TURBO_TURN;
     }
 
     private void switchDriveStyle(DrivingStyle style) {
@@ -84,7 +145,7 @@ public class Driver implements Command, Loggable {
     }
 
     public void EnableTangentialDriving() {
-        switchDriveStyle(DrivingStyle.Tangential);
+        switchDriveStyle(DrivingStyle.Tangential_BORKED);
     }
 
     public void HoldCurrentPosition() {
@@ -134,100 +195,14 @@ public class Driver implements Command, Loggable {
         }
     }
 
-    // The PedroPath follower, to let us actually make the bot move:
-    Follower follower;
-    // The sticks (probably each are CommandAxis suppliers)
-    // Note that the stick values returned are oriented like this:
-    // Up is a negative value, down is a positive value.
-    // Left is a negative value, right is a positive value.
-    DoubleSupplier x, y, r;
-    // This is the target Pose we're trying to reach
-    Pose targetPose;
-    // The offset heading for field-relative controls
-    double headingOffset;
-    // The current rotation scaling factor
-    double turnSpeed;
-    // Camera, for future use:
-    Limelight3A limelight;
-    // used to keep the directions straight
-    Alliance alliance;
-    // Used to keep track of the previous drive style when using the "StayPut" operation
-    private DrivingStyle prevDriveStyle = DrivingStyle.None;
-    private double prevDriveSpeed = 0;
-    private double prevTurnSpeed = 0;
-
-    public enum DrivingStyle {
-        // Validated:
-        Free, // Bot is free to move in all directions
-        // Validated:
-        Straight, // Bot will only move along the X or Y axis, but not both
-        // Validated:
-        Right, // Bot will hold a right angle while driving
-        // Validated:
-        Square, // Both Straight & Right driving styles
-        // Validated:
-        Hold, // Stay right where you are (just use Pedro)
-        // DOES NOT WORK:
-        Tangential, // Stay tangent to the bot's direction
-        // NOT YET IMPLEMENTED
-        Vision_NYI, // Bot will use Vision to find the target and aim toward it
-        None,
-    }
-
-    public enum DrivingMode {
-        RobotCentric,
-        FieldCentric,
-        // NOT YET IMPLEMENTED
-        TargetBased_NYI,
-    }
-
-    DrivingStyle driveStyle;
-    DrivingMode driveMode;
-    Pose holdPose;
-
-    public DrivingStyle getCurrentDriveStyle() {
-        return driveStyle;
-    }
-
-    public DrivingMode getCurrentDriveMode() {
-        return driveMode;
-    }
-
-    public Driver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll, Alliance all) {
-        // TODO: Throw an exception or log if there's some problem with constants.
-        // i.e. DEAD_ZONE is negative, or greater than 1.0
-        limelight = ll;
-        follower = fol;
-        headingOffset = 0.0;
-        alliance = all;
-        holdPose = null;
-        x = DeadZoneScale(xyStick.getXSupplier());
-        y = DeadZoneScale(xyStick.getYSupplier());
-        r = DeadZoneScale(rotStick.getXSupplier());
-        SetNormalSpeed();
-        SetFieldCentricDriveMode();
-        EnableFreeDriving();
-    }
-
-    public Driver(Follower fol, Stick xyStick, Stick rotStick) {
-        this(fol, xyStick, rotStick, null, Alliance.NONE);
-    }
-
-    public Driver(Follower fol, Stick xyStick, Stick rotStick, Limelight3A ll) {
-        this(fol, xyStick, rotStick, ll, Alliance.NONE);
-    }
-
-    public Driver(Follower fol, Stick xyStick, Stick rotStick, Alliance al) {
-        this(fol, xyStick, rotStick, null, al);
+    public void RegisterJoystickRead(double f, double s, double r) {
+        this.strafe = s;
+        this.forward = f;
+        this.rotation = r;
     }
 
     @Override
-    public void initialize() {
-        follower.startTeleOpDrive();
-    }
-
-    @Override
-    public void execute() {
+    public void periodic() {
         // If subsystem is busy it is running a path, just ignore the stick.
         ShowDriveInfo(driveStyle, driveMode, follower);
         if (follower.isBusy() || driveStyle == DrivingStyle.Hold) {
@@ -238,22 +213,20 @@ public class Driver implements Command, Loggable {
 
         // Recall that pushing a stick forward goes *negative* and pushing a stick to the left
         // goes *negative* as well (both are opposite Pedro's coordinate system)
-        double fwdVal = -y.getAsDouble();
-        double strafeVal = -x.getAsDouble();
         if (driveStyle == DrivingStyle.Straight || driveStyle == DrivingStyle.Square) {
             // for straight/square driving, we only use one of the two translation directions:
-            if (Math.abs(fwdVal) > Math.abs(strafeVal)) {
-                strafeVal = 0;
+            if (Math.abs(forward) > Math.abs(strafe)) {
+                strafe = 0;
             } else {
-                fwdVal = 0;
+                forward = 0;
             }
         }
         if (driveMode == DrivingMode.RobotCentric || driveMode == DrivingMode.FieldCentric) {
-            double rot = getRotation(fwdVal, strafeVal);
-            ShowDriveVectors(fwdVal, strafeVal, rot, headingOffset);
+            double rot = getRotation();
+            ShowDriveVectors(forward, strafe, rot, headingOffset);
             follower.setTeleOpDrive(
-                fwdVal,
-                strafeVal,
+                forward,
+                strafe,
                 rot,
                 driveMode == DrivingMode.RobotCentric,
                 headingOffset
@@ -274,10 +247,9 @@ public class Driver implements Command, Loggable {
         follower.update();
     }
 
-    double getRotation(double fwdVal, double strafeVal) {
+    double getRotation() {
         // Negative, because pushing left is negative, but that is a positive change in Pedro's
         // coordinate system.
-        double rotation = -r.getAsDouble();
         double curHeading = follower.getHeading() - headingOffset;
         double targetHeading = 0;
         switch (driveStyle) {
@@ -286,13 +258,13 @@ public class Driver implements Command, Loggable {
                 // Angle-focused driving styles override target-based driving mode
                 targetHeading = MathUtils.snapToNearestRadiansMultiple(curHeading, Math.PI / 2);
                 break;
-            case Tangential:
+            case Tangential_BORKED:
                 // Tangential is an angle-focused driving style, but the heading
                 // is strictly in the direction of the stick. Logically, this is an attempt to
                 // eliminate "actual" strafing: The robot should be oriented to drive forward in the
                 // direction of the stick
-                if (Math.abs(strafeVal) > 0 || Math.abs(fwdVal) > 0) {
-                    targetHeading = MathUtils.posNegRadians(Math.atan2(fwdVal, strafeVal));
+                if (Math.abs(strafe) > 0 || Math.abs(forward) > 0) {
+                    targetHeading = MathUtils.posNegRadians(Math.atan2(forward, strafe));
                     curHeading = MathUtils.posNegRadians(curHeading);
                 } else {
                     return 0;
@@ -313,30 +285,6 @@ public class Driver implements Command, Loggable {
         }
         // TODO: Use the Pedro heading PIDF to get this value?
         return (Math.clamp(targetHeading - curHeading, -1, 1) * turnSpeed);
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    // Helper to make dead zones on sticks still allow good scaling
-    private DoubleSupplier DeadZoneScale(DoubleSupplier ds) {
-        // Okay, we want a small dead zone in the middle of the stick, but that also means that
-        // you can't have a value any smaller than that value, so instead, we're going to scale
-        // the value after compensating for the dead zone
-        return () -> {
-            double val = ds.getAsDouble();
-            // If the value is inside the dead zone, just make it zero
-            if (Math.abs(val) <= Control.STICK_DEAD_ZONE) {
-                return 0.0;
-            }
-            // If the value is outside the dead zone, scale it
-            return (
-                (val - Math.copySign(Control.STICK_DEAD_ZONE, val)) /
-                (1.0 - Control.STICK_DEAD_ZONE)
-            );
-        };
     }
 
     // Everything below here is just for displaying/diagnostics
@@ -367,7 +315,7 @@ public class Driver implements Command, Loggable {
             case Hold:
                 drvMode = "!Hold!";
                 break;
-            case Tangential:
+            case Tangential_BORKED:
                 drvMode = "Tangent[NYI]";
                 break;
             case Vision_NYI:

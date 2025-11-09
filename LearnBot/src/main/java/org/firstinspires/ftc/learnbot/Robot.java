@@ -5,24 +5,25 @@ import com.pedropathing.follower.Follower;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
+import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
 
 @Configurable
 public class Robot implements Loggable {
 
-    public StartingPosition position;
     public Alliance alliance;
+    public StartingPosition position;
 
     public double initialVoltage;
     // Subsystems:
-    // (Currently, Mouse only has a single subsystem: THe drivebase)
-    public Follower follower;
+    // (Currently, Mouse only has a single subsystem: The drivebase)
+    public PedroDrivebaseSubsystem drivebase;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
         this.position = pos;
         this.alliance = team;
         this.initialVoltage = hw.voltage();
         if (Setup.Connected.DRIVEBASE) {
-            this.follower = DrivingConstants.createFollower(hw.map);
+            this.drivebase = new PedroDrivebaseSubsystem(hw.follower, team);
         }
     }
 
