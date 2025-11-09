@@ -3,12 +3,14 @@ package org.firstinspires.ftc.learnbot.subsystems;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
 import org.firstinspires.ftc.learnbot.DrivingConstants;
+import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
 
 public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
@@ -285,6 +287,10 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         }
         // TODO: Use the Pedro heading PIDF to get this value?
         return (Math.clamp(targetHeading - curHeading, -1, 1) * turnSpeed);
+    }
+
+    public PedroPathCommand MakePathCommand(PathChain p) {
+        return new PedroPathCommand(follower, p);
     }
 
     // Everything below here is just for displaying/diagnostics
