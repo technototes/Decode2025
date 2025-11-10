@@ -3,6 +3,7 @@ package org.firstinspires.ftc.learnbot.opmodes;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,7 +14,9 @@ import org.firstinspires.ftc.learnbot.Setup;
 import org.firstinspires.ftc.learnbot.subsystems.TestSubsystem;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+@SuppressWarnings("unused")
 @Configurable
+@Disabled
 @TeleOp(name = "Test Bed", group = "--Testing--")
 public class TestBedTele extends LinearOpMode {
 

@@ -4,7 +4,6 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -17,6 +16,14 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
     // Encapsulated to allow easy "previous driving style" tracking
     private static class DrivingStyle {
+
+        public DrivingStyle() {
+            perspective = DrivingPerspective.FieldCentric;
+            rotation = RotationalMode.Free;
+            translation = TranslationalMode.Free;
+            rotationSpeed = DrivingConstants.Control.NORMAL_TURN;
+            translationSpeed = DrivingConstants.Control.NORMAL_SPEED;
+        }
 
         public DrivingPerspective perspective;
         public RotationalMode rotation;
@@ -31,7 +38,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         Snap,
         Hold, // Hold the current heading
         Tangential_BORKED, // Aim toward the translational direction (NOT WORKING)
-        Vision_NYI, // Use Vision to find the target & aim toward it
+        Vision, // Use Vision to find the target & aim toward it
         Target_NYI, // The controller is used to specify a desired heading
         None,
     }
@@ -96,7 +103,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     }
 
     private double getHeadingOffsetRadians() {
-        return driveStyle.perspective == DrivingPerspective.RobotCentric ? headingOffsetRadians : 0;
+        return driveStyle.perspective == DrivingPerspective.FieldCentric ? headingOffsetRadians : 0;
     }
 
     public PedroDrivebaseSubsystem(Follower f, VisionSubsystem viz, Alliance all) {
@@ -220,7 +227,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     }
 
     public void EnableVisionDriving() {
-        switchDrivingMode(getTranslationalMode(), RotationalMode.Vision_NYI);
+        switchDrivingMode(getTranslationalMode(), RotationalMode.Vision);
     }
 
     public void SetRobotCentricDriveMode() {
@@ -347,11 +354,13 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
                     return 0;
                 }
                 break;
-            case Vision_NYI: // Use Vision to find the target & aim toward it
-                LLResult visResult = vision == null ? null : vision.getCurResult();
+            case Vision: // Use Vision to find the target & aim toward it
+                VisionSubsystem.TargetInfo visResult = vision == null
+                    ? null
+                    : vision.getCurResult();
                 if (visResult != null) {
                     // No idea if this is correct
-                    targetHeading = curHeading + Math.toRadians(visResult.getTx());
+                    targetHeading = curHeading + Math.toRadians(visResult.x);
                 } else {
                     return rotationTransform();
                 }
@@ -394,7 +403,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             case Tangential_BORKED:
                 drvMode = "rTangent";
                 break;
-            case Vision_NYI:
+            case Vision:
                 drvMode = "rVision[NYI]";
                 break;
             default:

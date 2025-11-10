@@ -37,6 +37,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
  *   and the ip address the Limelight device assigned the Control Hub and which is displayed in small text
  *   below the name of the Limelight on the top level configuration screen.
  */
+@SuppressWarnings("unused")
 @Disabled
 @Configurable
 @TeleOp(name = "Limelight Debug", group = "--Testing--")

@@ -72,6 +72,7 @@ public class DrivingConstants {
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
+    // Tristan says Kalman Filtering is for curve prediction, so...it helps predict ac/deceleration?
     public static FilteredPIDFCoefficients drivePID = new FilteredPIDFCoefficients(
         0.005,
         00.00001,
@@ -97,7 +98,7 @@ public class DrivingConstants {
     // while still saying the path is complete.
     public static double acceptableHeading = 2.5;
 
-    @Configurable
+    // @Configurable
     public static class OTOSConfig {
 
         public static double linearScalar = 1.4;
@@ -109,7 +110,7 @@ public class DrivingConstants {
         );
     }
 
-    @Configurable
+    // @Configurable
     public static class MotorLocConfig {
 
         public static double fwdTicksToInches = 135;
