@@ -5,6 +5,7 @@ import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.logger.Loggable;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
 @Configurable
 @SuppressWarnings("unused")
-@TeleOp(name = "Just Drive")
+@TeleOp(name = "Just drive")
 public class JustDriveTele extends CommandOpMode implements Loggable {
 
     public Robot robot;
@@ -31,6 +32,8 @@ public class JustDriveTele extends CommandOpMode implements Loggable {
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
+        hardware.follower.setPose(new Pose(0, 0, 0));
+        hardware.follower.update();
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
         CommandScheduler.scheduleInit(HeadingHelper.RestorePreviousPosition(robot.drivebase));

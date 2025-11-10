@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -14,22 +15,39 @@ import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
 
 public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
-    public enum DrivingStyle {
-        Free, // Bot is free to move in all directions
-        Straight, // Bot will only move along the X or Y axis, but not both
-        Right, // Bot will hold a right angle while driving
-        Square, // Both Straight & Right driving styles
-        Hold, // Stay right where you are (just use Pedro)
-        Tangential_BORKED, // Aim tangent (inline) w/the bot's translational direction (NOT WORKING)
-        Vision_NYI, // Bot will use Vision to find the target & aim toward it (NOT YET IMPLEMENTED)
+    private class DrivingStyle {
+
+        public DrivingPerspective perspective;
+        public RotationalMode rotation;
+        public TranslationalMode translation;
+        public double rotationSpeed;
+        public double translationSpeed;
+    }
+
+    // This concerns how the bot is rotating (or not)
+    public enum RotationalMode {
+        Free,
+        Snap,
+        Hold, // Hold the current heading
+        Tangential_BORKED, // Aim toward the translational direction (NOT WORKING)
+        Vision_NYI, // Use Vision to find the target & aim toward it
+        Target_NYI, // The controller is used to specify a desired heading
         None,
     }
 
-    public enum DrivingMode {
+    // This concerns how the bot is moving around the field
+    public enum TranslationalMode {
+        Free,
+        Square,
+        Hold,
+        Vision_NYI, // Drive toward the target using vision
+        Target_NYI, // Drive toward an external target (that is movable using the controller)
+        None,
+    }
+
+    public enum DrivingPerspective {
         RobotCentric,
         FieldCentric,
-        // NOT YET IMPLEMENTED
-        TargetBased_NYI,
     }
 
     // The PedroPath follower, to let us actually make the bot move:
@@ -37,43 +55,57 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     // The vision subsystem, for vision-based driving stuff
     public VisionSubsystem vision;
 
-    // The direction of the 3 axes for manual control
+    // The direction of the 3 axes for manual control: Should be updated by a joystick command
     public double strafe, forward, rotation;
 
-    // This is the target Pose we're trying to reach
-    Pose targetPose;
     // The offset heading for field-relative controls
     double headingOffset;
-    // The current rotation scaling factor
-    double turnSpeed;
     // used to keep the directions straight
     Alliance alliance;
+
     // Used to keep track of the previous drive style when using the "StayPut" operation
-    private DrivingStyle prevDriveStyle = DrivingStyle.None;
-    private double prevDriveSpeed = 0;
-    private double prevTurnSpeed = 0;
+    private DrivingStyle prevDriveStyle;
+
+    public double[] snapRadians;
 
     DrivingStyle driveStyle;
-    DrivingMode driveMode;
-    Pose holdPose;
 
-    public DrivingStyle getCurrentDriveStyle() {
-        return driveStyle;
+    Pose holdPose;
+    boolean started;
+
+    public RotationalMode getRotationalMode() {
+        return driveStyle.rotation;
     }
 
-    public DrivingMode getCurrentDriveMode() {
-        return driveMode;
+    public TranslationalMode getTranslationalMode() {
+        return driveStyle.translation;
+    }
+
+    public DrivingPerspective getPerspective() {
+        return driveStyle.perspective;
+    }
+
+    private double baseHeadingOffset() {
+        return alliance == Alliance.BLUE ? Math.PI : 0;
+    }
+
+    private double getHeadingOffset() {
+        return driveStyle.perspective == DrivingPerspective.RobotCentric ? headingOffset : 0;
     }
 
     public PedroDrivebaseSubsystem(Follower f, VisionSubsystem viz, Alliance all) {
+        started = false;
         follower = f;
         vision = viz;
-        headingOffset = 0.0;
         alliance = all;
+        headingOffset = baseHeadingOffset();
         holdPose = null;
         forward = 0;
         strafe = 0;
         rotation = 0;
+        driveStyle = new DrivingStyle();
+        // You need the 360 there for "wrap-around" to work properly
+        snapRadians = new double[] { 0, Math.PI / 2, Math.PI, (Math.PI * 3) / 2, 2 * Math.PI };
         SetNormalSpeed();
         SetFieldCentricDriveMode();
         EnableFreeDriving();
@@ -94,106 +126,133 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     // Command to start autonomous driving)
     // Command to start teleop driving
     public void StartTele() {
+        started = true;
         follower.startTeleOpDrive();
+        follower.update();
     }
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
-        headingOffset = follower.getHeading();
+        headingOffset = MathUtils.normalizeRadians(
+            follower.getHeading() + (alliance == Alliance.BLUE ? Math.PI : 0)
+        );
     }
 
     public void SetSnailSpeed() {
         follower.setMaxPowerScaling(DrivingConstants.Control.SNAIL_SPEED);
-        turnSpeed = DrivingConstants.Control.SNAIL_TURN;
+        driveStyle.translationSpeed = DrivingConstants.Control.SNAIL_SPEED;
+        driveStyle.rotationSpeed = DrivingConstants.Control.SNAIL_TURN;
     }
 
     public void SetNormalSpeed() {
         follower.setMaxPowerScaling(DrivingConstants.Control.NORMAL_SPEED);
-        turnSpeed = DrivingConstants.Control.NORMAL_TURN;
+        driveStyle.translationSpeed = DrivingConstants.Control.NORMAL_SPEED;
+        driveStyle.rotationSpeed = DrivingConstants.Control.NORMAL_TURN;
     }
 
     public void SetTurboSpeed() {
         follower.setMaxPowerScaling(DrivingConstants.Control.TURBO_SPEED);
-        turnSpeed = DrivingConstants.Control.TURBO_TURN;
+        driveStyle.translationSpeed = DrivingConstants.Control.TURBO_SPEED;
+        driveStyle.rotationSpeed = DrivingConstants.Control.TURBO_TURN;
     }
 
-    private void switchDriveStyle(DrivingStyle style) {
-        if (driveStyle == style) {
+    private void switchDrivingMode(TranslationalMode x, RotationalMode r) {
+        TranslationalMode px = driveStyle.translation;
+        RotationalMode pr = driveStyle.rotation;
+
+        if (px == x && pr == r) {
             return;
         }
-        if (driveStyle == DrivingStyle.Hold) {
+        driveStyle.translation = x;
+        driveStyle.rotation = r;
+        if (px == TranslationalMode.Hold && x != TranslationalMode.Hold) {
             // If we're currently holding a position, stop doing so
-            follower.startTeleOpDrive();
+            StartTele();
             holdPose = null;
-        }
-        driveStyle = style;
-        // If we've switched *to* holding a pose, start the follower
-        if (style == DrivingStyle.Hold) {
+        } else if (px != TranslationalMode.Hold && x == TranslationalMode.Hold) {
+            // If we've switched *to* holding a pose, start the follower
             holdPose = follower.getPose();
             follower.holdPoint(new BezierPoint(holdPose), holdPose.getHeading(), false);
         }
     }
 
-    public void EnableStraightDriving() {
-        switchDriveStyle(DrivingStyle.Straight);
+    public void EnableFreeDriving() {
+        switchDrivingMode(TranslationalMode.Free, RotationalMode.Free);
     }
 
-    public void EnableSnap90Driving() {
-        switchDriveStyle(DrivingStyle.Right);
+    public void EnableStraightDriving() {
+        switchDrivingMode(TranslationalMode.Square, RotationalMode.Free);
+    }
+
+    public void EnableSnapDriving() {
+        switchDrivingMode(getTranslationalMode(), RotationalMode.Snap);
+    }
+
+    // The list of rotation points (in degrees) you want to snap to.
+    public void EnableSnapDriving(double... degrees) {
+        snapRadians = new double[degrees.length + 1];
+        for (int i = 0; i < degrees.length; i++) {
+            snapRadians[i] = Math.toRadians(degrees[i]);
+        }
+        // For wrap-around to work properly, we'll add the first location, but past the wrap-around
+        // point of the circle. So, if you want to snap to 15 and 170, we'll append 375 so that 344
+        // will wind up going to 375 (which then normalizes back to 15). Neat, huh?
+        snapRadians[degrees.length] = snapRadians[0] + Math.PI * 2;
+        switchDrivingMode(getTranslationalMode(), RotationalMode.Snap);
     }
 
     public void EnableSquareDriving() {
-        switchDriveStyle(DrivingStyle.Square);
+        switchDrivingMode(TranslationalMode.Square, RotationalMode.Snap);
     }
 
     public void EnableTangentialDriving() {
-        switchDriveStyle(DrivingStyle.Tangential_BORKED);
+        switchDrivingMode(getTranslationalMode(), RotationalMode.Tangential_BORKED);
     }
 
     public void HoldCurrentPosition() {
-        switchDriveStyle(DrivingStyle.Hold);
+        switchDrivingMode(TranslationalMode.Hold, RotationalMode.Hold);
     }
 
     public void EnableVisionDriving() {
-        switchDriveStyle(DrivingStyle.Vision_NYI);
-    }
-
-    public void EnableFreeDriving() {
-        switchDriveStyle(DrivingStyle.Free);
+        switchDrivingMode(getTranslationalMode(), RotationalMode.Vision_NYI);
     }
 
     public void SetRobotCentricDriveMode() {
-        driveMode = DrivingMode.RobotCentric;
+        driveStyle.perspective = DrivingPerspective.RobotCentric;
     }
 
     public void SetFieldCentricDriveMode() {
-        driveMode = DrivingMode.FieldCentric;
+        driveStyle.perspective = DrivingPerspective.FieldCentric;
     }
 
-    public void SetTargetBasedDriveMode() {
-        driveMode = DrivingMode.TargetBased_NYI;
+    // This, when well tuned, should allow the driver to ignore minor bot-bumps and the like.
+    public void SetTargetBasedRotation() {
+        driveStyle.rotation = RotationalMode.Target_NYI;
+    }
+
+    // This, when well tuned, should allow the programmers to ignore frictional differences between
+    // wheels on the drivebase...
+    public void SetTargetBasedTranslation() {
+        driveStyle.translation = TranslationalMode.Target_NYI;
     }
 
     // Some just slightly more complex commands:
     public void StayPut() {
-        if (prevDriveStyle == DrivingStyle.None) {
+        if (prevDriveStyle == null) {
             prevDriveStyle = driveStyle;
-            prevDriveSpeed = follower.getMaxPowerScaling();
-            prevTurnSpeed = turnSpeed;
         }
+        driveStyle = new DrivingStyle();
         HoldCurrentPosition();
         SetTurboSpeed();
     }
 
     public void ResumeDriving() {
-        if (prevDriveStyle == DrivingStyle.None) {
+        if (prevDriveStyle == null) {
             EnableFreeDriving();
             SetNormalSpeed();
         } else {
-            switchDriveStyle(prevDriveStyle);
-            follower.setMaxPowerScaling(prevDriveSpeed);
-            turnSpeed = prevTurnSpeed;
-            prevDriveStyle = DrivingStyle.None;
+            driveStyle = prevDriveStyle;
+            prevDriveStyle = null;
         }
     }
 
@@ -206,34 +265,39 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     @Override
     public void periodic() {
         // If subsystem is busy it is running a path, just ignore the stick.
-        ShowDriveInfo(driveStyle, driveMode, follower);
-        if (follower.isBusy() || driveStyle == DrivingStyle.Hold) {
+        ShowDriveInfo(driveStyle, follower);
+        if (follower == null) {
+            return;
+        }
+        if (follower.isBusy()) {
             follower.update();
             drvVec = "busy";
+            return;
+        }
+        if (!started) {
             return;
         }
 
         // Recall that pushing a stick forward goes *negative* and pushing a stick to the left
         // goes *negative* as well (both are opposite Pedro's coordinate system)
-        if (driveStyle == DrivingStyle.Straight || driveStyle == DrivingStyle.Square) {
-            // for straight/square driving, we only use one of the two translation directions:
+        if (driveStyle.translation == TranslationalMode.Square) {
+            // for square driving, we only use one of the two translation directions:
             if (Math.abs(forward) > Math.abs(strafe)) {
                 strafe = 0;
             } else {
                 forward = 0;
             }
         }
-        if (driveMode == DrivingMode.RobotCentric || driveMode == DrivingMode.FieldCentric) {
-            double rot = getRotation();
-            ShowDriveVectors(forward, strafe, rot, headingOffset);
-            follower.setTeleOpDrive(
-                forward,
-                strafe,
-                rot,
-                driveMode == DrivingMode.RobotCentric,
-                headingOffset
-            );
-        }
+        double rot = getRotation();
+        ShowDriveVectors(forward, strafe, rot, headingOffset);
+        follower.setTeleOpDrive(
+            forward,
+            strafe,
+            rot,
+            driveStyle.perspective == DrivingPerspective.RobotCentric,
+            headingOffset
+        );
+        follower.update();
 
         // target based driving:
         // The idea is that we have a location along the edge of the field that indicates which
@@ -245,48 +309,52 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         // drivebase will compensate automatically. The hypothesis (not yet tested at all) is that
         // different friction between motors, motor speeds, etc... will be less frustrating to deal
         // with, as well..
-
-        follower.update();
     }
 
     double getRotation() {
         // Negative, because pushing left is negative, but that is a positive change in Pedro's
         // coordinate system.
-        double curHeading = follower.getHeading() - headingOffset;
+        double curHeading = follower.getHeading() - getHeadingOffset();
         double targetHeading = 0;
-        switch (driveStyle) {
-            case Right:
-            case Square:
+        switch (driveStyle.rotation) {
+            case Free:
+                return rotation;
+            case Snap:
                 // Angle-focused driving styles override target-based driving mode
-                targetHeading = MathUtils.snapToNearestRadiansMultiple(curHeading, Math.PI / 2);
+                targetHeading = MathUtils.closestTo(curHeading, snapRadians);
                 break;
-            case Tangential_BORKED:
+            case Hold:
+                // Hold the current heading
+                if (driveStyle.translation != TranslationalMode.Hold) {
+                    targetHeading = holdPose.getHeading() - getHeadingOffset();
+                }
+                break;
+            case Tangential_BORKED: // Aim toward the translational direction (NOT WORKING)
                 // Tangential is an angle-focused driving style, but the heading
                 // is strictly in the direction of the stick. Logically, this is an attempt to
                 // eliminate "actual" strafing: The robot should be oriented to drive forward in the
                 // direction of the stick
                 if (Math.abs(strafe) > 0 || Math.abs(forward) > 0) {
-                    targetHeading = MathUtils.posNegRadians(Math.atan2(forward, strafe));
+                    targetHeading = MathUtils.posNegRadians(Math.atan2(strafe, forward));
                     curHeading = MathUtils.posNegRadians(curHeading);
                 } else {
                     return 0;
                 }
                 break;
-            case Vision_NYI:
-                // TODO: Implement this (turn toward a target based on LimeLight)
-                return 0;
-            case Free:
-            case Straight:
-            default:
-                if (driveMode != DrivingMode.TargetBased_NYI) {
-                    return rotation * turnSpeed;
+            case Vision_NYI: // Use Vision to find the target & aim toward it
+                LLResult visResult = vision == null ? null : vision.getCurResult();
+                if (visResult != null) {
+                    // No idea if this is correct
+                    targetHeading = curHeading + Math.toRadians(visResult.getTx());
                 } else {
-                    // TODO: implement this (Turn toward the target)
-                    targetHeading = 0.0;
+                    return rotation;
                 }
+                break;
+            case Target_NYI: // The controller is used to specify a desired heading
+                return rotation;
         }
         // TODO: Use the Pedro heading PIDF to get this value?
-        return (Math.clamp(targetHeading - curHeading, -1, 1) * turnSpeed);
+        return (Math.clamp(targetHeading - curHeading, -1, 1) * driveStyle.rotationSpeed);
     }
 
     public PedroPathCommand MakePathCommand(PathChain p) {
@@ -304,48 +372,56 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     @Log(name = "Pose")
     public static String drvLoc = "";
 
-    private static void ShowDriveInfo(DrivingStyle driveStyle, DrivingMode driveMode, Follower f) {
-        switch (driveStyle) {
+    private static void ShowDriveInfo(DrivingStyle driveStyle, Follower f) {
+        switch (driveStyle.rotation) {
             case Free:
-                drvMode = "Free";
+                drvMode = "rFree";
                 break;
-            case Straight:
-                drvMode = "Straight";
-                break;
-            case Right:
-                drvMode = "Right";
-                break;
-            case Square:
-                drvMode = "Square";
+            case Snap:
+                drvMode = "rSnap";
                 break;
             case Hold:
-                drvMode = "!Hold!";
+                drvMode = "rHold";
                 break;
             case Tangential_BORKED:
-                drvMode = "Tangent[NYI]";
+                drvMode = "rTangent";
                 break;
             case Vision_NYI:
-                drvMode = "Vision[NYI]";
+                drvMode = "rVision[NYI]";
                 break;
             default:
-                drvMode = "Unknown";
+                drvMode = "rUnknown";
                 break;
         }
-        switch (driveMode) {
+        switch (driveStyle.translation) {
+            case Free:
+                drvMode += "xFree";
+                break;
+            case Square:
+                drvMode += "xSquare";
+                break;
+            case Hold:
+                drvMode += "xHold";
+                break;
+            case Vision_NYI:
+                drvMode += "xVision[NYI]";
+                break;
+            default:
+                drvMode += "xUnknown";
+                break;
+        }
+        switch (driveStyle.perspective) {
             case RobotCentric:
-                drvMode += " Bot-Centric";
+                drvMode += ":Bot-Centric";
                 break;
             case FieldCentric:
-                drvMode += " Field-Centric";
-                break;
-            case TargetBased_NYI:
-                drvMode += " Target-Based[NYI]";
+                drvMode += ":Field-Centric";
                 break;
             default:
-                drvMode += " [Unknown]";
+                drvMode += ":[Unknown]";
                 break;
         }
-        drvMode += String.format(" Max:%.2f", f.getMaxPowerScaling());
+        drvMode += String.format(" Max:%.2f", driveStyle.translationSpeed);
         Pose curPose = f.getPose();
         drvLoc = String.format(
             "X:%.2f Y:%.2f H:%.1f°",

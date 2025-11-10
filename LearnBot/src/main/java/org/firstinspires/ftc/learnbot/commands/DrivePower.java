@@ -8,15 +8,6 @@ public class DrivePower implements Command {
     public Follower follower;
     double[] p;
 
-    public DrivePower(Follower f, double power) {
-        follower = f;
-        p = new double[4];
-        p[0] = power;
-        p[1] = power;
-        p[2] = power;
-        p[3] = power;
-    }
-
     public DrivePower(Follower f, double p1, double p2, double p3, double p4) {
         follower = f;
         p = new double[4];
@@ -24,6 +15,10 @@ public class DrivePower implements Command {
         p[1] = p2;
         p[2] = p3;
         p[3] = p4;
+    }
+
+    public DrivePower(Follower f, double power) {
+        this(f, power, power, power, power);
     }
 
     @Override

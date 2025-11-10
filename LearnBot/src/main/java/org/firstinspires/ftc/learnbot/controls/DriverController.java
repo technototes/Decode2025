@@ -74,7 +74,7 @@ public class DriverController implements Loggable {
         }
 
         snap90Button.whenPressedReleased(
-            robot.drivebase::EnableSnap90Driving,
+            robot.drivebase::EnableSnapDriving,
             robot.drivebase::EnableFreeDriving
         );
         squareButton.whenPressedReleased(

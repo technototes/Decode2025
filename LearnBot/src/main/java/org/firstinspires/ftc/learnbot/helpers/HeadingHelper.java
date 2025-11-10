@@ -34,7 +34,7 @@ public class HeadingHelper {
         return Command.create(() -> {
             Pose p = getSavedPose();
             if (p != null) {
-                db.follower.setPose(getSavedPose());
+                db.follower.setPose(p);
             }
         });
     }
