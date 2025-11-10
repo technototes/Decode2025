@@ -23,7 +23,11 @@ public class Robot implements Loggable {
         this.alliance = team;
         this.initialVoltage = hw.voltage();
         if (Setup.Connected.DRIVEBASE) {
-            this.drivebase = new PedroDrivebaseSubsystem(hw.follower, team);
+            if (Setup.Connected.LIMELIGHT) {
+                this.drivebase = new PedroDrivebaseSubsystem(hw.follower, hw.limelight, team);
+            } else {
+                this.drivebase = new PedroDrivebaseSubsystem(hw.follower, team);
+            }
         }
     }
 

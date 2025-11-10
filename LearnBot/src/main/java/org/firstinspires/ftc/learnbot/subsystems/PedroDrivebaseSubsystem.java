@@ -15,7 +15,8 @@ import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
 
 public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
-    private class DrivingStyle {
+    // Encapsulated to allow easy "previous driving style" tracking
+    private static class DrivingStyle {
 
         public DrivingPerspective perspective;
         public RotationalMode rotation;
@@ -58,8 +59,13 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     // The direction of the 3 axes for manual control: Should be updated by a joystick command
     public double strafe, forward, rotation;
 
+    // TODO: Make this do something...PID related, maybe?
+    public double rotationTransform() {
+        return Math.cbrt(rotation) * driveStyle.rotationSpeed;
+    }
+
     // The offset heading for field-relative controls
-    double headingOffset;
+    double headingOffsetRadians;
     // used to keep the directions straight
     Alliance alliance;
 
@@ -89,8 +95,8 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         return alliance == Alliance.BLUE ? Math.PI : 0;
     }
 
-    private double getHeadingOffset() {
-        return driveStyle.perspective == DrivingPerspective.RobotCentric ? headingOffset : 0;
+    private double getHeadingOffsetRadians() {
+        return driveStyle.perspective == DrivingPerspective.RobotCentric ? headingOffsetRadians : 0;
     }
 
     public PedroDrivebaseSubsystem(Follower f, VisionSubsystem viz, Alliance all) {
@@ -98,7 +104,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         follower = f;
         vision = viz;
         alliance = all;
-        headingOffset = baseHeadingOffset();
+        headingOffsetRadians = baseHeadingOffset();
         holdPose = null;
         forward = 0;
         strafe = 0;
@@ -133,8 +139,8 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
-        headingOffset = MathUtils.normalizeRadians(
-            follower.getHeading() + (alliance == Alliance.BLUE ? Math.PI : 0)
+        headingOffsetRadians = MathUtils.normalizeRadians(
+            follower.getHeading() + baseHeadingOffset()
         );
     }
 
@@ -289,13 +295,13 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             }
         }
         double rot = getRotation();
-        ShowDriveVectors(forward, strafe, rot, headingOffset);
+        ShowDriveVectors(forward, strafe, rot, getHeadingOffsetRadians());
         follower.setTeleOpDrive(
             forward,
             strafe,
             rot,
             driveStyle.perspective == DrivingPerspective.RobotCentric,
-            headingOffset
+            getHeadingOffsetRadians()
         );
         follower.update();
 
@@ -314,11 +320,11 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     double getRotation() {
         // Negative, because pushing left is negative, but that is a positive change in Pedro's
         // coordinate system.
-        double curHeading = follower.getHeading() - getHeadingOffset();
+        double curHeading = follower.getHeading() - getHeadingOffsetRadians();
         double targetHeading = 0;
         switch (driveStyle.rotation) {
             case Free:
-                return rotation;
+                return rotationTransform();
             case Snap:
                 // Angle-focused driving styles override target-based driving mode
                 targetHeading = MathUtils.closestTo(curHeading, snapRadians);
@@ -326,7 +332,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             case Hold:
                 // Hold the current heading
                 if (driveStyle.translation != TranslationalMode.Hold) {
-                    targetHeading = holdPose.getHeading() - getHeadingOffset();
+                    targetHeading = holdPose.getHeading() - getHeadingOffsetRadians();
                 }
                 break;
             case Tangential_BORKED: // Aim toward the translational direction (NOT WORKING)
@@ -347,11 +353,13 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
                     // No idea if this is correct
                     targetHeading = curHeading + Math.toRadians(visResult.getTx());
                 } else {
-                    return rotation;
+                    return rotationTransform();
                 }
                 break;
             case Target_NYI: // The controller is used to specify a desired heading
-                return rotation;
+                return rotationTransform();
+            default:
+                return 0;
         }
         // TODO: Use the Pedro heading PIDF to get this value?
         return (Math.clamp(targetHeading - curHeading, -1, 1) * driveStyle.rotationSpeed);

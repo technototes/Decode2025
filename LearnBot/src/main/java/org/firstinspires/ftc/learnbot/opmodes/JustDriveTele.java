@@ -19,7 +19,7 @@ import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
 @Configurable
 @SuppressWarnings("unused")
-@TeleOp(name = "Just drive")
+@TeleOp(name = "JustDrive")
 public class JustDriveTele extends CommandOpMode implements Loggable {
 
     public Robot robot;

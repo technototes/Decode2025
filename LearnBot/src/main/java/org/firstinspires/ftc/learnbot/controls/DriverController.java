@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.learnbot.controls;
 
 import com.technototes.library.command.CycleCommandGroup;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
@@ -57,6 +58,8 @@ public class DriverController implements Loggable {
         normalButton = gamepad.dpadRight;
         snailButton = gamepad.dpadDown;
         holdPosButton = gamepad.dpadLeft;
+
+        visionButton = gamepad.ps_circle;
     }
 
     public void bindDriveControls() {
@@ -93,7 +96,7 @@ public class DriverController implements Loggable {
 
         resetGyroButton.whenPressed(robot.drivebase::ResetGyro);
         // This is a nifty feature students built last year: We can *cycle* through commands!
-        botFieldToggleButton.whenPressed(
+        botFieldToggleButton.whenReleased(
             new CycleCommandGroup(
                 robot.drivebase::SetRobotCentricDriveMode,
                 robot.drivebase::SetFieldCentricDriveMode
