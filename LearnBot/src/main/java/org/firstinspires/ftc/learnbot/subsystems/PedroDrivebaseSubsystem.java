@@ -201,16 +201,21 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         switchDrivingMode(getTranslationalMode(), RotationalMode.Snap);
     }
 
-    // The list of rotation points (in degrees) you want to snap to.
+    // The list of rotation points (in degrees) you want to snap to,
+    // in the range of 0 to 359.9999999 degrees
     public void EnableSnapDriving(double... degrees) {
         snapRadians = new double[degrees.length + 1];
+        double lowest = Math.PI * 2;
         for (int i = 0; i < degrees.length; i++) {
-            snapRadians[i] = Math.toRadians(degrees[i]);
+            snapRadians[i] = MathUtils.normalizeRadians(Math.toRadians(degrees[i]));
+            if (snapRadians[i] < lowest) {
+                lowest = snapRadians[i];
+            }
         }
         // For wrap-around to work properly, we'll add the first location, but past the wrap-around
         // point of the circle. So, if you want to snap to 15 and 170, we'll append 375 so that 344
         // will wind up going to 375 (which then normalizes back to 15). Neat, huh?
-        snapRadians[degrees.length] = snapRadians[0] + Math.PI * 2;
+        snapRadians[degrees.length] = lowest + Math.PI * 2;
         switchDrivingMode(getTranslationalMode(), RotationalMode.Snap);
     }
 
@@ -371,7 +376,10 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
                 return 0;
         }
         // TODO: Use the Pedro heading PIDF to get this value?
-        return (Math.clamp(targetHeading - curHeading, -1, 1) * driveStyle.rotationSpeed);
+        return (
+            Math.clamp(MathUtils.posNegRadians(targetHeading - curHeading), -1, 1) *
+            driveStyle.rotationSpeed
+        );
     }
 
     public PedroPathCommand MakePathCommand(PathChain p) {
