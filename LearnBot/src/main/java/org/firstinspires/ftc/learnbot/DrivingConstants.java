@@ -27,14 +27,14 @@ public class DrivingConstants {
     public static class Control {
 
         // Max power scaling for translational driving:
-        public static double SNAIL_SPEED = 0.35;
-        public static double NORMAL_SPEED = 0.75;
+        public static double SNAIL_SPEED = 0.40;
+        public static double NORMAL_SPEED = 0.8;
         public static double TURBO_SPEED = 1.0;
         public static double AUTO_SPEED = 0.95;
 
         // The 'fastest' the robot can turn (0: not turning, 1.0: Fastest possible)
-        public static double SNAIL_TURN = 0.2;
-        public static double NORMAL_TURN = 0.4;
+        public static double SNAIL_TURN = 0.25;
+        public static double NORMAL_TURN = 0.5;
         public static double TURBO_TURN = 1.0;
 
         public static double STICK_DEAD_ZONE = 0.05;
@@ -82,7 +82,7 @@ public class DrivingConstants {
     );
 
     // The percent of a path that must be complete for Pedro to decide it's done
-    public static double tValueContraint = 0.98;
+    public static double tValueContraint = 0.99;
 
     // Time, in *milliseconds*, to let the follower algorithm correct
     // before the path is considered "complete".
@@ -90,13 +90,13 @@ public class DrivingConstants {
 
     // The maximum velocity (in inches/second) the bot can be moving while still
     // saying the path is complete.
-    public static double acceptableVelocity = 1.0;
+    public static double acceptableVelocity = 0.5;
     // The maximum distance (in inches) the bot can be from the path end
     // while still saying the path is complete.
-    public static double acceptableDistance = 2.0;
+    public static double acceptableDistance = 0.75;
     // The maximum heading error (in degrees) the bot can be from the path end
     // while still saying the path is complete.
-    public static double acceptableHeading = 2.5;
+    public static double acceptableHeading = 1.5;
 
     // @Configurable
     public static class OTOSConfig {

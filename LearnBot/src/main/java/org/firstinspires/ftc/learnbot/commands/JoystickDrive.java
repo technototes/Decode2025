@@ -53,7 +53,8 @@ public class JoystickDrive implements Command, Loggable {
     public void execute() {
         // Read the stick values, and pass them to the drive base.
         // We invert the signs because both up and left are negative, which is opposite Pedro.
-        // The drivebase can do all the filtering & drive mode shenanigans it wants.
+        // The drivebase can do all the filtering & drive mode shenanigans it wants. We're just
+        // here to read the joysticks and send the values to the drivebase...
         double fwdVal = -y.getAsDouble();
         double strafeVal = -x.getAsDouble();
         double rotVal = -r.getAsDouble();

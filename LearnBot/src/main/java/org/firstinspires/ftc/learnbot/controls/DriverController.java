@@ -11,6 +11,7 @@ import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup.Connected;
 import org.firstinspires.ftc.learnbot.Setup.OtherSettings;
 import org.firstinspires.ftc.learnbot.commands.JoystickDrive;
+import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
 
 public class DriverController implements Loggable {
 
@@ -25,10 +26,8 @@ public class DriverController implements Loggable {
     public CommandButton snailButton;
     public CommandButton normalButton;
     public CommandButton visionButton;
-    public CommandButton straightButton;
-    public CommandButton snap90Button;
-    public CommandButton squareButton;
-    public CommandButton tangentButton;
+    public CommandButton rotateModeButton;
+    public CommandButton driveModeButton;
     public CommandButton holdPosButton;
     public JoystickDrive stickDriver;
 
@@ -46,10 +45,8 @@ public class DriverController implements Loggable {
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
 
-        snap90Button = gamepad.rightBumper;
-        squareButton = gamepad.rightTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
-        tangentButton = gamepad.leftBumper;
-        straightButton = gamepad.leftTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
+        rotateModeButton = gamepad.rightBumper;
+        driveModeButton = gamepad.leftBumper;
 
         resetGyroButton = gamepad.ps_options;
         botFieldToggleButton = gamepad.ps_share;
@@ -71,26 +68,26 @@ public class DriverController implements Loggable {
 
         if (Connected.LIMELIGHT) {
             visionButton.whenPressedReleased(
-                robot.drivebase::EnableVisionDriving,
-                robot.drivebase::EnableFreeDriving
+                robot.drivebase::SetVisionRotation,
+                robot.drivebase::SetFreeRotation
             );
         }
 
-        snap90Button.whenPressedReleased(
-            robot.drivebase::EnableSnapDriving,
-            robot.drivebase::EnableFreeDriving
+        rotateModeButton.whenPressed(
+            new CycleCommandGroup(
+                robot.drivebase::SetSnapRotation,
+                robot.drivebase::SetHoldRotation,
+                robot.drivebase::SetTangentRotation,
+                //robot.drivebase::SetTargetBasedRotation,
+                robot.drivebase::SetFreeRotation
+            )
         );
-        squareButton.whenPressedReleased(
-            robot.drivebase::EnableSquareDriving,
-            robot.drivebase::EnableFreeDriving
-        );
-        straightButton.whenPressedReleased(
-            robot.drivebase::EnableStraightDriving,
-            robot.drivebase::EnableFreeDriving
-        );
-        tangentButton.whenPressedReleased(
-            robot.drivebase::EnableTangentialDriving,
-            robot.drivebase::EnableFreeDriving
+        driveModeButton.whenPressed(
+            new CycleCommandGroup(
+                robot.drivebase::SetSquareMotion,
+                //robot.drivebase::SetTargetBasedMotion,
+                robot.drivebase::SetFreeMotion
+            )
         );
         holdPosButton.whenPressedReleased(robot.drivebase::StayPut, robot.drivebase::ResumeDriving);
 
@@ -98,8 +95,8 @@ public class DriverController implements Loggable {
         // This is a nifty feature students built last year: We can *cycle* through commands!
         botFieldToggleButton.whenReleased(
             new CycleCommandGroup(
-                robot.drivebase::SetRobotCentricDriveMode,
-                robot.drivebase::SetFieldCentricDriveMode
+                robot.drivebase::SetRobotCentricMode,
+                robot.drivebase::SetFieldCentricMode
             )
         );
     }
