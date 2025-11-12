@@ -14,6 +14,7 @@ import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup.Vision;
+import org.firstinspires.ftc.learnbot.commands.SetVisionPipeline;
 import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
@@ -39,7 +40,9 @@ public class VisionDrivingTele extends CommandOpMode implements Loggable {
         controls = new DriverController(driverGamepad, robot);
         CommandScheduler.register(robot.vision);
         CommandScheduler.scheduleInit(HeadingHelper.RestorePreviousPosition(robot.drivebase));
-        CommandScheduler.scheduleInit(() -> robot.vision.setPipeline(Vision.AprilTag_Pipeline));
+        CommandScheduler.scheduleInit(
+            new SetVisionPipeline(robot.vision, Vision.AprilTag_Pipeline)
+        );
         CommandScheduler.scheduleJoystick(controls.stickDriver);
     }
 
@@ -47,9 +50,4 @@ public class VisionDrivingTele extends CommandOpMode implements Loggable {
     public void uponStart() {
         robot.atStart();
     }
-
-    //    @Override
-    //    public void runLoop() {
-    //        telemetry.update();
-    //    }
 }

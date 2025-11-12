@@ -57,7 +57,7 @@ public class VisionSubsystem implements Subsystem, Loggable {
         limelight.pipelineSwitch(targetPipeline);
     }
 
-    public int getCurPipeline() {
+    public int getCurrentPipeline() {
         return limelight.getLatestResult().getPipelineIndex();
     }
 

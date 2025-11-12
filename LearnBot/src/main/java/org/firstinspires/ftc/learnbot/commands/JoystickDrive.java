@@ -7,24 +7,6 @@ import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.learnbot.DrivingConstants.Control;
 import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
 
-/* Recall, the Pedro Path coordinate system:
-                 [Refs/score table]
-+-------------------------------------------------+
-|(0,144)             ^ +y                (144,144)|
-|                                                 |
-|                    90 deg                       |
-|                                                 |
-|                                                 |
-| <== -x 180 deg     (72,72)        0 deg +x ==>  |
-|                                                 |
-|                                                 |
-| Red Drive Team                  Blue Drive Team |
-|                    270 deg                      |
-|(0,0)                v -y                 (144,0)|
-+-------------------------------------------------+
-                   [Audience]
- */
-
 public class JoystickDrive implements Command, Loggable {
 
     // The sticks (probably each are CommandAxis suppliers)

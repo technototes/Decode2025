@@ -12,6 +12,24 @@ import com.technototes.library.util.MathUtils;
 import org.firstinspires.ftc.learnbot.DrivingConstants;
 import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
 
+/* Recall, the Pedro Path coordinate system:
+                 [Refs/score table]
++-------------------------------------------------+
+|(0,144)             ^ +y                (144,144)|
+|                                                 |
+|                    90 deg                       |
+|                                                 |
+|                                                 |
+| <== -x 180 deg     (72,72)        0 deg +x ==>  |
+|                                                 |
+|                                                 |
+| Red Drive Team                  Blue Drive Team |
+|                    270 deg                      |
+|(0,0)                v -y                 (144,0)|
++-------------------------------------------------+
+                   [Audience]
+ */
+
 public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
     // Encapsulated to allow easy "previous driving style" tracking
