@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.sixteen750.opmodes.auto;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.ParallelCommandGroup;
@@ -28,7 +26,6 @@ public class RedIntakeandShootLinesOnlyPedro extends CommandOpMode {
 
     @Override
     public void uponInit() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
         LinePaths p = new LinePaths(robot.follower);

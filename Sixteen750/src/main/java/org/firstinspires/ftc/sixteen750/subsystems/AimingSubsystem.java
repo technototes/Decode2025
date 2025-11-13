@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.sixteen750.subsystems;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Log;
@@ -9,7 +8,7 @@ import com.technototes.library.logger.Loggable;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
-@Config
+@Configurable
 public class AimingSubsystem implements Loggable {
 
     public static double HOOD_POS = 0.5; // 0.5 1.0
