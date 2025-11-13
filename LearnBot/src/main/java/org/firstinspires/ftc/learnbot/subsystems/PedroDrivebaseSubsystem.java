@@ -321,6 +321,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         } else {
             driveStyle = prevDriveStyle;
             prevDriveStyle = null;
+            StartTele();
         }
     }
 
