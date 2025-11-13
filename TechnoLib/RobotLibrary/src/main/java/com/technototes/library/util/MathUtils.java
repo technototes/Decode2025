@@ -185,8 +185,8 @@ public class MathUtils {
         return normalizeAngle(angle + half, angleUnit) - half;
     }
 
-    public static double posNegRadians(double randians) {
-        return posNegAngle(randians, AngleUnit.RADIANS);
+    public static double posNegRadians(double radians) {
+        return posNegAngle(radians, AngleUnit.RADIANS);
     }
 
     public static double posNegDegrees(double randians) {
@@ -198,6 +198,6 @@ public class MathUtils {
     }
 
     public static double halfCircle(AngleUnit angleUnit) {
-        return angleUnit == AngleUnit.RADIANS ? Math.PI * 2 : 360;
+        return angleUnit == AngleUnit.RADIANS ? Math.PI : 180;
     }
 }

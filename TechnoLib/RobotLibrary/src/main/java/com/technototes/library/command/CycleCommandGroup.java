@@ -9,18 +9,35 @@ package com.technototes.library.command;
  * something like this:
  * clawToggle = new CycleCommandGroup(claw::open, claw::close);
  */
-public class CycleCommandGroup implements Command {
+public class CycleCommandGroup extends ParallelRaceGroup {
 
-    protected Command[] commands;
     protected int currentState = 0;
 
     public CycleCommandGroup(Command... commands) {
+        // You can't use 'this' in a lambda expression passed in the constructor
+        // as it *might* not be fully constructed. So, instead, we create the commands
+        // array, then add them to the command group after already constructing the
+        // ParallelRaceGroup.
+        super();
         assert commands.length > 0;
-        this.commands = commands;
+        ConditionalCommand[] conditionalCommands = new ConditionalCommand[commands.length];
+        for (int i = 0; i < commands.length; i++) {
+            final int finalI = i; // Need a capture-by-value for this one...
+            conditionalCommands[i] = new ConditionalCommand(() -> this.currentState == finalI, commands[i]);
+        }
+        addCommands(conditionalCommands);
     }
 
-    public void execute() {
-        commands[currentState].run();
-        currentState = (currentState + 1) % commands.length;
+    @Override
+    public boolean isFinished() {
+        boolean fin = super.isFinished();
+        if (fin) {
+            currentState = (currentState + 1) % this.commandMap.size();
+        }
+        return fin;
+    }
+
+    public void reset() {
+        currentState = 0;
     }
 }
