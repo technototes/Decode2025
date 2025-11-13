@@ -43,6 +43,14 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             translationSpeed = DrivingConstants.Control.NORMAL_SPEED;
         }
 
+        public DrivingStyle(DrivingStyle other) {
+            perspective = other.perspective;
+            rotation = other.rotation;
+            translation = other.translation;
+            rotationSpeed = other.rotationSpeed;
+            translationSpeed = other.translationSpeed;
+        }
+
         public DrivingPerspective perspective;
         public RotationMode rotation;
         public TranslationMode translation;
@@ -86,6 +94,9 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
     // TODO: Make this do something PIDF related, because if you don't, this is *super* jiggly...
     public double rotationTransform(double r) {
+        if (driveStyle.rotation == RotationMode.Vision) {
+            return r * DrivingConstants.Control.TAG_ALIGNMENT_GAIN;
+        }
         return Math.copySign(r * r * driveStyle.rotationSpeed, r);
     }
 
@@ -169,7 +180,6 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     public void StartTele() {
         started = true;
         follower.startTeleOpDrive();
-        follower.update();
     }
 
     // Methods to bind to buttons (Commands)
@@ -200,20 +210,19 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     private void switchDrivingMode(TranslationMode x, RotationMode r) {
         TranslationMode px = driveStyle.translation;
         RotationMode pr = driveStyle.rotation;
-
         if (px == x && pr == r) {
             return;
         }
         driveStyle.translation = x;
         driveStyle.rotation = r;
         if (px == TranslationMode.Hold && x != TranslationMode.Hold) {
-            // If we're currently holding a position, stop doing so
+            // If we're going to stop holding a position, start Tele back up
             StartTele();
         } else if (px != TranslationMode.Hold && x == TranslationMode.Hold) {
             // If we've switched *to* holding a pose, start the follower
             holdPose = follower.getPose();
             follower.holdPoint(new BezierPoint(holdPose), holdPose.getHeading(), false);
-        } else if (pr != RotationMode.Hold_NYI && r == RotationMode.Hold_NYI) {
+        } else if (pr != RotationMode.Hold_NYI && driveStyle.rotation == RotationMode.Hold_NYI) {
             // If we're transitioning to a Rotational hold, just set the pos in the holdPose
             holdPose = follower.getPose();
         }
@@ -227,8 +236,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         switchDrivingMode(getTranslationMode(), RotationMode.Free);
     }
 
-    // The list of rotation points (in degrees) you want to snap to,
-    // in the range of 0 to 359.9999999 degrees
+    // The list of rotation points (in degrees) you want to snap to
     public void SetSnapRotation(double... degrees) {
         snapRadians = new double[degrees.length + 1];
         double lowest = Math.PI * 2;
@@ -274,7 +282,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     }
 
     public void SetVisionDriving() {
-        // switchDrivingMode(TranslationalMode.Vision_NYI, RotationalMode.Vision);
+        switchDrivingMode(TranslationMode.Vision_NYI, RotationMode.Vision);
     }
 
     public void SetRobotCentricMode() {
@@ -301,7 +309,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         if (prevDriveStyle == null) {
             prevDriveStyle = driveStyle;
         }
-        driveStyle = new DrivingStyle();
+        driveStyle = new DrivingStyle(prevDriveStyle);
         HoldCurrentPosition();
         SetTurboSpeed();
     }

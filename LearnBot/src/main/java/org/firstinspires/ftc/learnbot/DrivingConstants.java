@@ -39,10 +39,10 @@ public class DrivingConstants {
 
         public static double STICK_DEAD_ZONE = 0.05;
 
-        // The amount to multiply the degrees of offset by to turn the bot to
+        // The amount to multiply the 'default' rotation by to turn the bot to
         // face the apriltag for the target. This is effectively "P" in a PID,
         // but we don't have I or D implemented
-        public static double TAG_ALIGNMENT_GAIN = 0.03;
+        public static double TAG_ALIGNMENT_GAIN = 2.0;
     }
 
     /**** Stuff for the PedroPathing follower ****/
