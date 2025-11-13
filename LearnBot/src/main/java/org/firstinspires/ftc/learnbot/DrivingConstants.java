@@ -90,13 +90,13 @@ public class DrivingConstants {
 
     // The maximum velocity (in inches/second) the bot can be moving while still
     // saying the path is complete.
-    public static double acceptableVelocity = 0.5;
+    public static double acceptableVelocity = 1.0;
     // The maximum distance (in inches) the bot can be from the path end
     // while still saying the path is complete.
-    public static double acceptableDistance = 0.75;
+    public static double acceptableDistance = 2.0;
     // The maximum heading error (in degrees) the bot can be from the path end
     // while still saying the path is complete.
-    public static double acceptableHeading = 1.5;
+    public static double acceptableHeading = 2.5;
 
     // @Configurable
     public static class OTOSConfig {
