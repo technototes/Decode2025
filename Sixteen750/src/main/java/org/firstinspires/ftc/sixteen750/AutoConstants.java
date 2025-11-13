@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.sixteen750;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
@@ -23,7 +22,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.sixteen750.Setup.HardwareNames;
 import org.firstinspires.ftc.sixteen750.helpers.CustomAdafruitIMU;
 
-@Config
 @Configurable
 public class AutoConstants {
 
@@ -213,8 +211,8 @@ public class AutoConstants {
             .mecanumDrivetrain(getDriveConstants())
             .twoWheelLocalizer(getTwoWheelLocalizerConstants())
             .build();
-//        fol.setMaxPowerScaling(0.5);
-            return fol;
+        //        fol.setMaxPowerScaling(0.5);
+        return fol;
     }
 
     //New testing constants for this year's game

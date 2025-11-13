@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.sixteen750.subsystems;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.logger.Log;
@@ -8,7 +8,7 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import org.firstinspires.ftc.sixteen750.Hardware;
 
-@Config
+@Configurable
 public class SafetySubsystem implements Subsystem, Loggable {
 
     public enum FailedPart {
