@@ -1,7 +1,5 @@
 package com.technototes.library.command;
 
-import java.util.function.BooleanSupplier;
-
 /**
  * Each time this command(group) is scheduled, the next one
  * in the series will execute. When the last one is executed,
