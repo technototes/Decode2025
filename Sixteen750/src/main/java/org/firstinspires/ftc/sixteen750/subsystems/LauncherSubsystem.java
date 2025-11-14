@@ -5,6 +5,9 @@ import com.pedropathing.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.technototes.library.command.Command;
+import com.technototes.library.command.SequentialCommandGroup;
+import com.technototes.library.command.WaitCommand;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
@@ -19,6 +22,7 @@ public class LauncherSubsystem implements Loggable {
     @Log.Number(name = "Motor Power")
     public static double MOTOR_POWER = 0.65; // 0.5 1.0
 
+    @Log.Number(name = "Target Velocity")
     public static double TARGET_LAUNCH_VELOCITY = 2700;
 
     @Log.Number(name = "Motor Velocity")
@@ -70,14 +74,14 @@ public class LauncherSubsystem implements Loggable {
     public void IncreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            TARGET_LAUNCH_VELOCITY += 100;
+            TARGET_LAUNCH_VELOCITY += 50;
         }
     }
 
     public void DecreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            TARGET_LAUNCH_VELOCITY -= 100;
+            TARGET_LAUNCH_VELOCITY -= 50;
         }
     }
 
@@ -106,4 +110,5 @@ public class LauncherSubsystem implements Loggable {
             TeleCommands.GateDown(robot);
         }
     }
+
 }
