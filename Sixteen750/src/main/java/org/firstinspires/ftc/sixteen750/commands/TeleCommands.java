@@ -2,6 +2,7 @@ package org.firstinspires.ftc.sixteen750.commands;
 
 import com.technototes.library.command.Command;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 
 public class TeleCommands {
 
@@ -76,4 +77,5 @@ public class TeleCommands {
     public static Command MotorVelocityTest(Robot r) {
         return Command.create(r.testSubsystem::setMotorVelocityTest);
     }
+
 }

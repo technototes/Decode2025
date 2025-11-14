@@ -10,6 +10,7 @@ import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
@@ -25,6 +26,8 @@ public class DriverController {
     public CommandButton launchButton;
     public CommandButton spitButton;
     public CommandButton intakeButton;
+
+    public CommandButton TripleBallLaunch;
 
     public CommandButton MotorDecrease;
     public CommandButton MotorIncrease;
@@ -71,7 +74,6 @@ public class DriverController {
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
         intakeTrigger = gamepad.rightTrigger;
-        intakeButton = gamepad.ps_cross;
         //autoAim = gamepad.leftTrigger;
         // turboButton = gamepad.leftBumper;
         snailButton = gamepad.leftBumper;
@@ -84,7 +86,8 @@ public class DriverController {
         MotorDecrease = gamepad.dpadLeft;
         MotorIncrease = gamepad.dpadRight;
         gateButton = gamepad.ps_circle;
-        holdButton = gamepad.dpadLeft;
+        holdButton = gamepad.ps_cross; // made it not bound the same as decrease velo
+        TripleBallLaunch = gamepad.ps_share; // made the auto launching command testable in tele
     }
 
     public void bindDriveControls() {
@@ -115,8 +118,7 @@ public class DriverController {
         spitButton.whenReleased(TeleCommands.IntakeStop(robot));
         intakeTrigger.whenPressed(TeleCommands.Intake(robot));
         intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot));
-        intakeButton.whenPressed(TeleCommands.Intake(robot));
-        intakeButton.whenReleased(TeleCommands.IntakeStop(robot));
+
     }
 
     // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
