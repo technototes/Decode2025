@@ -68,8 +68,8 @@ public class DriverController implements Loggable {
 
         if (Connected.LIMELIGHT) {
             visionButton.whenPressedReleased(
-                robot.drivebase::SetVisionRotation,
-                robot.drivebase::SetFreeRotation
+                robot.drivebase::SetVisionDriving,
+                robot.drivebase::ResumeDriving
             );
         }
 
@@ -78,6 +78,7 @@ public class DriverController implements Loggable {
                 robot.drivebase::SetSnapRotation,
                 robot.drivebase::SetHoldRotation,
                 robot.drivebase::SetTangentRotation,
+                robot.drivebase::SetVisionRotation,
                 //robot.drivebase::SetTargetBasedRotation,
                 robot.drivebase::SetFreeRotation
             )

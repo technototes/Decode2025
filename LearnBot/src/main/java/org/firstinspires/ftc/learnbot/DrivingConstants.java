@@ -43,6 +43,8 @@ public class DrivingConstants {
         // face the apriltag for the target. This is effectively "P" in a PID,
         // but we don't have I or D implemented
         public static double TAG_ALIGNMENT_GAIN = 2.0;
+        public static double VISION_TARGET_SIZE = 10;
+        public static double VISION_FORWARD_GAIN = .1;
     }
 
     /**** Stuff for the PedroPathing follower ****/

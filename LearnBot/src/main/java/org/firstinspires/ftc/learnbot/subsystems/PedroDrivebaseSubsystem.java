@@ -74,7 +74,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         Free,
         Square,
         Hold,
-        Vision_NYI, // Drive toward the target using vision
+        Vision, // Drive toward the target using vision
         Target_NYI, // Drive toward an external target (that is movable using the controller)
         None,
     }
@@ -282,7 +282,8 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     }
 
     public void SetVisionDriving() {
-        switchDrivingMode(TranslationMode.Vision_NYI, RotationMode.Vision);
+        prevDriveStyle = new DrivingStyle(driveStyle);
+        switchDrivingMode(TranslationMode.Vision, RotationMode.Vision);
     }
 
     public void SetRobotCentricMode() {
@@ -356,14 +357,22 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             }
         }
         double rot = getRotation();
+        boolean botCentric = driveStyle.perspective == DrivingPerspective.RobotCentric;
+        if (driveStyle.translation == TranslationMode.Vision) {
+            // For vision *translation* we will move forward or backward to maintain a 'size' of the
+            // target. The 'a' part of the result is the percentage of the total image that the
+            // target is filling, so the closer you are, the larger the area of the image. It's
+            // kinda dopey, but works just fine...
+            VisionSubsystem.TargetInfo curTarget = vision.getCurResult();
+            if (curTarget != null) {
+                forward =
+                    (DrivingConstants.Control.VISION_TARGET_SIZE - curTarget.a) *
+                    DrivingConstants.Control.VISION_FORWARD_GAIN;
+                botCentric = true;
+            }
+        }
         ShowDriveVectors(forward, strafe, rot, getHeadingOffsetRadians());
-        follower.setTeleOpDrive(
-            forward,
-            strafe,
-            rot,
-            driveStyle.perspective == DrivingPerspective.RobotCentric,
-            getHeadingOffsetRadians()
-        );
+        follower.setTeleOpDrive(forward, strafe, rot, botCentric, getHeadingOffsetRadians());
         follower.update();
     }
 
@@ -478,7 +487,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             case Hold:
                 drvMode += "xHold";
                 break;
-            case Vision_NYI:
+            case Vision:
                 drvMode += "xVision[NYI]";
                 break;
             default:
