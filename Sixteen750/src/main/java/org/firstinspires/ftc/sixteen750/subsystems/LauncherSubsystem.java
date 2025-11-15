@@ -67,8 +67,8 @@ public class LauncherSubsystem implements Loggable {
 
     public void Stop() {
         if (hasHardware) {
-            launcher1.setPower(0);
-            launcher2.setPower(0);
+            launcher1.setVelocity(0);
+            launcher2.setVelocity(0);
         }
     }
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.sixteen750.commands.auto;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -12,6 +13,7 @@ import com.technototes.library.command.WaitCommand;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
+@Configurable
 public class Paths {
 
     public static Follower follower;
@@ -23,7 +25,7 @@ public class Paths {
                 TeleCommands.GateUp(r),
                 TeleCommands.Launch(r)
             ),
-            new WaitCommand(2),
+            new WaitCommand(3),
             TeleCommands.GateDown(r),
             new WaitCommand(0.1),
             TeleCommands.GateUp(r),
@@ -53,33 +55,33 @@ public class Paths {
         );
     }
 
-    public Pose Start = new Pose(30.748, 135.152);
-    public Pose Launch = new Pose(38.490, 105.512);
-    public Pose Intake1 = new Pose(41.808, 91.276);
-    public Pose Intake1ControlPoint = new Pose(61.273, 89.143);
-    public Pose Intake1end = new Pose(15.043, 90.276);
-    public Pose Intake2 = new Pose(40.038, 69.502);
-    public Pose Intake2ControlPoint = new Pose(71.891, 64.369);
-    public Pose Intake2end = new Pose(9.513, 69.281);
-    public Pose Intake2endControlPoint = new Pose(49.328, 65.696);
-    public Pose Intake3 = new Pose(38.923, 47.834);
-    public Pose Intake3ControlPoint = new Pose(76.536, 41.585);
-    public Pose Intake3end = new Pose(7.407, 47.834);
-    public Pose Intake3endControlPoint = new Pose(62.000, 84.000);
+    public static Pose Start = new Pose(30.748, 135.152);
+    public static Pose Launch = new Pose(38.490, 105.512);
+    public static Pose Intake1 = new Pose(41.808, 91.276);
+    public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
+    public static Pose Intake1end = new Pose(15.043, 90.276);
+    public static Pose Intake2 = new Pose(40.038, 69.502);
+    public static Pose Intake2ControlPoint = new Pose(71.891, 64.369);
+    public static Pose Intake2end = new Pose(9.513, 69.281);
+    public static Pose Intake2endControlPoint = new Pose(49.328, 65.696);
+    public static Pose Intake3 = new Pose(38.923, 47.834);
+    public static Pose Intake3ControlPoint = new Pose(76.536, 41.585);
+    public static Pose Intake3end = new Pose(7.407, 47.834);
+    public static Pose Intake3endControlPoint = new Pose(62.000, 84.000);
     //Red poses reconfigure these
-    public Pose RStart = new Pose(114, 135.152);
-    public Pose RLaunch = new Pose(106, 105.512);
-    public Pose RIntake1 = new Pose(103, 84.276);
-    public Pose RIntake1ControlPoint = new Pose(83, 89.143);
-    public Pose RIntake1end = new Pose(129, 84.276);
-    public Pose RIntake2 = new Pose(104, 59.502);
-    public Pose RIntake2ControlPoint = new Pose(73, 64.369);
-    public Pose RIntake2end = new Pose(134, 59.281);
-    public Pose RIntake2endControlPoint = new Pose(95, 65.696);
-    public Pose RIntake3 = new Pose(104, 35.834);
-    public Pose RIntake3ControlPoint = new Pose(68, 41.585);
-    public Pose RIntake3end = new Pose(136, 35.613);
-    public Pose RIntake3endControlPoint = new Pose(82, 84.000);
+    public static Pose RStart = new Pose(114, 135.152);
+    public static Pose RLaunch = new Pose(100, 115);
+    public static Pose RIntake1 = new Pose(103, 88);
+    public static Pose RIntake1ControlPoint = new Pose(83, 89.143);
+    public static Pose RIntake1end = new Pose(129, 88);
+    public static Pose RIntake2 = new Pose(104, 65);
+    public static Pose RIntake2ControlPoint = new Pose(73, 64.369);
+    public static Pose RIntake2end = new Pose(134, 65);
+    public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
+    public static Pose RIntake3 = new Pose(104, 40);
+    public static Pose RIntake3ControlPoint = new Pose(68, 41.585);
+    public static Pose RIntake3end = new Pose(136, 40);
+    public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
 
     public PathChain launch;
     public PathChain launchtointake1;
@@ -120,22 +122,22 @@ public class Paths {
     public PathChain SideLeft48;
     public PathChain SideRight48;
 
-    public Pose getStart() {
+    public static Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
     }
 
-    public Pose getRStart() {
+    public static Pose getRStart() {
         return new Pose(112, 135.916, Math.toRadians(90));
     }
 
-    public Pose getBSegmentedCurveStart() {
+    public static Pose getBSegmentedCurveStart() {
         return new Pose(30.748, 135.152, Math.toRadians(90));
     }
-    public Pose getForward48Start() {
+    public static Pose getForward48Start() {
         return new Pose(56.000, 8.000, Math.toRadians(90));
     }
 
-    public Pose getRSegmentedCurveStart() {
+    public static Pose getRSegmentedCurveStart() {
         return new Pose(114, 135.152, Math.toRadians(90));
     }
 
