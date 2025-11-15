@@ -2,6 +2,7 @@ package org.firstinspires.ftc.sixteen750.commands;
 
 import static org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem.limelight;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
@@ -36,8 +37,9 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 +-------------------------------------------------+
                    [Audience]
  */
-
+@Configurable
 public class PedroDriver implements Command, Loggable {
+
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -96,6 +98,7 @@ public class PedroDriver implements Command, Loggable {
         switchDriveStyle(DrivingStyle.Vision_NYI);
     }
 
+
     public void EnableFreeDriving() {
         switchDriveStyle(DrivingStyle.Free);
     }
@@ -147,7 +150,8 @@ public class PedroDriver implements Command, Loggable {
     // The offset heading for field-relative controls
     double headingOffset;
     // The current rotation scaling factor
-    double turnSpeed;
+    public static double turnSpeed; //this is turnspeed FOR EVERYTHING
+    public static double visionTurnSpeed; //turnspeed for vision only
     // Camera, for future use:
     LimelightSubsystem limelightSubsystem;
     // used to keep the directions straight
@@ -287,9 +291,11 @@ public class PedroDriver implements Command, Loggable {
             case Vision_NYI:
                 if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
                     // --- Face AprilTag using Limelight ---
-                    targetHeading = Math.toRadians(limelightSubsystem.getLimelightRotation());
+                    targetHeading = curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
+                    //lowkey forgot what kevin said but i think it just sets the target heading to
+                    //where the limelight is so that vision can make the bot turn that way
                 } else {
-                    return 0;
+                    return rotation;
                 }
                 break;
             case Free:
@@ -299,6 +305,8 @@ public class PedroDriver implements Command, Loggable {
         }
         // TODO: Use the Pedro heading PIDF to get this value?
         return (Math.clamp(targetHeading - curHeading, -1, 1) * turnSpeed);
+        //so the line above overrides the joystick and makes it ignore what the human
+        //is doing with the joystick and makes it turn a specific way (vision control)
     }
 
     @Override

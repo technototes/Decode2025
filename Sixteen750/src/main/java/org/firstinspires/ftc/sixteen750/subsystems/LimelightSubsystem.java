@@ -15,16 +15,18 @@ import org.firstinspires.ftc.sixteen750.Setup;
 public class LimelightSubsystem implements Loggable {
 
     boolean hasHardware;
-
+    //data should not be flickering anymore on the driverstation because we are logging
+    //instead of updating telemetry
     @Log.Number(name = "LLX angle")
     public static double Xangle = 0.0;
 
-    @Log.Number(name = "LLX angle")
+    @Log.Number(name = "LLY angle")
     public static double Yangle = 0.0;
 
     @Log.Number(name = "LL Area")
     public static double Area = 0.0;
 
+    public static double SIGN = 1.0;
     public static Limelight3A limelight;
 
     public LimelightSubsystem(Hardware h) {
@@ -32,12 +34,18 @@ public class LimelightSubsystem implements Loggable {
         // Do stuff in here
         if (hasHardware) {
             limelight = h.limelight;
+            limelight.start();
+            setPipeline(1);
         } else {
             limelight = null;
         }
     }
 
-    public static void getLatestResult() {
+    public void setPipeline(int targetPipeline) {
+        limelight.pipelineSwitch(targetPipeline);
+    }
+
+    public boolean getLatestResult() {
         LLResult result = limelight.getLatestResult();
         if (result != null && result.isValid()) {
             // Not sure this is the right angle, because the camera is mounted sideways
@@ -45,6 +53,12 @@ public class LimelightSubsystem implements Loggable {
             Xangle = result.getTx();
             Yangle = result.getTy();
             Area = result.getTa();
+            return true;
+            //getLatestResult returns the x-angle, the y-angle,
+            // and the area of the apriltag on the camera
+        }
+        else {
+            return false;
         }
     }
 
@@ -53,7 +67,14 @@ public class LimelightSubsystem implements Loggable {
     }
 
     public double getLimelightRotation() {
-        getLatestResult();
-        return Yangle;
+        if (getLatestResult()) {
+            return SIGN * Yangle;
+        }
+
+        else {
+            return 0;
+        }
+        //its y-angle because we flipped the camera, we might need to invert the axis
+        // if it start turning away from the apriltag
     }
 }
