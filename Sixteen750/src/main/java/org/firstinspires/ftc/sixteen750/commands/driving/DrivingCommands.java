@@ -21,6 +21,10 @@ public class DrivingCommands {
         return pd::EnableVisionDriving;
     }
 
+    public static Command NoAutoOrient(PedroDriver pd) {
+        return pd::EnableFreeDriving;
+    }
+
     public static Command ResetGyro(PedroDriver pd) {
         return pd::ResetGyro;
     }
