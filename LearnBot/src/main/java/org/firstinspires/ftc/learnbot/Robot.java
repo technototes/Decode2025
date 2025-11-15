@@ -32,7 +32,6 @@ public class Robot implements Loggable {
             // Note that vision may be null, but the drivebase is okay with this.
             this.drivebase = new PedroDrivebaseSubsystem(hw.follower, vision, team);
         }
-
     }
 
     public void atStart() {}
