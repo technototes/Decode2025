@@ -18,9 +18,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
-    public static PIDFCoefficients launcherP = new PIDFCoefficients(1.2, 0.0, 0.0, 0);
+    public static PIDFCoefficients launcherP = new PIDFCoefficients(4.5, 0.0, 0.0, 0);
     public static double SPIN_F_SCALE = 1.0 / 6000;
-    public static double SPIN_VOLT_COMP = 0.1;
+    public static double SPIN_VOLT_COMP = 0.0216;
+    public static double DIFFERENCE = 0.0044;
     public static double PEAK_VOLTAGE = 13.0;
     private static PIDFController launcherPID;
 
@@ -41,7 +42,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         if (hasHardware) {
             top = h.top;
             top.coast();
-            launcherPID = new PIDFController(launcherP, target -> SPIN_F_SCALE * target + SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()));
+            double ADDITION = (double) Math.round((PEAK_VOLTAGE - h.voltage()));
+            if (ADDITION == 0) {
+                SPIN_VOLT_COMP = SPIN_VOLT_COMP + 0.001;
+            } else {
+                SPIN_VOLT_COMP = SPIN_VOLT_COMP + (ADDITION * DIFFERENCE);
+            }
+            launcherPID = new PIDFController(launcherP, target -> target == 0 ? 0 : (SPIN_F_SCALE * target) + (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage())));
 //            top.setPIDFCoefficients(launcherP);
             setTargetSpeed(0);
         } else {
@@ -108,6 +115,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void periodic() {
         setMotorPower(launcherPID.update(getMotorSpeed()));
         err = launcherPID.getLastError();
+        MOTOR_VELOCITY = top.getVelocity();
+        power = top.getPower();
 //        launcherP.f =  SPIN_F_SCALE * target + SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, Hardware.voltage());
     }
 }
