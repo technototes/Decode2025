@@ -78,4 +78,8 @@ public class TeleCommands {
         return Command.create(r.testSubsystem::setMotorVelocityTest);
     }
 
+    public static Command ReadVelocity(Robot r){
+        return Command.create(r.launcherSubsystem::readVelocity);
+    }
+
 }

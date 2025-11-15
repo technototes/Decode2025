@@ -38,6 +38,11 @@ public class LauncherSubsystem implements Loggable {
     // not tested just placeholder but should be used
     EncodedMotor<DcMotorEx> launcher1;
     EncodedMotor<DcMotorEx> launcher2;
+    @Log (name = "Flywheel at Velocity")
+    public static boolean ready;
+
+    @Log.Number (name = "Current Launcher Velocity")
+    public static double CURRENT_LAUNCHER_VELOCITY;
 
     public LauncherSubsystem(Hardware h) {
         hasHardware = Setup.Connected.LAUNCHERSUBSYSTEM;
@@ -51,6 +56,7 @@ public class LauncherSubsystem implements Loggable {
             launcher2.coast();
             launcher1.setPIDFCoefficients(launcherPIDF);
             launcher2.setPIDFCoefficients(launcherPIDF);
+            ready = false;
         } else {
             launcher1 = null;
             launcher2 = null;
@@ -62,7 +68,21 @@ public class LauncherSubsystem implements Loggable {
         if (hasHardware) {
             launcher1.setVelocity(TARGET_LAUNCH_VELOCITY);
             launcher2.setVelocity(TARGET_LAUNCH_VELOCITY);
+            readVelocity();
         }
+    }
+
+    public double readVelocity(){
+//        if(launcher1.getVelocity() == TARGET_LAUNCH_VELOCITY && launcher2.getVelocity() == TARGET_LAUNCH_VELOCITY) {
+//            return ready = true;
+//        }
+//
+//        else {
+//            return ready = false;
+//        }
+        CURRENT_LAUNCH_VELOCITY = launcher1.getVelocity();
+        return CURRENT_LAUNCH_VELOCITY;
+
     }
 
     public void Stop() {
