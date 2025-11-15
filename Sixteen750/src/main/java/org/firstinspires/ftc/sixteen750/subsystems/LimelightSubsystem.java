@@ -8,16 +8,23 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
 @Configurable
 public class LimelightSubsystem implements Loggable {
+
     boolean hasHardware;
 
-    @Log.Number(name = "texas angle")
-    public static double angle = 0.0;
+    @Log.Number(name = "LLX angle")
+    public static double Xangle = 0.0;
+
+    @Log.Number(name = "LLX angle")
+    public static double Yangle = 0.0;
+
+    @Log.Number(name = "LL Area")
+    public static double Area = 0.0;
+
     public static Limelight3A limelight;
 
     public LimelightSubsystem(Hardware h) {
@@ -30,26 +37,23 @@ public class LimelightSubsystem implements Loggable {
         }
     }
 
-    public static void getLatestResult(){
-        LLResult result = limelight.getLatestResult();
-        angle = result.getTx();
-    }
-
-    public void selectPipeline(int todo){
-        //TODO
-    }
-
-    public double getLimelightRotation(){
+    public static void getLatestResult() {
         LLResult result = limelight.getLatestResult();
         if (result != null && result.isValid()) {
-            double tx = result.getTx(); // horizontal offset in degrees
-            double kP_TagAlign = 0.03; // tune this gain
-            return -kP_TagAlign * tx; // rotate until tx ~ 0
-        } else {
-            return 0.0; // no target → don't spin
+            // Not sure this is the right angle, because the camera is mounted sideways
+            // IIRC, you should be using getTy() instead.
+            Xangle = result.getTx();
+            Yangle = result.getTy();
+            Area = result.getTa();
         }
     }
 
+    public void selectPipeline(int pipelineIndex) {
+        limelight.pipelineSwitch(pipelineIndex);
+    }
 
-
+    public double getLimelightRotation() {
+        getLatestResult();
+        return Yangle;
+    }
 }
