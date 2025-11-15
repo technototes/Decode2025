@@ -14,7 +14,6 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
 import java.util.function.DoubleSupplier;
-
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.Setup.OtherSettings;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
@@ -186,7 +185,13 @@ public class PedroDriver implements Command, Loggable {
         return driveMode;
     }
 
-    public PedroDriver(Follower fol, Stick xyStick, Stick rotStick, LimelightSubsystem ls, Alliance all) {
+    public PedroDriver(
+        Follower fol,
+        Stick xyStick,
+        Stick rotStick,
+        LimelightSubsystem ls,
+        Alliance all
+    ) {
         // TODO: Throw an exception or log if there's some problem with constants.
         // i.e. DEAD_ZONE is negative, or greater than 1.0
         limelightSubsystem = ls;
@@ -280,19 +285,13 @@ public class PedroDriver implements Command, Loggable {
                 targetHeading = MathUtils.snapToNearestRadiansMultiple(curHeading, Math.PI / 2);
                 break;
             case Vision_NYI:
-                if (Setup.Connected.LIMELIGHTSUBSYSTEM && limelight != null) {
+                if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
                     // --- Face AprilTag using Limelight ---
-                    @Log(name = "latest_result")
-                    LLResult result = limelight.getLatestResult();
-                    if (result != null && result.isValid()) {
-                        double tx = result.getTx(); // horizontal offset in degrees
-                        double kP_TagAlign = 0.03; // tune this gain
-                        return -kP_TagAlign * tx; // rotate until tx ~ 0
-                    } else {
-                        return 0.0; // no target → don't spin
-                    }
+                    targetHeading = Math.toRadians(limelightSubsystem.getLimelightRotation());
+                } else {
+                    return 0;
                 }
-                return 0;
+                break;
             case Free:
             case Straight:
             default:
