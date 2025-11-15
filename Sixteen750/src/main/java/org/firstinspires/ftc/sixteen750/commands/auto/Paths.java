@@ -56,17 +56,17 @@ public class Paths {
     }
 
     public static Pose Start = new Pose(30.748, 135.152);
-    public static Pose Launch = new Pose(38.490, 105.512);
-    public static Pose Intake1 = new Pose(41.808, 91.276);
+    public static Pose Launch = new Pose(38.490, 115);
+    public static Pose Intake1 = new Pose(41.808, 88);
     public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
-    public static Pose Intake1end = new Pose(15.043, 90.276);
-    public static Pose Intake2 = new Pose(40.038, 69.502);
+    public static Pose Intake1end = new Pose(15.043, 88);
+    public static Pose Intake2 = new Pose(40.038, 65);
     public static Pose Intake2ControlPoint = new Pose(71.891, 64.369);
-    public static Pose Intake2end = new Pose(9.513, 69.281);
+    public static Pose Intake2end = new Pose(9.513, 65);
     public static Pose Intake2endControlPoint = new Pose(49.328, 65.696);
-    public static Pose Intake3 = new Pose(38.923, 47.834);
+    public static Pose Intake3 = new Pose(38.923, 40);
     public static Pose Intake3ControlPoint = new Pose(76.536, 41.585);
-    public static Pose Intake3end = new Pose(7.407, 47.834);
+    public static Pose Intake3end = new Pose(7.407, 40);
     public static Pose Intake3endControlPoint = new Pose(62.000, 84.000);
     //Red poses reconfigure these
     public static Pose RStart = new Pose(114, 135.152);
