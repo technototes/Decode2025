@@ -4,6 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.technototes.library.command.Command;
+import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
 @Configurable
@@ -25,15 +26,15 @@ public class HeadingHelper {
         FtcRobotControllerActivity.SaveBetweenRuns = new HeadingHelper(x, y, h);
     }
 
-    public static Command SaveCurrentPosition(Follower f) {
-        return Command.create(() -> savePose(f.getPose()));
+    public static Command SaveCurrentPosition(PedroDrivebaseSubsystem db) {
+        return Command.create(() -> savePose(db.follower.getPose()));
     }
 
-    public static Command RestorePreviousPosition(Follower f) {
+    public static Command RestorePreviousPosition(PedroDrivebaseSubsystem db) {
         return Command.create(() -> {
             Pose p = getSavedPose();
             if (p != null) {
-                f.setPose(getSavedPose());
+                db.follower.setPose(p);
             }
         });
     }

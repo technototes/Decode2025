@@ -27,22 +27,24 @@ public class DrivingConstants {
     public static class Control {
 
         // Max power scaling for translational driving:
-        public static double SNAIL_SPEED = 0.35;
-        public static double NORMAL_SPEED = 0.75;
+        public static double SNAIL_SPEED = 0.40;
+        public static double NORMAL_SPEED = 0.8;
         public static double TURBO_SPEED = 1.0;
         public static double AUTO_SPEED = 0.95;
 
         // The 'fastest' the robot can turn (0: not turning, 1.0: Fastest possible)
-        public static double SNAIL_TURN = 0.2;
-        public static double NORMAL_TURN = 0.4;
+        public static double SNAIL_TURN = 0.25;
+        public static double NORMAL_TURN = 0.5;
         public static double TURBO_TURN = 1.0;
 
         public static double STICK_DEAD_ZONE = 0.05;
 
-        // The amount to multiply the degrees of offset by to turn the bot to
+        // The amount to multiply the 'default' rotation by to turn the bot to
         // face the apriltag for the target. This is effectively "P" in a PID,
         // but we don't have I or D implemented
-        public static double TAG_ALIGNMENT_GAIN = 0.03;
+        public static double TAG_ALIGNMENT_GAIN = 2.0;
+        public static double VISION_TARGET_SIZE = 10;
+        public static double VISION_FORWARD_GAIN = .1;
     }
 
     /**** Stuff for the PedroPathing follower ****/
@@ -72,6 +74,7 @@ public class DrivingConstants {
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
+    // Tristan says Kalman Filtering is for curve prediction, so...it helps predict ac/deceleration?
     public static FilteredPIDFCoefficients drivePID = new FilteredPIDFCoefficients(
         0.005,
         00.00001,
@@ -81,7 +84,7 @@ public class DrivingConstants {
     );
 
     // The percent of a path that must be complete for Pedro to decide it's done
-    public static double tValueContraint = 0.98;
+    public static double tValueContraint = 0.99;
 
     // Time, in *milliseconds*, to let the follower algorithm correct
     // before the path is considered "complete".
@@ -97,7 +100,7 @@ public class DrivingConstants {
     // while still saying the path is complete.
     public static double acceptableHeading = 2.5;
 
-    @Configurable
+    // @Configurable
     public static class OTOSConfig {
 
         public static double linearScalar = 1.4;
@@ -109,7 +112,7 @@ public class DrivingConstants {
         );
     }
 
-    @Configurable
+    // @Configurable
     public static class MotorLocConfig {
 
         public static double fwdTicksToInches = 135;

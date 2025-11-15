@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.learnbot.controls;
 
 import com.technototes.library.command.CycleCommandGroup;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
@@ -9,7 +10,8 @@ import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup.Connected;
 import org.firstinspires.ftc.learnbot.Setup.OtherSettings;
-import org.firstinspires.ftc.learnbot.commands.Driver;
+import org.firstinspires.ftc.learnbot.commands.JoystickDrive;
+import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
 
 public class DriverController implements Loggable {
 
@@ -24,12 +26,10 @@ public class DriverController implements Loggable {
     public CommandButton snailButton;
     public CommandButton normalButton;
     public CommandButton visionButton;
-    public CommandButton straightButton;
-    public CommandButton snap90Button;
-    public CommandButton squareButton;
-    public CommandButton tangentButton;
+    public CommandButton rotateModeButton;
+    public CommandButton driveModeButton;
     public CommandButton holdPosButton;
-    public Driver stickDriver;
+    public JoystickDrive stickDriver;
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
@@ -45,10 +45,8 @@ public class DriverController implements Loggable {
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
 
-        snap90Button = gamepad.rightBumper;
-        squareButton = gamepad.rightTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
-        tangentButton = gamepad.leftBumper;
-        straightButton = gamepad.leftTrigger.getAsButton(OtherSettings.TRIGGER_THRESHOLD);
+        rotateModeButton = gamepad.rightBumper;
+        driveModeButton = gamepad.leftBumper;
 
         resetGyroButton = gamepad.ps_options;
         botFieldToggleButton = gamepad.ps_share;
@@ -57,46 +55,49 @@ public class DriverController implements Loggable {
         normalButton = gamepad.dpadRight;
         snailButton = gamepad.dpadDown;
         holdPosButton = gamepad.dpadLeft;
+
+        visionButton = gamepad.ps_circle;
     }
 
     public void bindDriveControls() {
-        stickDriver = new Driver(robot.follower, driveLeftStick, driveRightStick);
+        stickDriver = new JoystickDrive(robot.drivebase, driveLeftStick, driveRightStick);
 
-        turboButton.whenPressed(stickDriver::SetTurboSpeed);
-        normalButton.whenPressed(stickDriver::SetNormalSpeed);
-        snailButton.whenPressed(stickDriver::SetSnailSpeed);
+        turboButton.whenPressed(robot.drivebase::SetTurboSpeed);
+        normalButton.whenPressed(robot.drivebase::SetNormalSpeed);
+        snailButton.whenPressed(robot.drivebase::SetSnailSpeed);
 
         if (Connected.LIMELIGHT) {
             visionButton.whenPressedReleased(
-                stickDriver::EnableVisionDriving,
-                stickDriver::EnableFreeDriving
+                robot.drivebase::SetVisionDriving,
+                robot.drivebase::ResumeDriving
             );
         }
 
-        snap90Button.whenPressedReleased(
-            stickDriver::EnableSnap90Driving,
-            stickDriver::EnableFreeDriving
-        );
-        squareButton.whenPressedReleased(
-            stickDriver::EnableSquareDriving,
-            stickDriver::EnableFreeDriving
-        );
-        straightButton.whenPressedReleased(
-            stickDriver::EnableStraightDriving,
-            stickDriver::EnableFreeDriving
-        );
-        tangentButton.whenPressedReleased(
-            stickDriver::EnableTangentialDriving,
-            stickDriver::EnableFreeDriving
-        );
-        holdPosButton.whenPressedReleased(stickDriver::StayPut, stickDriver::ResumeDriving);
-
-        resetGyroButton.whenPressed(stickDriver::ResetGyro);
-        // This is a nifty feature students built last year: We can *cycle* through commands!
-        botFieldToggleButton.whenPressed(
+        rotateModeButton.whenPressed(
             new CycleCommandGroup(
-                stickDriver::SetRobotCentricDriveMode,
-                stickDriver::SetFieldCentricDriveMode
+                robot.drivebase::SetSnapRotation,
+                robot.drivebase::SetHoldRotation,
+                robot.drivebase::SetTangentRotation,
+                robot.drivebase::SetVisionRotation,
+                //robot.drivebase::SetTargetBasedRotation,
+                robot.drivebase::SetFreeRotation
+            )
+        );
+        driveModeButton.whenPressed(
+            new CycleCommandGroup(
+                robot.drivebase::SetSquareMotion,
+                //robot.drivebase::SetTargetBasedMotion,
+                robot.drivebase::SetFreeMotion
+            )
+        );
+        holdPosButton.whenPressedReleased(robot.drivebase::StayPut, robot.drivebase::ResumeDriving);
+
+        resetGyroButton.whenPressed(robot.drivebase::ResetGyro);
+        // This is a nifty feature students built last year: We can *cycle* through commands!
+        botFieldToggleButton.whenReleased(
+            new CycleCommandGroup(
+                robot.drivebase::SetRobotCentricMode,
+                robot.drivebase::SetFieldCentricMode
             )
         );
     }
