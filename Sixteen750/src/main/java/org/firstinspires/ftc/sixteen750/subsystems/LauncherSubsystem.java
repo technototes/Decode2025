@@ -23,7 +23,8 @@ public class LauncherSubsystem implements Loggable {
     public static double MOTOR_POWER = 0.65; // 0.5 1.0
 
     @Log.Number(name = "Target Velocity")
-    public static double TARGET_LAUNCH_VELOCITY = 2700;
+    public static double TARGET_LAUNCH_VELOCITY = 2250
+            ;
 
     @Log.Number(name = "Motor Velocity")
     public static double CURRENT_LAUNCH_VELOCITY = 0.0;

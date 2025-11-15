@@ -109,7 +109,7 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-        launchButton.whenPressed(TeleCommands.Launch(robot));
+        launchButton.whilePressed(TeleCommands.Launch(robot));
         launchButton.whenReleased(TeleCommands.StopLaunch(robot));
     }
 
