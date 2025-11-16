@@ -15,6 +15,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 public class LimelightSubsystem implements Loggable {
 
     boolean hasHardware;
+
     //data should not be flickering anymore on the driverstation because we are logging
     //instead of updating telemetry
     @Log.Number(name = "LLX angle")
@@ -56,8 +57,7 @@ public class LimelightSubsystem implements Loggable {
             return true;
             //getLatestResult returns the x-angle, the y-angle,
             // and the area of the apriltag on the camera
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -69,9 +69,7 @@ public class LimelightSubsystem implements Loggable {
     public double getLimelightRotation() {
         if (getLatestResult()) {
             return SIGN * Yangle;
-        }
-
-        else {
+        } else {
             return 0;
         }
         //its y-angle because we flipped the camera, we might need to invert the axis

@@ -40,7 +40,6 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 @Configurable
 public class PedroDriver implements Command, Loggable {
 
-
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
         headingOffset = follower.getHeading();
@@ -97,7 +96,6 @@ public class PedroDriver implements Command, Loggable {
     public void EnableVisionDriving() {
         switchDriveStyle(DrivingStyle.Vision_NYI);
     }
-
 
     public void EnableFreeDriving() {
         switchDriveStyle(DrivingStyle.Free);
@@ -291,7 +289,8 @@ public class PedroDriver implements Command, Loggable {
             case Vision_NYI:
                 if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
                     // --- Face AprilTag using Limelight ---
-                    targetHeading = curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
+                    targetHeading =
+                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
                     //lowkey forgot what kevin said but i think it just sets the target heading to
                     //where the limelight is so that vision can make the bot turn that way
                 } else {

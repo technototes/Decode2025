@@ -23,8 +23,7 @@ public class LauncherSubsystem implements Loggable {
     public static double MOTOR_POWER = 0.65; // 0.5 1.0
 
     @Log.Number(name = "Target Velocity")
-    public static double TARGET_LAUNCH_VELOCITY = 2250
-            ;
+    public static double TARGET_LAUNCH_VELOCITY = 2250;
 
     @Log.Number(name = "Motor Velocity")
     public static double CURRENT_LAUNCH_VELOCITY = 0.0;
@@ -38,10 +37,11 @@ public class LauncherSubsystem implements Loggable {
     // not tested just placeholder but should be used
     EncodedMotor<DcMotorEx> launcher1;
     EncodedMotor<DcMotorEx> launcher2;
-    @Log (name = "Flywheel at Velocity")
+
+    @Log(name = "Flywheel at Velocity")
     public static boolean ready;
 
-    @Log.Number (name = "Current Launcher Velocity")
+    @Log.Number(name = "Current Launcher Velocity")
     public static double CURRENT_LAUNCHER_VELOCITY;
 
     public LauncherSubsystem(Hardware h) {
@@ -72,17 +72,14 @@ public class LauncherSubsystem implements Loggable {
         }
     }
 
-    public double readVelocity(){
-//        if(launcher1.getVelocity() == TARGET_LAUNCH_VELOCITY && launcher2.getVelocity() == TARGET_LAUNCH_VELOCITY) {
-//            return ready = true;
-//        }
-//
-//        else {
-//            return ready = false;
-//        }
+    public double readVelocity() {
+        // if(launcher1.getVelocity() == TARGET_LAUNCH_VELOCITY && launcher2.getVelocity() == TARGET_LAUNCH_VELOCITY) {
+        //     return ready = true;
+        // } else {
+        //     return ready = false;
+        // }
         CURRENT_LAUNCH_VELOCITY = launcher1.getVelocity();
         return CURRENT_LAUNCH_VELOCITY;
-
     }
 
     public void Stop() {
@@ -131,5 +128,4 @@ public class LauncherSubsystem implements Loggable {
             TeleCommands.GateDown(robot);
         }
     }
-
 }
