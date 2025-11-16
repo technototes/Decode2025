@@ -91,13 +91,20 @@ public class DriverController {
     }
 
     public void bindDriveControls() {
-        pedroDriver = new PedroDriver(robot.follower, driveLeftStick, driveRightStick, robot.limelightSubsystem);
+        pedroDriver = new PedroDriver(
+            robot.follower,
+            driveLeftStick,
+            driveRightStick,
+            robot.limelightSubsystem
+        );
         CommandScheduler.scheduleJoystick(pedroDriver);
 
         // turboButton.whenPressed(DrivingCommands.TurboDriving(robot.drivebase));
         // turboButton.whenReleased(DrivingCommands.NormalDriving(robot.drivebase));
-        snailButton.whenPressedReleased(DrivingCommands.SnailDriving(pedroDriver),
-                DrivingCommands.NormalDriving(pedroDriver));
+        snailButton.whenPressedReleased(
+            DrivingCommands.SnailDriving(pedroDriver),
+            DrivingCommands.NormalDriving(pedroDriver)
+        );
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(pedroDriver));
         MotorDecrease.whenPressed(TeleCommands.DecreaseMotor(robot));
         MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));
@@ -119,7 +126,6 @@ public class DriverController {
         spitButton.whenReleased(TeleCommands.IntakeStop(robot));
         intakeTrigger.whenPressed(TeleCommands.Intake(robot));
         intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot));
-
     }
 
     // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));

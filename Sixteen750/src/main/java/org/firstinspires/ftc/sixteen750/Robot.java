@@ -53,13 +53,14 @@ public class Robot implements Loggable {
         if (Setup.Connected.TESTSUBSYSTEM) {
             this.testSubsystem = new TestSubsystem(hw);
         }
-            if (Setup.Connected.LIMELIGHTSUBSYSTEM){
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             this.limelightSubsystem = new LimelightSubsystem(hw);
         }
         if (Setup.Connected.DRIVEBASE) {
-        follower = AutoConstants.createFollower(hw.map);
+            follower = AutoConstants.createFollower(hw.map);
         }
     }
+
     public Hardware getHardware() {
         return hardware;
     }

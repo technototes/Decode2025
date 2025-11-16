@@ -43,10 +43,10 @@ public class Paths {
     public static Command AutoLaunching3Balls(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.IntakeStop(r),
-                TeleCommands.GateUp(r),
-                TeleCommands.HoldIntake(r),
+            TeleCommands.GateUp(r),
+            TeleCommands.HoldIntake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
-             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
+            //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
             new WaitCommand(2.5),
             TeleCommands.GateUp(r),
@@ -133,6 +133,7 @@ public class Paths {
     public static Pose getBSegmentedCurveStart() {
         return new Pose(30.748, 135.152, Math.toRadians(90));
     }
+
     public static Pose getForward48Start() {
         return new Pose(56.000, 8.000, Math.toRadians(90));
     }
@@ -372,32 +373,28 @@ public class Paths {
             .build();
 
         Forward48 = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierLine(new Pose(56.000, 8.000), new Pose(56.000, 56.000))
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
-                .setVelocityConstraint(0.5)
-                .build();
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(56.000, 8.000), new Pose(56.000, 56.000)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+            .setVelocityConstraint(0.5)
+            .build();
         Backward48 = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierLine(new Pose(56.000, 56.000), new Pose(56.000, 8.000))
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
-                .build();
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(56.000, 56.000), new Pose(56.000, 8.000)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+            .build();
 
         SideLeft48 = follower
-                .pathBuilder()
-                .addPath(new BezierLine(new Pose(56.000, 8.000), new Pose(8, 8.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
-                .build();
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(56.000, 8.000), new Pose(8, 8.000)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+            .build();
 
         SideRight48 = follower
-                .pathBuilder()
-                .addPath(new BezierLine(new Pose(8, 8.000), new Pose(56.000, 8.000)))
-                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
-                .build();
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(8, 8.000), new Pose(56.000, 8.000)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+            .build();
     }
 }
 
