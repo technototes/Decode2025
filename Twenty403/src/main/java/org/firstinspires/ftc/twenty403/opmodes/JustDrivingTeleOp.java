@@ -97,7 +97,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
                 robot.follower.getHeading() - 90
             )
         );
-        if (Setup.Connected.LAUNCHER){
+        if (Setup.Connected.LAUNCHER) {
             CommandScheduler.register(robot.launcherSubsystem);
         }
         telemetry.addData(">", "Robot Ready.  Press Play.");

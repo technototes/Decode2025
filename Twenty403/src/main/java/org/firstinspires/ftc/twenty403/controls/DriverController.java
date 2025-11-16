@@ -152,10 +152,10 @@ public class DriverController {
         }
     }
 
-//    public void setLaunch() {
-//        launchOn = !launchOn;
-//        Launch();
-//    }
+    // public void setLaunch() {
+    //     launchOn = !launchOn;
+    //     Launch();
+    // }
 
     public void launchFaster() {
         robot.launcherSubsystem.IncreaseVelocity();
@@ -165,11 +165,11 @@ public class DriverController {
         robot.launcherSubsystem.DecreaseVelocity();
     }
 
-//    public void Launch() {
-//        if (launchOn) {
-//            robot.launcherSubsystem.Launch();
-//        } else {
-//            robot.launcherSubsystem.Stop();
-//        }
-//    }
+    // public void Launch() {
+    //     if (launchOn) {
+    //         robot.launcherSubsystem.Launch();
+    //     } else {
+    //         robot.launcherSubsystem.Stop();
+    //     }
+    // }
 }

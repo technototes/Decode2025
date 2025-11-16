@@ -14,7 +14,7 @@ import org.firstinspires.ftc.twenty403.Setup;
 @Configurable
 public class LauncherSubsystem implements Loggable, Subsystem {
 
-    public static double TARGET_MOTOR_VELOCITY = 1300 ; //.58; // 0.5 // /1.0
+    public static double TARGET_MOTOR_VELOCITY = 1300; //.58; // 0.5 // /1.0
 
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
@@ -27,10 +27,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     @Log(name = "Launcher Velo: ")
     public static double MOTOR_VELOCITY;
+
     @Log(name = "Target Speed: ")
     public static double target;
+
     @Log(name = "Launcher Power: ")
     public static double power;
+
     @Log(name = "Error")
     public static double err;
 
@@ -48,8 +51,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             } else {
                 SPIN_VOLT_COMP = SPIN_VOLT_COMP + (ADDITION * DIFFERENCE);
             }
-            launcherPID = new PIDFController(launcherP, target -> target == 0 ? 0 : (SPIN_F_SCALE * target) + (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage())));
-//            top.setPIDFCoefficients(launcherP);
+            launcherPID = new PIDFController(launcherP, target ->
+                target == 0
+                    ? 0
+                    : (SPIN_F_SCALE * target) +
+                      (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()))
+            );
+            //            top.setPIDFCoefficients(launcherP);
             setTargetSpeed(0);
         } else {
             top = null;
@@ -79,7 +87,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         }
     }
 
-
     public boolean GetCurrentTargetVelocity() {
         return top.getVelocity() >= 1300;
     }
@@ -93,30 +100,34 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public void setTargetSpeed(double speed) {
         target = speed;
-//        top.setVelocity(speed);
+        //        top.setVelocity(speed);
         launcherPID.setTarget(speed);
     }
+
     public double getTargetSpeed() {
         return target;
     }
+
     private void setMotorPower(double pow) {
         double power = Math.clamp(pow, -1, 1);
         if (top != null) {
             top.setPower(power);
         }
     }
+
     public double getMotorSpeed() {
         if (top != null) {
             return launcherPID.getTarget();
         }
         return -1;
     }
+
     @Override
     public void periodic() {
         setMotorPower(launcherPID.update(getMotorSpeed()));
         err = launcherPID.getLastError();
         MOTOR_VELOCITY = top.getVelocity();
         power = top.getPower();
-//        launcherP.f =  SPIN_F_SCALE * target + SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, Hardware.voltage());
+        // launcherP.f =  SPIN_F_SCALE * target + SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, Hardware.voltage());
     }
 }
