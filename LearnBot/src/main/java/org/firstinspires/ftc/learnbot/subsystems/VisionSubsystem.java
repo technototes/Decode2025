@@ -8,8 +8,23 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import org.firstinspires.ftc.learnbot.Setup;
 
+@Configurable
 public class VisionSubsystem implements Subsystem, Loggable {
 
+  
+    public static enum CameraOrientation {
+        USB_BOT_LEFT, // This is 'normal'
+        USB_UP,
+        USB_BOT_RIGHT, // This is upside down
+        USB_DOWN,
+    }
+
+    public static CameraOrientation Camera_Orientation = CameraOrientation.USB_UP;
+    public static int Green_Color_Pipeline = 0;
+    public static int AprilTag_Pipeline = 1;
+    public static int Purple_Color_Pipeline = 2;
+    public static double Camera_Tilt_Degrees = 14.0;
+    
     @Log(name = "Viz")
     public static String status = "";
 
@@ -32,19 +47,19 @@ public class VisionSubsystem implements Subsystem, Loggable {
             switch (Setup.Vision.Camera_Orientation) {
                 case USB_BOT_LEFT:
                     this.x = result.getTx();
-                    this.y = result.getTy();
+                    this.y = result.getTy() - Camera_Tilt_Degrees;
                     break;
                 case USB_UP:
                     this.x = -result.getTy();
-                    this.y = result.getTx();
+                    this.y = result.getTx() - Camera_Tilt_Degrees;
                     break;
                 case USB_BOT_RIGHT:
                     this.x = -result.getTx();
-                    this.y = -result.getTy();
+                    this.y = -result.getTy() + Camera_Tilt_Degrees;
                     break;
                 case USB_DOWN:
                     this.x = result.getTy();
-                    this.y = -result.getTx();
+                    this.y = -result.getTx() + Camera_Tilt_Degrees;
                     break;
             }
         }
@@ -64,7 +79,6 @@ public class VisionSubsystem implements Subsystem, Loggable {
         return limelight.getLatestResult().getPipelineIndex();
     }
 
-    // TODO: Handle orientation changes in here, rather than with the user?
     public TargetInfo getCurResult() {
         result = limelight.getLatestResult();
         rotatedResult = (result == null || !result.isValid()) ? null : new TargetInfo(result);
