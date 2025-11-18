@@ -17,6 +17,9 @@ public class VisionSubsystem implements Subsystem, Loggable {
     private LLResult result;
     private TargetInfo rotatedResult;
 
+    // Currently, the camera orientation is:
+    // USB port up, with a 14 degree upward tilt
+
     public static class TargetInfo {
 
         public double x;
