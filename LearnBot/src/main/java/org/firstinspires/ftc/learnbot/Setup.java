@@ -34,21 +34,4 @@ public class Setup {
         public static int AUTOTIME = 25;
         public static double TRIGGER_THRESHOLD = 0.3;
     }
-
-    public enum CameraOrientation {
-        USB_BOT_LEFT, // This is 'normal'
-        USB_UP,
-        USB_BOT_RIGHT, // This is upside down
-        USB_DOWN,
-    }
-
-    @Configurable
-    public static class Vision {
-
-        public static CameraOrientation Camera_Orientation = CameraOrientation.USB_UP;
-        public static int Green_Color_Pipeline = 0;
-        public static int AprilTag_Pipeline = 1;
-        public static int Purple_Color_Pipeline = 2;
-        public static String[] Motif = { "1", "2", "3" };
-    }
 }
