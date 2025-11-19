@@ -7,6 +7,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
@@ -62,6 +63,7 @@ public class DualTeleOp extends CommandOpMode {
             telemetry.setMsTransmissionInterval(11);
 
             limelight.pipelineSwitch(AprilTag_Pipeline);
+            CommandScheduler.register(robot.limelightSubsystem);
 
             /*
              * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
