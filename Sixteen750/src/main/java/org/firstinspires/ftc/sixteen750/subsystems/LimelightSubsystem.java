@@ -2,17 +2,22 @@ package org.firstinspires.ftc.sixteen750.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
+import com.technototes.library.subsystem.Subsystem;
+
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
+import java.util.List;
+
 @Configurable
-public class LimelightSubsystem implements Loggable {
+public class LimelightSubsystem implements Loggable, Subsystem {
 
     boolean hasHardware;
 
@@ -26,8 +31,15 @@ public class LimelightSubsystem implements Loggable {
 
     @Log.Number(name = "LL Area")
     public static double Area = 0.0;
+    @Log.Number (name = "distance")
+    public static double distance;
+
+    @Log (name = "new data")
+    public static boolean new_result;
 
     public static double SIGN = 1.0;
+    public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 17.2;
+    public static double CAMERA_TO_CENTER_OF_ROBOT = 7.2;
     public static Limelight3A limelight;
 
     public LimelightSubsystem(Hardware h) {
@@ -48,19 +60,20 @@ public class LimelightSubsystem implements Loggable {
 
     public boolean getLatestResult() {
         LLResult result = limelight.getLatestResult();
-        if (result != null && result.isValid()) {
+        if (result != null ) { //&& result.isValid()
             // Not sure this is the right angle, because the camera is mounted sideways
             // IIRC, you should be using getTy() instead.
-            Xangle = result.getTx();
-            Yangle = result.getTy();
+            Xangle = -result.getTy();
+            Yangle = result.getTx();
             Area = result.getTa();
             return true;
-            //getLatestResult returns the x-angle, the y-angle,
-            // and the area of the apriltag on the camera
+//            getLatestResult returns the x-angle, the y-angle,
+//             and the area of the apriltag on the camera
         } else {
             return false;
         }
     }
+    //distance = DISTANCE_FROM_LIMELIGHT_TO_APRILTAG/arctan(result.getTx())
 
     public void selectPipeline(int pipelineIndex) {
         limelight.pipelineSwitch(pipelineIndex);
@@ -74,5 +87,34 @@ public class LimelightSubsystem implements Loggable {
         }
         //its y-angle because we flipped the camera, we might need to invert the axis
         // if it start turning away from the apriltag
+    }
+
+    public double getDistance() {
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                if (fr.getFiducialId() == 21) {
+                    return -1;
+                } else if (fr.getFiducialId() == 22) {
+                    return -1;
+                } else if (fr.getFiducialId() == 23) {
+                    return -1;
+                }
+            }
+        }
+          distance = (DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY/Math.tan(Math.toRadians(Yangle))) + CAMERA_TO_CENTER_OF_ROBOT;
+          return distance;
+
+          // measurements:
+          // center of camera lens to floor - 12.3 inches
+          // camera to center of robot(front-back) - 7.2 inches
+          // apriltag height from floor- 29.5 inches
+
+    }
+    @Override
+    public void periodic() {
+        new_result = getLatestResult();
+        distance = getDistance();
     }
 }
