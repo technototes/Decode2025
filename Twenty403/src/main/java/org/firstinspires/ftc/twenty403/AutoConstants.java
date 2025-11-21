@@ -41,22 +41,22 @@ public class AutoConstants {
     public static double timeoutConstraint = 250;
     public static double linearScalar = 1.0;
     public static double angularScalar = 1.0;
-    public static double brakingStrength = 0.0009;
+    public static double brakingStrength = 0.09;
     public static double brakingStart = 0.1;
     public static double centripetalScale = 0.0005;
     public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(4.75, 0, -Math.PI / 2);
-    public static PIDFCoefficients translationPID = new PIDFCoefficients(0.08, 0.0, 0, 0.0);
-    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.8, 0.0, 0, 0.0);
+    public static PIDFCoefficients translationPID = new PIDFCoefficients(0.2, 0, 0.02, 0.02);
+    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.75, 0.0, 0.075 , 0.01);
 
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
     public static FilteredPIDFCoefficients drivePID = new FilteredPIDFCoefficients(
-        0.005,
+        0.03,
         0,
-        0.00035,
+        5E-5,
         0.6,
-        0.015
+        1E-4
     );
 
     @Configurable
