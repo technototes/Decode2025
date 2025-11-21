@@ -37,9 +37,10 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     @Log (name = "new data")
     public static boolean new_result;
 
-    public static double SIGN = 1.0;
+    public static double SIGN = -1.0;
     public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 17.2;
     public static double CAMERA_TO_CENTER_OF_ROBOT = 7.2;
+    public static double EXTRA_OFFSET = 0;
     public static Limelight3A limelight;
 
     public LimelightSubsystem(Hardware h) {
@@ -64,7 +65,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
             // Not sure this is the right angle, because the camera is mounted sideways
             // IIRC, you should be using getTy() instead.
             Xangle = -result.getTy();
-            Yangle = result.getTx();
+            Yangle = -result.getTx();
             Area = result.getTa();
             return true;
 //            getLatestResult returns the x-angle, the y-angle,
@@ -103,7 +104,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
                 }
             }
         }
-          distance = (DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY/Math.tan(Math.toRadians(Yangle))) + CAMERA_TO_CENTER_OF_ROBOT;
+          distance = (DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY/Math.tan(Math.toRadians(Yangle))) + CAMERA_TO_CENTER_OF_ROBOT + EXTRA_OFFSET;
           return distance;
 
           // measurements:
@@ -116,5 +117,6 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     public void periodic() {
         new_result = getLatestResult();
         distance = getDistance();
+
     }
 }

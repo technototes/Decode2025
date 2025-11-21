@@ -6,18 +6,21 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.command.Command;
+import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
+import com.technototes.library.subsystem.Subsystem;
+
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
-public class LauncherSubsystem implements Loggable {
+public class LauncherSubsystem implements Loggable, Subsystem {
 
     @Log.Number(name = "Motor Power")
     public static double MOTOR_POWER = 0.65; // 0.5 1.0
@@ -33,10 +36,13 @@ public class LauncherSubsystem implements Loggable {
     public PIDFCoefficients launcherPIDF = new PIDFCoefficients(1.0, 0.0, 0.0, 10.0);
     public PIDFController launcherPIDFController;
     public static double FEEDFORWARD_COEFFICIENT = 0.0;
+    @Log.Number (name = "AutoAim Velocity")
+    public static double auto_velocity;
     public double launcherPow;
     // not tested just placeholder but should be used
     EncodedMotor<DcMotorEx> launcher1;
     EncodedMotor<DcMotorEx> launcher2;
+    LimelightSubsystem ls;
 
     @Log(name = "Flywheel at Velocity")
     public static boolean ready;
@@ -57,10 +63,12 @@ public class LauncherSubsystem implements Loggable {
             launcher1.setPIDFCoefficients(launcherPIDF);
             launcher2.setPIDFCoefficients(launcherPIDF);
             ready = false;
+            ls = new LimelightSubsystem(h);
         } else {
             launcher1 = null;
             launcher2 = null;
         }
+        CommandScheduler.register(this);
     }
 
     public void Launch() {
@@ -127,5 +135,16 @@ public class LauncherSubsystem implements Loggable {
         ) {
             TeleCommands.GateDown(robot);
         }
+    }
+
+    public double autoVelocity() {
+        double auto_velocity = 100 * (0.982 * ((ls.getDistance() / 12) + 1.25) + 16.2);
+        // x = distance in feet
+        return auto_velocity;
+    }
+
+    @Override
+    public void periodic() {
+        auto_velocity = autoVelocity();
     }
 }
