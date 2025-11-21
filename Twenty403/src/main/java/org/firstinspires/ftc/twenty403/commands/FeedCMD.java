@@ -19,7 +19,7 @@ public class FeedCMD {
 
     public static SequentialCommandGroup Feed(Robot r) {
         return Command.create(r.launcherSubsystem::Launch)
-                .andThen(new WaitCommand(LAUNCH_STARTUP))
+                .andThen (new WaitCommand(LAUNCH_STARTUP))
         .andThen(Command.create(r.feedingSubsystem::moveball))
                 .andThen(new WaitCommand(FEED_WAIT))
                 .andThen(Command.create(r.feedingSubsystem::stop))

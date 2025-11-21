@@ -7,12 +7,17 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
+import org.firstinspires.ftc.twenty403.Paths;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
+import org.firstinspires.ftc.twenty403.commands.PPPathCommand;
+import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
 @Configurable
@@ -22,9 +27,7 @@ public class BlueSmallTriMove extends CommandOpMode {
 
     public Robot robot;
     public Hardware hardware;
-    public int pathState = 0;
-    public Timer pathTimer, actionTimer, opmodeTimer;
-    public PathChain bluesmalltobluegoal;
+    Paths p = null;
 
     public double MAX_POWER = .75;
 
@@ -32,39 +35,18 @@ public class BlueSmallTriMove extends CommandOpMode {
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
-        pathTimer = new Timer();
-        opmodeTimer = new Timer();
-        opmodeTimer.resetTimer();
         SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         otos.calibrateImu();
         robot.follower = AutoConstants.createFollower(hardwareMap);
-        robot.follower.setPose(new Pose(62.933, 9.422, 90));
-        bluesmalltobluegoal = robot.follower
-            .pathBuilder()
-            .addPath(
-                new BezierCurve(
-                    new Pose(62.933, 9.422),
-                    new Pose(51.200, 25.778),
-                    new Pose(40.178, 15.111)
-                )
-            )
-            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
-            .build();
-        //        robot.follower.setStartingPose(robot.follower.getPose());
-        //        bluesmalltobluegoal = robot.follower
-        //                .pathBuilder()
-        //                .addPath(
-        //                        new BezierCurve(
-        //                                new Pose(9.067, 56.889),
-        //                                new Pose(116.444, 72),
-        //                                new Pose(125.689, 22.044)
-        //                        )
-        //                )
-        //                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(145))
-        //                .build();
+        p = new Paths(robot.follower);
+        robot.follower.setPose(p.BlueSmall);
         telemetry.addData("Pose:", robot.follower.getPose());
-        robot.follower.setMaxPower(MAX_POWER);
+//        robot.follower.setMaxPower(MAX_POWER);
         robot.follower.update();
+        CommandScheduler.scheduleForState(new SequentialCommandGroup(new PPPathCommand(robot.follower, p.starttobluegoal), CommandScheduler::terminateOpMode
+                ),
+                OpModeState.RUN
+        );;
     }
 
     @Override
@@ -77,24 +59,16 @@ public class BlueSmallTriMove extends CommandOpMode {
     public void uponStart() {
         //        EZCmd.Drive.ResetGyro(robot.follower);
         robot.atStart();
-        opmodeTimer.resetTimer();
     }
 
-    //    public void end() {
-    //        HeadingHelper.savePose(robot.drivebaseSubsystem.getPoseEstimate());
-    //    }
+        public void end() {
+            HeadingHelper.savePose(robot.follower.getPose());
+        }
     @Override
     public void runLoop() {
         telemetry.addData("Pose:", robot.follower.getPose());
         //        if (robot.follower.getHeading() != robot.follower.getCurrentPath().getPose()) {}
-        autonomousPathRun();
         robot.follower.update();
     }
 
-    public void autonomousPathRun() {
-        if (pathState == 0) {
-            robot.follower.followPath(bluesmalltobluegoal);
-            pathState++;
-        }
-    }
 }
