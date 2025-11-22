@@ -15,6 +15,7 @@ import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
+import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 @Configurable
 @Autonomous(name = "MoveLeft", preselectTeleOp = "Two Controller Drive \uD83D\uDDFF")
@@ -57,7 +58,7 @@ public class MoveLeft extends CommandOpMode {
         //        if (robot.follower.getHeading() != robot.follower.getCurrentPath().getPose()) {}
         robot.follower.update();
     }
-    //    public void end() {
-    //        HeadingHelper.savePose(robot.follower.getPose());
-    //    }
+    public void end() {
+        HeadingHelper.savePose(robot.follower.getPose());
+    }
 }

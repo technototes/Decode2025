@@ -19,8 +19,6 @@ public class Paths {
     }
 
     //blue poses
-    public Pose BlueSmall = new Pose(56.418, 8.866);
-    public Pose BlueSmallFirstBezierPoint = new Pose(74.149, 51.045);
     public Pose BlueGoal = new Pose(23.104, 126.537);
     public Pose intake1end = new Pose(14, 84.233);
     public Pose intake2 = new Pose(42, 60);
@@ -41,16 +39,6 @@ public class Paths {
     public Pose Rmove = new Pose(115, 49.617);
 
     public Paths(Follower follower) {
-        starttobluegoal = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                BlueSmall,
-                                BlueSmallFirstBezierPoint,
-                                BlueGoal
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(145))
-                .build();
+
     }
 }
