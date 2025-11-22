@@ -5,10 +5,7 @@ import com.pedropathing.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
-import com.technototes.library.command.SequentialCommandGroup;
-import com.technototes.library.command.WaitCommand;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
@@ -26,10 +23,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double MOTOR_POWER = 0.65; // 0.5 1.0
 
     @Log.Number(name = "Target Velocity")
-    public static double TARGET_LAUNCH_VELOCITY = 2250;
+    public static double TargetLaunchVelocity = 2250;
 
-    @Log.Number(name = "Motor Velocity")
-    public static double CURRENT_LAUNCH_VELOCITY = 0.0;
+    @Log.Number(name = "Current Motor Velocity")
+    public static double CurrentLaunchVelocity = 0.0;
 
     boolean hasHardware;
     public Robot robot;
@@ -46,9 +43,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     @Log(name = "Flywheel at Velocity")
     public static boolean ready;
-
-    @Log.Number(name = "Current Launcher Velocity")
-    public static double CURRENT_LAUNCHER_VELOCITY;
 
     public LauncherSubsystem(Hardware h) {
         hasHardware = Setup.Connected.LAUNCHERSUBSYSTEM;
@@ -74,9 +68,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void Launch() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            launcher1.setVelocity(TARGET_LAUNCH_VELOCITY);
-            launcher2.setVelocity(TARGET_LAUNCH_VELOCITY);
-            readVelocity();
+            launcher1.setVelocity(TargetLaunchVelocity);
+            launcher2.setVelocity(TargetLaunchVelocity);
         }
     }
 
@@ -86,8 +79,11 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // } else {
         //     return ready = false;
         // }
-        CURRENT_LAUNCH_VELOCITY = launcher1.getVelocity();
-        return CURRENT_LAUNCH_VELOCITY;
+        return launcher1.getVelocity();
+
+        // 12.25 stationary voltage - had to decrease velocity by 150 (trial one: true, trial two: true)
+        // 11.84 stationary voltage - had to decrease velocity by 100? (trial one:
+
     }
 
     public void Stop() {
@@ -100,24 +96,24 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void IncreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            TARGET_LAUNCH_VELOCITY += 50;
+            TargetLaunchVelocity += 50;
         }
     }
 
     public void DecreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            TARGET_LAUNCH_VELOCITY -= 50;
+            TargetLaunchVelocity -= 50;
         }
     }
 
     public void setMotorVelocityTest() {
-        launcher1.setVelocity(TARGET_LAUNCH_VELOCITY);
+        launcher1.setVelocity(TargetLaunchVelocity);
     }
 
     public void setMotorPowerTest() {
         launcher1.setPower(MOTOR_POWER);
-        CURRENT_LAUNCH_VELOCITY = getMotor1Velocity();
+        CurrentLaunchVelocity = getMotor1Velocity();
     }
 
     public double getMotor1Velocity() {
@@ -130,8 +126,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public void VelocityShoot() {
         if (
-            getMotor1Velocity() == TARGET_LAUNCH_VELOCITY &&
-            getMotor2Velocity() == TARGET_LAUNCH_VELOCITY
+            getMotor1Velocity() == TargetLaunchVelocity &&
+            getMotor2Velocity() == TargetLaunchVelocity
         ) {
             TeleCommands.GateDown(robot);
         }
@@ -146,5 +142,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Override
     public void periodic() {
         auto_velocity = autoVelocity();
+        CurrentLaunchVelocity = readVelocity();
     }
 }
