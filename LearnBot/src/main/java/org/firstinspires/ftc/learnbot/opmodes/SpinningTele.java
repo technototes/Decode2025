@@ -15,6 +15,7 @@ import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.SpinningBot;
 import org.firstinspires.ftc.learnbot.controls.DriverController;
+import org.firstinspires.ftc.learnbot.controls.SpinController;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
@@ -24,7 +25,7 @@ import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 public class SpinningTele extends CommandOpMode implements Loggable {
 
     public SpinningBot robot;
-    public DriverController controls;
+    public SpinController controls;
     public Hardware hardware;
     // For Panels controller widget the two lines below
     private final GamepadManager driverManager = PanelsGamepad.INSTANCE.getFirstManager();
@@ -34,7 +35,7 @@ public class SpinningTele extends CommandOpMode implements Loggable {
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new SpinningBot(hardware, Alliance.NONE, StartingPosition.Unspecified);
-        // controls = new DriverController(driverGamepad, robot);
+        controls = new SpinController(driverGamepad, robot);
         // CommandScheduler.scheduleInit(HeadingHelper.RestorePreviousPosition(robot.drivebase));
         // CommandScheduler.scheduleJoystick(controls.stickDriver);
     }

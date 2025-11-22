@@ -12,6 +12,7 @@ import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.PIDFController;
 import org.firstinspires.ftc.learnbot.Hardware;
 
+// Untested, not really workingg...
 @Configurable
 public class SpinningSubsystem implements Subsystem, Loggable {
 
@@ -19,11 +20,11 @@ public class SpinningSubsystem implements Subsystem, Loggable {
     // Do remember that the output is in "power" terms,
     // while the target & error are in "RPM" terms.
     // F is unused, as we're going to have a function for it, instead
-    public static PIDFCoefficients PID_VALUES = new PIDFCoefficients(1e-4, 1e-8, 1e-6, 0);
+    public static PIDFCoefficients PID_VALUES = new PIDFCoefficients(1e-8, 1e-11, 1e-9, 0);
 
     // The idea is that at full power, if it spins at 3000 tps the "scale" is 1/3000
     // Change this to be correct for the gear ratio of your motor.
-    public static double SPIN_TO_RPM_SCALE = 1.0 / 1000;
+    public static double SPIN_TO_RPM_SCALE = 1.0 / 2800;
     // This should be the voltage compensation factor in F. For every 1V below "peak" voltage,
     // we'll increase the FF value by 0.1 (which simply raises power that much)
     public static double INITIAL_VOLTAGE_COMP_FACTOR = 0.03;
@@ -47,13 +48,14 @@ public class SpinningSubsystem implements Subsystem, Loggable {
     @Log(name = "Motor Delta")
     public double delta;
 
-    public boolean start;
+    @Log(name="Running")
+    public boolean running;
     public Hardware hardware;
 
     public SpinningSubsystem(EncodedMotor<DcMotorEx> m, Hardware hw, boolean dontSchedule) {
         motor = m;
         hardware = hw;
-        start = false;
+        running = false;
 
         if (motor != null) {
             motor.coast();
@@ -84,7 +86,7 @@ public class SpinningSubsystem implements Subsystem, Loggable {
 
     @Override
     public void periodic() {
-        if (start) {
+        if (running) {
             delta = spinningPID.update(getMotorSpeed());
             setMotorPower(power + delta);
         } else {
@@ -92,20 +94,26 @@ public class SpinningSubsystem implements Subsystem, Loggable {
         }
     }
 
+    // 54 = 500
+    // 90 = 840
+    // 148 = 1320
+    // 262 = 2360
+
     public void start() {
-        start = true;
+        running = true;
+        setTargetSpeed(target);
     }
 
     public void stop() {
-        start = false;
+        running = false;
     }
 
     public void increase() {
-        target += DELTA;
+        setTargetSpeed(target + DELTA);
     }
 
     public void decrease() {
-        target -= DELTA;
+        setTargetSpeed(target - DELTA);
     }
 
     public double getMotorSpeed() {
