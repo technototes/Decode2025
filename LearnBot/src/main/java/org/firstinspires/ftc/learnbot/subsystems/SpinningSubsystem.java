@@ -23,11 +23,13 @@ public class SpinningSubsystem implements Subsystem, Loggable {
 
     // The idea is that at full power, if it spins at 3000 tps the "scale" is 1/3000
     // Change this to be correct for the gear ratio of your motor.
-    public static double SPIN_TO_RPM_SCALE = 1.0 / 312;
+    public static double SPIN_TO_RPM_SCALE = 1.0 / 1000;
     // This should be the voltage compensation factor in F. For every 1V below "peak" voltage,
     // we'll increase the FF value by 0.1 (which simply raises power that much)
     public static double INITIAL_VOLTAGE_COMP_FACTOR = 0.03;
     public static double PEAK_VOLTAGE = 13.2;
+
+    public static double DELTA = 50;
 
     private final EncodedMotor<DcMotorEx> motor;
     private final PIDFController spinningPID;
@@ -45,11 +47,14 @@ public class SpinningSubsystem implements Subsystem, Loggable {
     @Log(name = "Motor Delta")
     public double delta;
 
+    public boolean start;
     public Hardware hardware;
 
     public SpinningSubsystem(EncodedMotor<DcMotorEx> m, Hardware hw, boolean dontSchedule) {
         motor = m;
         hardware = hw;
+        start = false;
+
         if (motor != null) {
             motor.coast();
         }
@@ -79,8 +84,28 @@ public class SpinningSubsystem implements Subsystem, Loggable {
 
     @Override
     public void periodic() {
-        delta = spinningPID.update(getMotorSpeed());
-        setMotorPower(power + delta);
+        if (start) {
+            delta = spinningPID.update(getMotorSpeed());
+            setMotorPower(power + delta);
+        } else {
+            setMotorPower(0);
+        }
+    }
+
+    public void start() {
+        start = true;
+    }
+
+    public void stop() {
+        start = false;
+    }
+
+    public void increase() {
+        target += DELTA;
+    }
+
+    public void decrease() {
+        target -= DELTA;
     }
 
     public double getMotorSpeed() {
