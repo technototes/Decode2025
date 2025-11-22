@@ -16,6 +16,7 @@ import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.commands.FeedCMD;
 import org.firstinspires.ftc.twenty403.commands.LLPipelineChangeCommand;
+import org.firstinspires.ftc.twenty403.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.twenty403.commands.driving.JoystickDriveCommand;
 import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
 
@@ -83,13 +84,14 @@ public class DriverController {
         angleTrigger = gamepad.leftTrigger;
         moveballup = gamepad.ps_square;
         launch = gamepad.ps_triangle;
-        pipelineMode = gamepad.dpadUp;
+//        pipelineMode = gamepad.dpadUp;
         launchSlower = gamepad.ps_cross;
         launchFaster = gamepad.ps_circle;
-        apriltagPipeline = gamepad.dpadRight;
+//        apriltagPipeline = gamepad.dpadRight;
 //        AutoAim = gamepad.dpadDown;
         moveballanyways = gamepad.dpadDown;
         compactScore = gamepad.dpadLeft;
+
     }
 
     public void bindDriveControls() {
@@ -130,30 +132,30 @@ public class DriverController {
     }
 
     public void bindPipelineControls() {
-        pipelineMode.whenPressed(this::togglePipelineMode);
-        if (pipelineToggle) {
-            //            barcodePipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Barcode_Pipeline));
-            GreencolorPipeline.whenPressed(
-                new LLPipelineChangeCommand(
-                    hardware.limelight,
-                    Setup.HardwareNames.Green_Color_Pipeline
-                )
-            );
-            PurplecolorPipeline.whenPressed(
-                new LLPipelineChangeCommand(
-                    hardware.limelight,
-                    Setup.HardwareNames.Purple_Color_Pipeline
-                )
-            );
-            //            classifierPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Classifier_Pipeline));
-            //            objectPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Object_Detection_Pipeline));
-            apriltagPipeline.whenPressed(
-                new LLPipelineChangeCommand(
-                    hardware.limelight,
-                    Setup.HardwareNames.AprilTag_Pipeline
-                )
-            );
-        }
+//        pipelineMode.whenPressed(this::togglePipelineMode);
+//        if (pipelineToggle) {
+//            //            barcodePipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Barcode_Pipeline));
+//            GreencolorPipeline.whenPressed(
+//                new LLPipelineChangeCommand(
+//                    hardware.limelight,
+//                    Setup.HardwareNames.Green_Color_Pipeline
+//                )
+//            );
+//            PurplecolorPipeline.whenPressed(
+//                new LLPipelineChangeCommand(
+//                    hardware.limelight,
+//                    Setup.HardwareNames.Purple_Color_Pipeline
+//                )
+//            );
+//            //            classifierPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Classifier_Pipeline));
+//            //            objectPipeline.whenPressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.Object_Detection_Pipeline));
+//            apriltagPipeline.whenPressed(
+//                new LLPipelineChangeCommand(
+//                    hardware.limelight,
+//                    Setup.HardwareNames.AprilTag_Pipeline
+//                )
+//            );
+//        }
     }
 
     // public void setLaunch() {
