@@ -48,9 +48,10 @@ public class BlueBigTriMove extends CommandOpMode {
         robot.atStart();
     }
 
-        public void end() {
-            HeadingHelper.savePose(robot.follower.getPose());
-        }
+    public void end() {
+        HeadingHelper.savePose(robot.follower.getPose());
+    }
+
     @Override
     public void runLoop() {
         telemetry.addData("Pose:", robot.follower.getPose());

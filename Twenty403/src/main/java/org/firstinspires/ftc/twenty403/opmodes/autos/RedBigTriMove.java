@@ -27,7 +27,6 @@ public class RedBigTriMove extends CommandOpMode {
     public PathChain bluesmalltobluegoal;
     public Paths p = null;
 
-
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
@@ -76,14 +75,14 @@ public class RedBigTriMove extends CommandOpMode {
         robot.atStart();
     }
 
-        public void end() {
-            HeadingHelper.savePose(robot.follower.getPose());
-        }
+    public void end() {
+        HeadingHelper.savePose(robot.follower.getPose());
+    }
+
     @Override
     public void runLoop() {
         telemetry.addData("Pose:", robot.follower.getPose());
         //        if (robot.follower.getHeading() != robot.follower.getCurrentPath().getPose()) {}
         robot.follower.update();
     }
-
 }

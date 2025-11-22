@@ -46,7 +46,7 @@ public class AutoConstants {
     public static double centripetalScale = 0.0005;
     public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(4.75, 0, -Math.PI / 2);
     public static PIDFCoefficients translationPID = new PIDFCoefficients(0.2, 0, 0.02, 0.02);
-    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.75, 0.0, 0.075 , 0.01);
+    public static PIDFCoefficients headingPID = new PIDFCoefficients(0.75, 0.0, 0.075, 0.01);
 
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
