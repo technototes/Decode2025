@@ -18,11 +18,11 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
-    public static PIDFCoefficients launcherP = new PIDFCoefficients(4.5, 0.0, 0.0, 0);
+    public static PIDFCoefficients launcherP = new PIDFCoefficients(0.002, 0.0, 0.0, 0);
     public static double SPIN_F_SCALE = 1.0 / 6000;
     public static double SPIN_VOLT_COMP = 0.0216;
-    public static double DIFFERENCE = 0.0016;
-    public static double PEAK_VOLTAGE = 16;
+    public static double DIFFERENCE = 0.0046;
+    public static double PEAK_VOLTAGE = 13;
     private static PIDFController launcherPID;
 
     @Log(name = "Launcher Velo: ")
@@ -117,7 +117,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public double getMotorSpeed() {
         if (top != null) {
-            return launcherPID.getTarget();
+            return top.getVelocity();
         }
         return -1;
     }
@@ -126,7 +126,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void periodic() {
         setMotorPower(launcherPID.update(getMotorSpeed()));
         err = launcherPID.getLastError();
-        MOTOR_VELOCITY = top.getVelocity();
+        MOTOR_VELOCITY = getMotorSpeed();
         power = top.getPower();
         // launcherP.f =  SPIN_F_SCALE * target + SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, Hardware.voltage());
     }
