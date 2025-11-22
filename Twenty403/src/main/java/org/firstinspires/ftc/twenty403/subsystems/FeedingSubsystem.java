@@ -3,15 +3,19 @@ package org.firstinspires.ftc.twenty403.subsystems;
 import static org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem.TARGET_MOTOR_VELOCITY;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.technototes.library.command.Command;
 import com.technototes.library.hardware.motor.CRServo;
+import com.technototes.library.subsystem.Subsystem;
+
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Setup;
 
 @Configurable
-public class FeedingSubsystem {
+public class FeedingSubsystem implements Subsystem {
 
     public static double CRSERVO_SPEED = 1; // 0.15 0.25
     public static double CRSERVO_SPEED_SLOW = .7;
+    private boolean REQUEST_TO_MOVE = false;
 
     boolean hasHardware;
     CRServo bottomLeft, bottomRight;
@@ -39,13 +43,7 @@ public class FeedingSubsystem {
             //                // target velocity. We don't want bland throws.
             //                return;
             //            }
-            if (
-                h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 &&
-                h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30
-            ) {
-                bottomRight.setPower(-CRSERVO_SPEED);
-                bottomLeft.setPower(CRSERVO_SPEED);
-            }
+           REQUEST_TO_MOVE = true;
         }
     }
 
@@ -67,6 +65,16 @@ public class FeedingSubsystem {
         if (hasHardware) {
             bottomLeft.setPower(0);
             bottomRight.setPower(0);
+        }
+    }
+    @Override
+    public void periodic() {
+        if (REQUEST_TO_MOVE) {
+            if (h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 && h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30) {
+                bottomRight.setPower(-CRSERVO_SPEED);
+                bottomLeft.setPower(CRSERVO_SPEED);
+                REQUEST_TO_MOVE = false;
+            }
         }
     }
 }
