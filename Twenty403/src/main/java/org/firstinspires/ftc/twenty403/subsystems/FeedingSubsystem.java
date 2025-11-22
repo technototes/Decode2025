@@ -6,7 +6,6 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.command.Command;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.subsystem.Subsystem;
-
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Setup;
 
@@ -43,14 +42,14 @@ public class FeedingSubsystem implements Subsystem {
             //                // target velocity. We don't want bland throws.
             //                return;
             //            }
-           REQUEST_TO_MOVE = true;
+            REQUEST_TO_MOVE = true;
         }
     }
 
     public void moveballanyways() {
         if (hasHardware) {
-                bottomRight.setPower(-CRSERVO_SPEED);
-                bottomLeft.setPower(CRSERVO_SPEED);
+            bottomRight.setPower(-CRSERVO_SPEED);
+            bottomLeft.setPower(CRSERVO_SPEED);
         }
     }
 
@@ -67,10 +66,14 @@ public class FeedingSubsystem implements Subsystem {
             bottomRight.setPower(0);
         }
     }
+
     @Override
     public void periodic() {
         if (REQUEST_TO_MOVE) {
-            if (h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 && h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30) {
+            if (
+                h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 &&
+                h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30
+            ) {
                 bottomRight.setPower(-CRSERVO_SPEED);
                 bottomLeft.setPower(CRSERVO_SPEED);
                 REQUEST_TO_MOVE = false;

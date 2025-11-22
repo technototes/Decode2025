@@ -24,7 +24,6 @@ public class DriveAutoCommand implements Command {
         powers[3] = rrp;
     }
 
-
     @Override
     public void execute() {
         follower.drivetrain.runDrive(powers);

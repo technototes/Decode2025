@@ -93,17 +93,17 @@ public class JustDrivingTeleOp extends CommandOpMode {
         }
         // use only if useing Move foward auto that relys on just setting motor powers
         CommandScheduler.scheduleForState(
-                new SequentialCommandGroup(
-                        HeadingHelper.RestorePreviousPosition(robot.follower),
-                        EZCmd.Drive.ResetGyro(robot.follower)
-                ),
-                OpModeState.INIT
+            new SequentialCommandGroup(
+                HeadingHelper.RestorePreviousPosition(robot.follower),
+                EZCmd.Drive.ResetGyro(robot.follower)
+            ),
+            OpModeState.INIT
         );
         if (Setup.Connected.LAUNCHER) {
             CommandScheduler.register(robot.launcherSubsystem);
         }
         if (Setup.Connected.FEED) {
-            CommandScheduler.register(robot.feedingSubsystem)   ;
+            CommandScheduler.register(robot.feedingSubsystem);
         }
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();

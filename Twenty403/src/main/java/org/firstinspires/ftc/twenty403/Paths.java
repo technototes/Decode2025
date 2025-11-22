@@ -38,7 +38,5 @@ public class Paths {
     public Pose Rintake3end = new Pose(135, 36);
     public Pose Rmove = new Pose(115, 49.617);
 
-    public Paths(Follower follower) {
-
-    }
+    public Paths(Follower follower) {}
 }
