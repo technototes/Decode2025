@@ -33,7 +33,7 @@ public class Setup {
         public static String TOP = "top";
         public static String BOTTOML = "bottoml";
         public static String BOTTOMR = "bottomr";
-        public static String OTOS = "spar ky";
+        public static String OTOS = "sparky";
         public static String LIMELIGHT = "limelight";
         public static String TESTSERVO = "testservo";
         public static String TESTMOTOR = "testmotor";
