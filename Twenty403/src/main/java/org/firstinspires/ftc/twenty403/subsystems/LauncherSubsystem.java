@@ -21,8 +21,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static PIDFCoefficients launcherP = new PIDFCoefficients(4.5, 0.0, 0.0, 0);
     public static double SPIN_F_SCALE = 1.0 / 6000;
     public static double SPIN_VOLT_COMP = 0.0216;
-    public static double DIFFERENCE = 0.0044;
-    public static double PEAK_VOLTAGE = 13.0;
+    public static double DIFFERENCE = 0.0016;
+    public static double PEAK_VOLTAGE = 16;
     private static PIDFController launcherPID;
 
     @Log(name = "Launcher Velo: ")
@@ -45,7 +45,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         if (hasHardware) {
             top = h.top;
             top.coast();
-            double ADDITION = (double) Math.round((PEAK_VOLTAGE - h.voltage()));
+            double ADDITION = (PEAK_VOLTAGE - h.voltage());
             if (ADDITION == 0) {
                 SPIN_VOLT_COMP = SPIN_VOLT_COMP + 0.001;
             } else {

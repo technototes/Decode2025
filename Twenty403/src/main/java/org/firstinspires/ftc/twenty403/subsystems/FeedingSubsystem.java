@@ -49,6 +49,13 @@ public class FeedingSubsystem {
         }
     }
 
+    public void moveballanyways() {
+        if (hasHardware) {
+                bottomRight.setPower(-CRSERVO_SPEED);
+                bottomLeft.setPower(CRSERVO_SPEED);
+        }
+    }
+
     public void moveballslow() {
         if (hasHardware) {
             bottomRight.setPower(-CRSERVO_SPEED_SLOW);
