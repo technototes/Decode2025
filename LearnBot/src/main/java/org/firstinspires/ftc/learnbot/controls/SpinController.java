@@ -41,7 +41,7 @@ public class SpinController implements Loggable {
     }
 
     public void bindDriveControls() {
-        incTarget.whenPressed(robot.spin::inccrease);
+        incTarget.whenPressed(robot.spin::increase);
         decTarget.whenPressed(robot.spin::decrease);
         startSpin.whenPressed(robot.spin::start);
         stopSpin.whenPressed(robot.spin::stop);
