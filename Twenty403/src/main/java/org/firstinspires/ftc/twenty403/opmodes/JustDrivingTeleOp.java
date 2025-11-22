@@ -19,6 +19,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.commands.EZCmd;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
 import org.firstinspires.ftc.twenty403.controls.OperatorController;
+import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
 // unicode is moai emoji
@@ -90,12 +92,12 @@ public class JustDrivingTeleOp extends CommandOpMode {
             limelight.start();
         }
         // use only if useing Move foward auto that relys on just setting motor powers
-        robot.follower.setPose(
-            new Pose(
-                robot.follower.getPose().getX(),
-                robot.follower.getPose().getY(),
-                robot.follower.getHeading() - 90
-            )
+        CommandScheduler.scheduleForState(
+                new SequentialCommandGroup(
+                        HeadingHelper.RestorePreviousPosition(robot.follower),
+                        EZCmd.Drive.ResetGyro(robot.follower)
+                ),
+                OpModeState.INIT
         );
         if (Setup.Connected.LAUNCHER) {
             CommandScheduler.register(robot.launcherSubsystem);
