@@ -48,8 +48,9 @@ public class SpinningSubsystem implements Subsystem, Loggable {
     @Log(name = "Motor Delta")
     public double delta;
 
-    @Log(name="Running")
+    @Log(name = "Running")
     public boolean running;
+
     public Hardware hardware;
 
     public SpinningSubsystem(EncodedMotor<DcMotorEx> m, Hardware hw, boolean dontSchedule) {

@@ -60,35 +60,41 @@ public class Paths {
     public static Pose Launch = new Pose(45.490, 110);
     public static Pose Intake1 = new Pose(41.808, 85);
     public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
-    public static Pose Intake1end = new Pose(18, 85);
+    public static Pose Intake1end = new Pose(20, 85);
     public static Pose Intake2 = new Pose(40.038, 63);
     public static Pose Intake2ControlPoint = new Pose(71.891, 64.369);
     public static Pose Intake2ControlPoint2 = new Pose(46, 54);
-    public static Pose Intake2end = new Pose(16, 63);
+    public static Pose Intake2end = new Pose(18, 63);
     public static Pose Intake2endControlPoint = new Pose(49.328, 65.696);
     public static Pose Intake3 = new Pose(38.923, 38);
     public static Pose Intake3ControlPoint = new Pose(76.536, 41.585);
-    public static Pose Intake3end = new Pose(16, 38);
+    public static Pose Intake3end = new Pose(18, 38);
     public static Pose Intake3endControlPoint = new Pose(62.000, 84.000);
+
     public static double launchHeading = 130;
     public static double launchHeading2 = 140;
     public static double launchHeading3 = 140;
     public static double intakeHeading = 180;
+
     //Red poses reconfigure these
     public static Pose RStart = new Pose(114, 135.152);
     public static Pose RLaunch = new Pose(100, 115);
+    public static Pose RLaunchend = new Pose(98, 117);
+
     public static Pose RIntake1 = new Pose(103, 88);
     public static Pose RIntake1ControlPoint = new Pose(83, 89.143);
-    public static Pose RIntake1end = new Pose(124, 88);
+    public static Pose RIntake1end = new Pose(123, 88);
     public static Pose RIntake2 = new Pose(104, 65);
     public static Pose RIntake2ControlPoint = new Pose(73, 64.369);
-    public static Pose RIntake2end = new Pose(132, 65);
+    public static Pose RIntake2end = new Pose(131, 65);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
     public static Pose RIntake3 = new Pose(104, 40);
     public static Pose RIntake3ControlPoint = new Pose(68, 41.585);
-    public static Pose RIntake3end = new Pose(132, 40);
+    public static Pose RIntake3end = new Pose(131, 40);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static double RlaunchHeading = 35;
+    public static double RlaunchHeading2 = 25;
+    public static double RlaunchHeading3 = 25;
     public static double RintakeHeading = 0;
 
     public PathChain launch;
@@ -410,7 +416,7 @@ public class Paths {
 
         RIntake3endtoLaunch = follower
             .pathBuilder()
-            .addPath(new BezierCurve(RIntake3end, RIntake3endControlPoint, RLaunch))
+            .addPath(new BezierCurve(RIntake3end, RIntake3endControlPoint, RLaunchend))
             .setLinearHeadingInterpolation(
                 Math.toRadians(RintakeHeading),
                 Math.toRadians(RlaunchHeading)
