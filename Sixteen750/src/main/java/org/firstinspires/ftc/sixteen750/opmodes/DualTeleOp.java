@@ -70,7 +70,7 @@ public class DualTeleOp extends CommandOpMode {
              */
             limelight.start();
         }
-        if (Setup.Connected.LAUNCHERSUBSYSTEM){
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             CommandScheduler.register(robot.launcherSubsystem);
         }
     }

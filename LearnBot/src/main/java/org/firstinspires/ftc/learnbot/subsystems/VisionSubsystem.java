@@ -11,7 +11,6 @@ import org.firstinspires.ftc.learnbot.Setup;
 @Configurable
 public class VisionSubsystem implements Subsystem, Loggable {
 
-  
     public static enum CameraOrientation {
         USB_BOT_LEFT, // This is 'normal'
         USB_UP,
@@ -24,7 +23,7 @@ public class VisionSubsystem implements Subsystem, Loggable {
     public static int AprilTag_Pipeline = 1;
     public static int Purple_Color_Pipeline = 2;
     public static double Camera_Tilt_Degrees = 14.0;
-    
+
     @Log(name = "Viz")
     public static String status = "";
 

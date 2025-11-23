@@ -10,7 +10,6 @@ import com.technototes.library.command.Command;
 import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
-
 import org.firstinspires.ftc.sixteen750.R;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
@@ -272,7 +271,10 @@ public class Paths {
         LaunchtoIntake1 = follower
             .pathBuilder()
             .addPath(new BezierCurve(Launch, Intake1ControlPoint, Intake1))
-            .setLinearHeadingInterpolation(Math.toRadians(launchHeading), Math.toRadians(intakeHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(launchHeading),
+                Math.toRadians(intakeHeading)
+            )
             .build();
 
         Intake1toIntake1end = follower
@@ -284,13 +286,19 @@ public class Paths {
         Intake1endtoLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(Intake1end, Launch))
-            .setLinearHeadingInterpolation(Math.toRadians(intakeHeading),Math.toRadians(launchHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(intakeHeading),
+                Math.toRadians(launchHeading)
+            )
             .build();
 
         LaunchtoIntake2 = follower
             .pathBuilder()
             .addPath(new BezierCurve(Launch, Intake2ControlPoint, Intake2ControlPoint2, Intake2))
-            .setLinearHeadingInterpolation(Math.toRadians(launchHeading), Math.toRadians(intakeHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(launchHeading),
+                Math.toRadians(intakeHeading)
+            )
             .build();
 
         Intake2toIntake2end = follower
@@ -302,13 +310,19 @@ public class Paths {
         Intake2endtoLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(Intake2end, Intake2endControlPoint, Launch))
-            .setLinearHeadingInterpolation(Math.toRadians(intakeHeading), Math.toRadians(launchHeading2))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(intakeHeading),
+                Math.toRadians(launchHeading2)
+            )
             .build();
 
         LaunchtoIntake3 = follower
             .pathBuilder()
             .addPath(new BezierCurve(Launch, Intake3ControlPoint, Intake3))
-            .setLinearHeadingInterpolation(Math.toRadians(launchHeading), Math.toRadians(intakeHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(launchHeading),
+                Math.toRadians(intakeHeading)
+            )
             .build();
 
         Intake3toIntake3end = follower
@@ -320,7 +334,10 @@ public class Paths {
         Intake3endtoLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(Intake3end, Intake3endControlPoint, Launch))
-            .setLinearHeadingInterpolation(Math.toRadians(intakeHeading), Math.toRadians(launchHeading3))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(intakeHeading),
+                Math.toRadians(launchHeading3)
+            )
             .build();
         RStarttoLaunch = follower
             .pathBuilder()
@@ -331,7 +348,10 @@ public class Paths {
         RLaunchtoIntake1 = follower
             .pathBuilder()
             .addPath(new BezierCurve(RLaunch, RIntake1ControlPoint, RIntake1))
-            .setLinearHeadingInterpolation(Math.toRadians(RlaunchHeading), Math.toRadians(RintakeHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RlaunchHeading),
+                Math.toRadians(RintakeHeading)
+            )
             .build();
 
         RIntake1toIntake1end = follower
@@ -343,13 +363,19 @@ public class Paths {
         RIntake1endtoLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(RIntake1end, RLaunch))
-            .setLinearHeadingInterpolation(Math.toRadians(RintakeHeading), Math.toRadians(RlaunchHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RintakeHeading),
+                Math.toRadians(RlaunchHeading)
+            )
             .build();
 
         RLaunchtoIntake2 = follower
             .pathBuilder()
             .addPath(new BezierCurve(RLaunch, RIntake2ControlPoint, RIntake2))
-            .setLinearHeadingInterpolation(Math.toRadians(RlaunchHeading), Math.toRadians(RintakeHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RlaunchHeading),
+                Math.toRadians(RintakeHeading)
+            )
             .build();
 
         RIntake2toIntake2end = follower
@@ -361,13 +387,19 @@ public class Paths {
         RIntake2endtoLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(RIntake2end, RIntake2endControlPoint, RLaunch))
-            .setLinearHeadingInterpolation(Math.toRadians(RintakeHeading), Math.toRadians(RlaunchHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RintakeHeading),
+                Math.toRadians(RlaunchHeading)
+            )
             .build();
 
         RLaunchtoIntake3 = follower
             .pathBuilder()
             .addPath(new BezierCurve(RLaunch, RIntake3ControlPoint, RIntake3))
-            .setLinearHeadingInterpolation(Math.toRadians(RlaunchHeading), Math.toRadians(RintakeHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RlaunchHeading),
+                Math.toRadians(RintakeHeading)
+            )
             .build();
 
         RIntake3toIntake3end = follower
@@ -379,7 +411,10 @@ public class Paths {
         RIntake3endtoLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(RIntake3end, RIntake3endControlPoint, RLaunch))
-            .setLinearHeadingInterpolation(Math.toRadians(RintakeHeading), Math.toRadians(RlaunchHeading))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RintakeHeading),
+                Math.toRadians(RlaunchHeading)
+            )
             .build();
 
         Forward48 = follower
