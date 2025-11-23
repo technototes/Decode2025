@@ -37,6 +37,8 @@ public class DriverController {
     public CommandButton override;
     public CommandButton hooddownButton;
     public CommandButton holdButton;
+    public CommandButton CloseShoot;
+    public CommandButton FarShoot;
     public CommandAxis intakeTrigger;
     public CommandAxis autoAim;
     public CommandAxis spitTrigger;
@@ -83,10 +85,12 @@ public class DriverController {
         hoodButton = gamepad.dpadUp;
         hooddownButton = gamepad.dpadDown;
         AutoOrient = gamepad.leftTrigger;
-        MotorDecrease = gamepad.dpadLeft;
-        MotorIncrease = gamepad.dpadRight;
-        gateButton = gamepad.ps_circle;
-        holdButton = gamepad.ps_cross; // made it not bound the same as decrease velo
+        //MotorDecrease = gamepad.dpadDown;
+        //MotorIncrease = gamepad.dpadUp;
+        FarShoot = gamepad.dpadLeft;
+        CloseShoot = gamepad.dpadRight;
+        gateButton = gamepad.ps_cross;
+        holdButton = gamepad.ps_circle; // made it not bound the same as decrease velo
         TripleBallLaunch = gamepad.ps_share; // made the auto launching command testable in tele
     }
 
@@ -106,8 +110,8 @@ public class DriverController {
             DrivingCommands.NormalDriving(pedroDriver)
         );
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(pedroDriver));
-        MotorDecrease.whenPressed(TeleCommands.DecreaseMotor(robot));
-        MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));
+        //MotorDecrease.whenPressed(TeleCommands.DecreaseMotor(robot));
+        //MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));
 
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             autoAim.whenPressed(DrivingCommands.AutoOrient(pedroDriver));
@@ -119,6 +123,8 @@ public class DriverController {
     public void bindLaunchControls() {
         launchButton.whenPressed(TeleCommands.Launch(robot));
         launchButton.whenReleased(TeleCommands.StopLaunch(robot));
+        CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
+        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
     }
 
     public void bindIntakeControls() {

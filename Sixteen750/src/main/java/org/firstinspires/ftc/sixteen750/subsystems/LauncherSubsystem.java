@@ -23,6 +23,9 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log.Number(name = "Target Velocity")
     public static double targetLaunchVelocity = 1400;
 
+    public static double closetargetLaunchVelocity = 1400;
+    public static double fartargetLaunchVelocity = 1750;
+
     public static double targetLaunchVelocityforAuto = 1200;
 
     @Log.Number(name = "Current Motor Velocity")
@@ -42,7 +45,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherP = new PIDFCoefficients(0.002, 0.0, 0.0, 0);
+    public static PIDFCoefficients launcherP = new PIDFCoefficients(0.002, 0.00, 0.0, 0);
     public static double SPIN_F_SCALE = 1.0 / 6000;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
@@ -108,6 +111,20 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             setTargetSpeed(targetLaunchVelocity); //change to auto aim velocity
             //            launcher1.setVelocity(TargetLaunchVelocity);
             //            launcher2.setVelocity(TargetLaunchVelocity);
+        }
+    }
+
+    public void CloseShoot() {
+        // Spin the motors pid goes here
+        if (hasHardware) {
+            targetLaunchVelocity = closetargetLaunchVelocity;
+        }
+    }
+
+    public void FarShoot() {
+        // Spin the motors pid goes here
+        if (hasHardware) {
+            targetLaunchVelocity = fartargetLaunchVelocity;
         }
     }
 

@@ -10,6 +10,14 @@ public class TeleCommands {
         return Command.create(r.launcherSubsystem::Launch);
     }
 
+    public static Command SetFarShoot(Robot r) {
+        return Command.create(r.launcherSubsystem::FarShoot);
+    }
+
+    public static Command SetCloseShoot(Robot r) {
+        return Command.create(r.launcherSubsystem::CloseShoot);
+    }
+
     public static Command AutoLaunch(Robot r) {
         return Command.create(r.launcherSubsystem::AutoLaunch);
     }
@@ -60,6 +68,10 @@ public class TeleCommands {
 
     public static Command HoodUpAutoOnly(Robot r) {
         return Command.create(r.aimingSubsystem::testHoodUpAutoOnly);
+    }
+
+    public static Command HoodUpAutoOnly2(Robot r) {
+        return Command.create(r.aimingSubsystem::testHoodUpAutoOnly2);
     }
 
     public static Command HoodDown(Robot r) {

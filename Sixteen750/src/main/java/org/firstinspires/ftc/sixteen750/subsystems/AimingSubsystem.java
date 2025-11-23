@@ -13,7 +13,9 @@ public class AimingSubsystem implements Loggable {
 
     public static double HOOD_POS = 0.5; // 0.5 1.0
     public static double HOOD_POS_UP = 1; // 0.5 1.0
-    public static double HOD_POS_UP_AUTO_ONLY = 1;
+    public static double HOD_POS_UP_AUTO_ONLY = 0.90;
+    public static double HOD_POS_UP_AUTO_ONLY2 = 0.80;
+
     public static double HOOD_POS_DOWN = 0.4; // 0.5 1.0
 
     public static double LEVER_POS = 0.7; //.65
@@ -66,6 +68,10 @@ public class AimingSubsystem implements Loggable {
 
     public void testHoodUpAutoOnly() {
         setHoodPos(HOD_POS_UP_AUTO_ONLY);
+    }
+
+    public void testHoodUpAutoOnly2() {
+        setHoodPos(HOD_POS_UP_AUTO_ONLY2);
     }
 
     public void testHoodDown() {
