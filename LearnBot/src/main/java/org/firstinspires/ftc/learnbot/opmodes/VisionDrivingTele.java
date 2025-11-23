@@ -13,11 +13,11 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
-import org.firstinspires.ftc.learnbot.Setup.Vision;
 import org.firstinspires.ftc.learnbot.commands.SetVisionPipeline;
 import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
+import org.firstinspires.ftc.learnbot.subsystems.VisionSubsystem;
 
 @Configurable
 @SuppressWarnings("unused")
@@ -41,7 +41,7 @@ public class VisionDrivingTele extends CommandOpMode implements Loggable {
         CommandScheduler.register(robot.vision);
         CommandScheduler.scheduleInit(HeadingHelper.RestorePreviousPosition(robot.drivebase));
         CommandScheduler.scheduleInit(
-            new SetVisionPipeline(robot.vision, Vision.AprilTag_Pipeline)
+            new SetVisionPipeline(robot.vision, VisionSubsystem.AprilTag_Pipeline)
         );
         CommandScheduler.scheduleJoystick(controls.stickDriver);
     }

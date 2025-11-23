@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.learnbot.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
-import org.firstinspires.ftc.learnbot.Setup;
 
 @Configurable
 public class VisionSubsystem implements Subsystem, Loggable {
@@ -43,7 +43,7 @@ public class VisionSubsystem implements Subsystem, Loggable {
         public TargetInfo(LLResult result) {
             this.a = result.getTa();
             // Translate based on Camera Orientation
-            switch (Setup.Vision.Camera_Orientation) {
+            switch (VisionSubsystem.Camera_Orientation) {
                 case USB_BOT_LEFT:
                     this.x = result.getTx();
                     this.y = result.getTy() - Camera_Tilt_Degrees;
