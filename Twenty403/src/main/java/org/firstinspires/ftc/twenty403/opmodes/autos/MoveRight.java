@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.twenty403.opmodes.autos;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.CommandScheduler;
@@ -60,6 +61,6 @@ public class MoveRight extends CommandOpMode {
     }
 
     public void end() {
-        HeadingHelper.savePose(robot.follower.getPose());
+        HeadingHelper.savePose(new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), hardware.imu.getHeading()));
     }
 }
