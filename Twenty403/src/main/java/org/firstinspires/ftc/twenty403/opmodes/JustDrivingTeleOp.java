@@ -25,6 +25,7 @@ import com.technototes.library.util.Alliance;
 import java.util.Arrays;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.Supplier;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
@@ -94,8 +95,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
         // use only if useing Move foward auto that relys on just setting motor powers
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                HeadingHelper.RestorePreviousPosition(robot.follower),
-                EZCmd.Drive.ResetGyro(robot.follower)
+                HeadingHelper.RestorePreviousPosition(robot.follower)
             ),
             OpModeState.INIT
         );
@@ -117,6 +117,8 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void runLoop() {
+//        telemetry.addData("imu ori", hardware.imu.getHeading(AngleUnit.DEGREES));
+//        telemetry.update();
         robot.follower.update();
 
         robot.follower.setTeleOpDrive(

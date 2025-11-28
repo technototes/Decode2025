@@ -13,7 +13,7 @@ public class Setup {
         public static boolean DRIVEBASE = true;
         public static boolean TESTSUBSYSTEM = false;
         public static boolean SAFETYSUBSYSTEM = false;
-        public static boolean EXTERNALIMU = false;
+        public static boolean EXTERNALIMU = true;
         public static boolean LAUNCHER = true;
         public static boolean FEED = true;
         public static boolean LIMELIGHT = false;
