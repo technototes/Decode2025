@@ -92,6 +92,10 @@ public class LimelightSubsystem implements Loggable, Subsystem {
         // if it start turning away from the apriltag
     }
 
+    public double getTX() {
+        return Xangle;
+    }
+
     public double getDistance() {
         LLResult result = limelight.getLatestResult();
         if (result != null) {
