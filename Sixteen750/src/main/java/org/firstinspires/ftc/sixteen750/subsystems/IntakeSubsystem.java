@@ -18,7 +18,7 @@ public class IntakeSubsystem implements Loggable {
     EncodedMotor<DcMotorEx> intake;
 
     public IntakeSubsystem(Hardware h) {
-        //        intake.getRawMotor(DcMotorEx.class).getCurrent(CurrentUnit.AMPS)
+        // intake.getRawMotor(DcMotorEx.class).getCurrent(CurrentUnit.AMPS)
         hasHardware = Setup.Connected.INTAKESUBSYSTEM;
         // Do stuff in here
         if (hasHardware) {
