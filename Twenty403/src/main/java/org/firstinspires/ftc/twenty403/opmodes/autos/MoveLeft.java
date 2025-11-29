@@ -61,6 +61,12 @@ public class MoveLeft extends CommandOpMode {
     }
 
     public void end() {
-        HeadingHelper.savePose(new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), hardware.imu.getHeading()));
+        HeadingHelper.savePose(
+            new Pose(
+                robot.follower.getPose().getX(),
+                robot.follower.getPose().getY(),
+                hardware.imu.getHeading()
+            )
+        );
     }
 }

@@ -43,8 +43,8 @@ public class FeedingSubsystem implements Subsystem {
             //                return;
             //            }
             if (
-                    h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 &&
-                            h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30
+                h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 &&
+                h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30
             ) {
                 bottomRight.setPower(-CRSERVO_SPEED);
                 bottomLeft.setPower(CRSERVO_SPEED);
@@ -72,6 +72,4 @@ public class FeedingSubsystem implements Subsystem {
             bottomRight.setPower(0);
         }
     }
-
-
 }
