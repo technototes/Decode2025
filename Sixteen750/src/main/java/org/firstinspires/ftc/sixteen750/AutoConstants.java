@@ -26,7 +26,7 @@ import org.firstinspires.ftc.sixteen750.helpers.CustomAdafruitIMU;
 public class AutoConstants {
 
     // note these need to be measured:
-    public static double botWeightKg = 9.44;
+    public static double botWeightKg = 10.1;
     public static double robotLength = 17.5;
     public static double robotWidth = 11.5;
 
