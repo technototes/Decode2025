@@ -94,9 +94,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
         }
         // use only if useing Move foward auto that relys on just setting motor powers
         CommandScheduler.scheduleForState(
-            new SequentialCommandGroup(
-                HeadingHelper.RestorePreviousPosition(robot.follower)
-            ),
+            new SequentialCommandGroup(HeadingHelper.RestorePreviousPosition(robot.follower)),
             OpModeState.INIT
         );
         if (Setup.Connected.LAUNCHER) {
@@ -117,8 +115,8 @@ public class JustDrivingTeleOp extends CommandOpMode {
 
     @Override
     public void runLoop() {
-//        telemetry.addData("imu ori", hardware.imu.getHeading(AngleUnit.DEGREES));
-//        telemetry.update();
+        // telemetry.addData("imu ori", hardware.imu.getHeading(AngleUnit.DEGREES));
+        // telemetry.update();
         robot.follower.update();
 
         robot.follower.setTeleOpDrive(
@@ -135,7 +133,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
         }
 
         if (Setup.Connected.LAUNCHER) {
-            //robot.launcherSubsystem.RunLoop(telemetry);
+            // robot.launcherSubsystem.RunLoop(telemetry);
         }
 
         if (Setup.Connected.LIMELIGHT) {
