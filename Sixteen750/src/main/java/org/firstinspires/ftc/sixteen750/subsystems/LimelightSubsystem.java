@@ -91,7 +91,9 @@ public class LimelightSubsystem implements Loggable, Subsystem {
         //its y-angle because we flipped the camera, we might need to invert the axis
         // if it start turning away from the apriltag
     }
-
+    public double getTX() {
+        return Xangle;
+    }
     public double getDistance() {
         LLResult result = limelight.getLatestResult();
         if (result != null) {
