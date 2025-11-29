@@ -44,6 +44,7 @@ public class Paths {
 
     public static Command AutoLaunching3Balls(Robot r) {
         return new SequentialCommandGroup(
+            TeleCommands.IntakeStop(r),
             TeleCommands.GateUp(r),
             TeleCommands.Intake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
