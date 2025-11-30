@@ -46,7 +46,7 @@ public class Paths {
         return new SequentialCommandGroup(
             TeleCommands.IntakeStop(r),
             TeleCommands.GateUp(r),
-            TeleCommands.Intake(r),
+            TeleCommands.HoldIntake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
@@ -117,6 +117,7 @@ public class Paths {
     public PathChain intake4tolaunchfar;
     public PathChain Rintake4tolaunchfar;
     public PathChain StartFartolaunchfar;
+    public PathChain launchfar;
     public PathChain Rlaunchfar;
     public PathChain RStartFartolaunchfar;
     public PathChain Rintake5tolaunchfar;
@@ -536,11 +537,14 @@ public class Paths {
             .build();
 
         Rintake4tolaunchfar = follower
-            .pathBuilder()
-            .addPath(new BezierLine(new Pose(135.000, 36.000), new Pose(85.000, 12.000)))
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(65))
-            .setBrakingStart(2)
-            .build();
+                .pathBuilder()
+
+                .addPath(
+                        new BezierLine(new Pose(135.000, 36.000), new Pose(85.000, 12.000))
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .setVelocityConstraint(0.3)
+                .build();
 
         Rlaunchfartointake5 = follower
             .pathBuilder()
@@ -552,7 +556,7 @@ public class Paths {
         Rintake5tolaunchfar = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(138.286, 13.061), new Pose(85.000, 12.000)))
-            .setBrakingStart(2)
+            .setVelocityConstraint(0.3)
             .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(65))
             .build();
 
