@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Loggable;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
@@ -17,6 +18,7 @@ public class IntakeSubsystem implements Loggable {
     EncodedMotor<DcMotorEx> intake;
 
     public IntakeSubsystem(Hardware h) {
+        // intake.getRawMotor(DcMotorEx.class).getCurrent(CurrentUnit.AMPS)
         hasHardware = Setup.Connected.INTAKESUBSYSTEM;
         // Do stuff in here
         if (hasHardware) {

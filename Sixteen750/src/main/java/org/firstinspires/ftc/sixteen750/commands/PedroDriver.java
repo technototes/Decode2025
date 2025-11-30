@@ -291,12 +291,13 @@ public class PedroDriver implements Command, Loggable {
                     // --- Face AprilTag using Limelight ---
                     targetHeading =
                         curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
+                    return Math.toRadians(LimelightSubsystem.Xangle);
                     //lowkey forgot what kevin said but i think it just sets the target heading to
                     //where the limelight is so that vision can make the bot turn that way
                 } else {
                     return rotation;
                 }
-                break;
+            //break;
             case Free:
             case Straight:
             default:

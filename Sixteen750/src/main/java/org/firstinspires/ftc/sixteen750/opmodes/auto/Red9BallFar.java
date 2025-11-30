@@ -6,7 +6,6 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
@@ -44,7 +43,6 @@ public class Red9BallFar extends CommandOpMode {
                 // new WaitCommand(1),
                 // new WaitCommand(2),
                 new PedroPathCommand(robot.follower, p.Rintake4tolaunchfar),
-
                 Paths.AutoLaunching3Balls(robot),
                 new PedroPathCommand(robot.follower, p.Rlaunchfartointake5),
                 new PedroPathCommand(robot.follower, p.Rintake5tolaunchfar),

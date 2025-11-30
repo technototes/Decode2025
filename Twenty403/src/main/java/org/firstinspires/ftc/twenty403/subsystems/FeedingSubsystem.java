@@ -42,7 +42,13 @@ public class FeedingSubsystem implements Subsystem {
             //                // target velocity. We don't want bland throws.
             //                return;
             //            }
-            REQUEST_TO_MOVE = true;
+            if (
+                h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 &&
+                h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30
+            ) {
+                bottomRight.setPower(-CRSERVO_SPEED);
+                bottomLeft.setPower(CRSERVO_SPEED);
+            }
         }
     }
 
@@ -64,20 +70,6 @@ public class FeedingSubsystem implements Subsystem {
         if (hasHardware) {
             bottomLeft.setPower(0);
             bottomRight.setPower(0);
-        }
-    }
-
-    @Override
-    public void periodic() {
-        if (REQUEST_TO_MOVE) {
-            if (
-                h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 &&
-                h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30
-            ) {
-                bottomRight.setPower(-CRSERVO_SPEED);
-                bottomLeft.setPower(CRSERVO_SPEED);
-                REQUEST_TO_MOVE = false;
-            }
         }
     }
 }
