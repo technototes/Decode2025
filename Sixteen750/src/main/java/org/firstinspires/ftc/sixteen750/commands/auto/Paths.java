@@ -96,6 +96,8 @@ public class Paths {
     public static Pose RIntake3ControlPoint = new Pose(68, 41.585);
     public static Pose RIntake3end = new Pose(131, 40);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
+    public static Pose Rlever = new Pose(131.75,75.5);
+    public static Pose REnd = new Pose(128.5,105);
     public static double RlaunchHeading = 35;
     public static double RlaunchHeading2 = 25;
     public static double RlaunchHeading3 = 25;
@@ -113,7 +115,7 @@ public class Paths {
     public PathChain Rlaunchfartointake4;
     public PathChain intake4tolaunchfar;
     public PathChain Rintake4tolaunchfar;
-    public PathChain launchfar;
+    public PathChain StartFartolaunchfar;
     public PathChain Rlaunchfar;
     public PathChain RStartFartolaunchfar;
     public PathChain Rintake5tolaunchfar;
@@ -154,8 +156,11 @@ public class Paths {
     public PathChain SideLeft48;
     public PathChain SideRight48;
     public PathChain Intake1endtoLever;
+    public PathChain RIntake1endtoLever;
     public PathChain LevertoLaunch;
+    public PathChain RLevertoLaunch;
     public PathChain LaunchtoEnd;
+    public PathChain RLaunchtoEnd;
 
     public static Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
@@ -179,6 +184,9 @@ public class Paths {
 
     public static Pose getRFar9BallStart() {
         return new Pose(90, 9, Math.toRadians(90));
+    }
+    public static Pose getFar9BallStart() {
+        return new Pose(54,9,Math.toRadians(90));
     }
 
     public Paths(Follower follower) {
@@ -402,12 +410,17 @@ public class Paths {
             .addPath(new BezierLine(RIntake1, RIntake1end))
             .setTangentHeadingInterpolation()
             .build();
+        RIntake1endtoLever = follower
+                .pathBuilder()
+                .addPath(new BezierLine(RIntake1end,Rlever))
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
+                .build();
 
-        RIntake1endtoLaunch = follower
+        RLevertoLaunch = follower
             .pathBuilder()
-            .addPath(new BezierLine(RIntake1end, RLaunch))
+            .addPath(new BezierLine(Rlever, RLaunch))
             .setLinearHeadingInterpolation(
-                Math.toRadians(RintakeHeading),
+                Math.toRadians(90),
                 Math.toRadians(RlaunchHeading)
             )
             .build();
@@ -459,6 +472,14 @@ public class Paths {
                 Math.toRadians(RlaunchHeading)
             )
             .build();
+        RLaunchtoEnd = follower
+                .pathBuilder()
+                .addPath(new BezierLine(RLaunch, REnd))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(launchHeading3),
+                        Math.toRadians(180)
+                )
+                .build();
 
         Forward48 = follower
             .pathBuilder()
@@ -506,8 +527,8 @@ public class Paths {
         Rintake4tolaunchfar = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(135.000, 36.000), new Pose(85.000, 12.000)))
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
-            .setVelocityConstraint(0.3)
+            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(65))
+            .setBrakingStart(2)
             .build();
 
         Rlaunchfartointake5 = follower
@@ -520,7 +541,7 @@ public class Paths {
         Rintake5tolaunchfar = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(138.286, 13.061), new Pose(85.000, 12.000)))
-            .setVelocityConstraint(0.3)
+            .setBrakingStart(2)
             .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(65))
             .build();
 
@@ -530,6 +551,54 @@ public class Paths {
             .setLinearHeadingInterpolation(Math.toRadians(65), Math.toRadians(0))
             .setVelocityConstraint(0.3)
             .build();
+
+        StartFartolaunchfar = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(54.000, 9.000), new Pose(59.000, 12.000)))
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(115))
+                .setVelocityConstraint(0.3)
+                .build();
+
+        launchfartointake4 = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(35.000, 12.000),
+                                new Pose(66.000, 40.000),
+                                new Pose(7.000, 36.000)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(115), Math.toRadians(180))
+                .setVelocityConstraint(0.3)
+                .build();
+
+        intake4tolaunchfar = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(7.000, 36.000), new Pose(59.000, 12.000)))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(115))
+                .setVelocityConstraint(0.3)
+                .build();
+
+        launchfartointake5 = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(59.000, 12.000), new Pose(5.75, 13.061)))
+                .setLinearHeadingInterpolation(Math.toRadians(115), Math.toRadians(180))
+                .setVelocityConstraint(0.3)
+                .build();
+
+        intake5tolaunchfar = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(5.75, 13.061), new Pose(59.000, 12.000)))
+                .setVelocityConstraint(0.3)
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(115))
+                .build();
+
+        launchfartopark = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(59.000, 12.000), new Pose(21.25, 12.735)))
+                .setLinearHeadingInterpolation(Math.toRadians(115), Math.toRadians(180))
+                .setVelocityConstraint(0.3)
+                .build();
     }
 }
 
