@@ -57,7 +57,7 @@ public class Paths {
     }
 
     public static Pose Start = new Pose(30.748, 135.152);
-    public static Pose Launch = new Pose(45.490, 110);
+    public static Pose Launch = new Pose(54, 70);
     public static Pose Intake1 = new Pose(41.808, 85);
     public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
     public static Pose Intake1end = new Pose(20, 85);
@@ -75,15 +75,15 @@ public class Paths {
     public static Pose End = new Pose(15.5, 105);
 
     public static double launchHeading = 130;
-    public static double launchHeading2 = 140;
-    public static double launchHeading3 = 140;
+    public static double launchHeading2 = 130;
+    public static double launchHeading3 = 130;
     public static double launchfarheading = 108;
     public static double intakeHeading = 180;
 
     //Red poses reconfigure these
     public static Pose RStart = new Pose(114, 135.152);
-    public static Pose RLaunch = new Pose(100, 115);
-    public static Pose RLaunchend = new Pose(98, 117);
+    public static Pose RLaunch = new Pose(90, 90);
+    public static Pose RLaunchend = new Pose(90, 90);
 
     public static Pose RIntake1 = new Pose(103, 88);
     public static Pose RIntake1ControlPoint = new Pose(83, 89.143);
@@ -98,9 +98,9 @@ public class Paths {
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(131.75,75.5);
     public static Pose REnd = new Pose(128.5,105);
-    public static double RlaunchHeading = 35;
-    public static double RlaunchHeading2 = 25;
-    public static double RlaunchHeading3 = 25;
+    public static double RlaunchHeading = 49;
+    public static double RlaunchHeading2 = 45;
+    public static double RlaunchHeading3 = 45;
     public static double RintakeHeading = 0;
     public static double Rlaunchfarheading = 282;
 
