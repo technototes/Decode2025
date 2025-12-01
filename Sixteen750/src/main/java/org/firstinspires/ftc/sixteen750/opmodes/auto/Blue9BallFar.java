@@ -32,9 +32,10 @@ public class Blue9BallFar extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 TeleCommands.GateUp(robot),
-                TeleCommands.Intake(robot),
-                TeleCommands.HoodUpAutoOnly(robot),
+                TeleCommands.SetFarShoot(robot),
                 TeleCommands.Launch(robot),
+                TeleCommands.Intake(robot),
+                TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.StartFartolaunchfar),
                 new WaitCommand(1),
                 Paths.AutoLaunching3Balls(robot),
@@ -48,7 +49,7 @@ public class Blue9BallFar extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.intake5tolaunchfar),
                 Paths.AutoLaunching3Balls(robot),
                 new PedroPathCommand(robot.follower, p.launchfartopark),
-                new WaitCommand(2),
+                new WaitCommand(1),
                 TeleCommands.StopLaunch(robot),
                 TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode

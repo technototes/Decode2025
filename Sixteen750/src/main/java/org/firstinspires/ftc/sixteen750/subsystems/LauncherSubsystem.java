@@ -26,7 +26,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double closetargetLaunchVelocity = 1400;
     public static double fartargetLaunchVelocity = 1750;
 
-    public static double targetLaunchVelocityforAuto = 1200;
+    public static double targetLaunchVelocityforAuto = 1340;
 
     @Log.Number(name = "Current Motor Velocity")
     public static double currentLaunchVelocity = 0.0;

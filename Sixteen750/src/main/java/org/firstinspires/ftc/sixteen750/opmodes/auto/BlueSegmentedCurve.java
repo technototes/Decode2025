@@ -32,9 +32,9 @@ public class BlueSegmentedCurve extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 TeleCommands.GateUp(robot),
-                TeleCommands.Launch(robot),
+                TeleCommands.AutoLaunch(robot),
                 TeleCommands.Intake(robot),
-                TeleCommands.HoodUpAutoOnly(robot),
+                TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.StarttoLaunch),
                 Paths.AutoLaunching3Balls(robot),
                 // new WaitCommand(0.5),

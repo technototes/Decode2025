@@ -32,9 +32,9 @@ public class RedSegmentedCurve extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 TeleCommands.GateUp(robot),
-                TeleCommands.Launch(robot),
+                TeleCommands.AutoLaunch(robot),
                 TeleCommands.Intake(robot),
-                TeleCommands.HoodUpAutoOnly(robot),
+                TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.RStarttoLaunch),
                 Paths.AutoLaunching3Balls(robot),
                 // new WaitCommand(0.5),
@@ -45,7 +45,6 @@ public class RedSegmentedCurve extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.RIntake1endtoLever),
                 new PedroPathCommand(robot.follower, p.RLevertoLaunch),
                 Paths.AutoLaunching3Balls(robot),
-                TeleCommands.HoodUpAutoOnly2(robot),
                 new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
                 new PedroPathCommand(robot.follower, p.RIntake2toIntake2end),
                 new PedroPathCommand(robot.follower, p.RIntake2endtoLaunch),
@@ -55,7 +54,6 @@ public class RedSegmentedCurve extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch),
                 Paths.AutoLaunching3Balls(robot),
                 new PedroPathCommand(robot.follower, p.RLaunchtoEnd),
-                new WaitCommand(2),
                 TeleCommands.StopLaunch(robot),
                 TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode
