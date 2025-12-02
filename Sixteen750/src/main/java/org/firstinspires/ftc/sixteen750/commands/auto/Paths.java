@@ -46,7 +46,7 @@ public class Paths {
         return new SequentialCommandGroup(
             TeleCommands.IntakeStop(r),
             TeleCommands.GateUp(r),
-            TeleCommands.HoldIntake(r),
+            TeleCommands.Intake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
