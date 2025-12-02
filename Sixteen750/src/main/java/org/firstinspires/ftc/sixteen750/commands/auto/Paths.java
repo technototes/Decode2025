@@ -45,11 +45,11 @@ public class Paths {
     public static Command AutoLaunching3Balls(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.GateUp(r),
-            TeleCommands.HoldIntake(r),
+            TeleCommands.Intake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
-            new WaitCommand(1.6),
+            new WaitCommand(1.15),
             TeleCommands.GateUp(r),
             TeleCommands.Intake(r)
             // want to keep launcher running during auto also no need to stop intake
@@ -74,9 +74,9 @@ public class Paths {
     public static Pose Startfar;
     public static Pose End = new Pose(15.5, 105);
 
-    public static double launchHeading = 130;
-    public static double launchHeading2 = 130;
-    public static double launchHeading3 = 130;
+    public static double launchHeading = 128;
+    public static double launchHeading2 = 128;
+    public static double launchHeading3 = 128;
     public static double launchfarheading = 108;
     public static double intakeHeading = 180;
 
@@ -98,7 +98,7 @@ public class Paths {
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(131.75, 75.5);
     public static Pose REnd = new Pose(128.5, 105);
-    public static double RlaunchHeading = 49;
+    public static double RlaunchHeading = 50.5;
     public static double RlaunchHeading2 = 45;
     public static double RlaunchHeading3 = 45;
     public static double RintakeHeading = 0;
@@ -335,6 +335,11 @@ public class Paths {
                 Math.toRadians(launchHeading)
             )
             .build();
+        Intake1endtoLaunch = follower
+            .pathBuilder()
+            .addPath(new BezierLine(Intake1end, Launch))
+            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(launchHeading))
+            .build();
 
         LaunchtoIntake2 = follower
             .pathBuilder()
@@ -422,6 +427,11 @@ public class Paths {
             .addPath(new BezierLine(Rlever, RLaunch))
             .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(RlaunchHeading))
             .build();
+        RIntake1endtoLaunch = follower
+            .pathBuilder()
+            .addPath(new BezierLine(RIntake1end, RLaunch))
+            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RlaunchHeading))
+            .build();
 
         RLaunchtoIntake2 = follower
             .pathBuilder()
@@ -473,7 +483,7 @@ public class Paths {
         RLaunchtoEnd = follower
             .pathBuilder()
             .addPath(new BezierLine(RLaunch, REnd))
-            .setLinearHeadingInterpolation(Math.toRadians(launchHeading3), Math.toRadians(180))
+            .setLinearHeadingInterpolation(Math.toRadians(launchHeading3), Math.toRadians(0))
             .build();
 
         Forward48 = follower
