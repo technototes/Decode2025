@@ -48,7 +48,7 @@ public class IntakeSubsystem implements Loggable {
     public void Hold() {
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake.setPower(MOTOR_VELOCITY / 1.2); // needed to make hold a little bit faster to keep spinning at atleast a slow speed
+            intake.setPower(MOTOR_VELOCITY / 1.1); // needed to make hold a little bit faster to keep spinning at atleast a slow speed
         }
     }
 
