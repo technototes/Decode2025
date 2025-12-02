@@ -6,7 +6,6 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
@@ -16,9 +15,9 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "BlueSegmentedCurve", preselectTeleOp = "Dual Control")
+@Autonomous(name = "BlueSegmentedCurveLever", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class BlueSegmentedCurve extends CommandOpMode {
+public class BlueSegmentedCurveLever extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -42,8 +41,10 @@ public class BlueSegmentedCurve extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.LaunchtoIntake1),
                 // new WaitCommand(1),
                 new PedroPathCommand(robot.follower, p.Intake1toIntake1end),
-                new PedroPathCommand(robot.follower, p.Intake1endtoLaunch),
+                new PedroPathCommand(robot.follower, p.Intake1endtoLever),
+                new WaitCommand(.2),
                 // new WaitCommand(2),
+                new PedroPathCommand(robot.follower, p.LevertoLaunch),
                 Paths.AutoLaunching3Balls(robot),
                 new PedroPathCommand(robot.follower, p.LaunchtoIntake2),
                 new PedroPathCommand(robot.follower, p.Intake2toIntake2end),
