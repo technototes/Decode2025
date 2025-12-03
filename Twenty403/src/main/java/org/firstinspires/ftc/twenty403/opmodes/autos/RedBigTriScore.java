@@ -4,25 +4,31 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
+import org.firstinspires.ftc.twenty403.Paths;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
+import org.firstinspires.ftc.twenty403.commands.FeedCMD;
+import org.firstinspires.ftc.twenty403.commands.PPPathCommand;
 import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
 @Configurable
-@Autonomous(name = "BlueBigTriScore", preselectTeleOp = "Two Controller Drive \uD83D\uDDFF")
+@Autonomous(name = "RedBigTriScore", preselectTeleOp = "Two Controller Drive \uD83D\uDDFF")
 @SuppressWarnings("unused")
-public class BlueBigTriMove extends CommandOpMode {
+public class RedBigTriScore extends CommandOpMode {
 
     public Robot robot;
     public Hardware hardware;
+    public PathChain bluesmalltobluegoal;
+    public Paths p = null;
 
     @Override
     public void uponInit() {
@@ -31,7 +37,16 @@ public class BlueBigTriMove extends CommandOpMode {
         SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         otos.calibrateImu();
         robot.follower = AutoConstants.createFollower(hardwareMap);
-        robot.follower.setPose(new Pose(34.133, 134.756, 270));
+        p = new Paths(robot.follower);
+        robot.follower.setPose(p.Rstart);
+        CommandScheduler.register(robot.launcherSubsystem);
+        CommandScheduler.scheduleForState( new SequentialCommandGroup(
+                        new PPPathCommand(robot.follower, p.RedStartToRedGoal),
+                        FeedCMD.Feed(robot),
+                        new PPPathCommand(robot.follower, p.RedGoalToEscape),
+                        CommandScheduler::terminateOpMode
+                ),
+                OpModeState.RUN);
         telemetry.addData("Pose:", robot.follower.getPose());
         robot.follower.update();
     }

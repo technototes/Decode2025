@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.twenty403.opmodes.autos;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.twenty403.AutoConstants;
@@ -14,18 +13,19 @@ import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Paths;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
+import org.firstinspires.ftc.twenty403.commands.FeedCMD;
+import org.firstinspires.ftc.twenty403.commands.PPPathCommand;
 import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
 @Configurable
-@Autonomous(name = "RedBigTriScore", preselectTeleOp = "Two Controller Drive \uD83D\uDDFF")
+@Autonomous(name = "BlueBigTriScore", preselectTeleOp = "Two Controller Drive \uD83D\uDDFF")
 @SuppressWarnings("unused")
-public class RedBigTriMove extends CommandOpMode {
+public class BlueBigTriScore extends CommandOpMode {
 
     public Robot robot;
     public Hardware hardware;
-    public PathChain bluesmalltobluegoal;
-    public Paths p = null;
+    private Paths p;
 
     @Override
     public void uponInit() {
@@ -35,32 +35,17 @@ public class RedBigTriMove extends CommandOpMode {
         otos.calibrateImu();
         robot.follower = AutoConstants.createFollower(hardwareMap);
         p = new Paths(robot.follower);
-        robot.follower.setPose(new Pose(109.867, 134.578, 270));
-        bluesmalltobluegoal = robot.follower
-            .pathBuilder()
-            .addPath(
-                new BezierCurve(
-                    new Pose(80.889, 134.933),
-                    new Pose(87.111, 69.867),
-                    new Pose(86.933, 62.222)
-                )
-            )
-            .setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(0))
-            .build();
-        //        robot.follower.setStartingPose(robot.follower.getPose());
-        //        bluesmalltobluegoal = robot.follower
-        //                .pathBuilder()
-        //                .addPath(
-        //                        new BezierCurve(
-        //                                new Pose(9.067, 56.889),
-        //                                new Pose(116.444, 72),
-        //                                new Pose(125.689, 22.044)
-        //                        )
-        //                )
-        //                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(145))
-        //                .build();
+        robot.follower.setPose(p.start);
         telemetry.addData("Pose:", robot.follower.getPose());
         robot.follower.update();
+        CommandScheduler.register(robot.launcherSubsystem);
+        CommandScheduler.scheduleForState( new SequentialCommandGroup(
+                new PPPathCommand(robot.follower, p.StartToBlueGoal),
+                        FeedCMD.Feed(robot),
+                        new PPPathCommand(robot.follower, p.BlueGoalToEscape),
+                CommandScheduler::terminateOpMode
+                ),
+                OpModeState.RUN);
     }
 
     @Override
