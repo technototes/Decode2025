@@ -58,26 +58,27 @@ public class Paths {
     }
 
     public static Pose Start = new Pose(30.748, 135.152);
-    public static Pose Launch = new Pose(54, 70);
+    public static Pose Launch = new Pose(45, 110);
     public static Pose Intake1 = new Pose(41.808, 85);
     public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
-    public static Pose Intake1end = new Pose(20, 85);
+    public static Pose Intake1end = new Pose(19, 85);
     public static Pose Lever = new Pose(12.25, 75.5);
     public static Pose Intake2 = new Pose(40.038, 63);
-    public static Pose Intake2ControlPoint = new Pose(71.891, 64.369);
-    public static Pose Intake2ControlPoint2 = new Pose(46, 54);
-    public static Pose Intake2end = new Pose(18, 63);
+    public static Pose Intake2ControlPoint = new Pose(72, 61);
+    public static Pose Intake2ControlPoint2 = new Pose(46, 64);
+    public static Pose Intake2end = new Pose(15, 63);
     public static Pose Intake2endControlPoint = new Pose(49.328, 65.696);
     public static Pose Intake3 = new Pose(38.923, 38);
     public static Pose Intake3ControlPoint = new Pose(76.536, 41.585);
-    public static Pose Intake3end = new Pose(18, 38);
+    public static Pose Intake3end = new Pose(15, 38);
     public static Pose Intake3endControlPoint = new Pose(62.000, 84.000);
     public static Pose Startfar;
-    public static Pose End = new Pose(15.5, 105);
+    public static Pose End = new Pose(19, 105);
 
-    public static double launchHeading = 128;
-    public static double launchHeading2 = 128;
-    public static double launchHeading3 = 128;
+    public static double launchHeading = 130;
+    public static double launchHeading1 = 140;
+    public static double launchHeading2 = 150;
+    public static double launchHeading3 = 140;
     public static double launchfarheading = 108;
     public static double intakeHeading = 180;
 
@@ -339,14 +340,14 @@ public class Paths {
         Intake1endtoLaunch = follower
                 .pathBuilder()
                 .addPath(new BezierLine(Intake1end, Launch))
-                .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(launchHeading))
+                .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(launchHeading1))
                 .build();
 
         LaunchtoIntake2 = follower
             .pathBuilder()
             .addPath(new BezierCurve(Launch, Intake2ControlPoint, Intake2ControlPoint2, Intake2))
             .setLinearHeadingInterpolation(
-                Math.toRadians(launchHeading),
+                Math.toRadians(launchHeading1),
                 Math.toRadians(intakeHeading)
             )
             .build();
@@ -370,7 +371,7 @@ public class Paths {
             .pathBuilder()
             .addPath(new BezierCurve(Launch, Intake3ControlPoint, Intake3))
             .setLinearHeadingInterpolation(
-                Math.toRadians(launchHeading),
+                Math.toRadians(launchHeading2),
                 Math.toRadians(intakeHeading)
             )
             .build();
