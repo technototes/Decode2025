@@ -7,7 +7,9 @@ import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 public class TeleCommands {
 
     public static Command AltAutoOrient(Robot r) {
-        return Command.create(() -> r.follower.turnTo(r.limelightSubsystem.getTX()));
+        return Command.create(() ->
+            r.follower.turnTo(Math.toRadians(r.limelightSubsystem.getTX()))
+        );
     }
 
     public static Command Launch(Robot r) {

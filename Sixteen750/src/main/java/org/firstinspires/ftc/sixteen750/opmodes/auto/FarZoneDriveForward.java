@@ -9,6 +9,7 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
@@ -33,8 +34,10 @@ public class FarZoneDriveForward extends CommandOpMode {
         hardware.rr.setDirection(DcMotorSimple.Direction.FORWARD);
         hardware.fl.setDirection(DcMotorSimple.Direction.REVERSE);
         hardware.fr.setDirection(DcMotorSimple.Direction.FORWARD);
+        CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
+                new LLSetup(robot),
                 TeleCommands.SetFarShoot(robot),
                 TeleCommands.Launch(robot),
                 TeleCommands.HoodUp(robot),
@@ -58,5 +61,6 @@ public class FarZoneDriveForward extends CommandOpMode {
 
     public void end() {
         HeadingHelper.savePose(robot.follower.getPose());
+        robot.limelightSubsystem.LimelightTurnOff();
     }
 }
