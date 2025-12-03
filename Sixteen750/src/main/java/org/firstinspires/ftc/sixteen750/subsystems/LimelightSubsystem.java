@@ -65,7 +65,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
             //&& result.isValid()
             // Not sure this is the right angle, because the camera is mounted sideways
             // IIRC, you should be using getTy() instead.
-            Xangle = result.getTy();
+            Xangle = -result.getTy();
             Yangle = result.getTx() + LIMELIGHT_ANGLE;
             Area = result.getTa();
             return true;
