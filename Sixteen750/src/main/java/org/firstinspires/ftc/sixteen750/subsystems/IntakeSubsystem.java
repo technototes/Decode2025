@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Loggable;
-
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
@@ -19,7 +18,7 @@ public class IntakeSubsystem implements Loggable {
     EncodedMotor<DcMotorEx> intake;
 
     public IntakeSubsystem(Hardware h) {
-//        intake.getRawMotor(DcMotorEx.class).getCurrent(CurrentUnit.AMPS)
+        // intake.getRawMotor(DcMotorEx.class).getCurrent(CurrentUnit.AMPS)
         hasHardware = Setup.Connected.INTAKESUBSYSTEM;
         // Do stuff in here
         if (hasHardware) {
@@ -49,7 +48,7 @@ public class IntakeSubsystem implements Loggable {
     public void Hold() {
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake.setPower(MOTOR_VELOCITY / 1.7); // needed to make hold a little bit faster to keep spinning at atleast a slow speed
+            intake.setPower(MOTOR_VELOCITY / 1.2); // needed to make hold a little bit faster to keep spinning at atleast a slow speed
         }
     }
 
