@@ -8,6 +8,7 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.LinePaths;
@@ -30,8 +31,10 @@ public class RedIntakeandShootLinesOnlyPedro extends CommandOpMode {
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
         LinePaths p = new LinePaths(robot.follower);
         robot.follower.setStartingPose(p.getRStart());
+        CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
-            new SequentialCommandGroup(
+                new SequentialCommandGroup(
+                        new LLSetup(robot),
                 new ParallelCommandGroup(
                     new PedroPathCommand(robot.follower, p.RStart_to_Launch),
                     Paths.Launching3Balls(robot),
@@ -71,5 +74,6 @@ public class RedIntakeandShootLinesOnlyPedro extends CommandOpMode {
 
     public void end() {
         HeadingHelper.savePose(robot.follower.getPose());
+        robot.limelightSubsystem.LimelightTurnOff();
     }
 }
