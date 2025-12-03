@@ -10,6 +10,7 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
@@ -33,8 +34,10 @@ public class DriveBackwardShoot extends CommandOpMode {
         hardware.rr.setDirection(DcMotorSimple.Direction.REVERSE);
         hardware.fl.setDirection(DcMotorSimple.Direction.FORWARD);
         hardware.fr.setDirection(DcMotorSimple.Direction.REVERSE);
+        CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
-            new SequentialCommandGroup(
+                new SequentialCommandGroup(
+                        new LLSetup(robot),
                 new ParallelCommandGroup(
                     new DriveAutoCommand(robot.follower, 0.5),
                     TeleCommands.Intake(robot),
@@ -71,5 +74,6 @@ public class DriveBackwardShoot extends CommandOpMode {
 
     public void end() {
         HeadingHelper.savePose(robot.follower.getPose());
+        robot.limelightSubsystem.LimelightTurnOff();
     }
 }
