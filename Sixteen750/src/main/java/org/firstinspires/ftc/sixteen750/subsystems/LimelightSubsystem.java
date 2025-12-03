@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.sixteen750.subsystems;
 
+import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.AprilTag_Pipeline;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -35,6 +37,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
 
     @Log(name = "new data")
     public static boolean new_result;
+    public boolean startup_done;
 
     public static double SIGN = -1.0;
     public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 17.2;
@@ -42,6 +45,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     public static double EXTRA_OFFSET = -3;
     public static double LIMELIGHT_ANGLE = 11;
     public static Limelight3A limelight;
+    LLResult result;
 
     public LimelightSubsystem(Hardware h) {
         hasHardware = Setup.Connected.LIMELIGHTSUBSYSTEM;
@@ -60,7 +64,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     }
 
     public boolean getLatestResult() {
-        LLResult result = limelight.getLatestResult();
+        result = limelight.getLatestResult();
         if (result != null) {
             //&& result.isValid()
             // Not sure this is the right angle, because the camera is mounted sideways
@@ -94,6 +98,16 @@ public class LimelightSubsystem implements Loggable, Subsystem {
 
     public double getTX() {
         return Xangle;
+    }
+    public void LimelightStartup() {
+            limelight.setPollRateHz(100);
+            limelight.pipelineSwitch(AprilTag_Pipeline);
+            limelight.start();
+            startup_done = true;
+    }
+    public void LimelightTurnOff() {
+        limelight.stop();
+        startup_done = false;
     }
 
     public double getDistance() {
