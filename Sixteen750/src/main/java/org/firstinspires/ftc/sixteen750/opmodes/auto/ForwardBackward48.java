@@ -8,6 +8,7 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
@@ -29,8 +30,10 @@ public class ForwardBackward48 extends CommandOpMode {
         Paths p = new Paths(robot.follower);
         robot.follower.setMaxPowerScaling(0.5);
         robot.follower.setStartingPose(p.getForward48Start());
+        CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
+                new LLSetup(robot),
                 new PedroPathCommand(robot.follower, p.Forward48),
                 new WaitCommand(5),
                 new PedroPathCommand(robot.follower, p.Backward48),
