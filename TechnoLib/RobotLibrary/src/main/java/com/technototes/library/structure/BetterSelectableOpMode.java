@@ -9,16 +9,25 @@ import java.util.function.Supplier;
 
 public abstract class BetterSelectableOpMode extends OpMode {
 
+    private static OpMode previouslySelectedOpMode = null;
+
     private final Selector<Supplier<OpMode>> selector;
     private OpMode selectedOpMode;
-    private static final String[] MESSAGE = {
+    private static final String[] PLAIN_MESSAGE = {
         "Use the d-pad to move the cursor.",
         "Press right bumper or dpad right to select.",
         "Press left bumper to dpad left go back.",
     };
+    private static final String[] PREV_MESSAGE = {
+        "Use the d-pad to move the cursor.",
+        "Press right bumper or dpad right to select.",
+        "Press left bumper to dpad left go back.",
+        "",
+        "Just start the opmode to start your previous selection.",
+    };
 
     public BetterSelectableOpMode(String name, Consumer<SelectScope<Supplier<OpMode>>> opModes) {
-        selector = Selector.create(name, opModes, MESSAGE);
+        selector = Selector.create(name, opModes, previouslySelectedOpMode == null ? PLAIN_MESSAGE : PREV_MESSAGE);
         selector.onSelect(opModeSupplier -> {
             onSelect();
             selectedOpMode = opModeSupplier.get();
@@ -60,6 +69,10 @@ public abstract class BetterSelectableOpMode extends OpMode {
                 selector.goBack();
             }
 
+            // if (previouslySelectedOpMode != null) {
+            //     previouslySelectedOpMode.init_loop();
+            // }
+
             List<String> lines = selector.getLines();
             for (String line : lines) {
                 telemetry.addLine(line);
@@ -67,22 +80,46 @@ public abstract class BetterSelectableOpMode extends OpMode {
             onLog(lines);
         } else {
             selectedOpMode.init_loop();
+            // Allow us to back up one, if we accidentally selected an opmode
+            if (
+                gamepad1.leftBumperWasPressed() ||
+                gamepad2.leftBumperWasPressed() ||
+                gamepad1.dpadLeftWasPressed() ||
+                gamepad2.dpadLeftWasPressed()
+            ) {
+                selector.goBack();
+            }
         }
     }
 
     @Override
     public final void start() {
-        if (selectedOpMode == null) throw new RuntimeException("No OpMode selected!");
-        selectedOpMode.start();
+        if (selectedOpMode != null) {
+            selectedOpMode.start();
+            previouslySelectedOpMode = selectedOpMode;
+        } else if (previouslySelectedOpMode != null) {
+            previouslySelectedOpMode.start();
+        }
     }
 
     @Override
     public final void loop() {
-        selectedOpMode.loop();
+        if (selectedOpMode != null) {
+            selectedOpMode.loop();
+        } else if (previouslySelectedOpMode != null) {
+            previouslySelectedOpMode.loop();
+        } else {
+            telemetry.addLine("You forgot to select an opmode. Oops.");
+            telemetry.update();
+        }
     }
 
     @Override
     public final void stop() {
-        if (selectedOpMode != null) selectedOpMode.stop();
+        if (selectedOpMode != null) {
+            selectedOpMode.stop();
+        } else if (previouslySelectedOpMode != null) {
+            previouslySelectedOpMode.stop();
+        }
     }
 }

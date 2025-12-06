@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.twenty403.subsystems;
 
 import static org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem.TARGET_MOTOR_VELOCITY;
+import static org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem.err;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.command.Command;
@@ -43,8 +44,9 @@ public class FeedingSubsystem implements Subsystem {
             //                return;
             //            }
             if (
-                h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 &&
-                h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30
+                (h.top.getVelocity() >= TARGET_MOTOR_VELOCITY - 20 &&
+                    h.top.getVelocity() < TARGET_MOTOR_VELOCITY + 30) ||
+                err < 0
             ) {
                 bottomRight.setPower(-CRSERVO_SPEED);
                 bottomLeft.setPower(CRSERVO_SPEED);

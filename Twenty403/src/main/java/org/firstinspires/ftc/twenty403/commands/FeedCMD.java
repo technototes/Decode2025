@@ -12,21 +12,13 @@ import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
 @Configurable
 public class FeedCMD {
 
-    public static double FEED_WAIT = 0.33;
-    public static double LAUNCH_STARTUP = 1.4;
+    public static double FEED_WAIT = 3.2;
+    public static double LAUNCH_STARTUP = 1.7;
     public static double RETURN_TO_PEAK = 1.8;
 
     public static SequentialCommandGroup Feed(Robot r) {
         return Command.create(r.launcherSubsystem::Launch)
             .andThen(new WaitCommand(LAUNCH_STARTUP))
-            .andThen(Command.create(r.feedingSubsystem::moveball))
-            .andThen(new WaitCommand(FEED_WAIT))
-            .andThen(Command.create(r.feedingSubsystem::stop))
-            .andThen(new WaitCommand(RETURN_TO_PEAK))
-            .andThen(Command.create(r.feedingSubsystem::moveball))
-            .andThen(new WaitCommand(FEED_WAIT))
-            .andThen(Command.create(r.feedingSubsystem::stop))
-            .andThen(new WaitCommand(RETURN_TO_PEAK))
             .andThen(Command.create(r.feedingSubsystem::moveball))
             .andThen(new WaitCommand(FEED_WAIT))
             .andThen(Command.create(r.feedingSubsystem::stop));
