@@ -1,10 +1,12 @@
 package com.technototes.library.hardware.motor;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 import com.technototes.library.hardware.HardwareDevice;
 import java.util.function.Supplier;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 /**
  * Class for motors
@@ -213,5 +215,18 @@ public class Motor<T extends DcMotorSimple> extends HardwareDevice<T> implements
     @Override
     public Double get() {
         return getPower();
+    }
+
+    /**
+     * Gets the electrical flow of the motor, in Amps or mAmps, if this is a DcMotorEx
+     *
+     * @returns the amperage the motor is currently pulling, or 0 if not a DcMotorEx
+     */
+    public double getAmperage(CurrentUnit cu) {
+        T device = getRawDevice();
+        if (device instanceof DcMotorEx) {
+            return ((DcMotorEx) device).getCurrent(cu);
+        }
+        return 0;
     }
 }
