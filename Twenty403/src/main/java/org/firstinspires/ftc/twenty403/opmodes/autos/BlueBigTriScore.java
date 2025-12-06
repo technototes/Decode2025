@@ -35,12 +35,12 @@ public class BlueBigTriScore extends CommandOpMode {
         otos.calibrateImu();
         robot.follower = AutoConstants.createFollower(hardwareMap);
         p = new Paths(robot.follower);
+        Pose start = p.start.setHeading(Math.toRadians(37));
         robot.follower.setPose(p.start);
         telemetry.addData("Pose:", robot.follower.getPose());
         robot.follower.update();
         CommandScheduler.register(robot.launcherSubsystem);
         CommandScheduler.scheduleForState( new SequentialCommandGroup(
-                new PPPathCommand(robot.follower, p.StartToBlueGoal),
                         FeedCMD.Feed(robot),
                         new PPPathCommand(robot.follower, p.BlueGoalToEscape),
                 CommandScheduler::terminateOpMode

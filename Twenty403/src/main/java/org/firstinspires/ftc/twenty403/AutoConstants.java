@@ -25,7 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Configurable
-public class AutoConstants {
+public class  AutoConstants {
 
     public static boolean ptechno = false;
 

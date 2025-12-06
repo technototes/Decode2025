@@ -38,10 +38,10 @@ public class RedBigTriScore extends CommandOpMode {
         otos.calibrateImu();
         robot.follower = AutoConstants.createFollower(hardwareMap);
         p = new Paths(robot.follower);
-        robot.follower.setPose(p.Rstart);
+        Pose start = p.Rstart.setHeading(Math.toRadians(143));
+        robot.follower.setPose(start);
         CommandScheduler.register(robot.launcherSubsystem);
         CommandScheduler.scheduleForState( new SequentialCommandGroup(
-                        new PPPathCommand(robot.follower, p.RedStartToRedGoal),
                         FeedCMD.Feed(robot),
                         new PPPathCommand(robot.follower, p.RedGoalToEscape),
                         CommandScheduler::terminateOpMode
@@ -70,7 +70,7 @@ public class RedBigTriScore extends CommandOpMode {
     @Override
     public void runLoop() {
         telemetry.addData("Pose:", robot.follower.getPose());
-        //        if (robot.follower.getHeading() != robot.follower.getCurrentPath().getPose()) {}
+        //        if (robot.follower.getHeading() != robot.follower.getCurr      entPath().getPose()) {}
         robot.follower.update();
     }
 }
