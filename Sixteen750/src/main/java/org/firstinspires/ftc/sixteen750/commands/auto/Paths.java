@@ -5,6 +5,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 import com.technototes.library.command.Command;
 import com.technototes.library.command.ParallelCommandGroup;
@@ -94,21 +95,23 @@ public class Paths {
     //Red poses reconfigure these
     public static Pose RStart = new Pose(114, 135.152);
     public static Pose RLaunch = new Pose(90, 90);
+    public static Pose RGoal = new Pose(144, 144);
+
     public static Pose RLaunchend = new Pose(90, 90);
 
     public static Pose RIntake1 = new Pose(103, 88);
     public static Pose RIntake1ControlPoint = new Pose(83, 89.143);
     public static Pose RIntake1end = new Pose(123, 88);
-    public static Pose RIntake2 = new Pose(104, 65);
+    public static Pose RIntake2 = new Pose(104, 60);
     public static Pose RIntake2ControlPoint = new Pose(73, 64.369);
-    public static Pose RIntake2end = new Pose(131, 65);
+    public static Pose RIntake2end = new Pose(126, 60);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
     public static Pose RIntake3 = new Pose(104, 40);
     public static Pose RIntake3ControlPoint = new Pose(68, 41.585);
-    public static Pose RIntake3end = new Pose(131, 40);
+    public static Pose RIntake3end = new Pose(126, 40);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(131.75,75.5);
-    public static Pose REnd = new Pose(128.5,105);
+    public static Pose REnd = new Pose(123,105);
     public static double RlaunchHeading = 50.5;
     public static double RlaunchHeading2 = 45;
     public static double RlaunchHeading3 = 45;
@@ -160,6 +163,13 @@ public class Paths {
     public PathChain LaunchtoIntake3;
     public PathChain Intake3toIntake3end;
     public PathChain Intake3endtoLaunch;
+    public PathChain RStarttoLaunchH;
+    public PathChain RLaunchtoIntake1H;
+    public PathChain RIntake1toIntake1endH;
+    public PathChain RIntake1endtoLeverH;
+    public PathChain RLevertoLaunchH;
+
+
     public PathChain RStarttoLaunch;
     public PathChain RLaunchtoIntake1;
     public PathChain RIntake1toIntake1end;
@@ -461,6 +471,38 @@ public class Paths {
                 )
                 .setLinearHeadingInterpolation(tunnelIntakeHeading, farlaunchHeading)
                 .build();
+        RStarttoLaunchH = follower
+                .pathBuilder()
+                .addPath(new BezierLine(RStart, RLaunch))
+                .setHeadingInterpolation(HeadingInterpolator.facingPoint(RGoal)) //            .setHeadingInterpolation(HeadingInterpolator.facingPoint(0, RADIUS))
+                .build();
+
+        RLaunchtoIntake1H = follower
+                .pathBuilder()
+                .addPath(new BezierCurve(RLaunch, RIntake1ControlPoint, RIntake1))
+                .setLinearHeadingInterpolation(
+                        Math.toRadians(RlaunchHeading),
+                        Math.toRadians(RintakeHeading)
+                )
+                .build();
+
+        RIntake1toIntake1endH = follower
+                .pathBuilder()
+                .addPath(new BezierLine(RIntake1, RIntake1end))
+                .setTangentHeadingInterpolation()
+                .build();
+        RIntake1endtoLeverH = follower
+                .pathBuilder()
+                .addPath(new BezierLine(RIntake1end,Rlever))
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
+                .build();
+
+        RLevertoLaunchH = follower
+                .pathBuilder()
+                .addPath(new BezierLine(Rlever, RLaunch))
+                .setHeadingInterpolation(HeadingInterpolator.facingPoint(RGoal)
+                )
+                .build();
 
         RStarttoLaunch = follower
             .pathBuilder()
@@ -554,7 +596,7 @@ public class Paths {
                 .addPath(new BezierLine(RLaunch, REnd))
                 .setLinearHeadingInterpolation(
                         Math.toRadians(launchHeading3),
-                        Math.toRadians(0)
+                        Math.toRadians(90)
                 )
                 .build();
 
