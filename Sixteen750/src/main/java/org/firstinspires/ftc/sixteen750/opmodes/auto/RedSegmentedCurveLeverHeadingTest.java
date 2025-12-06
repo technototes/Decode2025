@@ -15,9 +15,9 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "RedSegmentedCurveLever", preselectTeleOp = "Dual Control")
+@Autonomous(name = "RedSegmentedCurveLeverHeadingTest", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class RedSegmentedCurveLever extends CommandOpMode {
+public class RedSegmentedCurveLeverHeadingTest extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -35,26 +35,26 @@ public class RedSegmentedCurveLever extends CommandOpMode {
                 TeleCommands.AutoLaunch(robot),
                 TeleCommands.Intake(robot),
                 TeleCommands.HoodUp(robot),
-                new PedroPathCommand(robot.follower, p.RStarttoLaunch),
+                new PedroPathCommand(robot.follower, p.RStarttoLaunchH),
                 Paths.AutoLaunching3Balls(robot),
                 // new WaitCommand(0.5),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake1),
+                new PedroPathCommand(robot.follower, p.RLaunchtoIntake1H),
                 // new WaitCommand(1),
-                new PedroPathCommand(robot.follower, p.RIntake1toIntake1end),
+                new PedroPathCommand(robot.follower, p.RIntake1toIntake1endH),
                 // new WaitCommand(2),
-                new PedroPathCommand(robot.follower, p.RIntake1endtoLever),
+                new PedroPathCommand(robot.follower, p.RIntake1endtoLeverH),
                 new WaitCommand(1),
-                new PedroPathCommand(robot.follower, p.RLevertoLaunch),
+                new PedroPathCommand(robot.follower, p.RLevertoLaunchH),
                 Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
-                new PedroPathCommand(robot.follower, p.RIntake2toIntake2end),
-                new PedroPathCommand(robot.follower, p.RIntake2endtoLaunch),
-                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),
-                new PedroPathCommand(robot.follower, p.RIntake3toIntake3end),
-                new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch),
-                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoEnd),
+                // new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
+                // new PedroPathCommand(robot.follower, p.RIntake2toIntake2end),
+                // new PedroPathCommand(robot.follower, p.RIntake2endtoLaunch),
+                // Paths.AutoLaunching3Balls(robot),
+                // new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),
+                // new PedroPathCommand(robot.follower, p.RIntake3toIntake3end),
+                // new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch),
+                // Paths.AutoLaunching3Balls(robot),
+                // new PedroPathCommand(robot.follower, p.RLaunchtoEnd),
                 TeleCommands.StopLaunch(robot),
                 TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode
