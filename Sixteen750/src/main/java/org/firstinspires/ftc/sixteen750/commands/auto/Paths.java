@@ -190,6 +190,9 @@ public class Paths {
     public PathChain RLevertoLaunch;
     public PathChain LaunchtoEnd;
     public PathChain RLaunchtoEnd;
+    public PathChain Rlaunchfartogateintake;
+    public PathChain Rgateintaketolaunchfar;
+
 
     public static Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
@@ -655,8 +658,11 @@ public class Paths {
 
         Rlaunchfartointake5 = follower
             .pathBuilder()
-            .addPath(new BezierLine(new Pose(85.000, 12.000), new Pose(138.286, 13.061)))
-            .setLinearHeadingInterpolation(Math.toRadians(65), Math.toRadians(0))
+            .addPath(new BezierCurve(
+                    new Pose(85.000, 12.000),
+                    new Pose(141.780, 113.333),
+                    new Pose(132.5, 12.229)))
+            .setLinearHeadingInterpolation(Math.toRadians(65), Math.toRadians(250))
             .setVelocityConstraint(0.3)
             .build();
 
@@ -687,7 +693,7 @@ public class Paths {
                         new BezierCurve(
                                 new Pose(35.000, 12.000),
                                 new Pose(66.000, 40.000),
-                                new Pose(7.000, 36.000)
+                                new Pose(132.5, 12.229)
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(115), Math.toRadians(180))
@@ -753,7 +759,26 @@ public class Paths {
                 .setLinearHeadingInterpolation(Math.toRadians(115), Math.toRadians(180))
                 .setVelocityConstraint(0.3)
                 .build();
+        Rlaunchfartogateintake = follower
+                .pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Pose(85.000, 12.000),
+                                new Pose(144.000, 0.000),
+                                new Pose(138.000, 43.000)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(65), Math.toRadians(100))
+                .build();
+
+        Rgateintaketolaunchfar = follower
+                .pathBuilder()
+                .addPath(new BezierLine(new Pose(138, 43), new Pose(85.000, 12.000)))
+                .setVelocityConstraint(0.3)
+                .setLinearHeadingInterpolation(Math.toRadians(100), Math.toRadians(55))
+                .build();
     }
+
     // move the park position lower to scoop more balls and shoot again
 }
 
