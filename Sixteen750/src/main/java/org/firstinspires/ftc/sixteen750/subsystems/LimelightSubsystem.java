@@ -65,7 +65,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
             //&& result.isValid()
             // Not sure this is the right angle, because the camera is mounted sideways
             // IIRC, you should be using getTy() instead.
-            Xangle = result.getTy();
+            Xangle = -result.getTy();
             Yangle = result.getTx() + LIMELIGHT_ANGLE;
             Area = result.getTa();
             return true;
@@ -90,6 +90,10 @@ public class LimelightSubsystem implements Loggable, Subsystem {
         }
         //its y-angle because we flipped the camera, we might need to invert the axis
         // if it start turning away from the apriltag
+    }
+
+    public double getTX() {
+        return Xangle;
     }
 
     public double getDistance() {

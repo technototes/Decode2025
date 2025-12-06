@@ -30,5 +30,6 @@ public class TestingController {
         motorPowerButton.whenPressed(TeleCommands.MotorPowerTest(robot));
         // motorPowerButton.whenReleased(TeleCommands.)/
         motorVelocityButton.whenPressed(TeleCommands.MotorVelocityTest(robot));
+
     }
 }
