@@ -12,7 +12,7 @@ import org.firstinspires.ftc.twenty403.subsystems.LauncherSubsystem;
 @Configurable
 public class FeedCMD {
 
-    public static double FEED_WAIT = 2.7;
+    public static double FEED_WAIT = 3.2   ;
     public static double LAUNCH_STARTUP = 1.7;
     public static double RETURN_TO_PEAK = 1.8;
 

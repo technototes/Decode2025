@@ -8,6 +8,7 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
+import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.twenty403.AutoConstants;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.commands.FeedCMD;
 import org.firstinspires.ftc.twenty403.commands.PPPathCommand;
+import org.firstinspires.ftc.twenty403.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
@@ -43,7 +45,11 @@ public class RedBigTriScore extends CommandOpMode {
         CommandScheduler.register(robot.launcherSubsystem);
         CommandScheduler.scheduleForState( new SequentialCommandGroup(
                         FeedCMD.Feed(robot),
-                        new PPPathCommand(robot.follower, p.RedGoalToEscape),
+                        new DriveAutoCommand(robot.follower, -.5),
+                        new WaitCommand(.3),
+                        new DriveAutoCommand(robot.follower, .5, -.5, -.5, .5),
+                        new WaitCommand(.9),
+                        new DriveAutoCommand(robot.follower, 0),
                         CommandScheduler::terminateOpMode
                 ),
                 OpModeState.RUN);
