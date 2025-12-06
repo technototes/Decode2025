@@ -111,6 +111,8 @@ public class Paths {
     public static Pose RIntake3end = new Pose(126, 40);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(131.75,75.5);
+    public static Pose RleverControlPoint = new Pose(97.331, 74.620);
+
     public static Pose REnd = new Pose(123,105);
     public static double RlaunchHeading = 50.5;
     public static double RlaunchHeading2 = 45;
@@ -529,7 +531,7 @@ public class Paths {
             .build();
         RIntake1endtoLever = follower
                 .pathBuilder()
-                .addPath(new BezierLine(RIntake1end,Rlever))
+                .addPath(new BezierCurve(RIntake1end, RleverControlPoint, Rlever))
                 .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
                 .build();
 
