@@ -80,7 +80,16 @@ public class Paths {
     public static Pose IntakeCorner = new Pose(11, 12);
     public static Pose IntakeCornerControlPoint = new Pose(42, 29);
     public static Pose IntakeTunnel = new Pose(8, 27);
+    public static Pose farStart = new Pose(54.000, 9.000);
+    public static Pose farLaunch = new Pose(59.000, 12.000);
+    public static Pose intake4 = new Pose(132.5, 12.229);
+    public static Pose intake4ControlPoint = new Pose(0, 0);
+    public static Pose intake5 = new Pose(11.480, 12.229);
+    public static Pose intake5ControlPoint = new Pose(2.220, 30.666);
+    public static Pose gateIntake = new Pose(6, 43);
+    public static Pose gateIntakeControlPoint = new Pose(0, 0);
 
+    public static Pose farPark = new Pose(21.25, 12.735);
 
     public static double launchHeading = 130;
     public static double launchHeading1 = 140;
@@ -684,7 +693,7 @@ public class Paths {
 
         StartFartolaunchfar = follower
                 .pathBuilder()
-                .addPath(new BezierLine(new Pose(54.000, 9.000), new Pose(59.000, 12.000)))
+                .addPath(new BezierLine(farStart, farLaunch))
                 .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(125))
                 .setVelocityConstraint(0.3)
                 .build();
@@ -720,9 +729,9 @@ public class Paths {
                     .pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(59.000, 12.000),
-                                    new Pose(2.220, 30.666),
-                                    new Pose(11.480, 12.229)
+                                    farLaunch,
+                                    intake5ControlPoint,
+                                    intake5
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(115), Math.toRadians(290))
@@ -731,7 +740,7 @@ public class Paths {
 
         intake5tolaunchfar = follower
                 .pathBuilder()
-                .addPath(new BezierLine(new Pose(11.48, 12.229), new Pose(59.000, 12.000)))
+                .addPath(new BezierLine(intake5, farLaunch))
                 .setVelocityConstraint(0.3)
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(125))
                 .build();
@@ -740,9 +749,9 @@ public class Paths {
                 .pathBuilder()
                 .addPath(
                         new BezierCurve(
-                                new Pose(59.000, 12.000),
-                                new Pose(0.000, 0.000),
-                                new Pose(6.000, 43.000)
+                                farLaunch,
+                                gateIntakeControlPoint,
+                                gateIntake
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(115), Math.toRadians(80))
@@ -750,14 +759,14 @@ public class Paths {
 
         gateintaketolaunchfar = follower
                 .pathBuilder()
-                .addPath(new BezierLine(new Pose(6, 43), new Pose(59.000, 12.000)))
+                .addPath(new BezierLine(gateIntake, farLaunch))
                 .setVelocityConstraint(0.3)
                 .setLinearHeadingInterpolation(Math.toRadians(80), Math.toRadians(125))
                 .build();
 
         launchfartopark = follower
                 .pathBuilder()
-                .addPath(new BezierLine(new Pose(59.000, 12.000), new Pose(21.25, 12.735)))
+                .addPath(new BezierLine(farLaunch, farPark))
                 .setLinearHeadingInterpolation(Math.toRadians(115), Math.toRadians(180))
                 .setVelocityConstraint(0.3)
                 .build();

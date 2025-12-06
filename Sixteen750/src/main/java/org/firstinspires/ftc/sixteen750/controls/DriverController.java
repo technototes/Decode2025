@@ -77,8 +77,8 @@ public class DriverController {
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
         intakeTrigger = gamepad.rightTrigger;
-//        autoAim = gamepad.leftTrigger;
-        AltAutoAlign = gamepad.leftTrigger;
+        autoAim = gamepad.leftTrigger;
+        //AltAutoAlign = gamepad.leftTrigger;
         // turboButton = gamepad.leftBumper;
         snailButton = gamepad.leftBumper;
         launchButton = gamepad.rightBumper;
@@ -118,7 +118,8 @@ public class DriverController {
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             autoAim.whenPressed(DrivingCommands.AutoOrient(pedroDriver));
             autoAim.whenReleased(DrivingCommands.NoAutoOrient(pedroDriver));
-            AltAutoAlign.whenPressed(TeleCommands.AltAutoOrient(robot));
+            //AltAutoAlign.whenPressed(TeleCommands.AltAutoOrient(robot));
+            //AltAutoAlign.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
         }
         // autoAim.whilePressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.AprilTag_Pipeline));
     }

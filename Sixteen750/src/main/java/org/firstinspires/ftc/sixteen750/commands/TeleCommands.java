@@ -1,15 +1,20 @@
 package org.firstinspires.ftc.sixteen750.commands;
 
+import com.pedropathing.geometry.BezierPoint;
 import com.technototes.library.command.Command;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
+import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 public class TeleCommands {
 
     public static Command AltAutoOrient(Robot r) {
-        return Command.create(() -> r.follower.turnTo(Math.toRadians(r.limelightSubsystem.getTX())));
+        return Command.create(() -> r.follower.turnTo(Math.toRadians(LimelightSubsystem.Xangle))); //r.limelightSubsystem.getTX()
     }
+    public static Command TurnTo90(Robot r){
+        return Command.create(() -> r.follower.holdPoint(new BezierPoint(90,90),Math.toRadians(90), false)); //pose might need to be current pose?
 
+    }
     public static Command Launch(Robot r) {
         return Command.create(r.launcherSubsystem::Launch);
     }
