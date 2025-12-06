@@ -43,16 +43,18 @@ public class RedBigTriScore extends CommandOpMode {
         Pose start = p.Rstart.setHeading(Math.toRadians(143));
         robot.follower.setPose(start);
         CommandScheduler.register(robot.launcherSubsystem);
-        CommandScheduler.scheduleForState( new SequentialCommandGroup(
-                        FeedCMD.Feed(robot),
-                        new DriveAutoCommand(robot.follower, -.5),
-                        new WaitCommand(.3),
-                        new DriveAutoCommand(robot.follower, .5, -.5, -.5, .5),
-                        new WaitCommand(.9),
-                        new DriveAutoCommand(robot.follower, 0),
-                        CommandScheduler::terminateOpMode
-                ),
-                OpModeState.RUN);
+        CommandScheduler.scheduleForState(
+            new SequentialCommandGroup(
+                FeedCMD.Feed(robot),
+                new DriveAutoCommand(robot.follower, -.5),
+                new WaitCommand(.3),
+                new DriveAutoCommand(robot.follower, .5, -.5, -.5, .5),
+                new WaitCommand(.9),
+                new DriveAutoCommand(robot.follower, 0),
+                CommandScheduler::terminateOpMode
+            ),
+            OpModeState.RUN
+        );
         telemetry.addData("Pose:", robot.follower.getPose());
         robot.follower.update();
     }

@@ -17,7 +17,6 @@ public class Paths {
     private final Pose BGoalBezierPointToEscape = new Pose(31.164, 120.358);
     private final Pose RGoalBezierPointToEscape = new Pose(117.313, 117.313);
 
-
     //blue poses
     private final Pose Bescape = new Pose(16.298, 105.492);
     private final Pose intake1end = new Pose(14, 84.233);
@@ -40,29 +39,16 @@ public class Paths {
     private final Pose Rmove = new Pose(115, 49.617);
 
     public Paths(Follower follower) {
-
         BlueGoalToEscape = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                start,
-                                BGoalBezierPointToEscape,
-                                Bescape
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(145), Math.toRadians(180))
-                .build();
+            .pathBuilder()
+            .addPath(new BezierCurve(start, BGoalBezierPointToEscape, Bescape))
+            .setLinearHeadingInterpolation(Math.toRadians(145), Math.toRadians(180))
+            .build();
 
         RedGoalToEscape = follower
-                .pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                Rstart,
-                                RGoalBezierPointToEscape,
-                                Rescape
-                        )
-                )
-                .setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(0))
-                .build();
+            .pathBuilder()
+            .addPath(new BezierCurve(Rstart, RGoalBezierPointToEscape, Rescape))
+            .setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(0))
+            .build();
     }
 }
