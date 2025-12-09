@@ -11,6 +11,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
@@ -118,8 +119,8 @@ public class DriverController {
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             autoAim.whenPressed(DrivingCommands.AutoOrient(pedroDriver));
             autoAim.whenReleased(DrivingCommands.NoAutoOrient(pedroDriver));
-            //AltAutoAlign.whenPressed(TeleCommands.AltAutoOrient(robot));
-            //AltAutoAlign.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
+            AltAutoAlign.whenPressed(new AltAutoOrient(robot));
+            AltAutoAlign.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
         }
         // autoAim.whilePressed(new LLPipelineChangeCommand(hardware.limelight, Setup.HardwareNames.AprilTag_Pipeline));
     }

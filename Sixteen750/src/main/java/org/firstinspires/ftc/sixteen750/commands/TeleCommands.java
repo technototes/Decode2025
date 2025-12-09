@@ -8,9 +8,6 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 public class TeleCommands {
 
-    public static Command AltAutoOrient(Robot r) {
-        return AltAutoOrient(r); //r.limelightSubsystem.getTX()
-    }
 
     public static Command TurnTo90(Robot r) {
         return Command.create(() ->

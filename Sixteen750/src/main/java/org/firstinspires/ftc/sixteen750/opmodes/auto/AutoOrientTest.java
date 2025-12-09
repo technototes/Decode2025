@@ -13,6 +13,7 @@ import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
@@ -57,7 +58,7 @@ public class AutoOrientTest extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 TeleCommands.Intake(robot),
-                TeleCommands.AltAutoOrient(robot),
+                new AltAutoOrient(robot),
                 new WaitCommand(15),
                 CommandScheduler::terminateOpMode
             ),
