@@ -9,7 +9,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 public class TeleCommands {
 
     public static Command AltAutoOrient(Robot r) {
-        return Command.create(() -> r.follower.turnTo(Math.toRadians(LimelightSubsystem.Xangle))); //r.limelightSubsystem.getTX()
+        return AltAutoOrient(r); //r.limelightSubsystem.getTX()
     }
 
     public static Command TurnTo90(Robot r) {

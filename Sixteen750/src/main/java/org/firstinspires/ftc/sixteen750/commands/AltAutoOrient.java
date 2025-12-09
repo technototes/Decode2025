@@ -1,0 +1,61 @@
+package org.firstinspires.ftc.sixteen750.commands;
+
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierPoint;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+import com.technototes.library.command.Command;
+
+import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.Setup;
+
+public class AltAutoOrient implements Command {
+
+    public Robot robot;
+
+    public Pose wantedPose;
+
+    public AltAutoOrient(Robot r) {
+        robot = r;
+    }
+
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public boolean isFinished() {
+        return !robot.follower.isBusy();
+        // I *believe* that a properly tuned robot shouldn't need all this stuff
+        /*
+        if (
+            follower.atParametricEnd() &&
+            follower.getHeadingError() < follower.getCurrentPath().getPathEndHeadingConstraint()
+        ) {
+            return true;
+        } else if (
+            follower.getVelocity().getMagnitude() <
+                follower.getCurrentPath().getPathEndVelocityConstraint() &&
+            follower.getPose().distanceFrom(follower.getCurrentPath().endPose()) < 2.54 &&
+            follower.getAngularVelocity() < 0.055
+        ) {
+            return true;
+        } else {
+            return false;
+        }*/
+    }
+
+    @Override
+    public void execute() {
+        wantedPose = new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), Math.toRadians(robot.limelightSubsystem.getTX()));
+        robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
+        robot.follower.update();
+    }
+
+    @Override
+    public void end(boolean s) {
+        robot.follower.breakFollowing();
+    }
+
+}
