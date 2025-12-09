@@ -19,11 +19,6 @@ public class AltAutoOrient implements Command {
         robot = r;
     }
 
-
-    @Override
-    public void initialize() {
-    }
-
     @Override
     public boolean isFinished() {
         return !robot.follower.isBusy();
