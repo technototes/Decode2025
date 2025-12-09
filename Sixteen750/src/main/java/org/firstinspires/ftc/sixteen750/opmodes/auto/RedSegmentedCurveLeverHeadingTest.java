@@ -9,6 +9,7 @@ import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
@@ -36,7 +37,7 @@ public class RedSegmentedCurveLeverHeadingTest extends CommandOpMode {
                 TeleCommands.Intake(robot),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.RStarttoLaunchH),
-                TeleCommands.AltAutoOrient(robot),
+                new AltAutoOrient(robot),
                 Paths.AutoLaunching3Balls(robot),
                 // new WaitCommand(0.5),
                 new PedroPathCommand(robot.follower, p.RLaunchtoIntake1H),
@@ -46,7 +47,7 @@ public class RedSegmentedCurveLeverHeadingTest extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.RIntake1endtoLeverH),
                 new WaitCommand(1),
                 new PedroPathCommand(robot.follower, p.RLevertoLaunchH),
-                TeleCommands.AltAutoOrient(robot),
+                new AltAutoOrient(robot),
                 Paths.AutoLaunching3Balls(robot),
                 // new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
                 // new PedroPathCommand(robot.follower, p.RIntake2toIntake2end),

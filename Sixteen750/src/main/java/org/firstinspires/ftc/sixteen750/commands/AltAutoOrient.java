@@ -55,7 +55,7 @@ public class AltAutoOrient implements Command {
 
     @Override
     public void end(boolean s) {
-        robot.follower.breakFollowing();
+        robot.follower.drivetrain.breakFollowing();
     }
 
 }
