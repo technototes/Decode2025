@@ -14,7 +14,7 @@ import org.firstinspires.ftc.twenty403.Setup;
 @Configurable
 public class LauncherSubsystem implements Loggable, Subsystem {
 
-    public static double TARGET_MOTOR_VELOCITY = 1320; //.58; // 0.5 // /1.0
+    public static double TARGET_MOTOR_VELOCITY = 1375; //.58; // 0.5 // /1.0
 
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
@@ -69,6 +69,15 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // TODO: make the motors spit the thing at the right angle
         if (hasHardware) {
             setTargetSpeed(TARGET_MOTOR_VELOCITY);
+        }
+        launching = true;
+    }
+
+    public void AutoLaunch() {
+        // Spin the motors
+        // TODO: make the motors spit the thing at the right angle
+        if (hasHardware) {
+            setTargetSpeed(1320);
         }
         launching = true;
     }

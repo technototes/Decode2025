@@ -10,7 +10,7 @@ public class EZCmd {
     public static class Drive {
 
         public static Command NormalMode(Follower follower) {
-            return Command.create(() -> follower.setMaxPowerScaling(0.65));
+            return Command.create(() -> follower.setMaxPowerScaling(0.85));
         }
 
         public static Command SnailMode(Follower follower) {
@@ -18,7 +18,7 @@ public class EZCmd {
         }
 
         public static Command TurboMode(Follower follower) {
-            return Command.create(() -> follower.setMaxPowerScaling(.85));
+            return Command.create(() -> follower.setMaxPowerScaling(1));
         }
 
         public static Command AutoAim() {

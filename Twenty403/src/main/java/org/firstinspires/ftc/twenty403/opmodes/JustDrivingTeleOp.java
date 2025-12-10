@@ -105,6 +105,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
         }
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
+        robot.follower.setMaxPowerScaling(.75);
     }
 
     @Override
