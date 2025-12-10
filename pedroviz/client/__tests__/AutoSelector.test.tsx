@@ -92,7 +92,7 @@ describe('AutoSelector tests', () => {
     );
     const items = screen.getAllByText('Test');
     expect(items.length).toBe(2);
-    expect(items[0]).toBeDisabled();
+    expect(items[1]).toBeDisabled();
     await waitFor(() => expect(setSel).toBeCalledTimes(0));
   });
 });

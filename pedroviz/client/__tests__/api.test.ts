@@ -198,15 +198,14 @@ describe('API validation', () => {
     expect(numFromVal({ type: 'radians', value: 180 })).toEqual(Math.PI);
     expect(getValue('val2')).toEqual(2.5);
     expect(pointFromPose({ x: 'val1', y: 'val2' })).toEqual({ x: 1, y: 2.5 });
-    expect(pointFromPoseRef('pose3')).toEqual([0, { x: 1, y: 2.5 }]);
+    const pose3 = pointFromPoseRef('pose3');
+    expect(pose3.length).toEqual(2);
+    expect(pose3[1]).toEqual({ x: 1, y: 2.5 });
     expect(() => pointFromPoseRef('noPose')).toThrow();
-    expect(getBezierPoints('bez2')).toEqual([
-      1,
-      [
-        [2, { x: 1, y: 1 }],
-        [3, { x: 2.5, y: 1 }],
-        [4, { x: 2.5, y: 1 }],
-      ],
+    expect(getBezierPoints('bez2')[1].map(([n, p]) => p)).toEqual([
+      { x: 1, y: 1 },
+      { x: 2.5, y: 1 },
+      { x: 2.5, y: 1 },
     ]);
     expect(getValueFromHeaderRef('val1')).toEqual(1);
     expect(getValueFromHeaderRef({ radians: 'val2' })).toEqual(

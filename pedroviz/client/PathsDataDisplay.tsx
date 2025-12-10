@@ -430,23 +430,38 @@ export function PathChainList(): ReactElement {
   );
 }
 
-export function PathsDataDisplay() {
+export function PathsDataDisplay({
+  expand,
+}: {
+  expand?: boolean;
+}): ReactElement {
+  const defaultShow = !!expand;
   const selFile = useAtomValue(SelectedFileAtom);
   if (selFile.length === 0) {
     return <div>Please select a file to view.</div>;
   }
   return (
     <>
-      <Expando label="Values" indent={20} size={500} defaultShow={true}>
+      <Expando label="Values" indent={20} size={500} defaultShow={defaultShow}>
         <NamedValueList />
       </Expando>
-      <Expando label="Poses" indent={20} size={500}>
+      <Expando label="Poses" indent={20} size={500} defaultShow={defaultShow}>
         <NamedPoseList />
       </Expando>
-      <Expando label="Bezier Lines/Curves" indent={20} size={500}>
+      <Expando
+        label="Bezier Lines/Curves"
+        indent={20}
+        size={500}
+        defaultShow={defaultShow}
+      >
         <NamedBezierList />
       </Expando>
-      <Expando label="PathChains" indent={20} size={500}>
+      <Expando
+        label="PathChains"
+        indent={20}
+        size={500}
+        defaultShow={defaultShow}
+      >
         <PathChainList />
       </Expando>
     </>

@@ -1,6 +1,7 @@
 import { hasField } from '@freik/typechk';
 import { atom } from 'jotai';
-import { atomFamily } from 'jotai/utils';
+import { atomFamily } from 'jotai-family';
+import { atomWithStorage } from 'jotai/utils';
 import {
   AnonymousBezier,
   AnonymousPose,
@@ -27,7 +28,7 @@ import {
   namedValues,
 } from './API';
 
-export const ThemeAtom = atom<'dark' | 'light'>('light');
+export const ThemeAtom = atomWithStorage<'dark' | 'light'>('theme', 'light');
 export const ColorsAtom = atom((get) => {
   const theme = get(ThemeAtom);
   return theme === 'dark' ? lightOnBlack : darkOnWhite;
@@ -104,11 +105,16 @@ export const NamedValuesAtom = atom(
       nvba.set(val.name, val);
       set(NamedValuesBackerAtom, nvba);
       namedValues.set(val.name, val);
-    } else {
-      const nv = new Map([...val].map((val) => [val.name, val]));
+    } else if (Symbol.iterator in Object(val)) {
+      const nv = new Map<string, NamedValue>();
+      for (const valItems of val) {
+        nv.set(valItems.name, valItems);
+      }
       set(NamedValuesBackerAtom, nv);
       namedValues.clear();
       nv.forEach((n) => namedValues.set(n.name, n));
+    } else {
+      throw new Error('Invalid value passed to NamedValuesAtom setter');
     }
   },
 );

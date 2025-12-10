@@ -13,7 +13,8 @@
         "@freik/typechk": "^0.9.0",
         "@freik/workspace": "^0.6.5",
         "java-parser": "^3.0.1",
-        "jotai": "^2.15.2",
+        "jotai": "^2.16.0",
+        "jotai-family": "^1.0.1",
         "prettier": "^3.7.4",
         "prettier-plugin-java": "^2.7.7",
         "react": "^19.2.1",
@@ -369,7 +370,9 @@
 
     "java-parser": ["java-parser@3.0.1", "", { "dependencies": { "chevrotain": "11.0.3", "chevrotain-allstar": "0.3.1", "lodash": "4.17.21" } }, "sha512-sDIR7u9b7O2JViNUxiZRhnRz7URII/eE7g2B+BmGxDeS6Ex3OYAcCyz5oh0H4LQ+hL/BS8OJTz8apMy9xtGmrQ=="],
 
-    "jotai": ["jotai@2.15.2", "", { "peerDependencies": { "@babel/core": ">=7.0.0", "@babel/template": ">=7.0.0", "@types/react": ">=17.0.0", "react": ">=17.0.0" }, "optionalPeers": ["@babel/core", "@babel/template", "@types/react", "react"] }, "sha512-El86CCfXNMEOytp20NPfppqGGmcp6H6kIA+tJHdmASEUURJCYW4fh8nTHEnB8rUXEFAY1pm8PdHPwnrcPGwdEg=="],
+    "jotai": ["jotai@2.16.0", "", { "peerDependencies": { "@babel/core": ">=7.0.0", "@babel/template": ">=7.0.0", "@types/react": ">=17.0.0", "react": ">=17.0.0" }, "optionalPeers": ["@babel/core", "@babel/template", "@types/react", "react"] }, "sha512-NmkwPBet0SHQ28GBfEb10sqnbVOYyn6DL4iazZgGRDUKxSWL0iqcm+IK4TqTSFC2ixGk+XX2e46Wbv364a3cKg=="],
+
+    "jotai-family": ["jotai-family@1.0.1", "", { "peerDependencies": { "jotai": ">=2.9.0" } }, "sha512-Zb/79GNDhC/z82R+6qTTpeKW4l4H6ZCApfF5W8G4SH37E4mhbysU7r8DkP0KX94hWvjB/6lt/97nSr3wB+64Zg=="],
 
     "js-tokens": ["js-tokens@4.0.0", "", {}, "sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ=="],
 
