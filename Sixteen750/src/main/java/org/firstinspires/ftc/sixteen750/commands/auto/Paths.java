@@ -58,7 +58,7 @@ public class Paths {
     }
 
     public static Pose Start = new Pose(30.748, 135.152);
-    public static Pose Launch = new Pose(45, 110);
+    public static Pose Launch = new Pose(54, 90);
     public static Pose Intake1 = new Pose(41.808, 85);
     public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
     public static Pose Intake1end = new Pose(19, 85);
@@ -80,7 +80,7 @@ public class Paths {
     public static Pose IntakeCornerControlPoint = new Pose(42, 29);
     public static Pose IntakeTunnel = new Pose(8, 27);
     public static Pose farStart = new Pose(54.000, 9.000);
-    public static Pose farLaunch = new Pose(59.000, 12.000);
+    public static Pose farLaunch = new Pose(57.000, 14.000);
     public static Pose intake4 = new Pose(132.5, 12.229);
     public static Pose intake4ControlPoint = new Pose(0, 0);
     public static Pose intakeCorner = new Pose(11.480, 12.229);
@@ -89,13 +89,13 @@ public class Paths {
     public static Pose gateIntakeControlPoint = new Pose(0, 0);
     public static Pose farPark = new Pose(21.25, 12.735);
 
-    public static double launchHeading1 = 130;
-    public static double launchHeading2 = 140;
-    public static double launchHeading3 = 150;
-    public static double launchHeading4 = 140;
+    public static double launchHeading1 = 129.5;
+    public static double launchHeading2 = 135;
+    public static double launchHeading3 = 135;
+    public static double launchHeading4 = 135;
     public static double launchfarheading = 108;
     public static double intakeHeading = 180;
-    public static double farlaunchHeading = 115;
+    public static double farlaunchHeading = 125;
     public static double farlaunchHeading2 = 125;
     public static double cornerIntakeHeading = 290;
     public static double cornerIntakeHeading2 = 180;
@@ -641,14 +641,14 @@ public class Paths {
         Rlaunchfartointake4 = follower
             .pathBuilder()
             .addPath(new BezierCurve(RfarLaunch, Rintake4ControlPoint, Rintake4))
-            .setLinearHeadingInterpolation(Math.toRadians(65), Math.toRadians(0))
+            .setConstantHeadingInterpolation(Math.toRadians(0))
             .setVelocityConstraint(0.3)
             .build();
 
         Rintake4tolaunchfar = follower
             .pathBuilder()
             .addPath(new BezierLine(Rintake4, RfarLaunch))
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RfarlaunchHeading))
             .setVelocityConstraint(0.3)
             .build();
 
