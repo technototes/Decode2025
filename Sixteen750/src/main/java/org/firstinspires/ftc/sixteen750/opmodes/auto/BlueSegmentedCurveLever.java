@@ -42,7 +42,7 @@ public class BlueSegmentedCurveLever extends CommandOpMode {
                 // new WaitCommand(1),
                 new PedroPathCommand(robot.follower, p.Intake1toIntake1end),
                 new PedroPathCommand(robot.follower, p.Intake1endtoLever),
-                new WaitCommand(.2),
+                new WaitCommand(1),
                 // new WaitCommand(2),
                 new PedroPathCommand(robot.follower, p.LevertoLaunch),
                 Paths.AutoLaunching3Balls(robot),

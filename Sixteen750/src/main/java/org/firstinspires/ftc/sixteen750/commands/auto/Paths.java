@@ -11,7 +11,6 @@ import com.technototes.library.command.Command;
 import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
-
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
@@ -62,7 +61,7 @@ public class Paths {
     public static Pose Intake1 = new Pose(41.808, 85);
     public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
     public static Pose Intake1end = new Pose(19, 85);
-    public static Pose Lever = new Pose(12.25, 75.5);
+    public static Pose Lever = new Pose(12.25, 78.5);
     public static Pose Intake2 = new Pose(40.038, 63);
     public static Pose Intake2ControlPoint = new Pose(72, 61);
     public static Pose Intake2ControlPoint2 = new Pose(46, 64);
@@ -70,7 +69,7 @@ public class Paths {
     public static Pose Intake2endControlPoint = new Pose(49.328, 65.696);
     public static Pose Intake3 = new Pose(38.923, 38);
     public static Pose Intake3ControlPoint = new Pose(76.536, 41.585);
-    public static Pose Intake3end = new Pose(15, 38);
+    public static Pose Intake3end = new Pose(11, 38);
     public static Pose Intake3endControlPoint = new Pose(62.000, 84.000);
     public static Pose Startfar;
     public static Pose End = new Pose(19, 105);
@@ -119,7 +118,7 @@ public class Paths {
     public static Pose RIntake3ControlPoint = new Pose(68, 41.585);
     public static Pose RIntake3end = new Pose(126, 40);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
-    public static Pose Rlever = new Pose(131.75, 75.5);
+    public static Pose Rlever = new Pose(131.75, 78.5);
     public static Pose RleverControlPoint = new Pose(97.331, 74.620);
     public static Pose REnd = new Pose(123, 105);
     public static Pose RfarStart = new Pose(90.000, 9.000);
@@ -137,8 +136,8 @@ public class Paths {
     public static double RlaunchHeading4 = 45;
 
     public static double RintakeHeading = 0;
-    public static double RfarlaunchHeading = 55;
-    public static double RfarlaunchHeading2 = 55;
+    public static double RfarlaunchHeading = 51;
+    public static double RfarlaunchHeading2 = 50;
     public static double RcornerIntakeHeading = 250;
     public static double RcornerIntakeHeading2 = 0;
     public static double RtunnelIntakeHeading = 90;
@@ -655,12 +654,12 @@ public class Paths {
         RlaunchfartointakeCorner = follower
             .pathBuilder()
             .addPath(new BezierCurve(RfarLaunch, RintakeCornerControlPoint, RintakeCorner))
-//            .setLinearHeadingInterpolation(
-//                Math.toRadians(RlaunchHeading1),
-//                Math.toRadians(RcornerIntakeHeading)
-//            )
-                //.setTangentHeadingInterpolation() //test this
-                .setConstantHeadingInterpolation(RcornerIntakeHeading)
+            //            .setLinearHeadingInterpolation(
+            //                Math.toRadians(RlaunchHeading1),
+            //                Math.toRadians(RcornerIntakeHeading)
+            //            )
+            //.setTangentHeadingInterpolation() //test this
+            .setConstantHeadingInterpolation(RcornerIntakeHeading)
             .setVelocityConstraint(0.3)
             .build();
 
