@@ -18,15 +18,22 @@ import { Provider, useAtom } from 'jotai';
 import { ReactElement } from 'react';
 import { AnonymousBezier, PathChainFile, TeamPaths } from '../../server/types';
 import { select_a_bot, select_a_file } from '../constants';
+import { PathsDataDisplay } from '../PathsDataDisplay';
 import { PathSelector } from '../PathSelector';
 import { EmptyPathChainFile } from '../state/API';
 import {
   ColorForNumber,
   ColorsAtom,
   FilesForSelectedTeam,
+  NamedBeziersAtom,
+  NamedPathChainsAtom,
+  NamedPosesAtom,
+  NamedValuesAtom,
+  PoseAtomFor,
   SelectedFileAtom,
   SelectedTeamAtom,
   ThemeAtom,
+  ValueAtomFor,
 } from '../state/Atoms';
 import { getStore } from '../state/Storage';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
@@ -221,5 +228,76 @@ describe('Simplest UI validation', () => {
     await act(async () => {
       expect(await store.get(FilesForSelectedTeam)).toEqual([]);
     });
+  });
+});
+
+describe('SchemaAtom tests', () => {
+  test('PathDataDisplay atoms', async () => {
+    globalThis.fetch = MyFetchFunc;
+    const store = getStore();
+    await act(async () => {
+      render(
+        <JotaiProvider>
+          <PathsDataDisplay expand={true} />
+        </JotaiProvider>,
+      );
+    });
+    store.set(SelectedTeamAtom, 'team2');
+    store.set(SelectedFileAtom, 'path3.java');
+    await waitFor(async () => {
+      expect(await store.get(SelectedFileAtom)).toBe('path3.java');
+    });
+    expect(store.get(NamedValuesAtom)).toBeDefined();
+    expect(store.get(NamedPosesAtom)).toBeDefined();
+    expect(store.get(NamedBeziersAtom)).toBeDefined();
+    expect(store.get(NamedPathChainsAtom)).toBeDefined();
+    await act(() =>
+      store.set(NamedValuesAtom, {
+        name: 'valX',
+        value: { type: 'int', value: 42 },
+      }),
+    );
+    const valX = store.get(ValueAtomFor('valX'));
+    expect(valX).toBeDefined();
+    expect(valX?.name).toBe('valX');
+    expect((valX?.value as { type: string; value: number }).value).toBe(42);
+    await act(() =>
+      store.set(ValueAtomFor('valX'), { type: 'int', value: 84 }),
+    );
+    const valX2 = store.get(ValueAtomFor('valX'));
+    expect(valX2).toBeDefined();
+    expect(valX2?.name).toBe('valX');
+    expect((valX2?.value as { type: string; value: number }).value).toBe(84);
+    await act(() =>
+      store.set(ValueAtomFor('valX'), {
+        name: 'valX',
+        value: { type: 'int', value: 123 },
+      }),
+    );
+    waitFor(async () => {
+      expect(await store.get(NamedValuesAtom)).toHaveProperty('valX');
+      expect(await store.get(NamedPosesAtom)).toHaveProperty('poseX');
+    });
+    const valX3 = store.get(ValueAtomFor('valX'));
+    expect(valX3).toBeDefined();
+    expect(valX3?.name).toBe('valX');
+    expect((valX3?.value as { type: string; value: number }).value).toBe(123);
+    await act(() =>
+      store.set(NamedPosesAtom, {
+        name: 'poseX',
+        pose: { x: 'valX', y: 'valX' },
+      }),
+    );
+    const poseX = store.get(PoseAtomFor('poseX'));
+    expect(poseX).toBeDefined();
+    expect(poseX?.name).toBe('poseX');
+    expect(poseX?.pose.x as string).toBe('valX');
+    expect(poseX?.pose.y as string).toBe('valX');
+    await act(() =>
+      store.set(PoseAtomFor('poseX'), {
+        x: { type: 'int', value: 1 },
+        y: 'valX',
+      }),
+    );
   });
 });
