@@ -1,16 +1,10 @@
-import {
-  NamedBezier,
-  NamedPathChain,
-  NamedPose,
-  NamedValue,
-  PathChainFile,
-} from '../../server/types';
+import { PathChainFile } from '../../server/types';
 
 export type IndexedPCF = PathChainFile & {
-  namedValues: Map<string, NamedValue>;
-  namedPoses: Map<string, NamedPose>;
-  namedBeziers: Map<string, NamedBezier>;
-  namedPathChains: Map<string, NamedPathChain>;
+  namedValues: Map<string, number>;
+  namedPoses: Map<string, number>;
+  namedBeziers: Map<string, number>;
+  namedPathChains: Map<string, number>;
 };
 
 export type Point = { x: number; y: number };

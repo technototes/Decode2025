@@ -3,12 +3,6 @@ import { atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
 import { atomWithStorage } from 'jotai/utils';
 import {
-  AnonymousBezier,
-  AnonymousPose,
-  AnonymousValue,
-  chkAnonymousBezier,
-  chkAnonymousPose,
-  chkAnonymousValue,
   chkNamedBezier,
   chkNamedPathChain,
   chkNamedPose,
@@ -20,12 +14,13 @@ import {
 } from '../../server/types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import {
+  EmptyPathChainFile,
   GetPaths,
   LoadFile,
-  namedBeziers,
-  namedPathChains,
-  namedPoses,
-  namedValues,
+  SetNamedBezier,
+  SetNamedPathChain,
+  SetNamedPose,
+  SetNamedValue,
 } from './API';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
@@ -110,149 +105,91 @@ export const SelectedFileAtom = atom(
   async (get, set, val: string) => {
     const team = await get(SelectedTeamAtom);
     set(SelectedFileBackingAtom, val);
-    if (val !== '') {
-      // TODO: clear any AtomFamiliy cache
-      const pcf = await LoadFile(team, val);
-      // Set all teh names
-      set(NamedValuesAtom, pcf.values);
-      set(NamedPosesAtom, pcf.poses);
-      set(NamedBeziersAtom, pcf.beziers);
-      set(NamedPathChainsAtom, pcf.pathChains);
+  },
+);
+
+export const FileContentsAtom = atom(
+  async (get) => {
+    const team = await get(SelectedTeamAtom);
+    const path = await get(SelectedFileAtom);
+    if (team === '' || path === '') {
+      return EmptyPathChainFile;
+    }
+    return LoadFile(team, path);
+  },
+  (_, __, val: NamedValue | NamedPose | NamedBezier | NamedPathChain) => {
+    if (chkNamedValue(val)) {
+      SetNamedValue(val);
+    } else if (chkNamedPose(val)) {
+      SetNamedPose(val);
+    } else if (chkNamedBezier(val)) {
+      SetNamedBezier(val);
+    } else if (chkNamedPathChain(val)) {
+      SetNamedPathChain(val);
     }
   },
 );
 
-const NamedValuesBackerAtom = atom<Map<string, NamedValue>>(new Map());
 export const NamedValuesAtom = atom(
-  (get) => get(NamedValuesBackerAtom),
-  (get, set, val: Iterable<NamedValue> | NamedValue) => {
+  async (get) => (await get(FileContentsAtom)).values,
+  async (_, set, val: Iterable<NamedValue> | NamedValue) => {
     if (chkNamedValue(val)) {
-      const nvba = new Map(get(NamedValuesBackerAtom));
-      nvba.set(val.name, val);
-      set(NamedValuesBackerAtom, nvba);
-      namedValues.set(val.name, val);
+      set(FileContentsAtom, val);
     } else if (Symbol.iterator in Object(val)) {
-      const nv = new Map<string, NamedValue>();
-      for (const valItems of val) {
-        nv.set(valItems.name, valItems);
+      for (const valItem of val) {
+        set(FileContentsAtom, valItem);
       }
-      set(NamedValuesBackerAtom, nv);
-      namedValues.clear();
-      nv.forEach((n) => namedValues.set(n.name, n));
     } else {
       throw new Error('Invalid value passed to NamedValuesAtom setter');
     }
   },
 );
-export const ValueNamesAtom = atom((get) => [
-  ...get(NamedValuesBackerAtom).keys(),
-]);
-export const ValueAtomFor = atomFamily((name: string) =>
-  atom(
-    (get) => get(NamedValuesBackerAtom).get(name),
-    (_, set, args: NamedValue | AnonymousValue) => {
-      set(
-        NamedValuesAtom,
-        chkAnonymousValue(args) ? { name, value: args } : args,
-      );
-    },
-  ),
-);
 
-const NamedPosesBackerAtom = atom<Map<string, NamedPose>>(new Map());
 export const NamedPosesAtom = atom(
-  (get) => get(NamedPosesBackerAtom),
-  (get, set, val: Iterable<NamedPose> | NamedPose) => {
+  async (get) => (await get(FileContentsAtom)).poses,
+  (_, set, val: Iterable<NamedPose> | NamedPose) => {
     if (chkNamedPose(val)) {
-      const npba = new Map(get(NamedPosesBackerAtom));
-      npba.set(val.name, val);
-      set(NamedPosesBackerAtom, npba);
-      namedPoses.set(val.name, val);
+      set(FileContentsAtom, val);
     } else {
-      const np = new Map([...val].map((val) => [val.name, val]));
-      set(NamedPosesBackerAtom, np);
-      namedPoses.clear();
-      np.forEach((p) => namedPoses.set(p.name, p));
+      for (const posItem of val) {
+        set(FileContentsAtom, posItem);
+      }
     }
   },
 );
-export const PoseNamesAtom = atom((get) => [
-  ...get(NamedPosesBackerAtom).keys(),
-]);
-export const PoseAtomFor = atomFamily((name: string) =>
-  atom(
-    (get) => get(NamedPosesAtom).get(name),
-    (_, set, args: NamedPose | AnonymousPose) =>
-      set(NamedPosesAtom, chkAnonymousPose(args) ? { name, pose: args } : args),
-  ),
-);
 
-export const NamedBeziersBackerAtom = atom<Map<string, NamedBezier>>(new Map());
 export const NamedBeziersAtom = atom(
-  (get) => get(NamedBeziersBackerAtom),
-  (get, set, val: Iterable<NamedBezier> | NamedBezier) => {
+  async (get) => (await get(FileContentsAtom)).beziers,
+  (_, set, val: Iterable<NamedBezier> | NamedBezier) => {
     if (chkNamedBezier(val)) {
-      const nbba = new Map(get(NamedBeziersBackerAtom));
-      nbba.set(val.name, val);
-      set(NamedBeziersBackerAtom, nbba);
-      namedBeziers.set(val.name, val);
+      set(FileContentsAtom, val);
     } else {
-      const nb = new Map([...val].map((val) => [val.name, val]));
-      set(NamedBeziersBackerAtom, nb);
-      namedBeziers.clear();
-      nb.forEach((b) => namedBeziers.set(b.name, b));
+      for (const bezItem of val) {
+        set(FileContentsAtom, bezItem);
+      }
     }
   },
 );
-export const BezierNamesAtom = atom((get) => [
-  ...get(NamedBeziersBackerAtom).keys(),
-]);
-export const BezierAtomFor = atomFamily((name: string) =>
-  atom(
-    (get) => get(NamedBeziersAtom).get(name),
-    (_, set, args: NamedBezier | AnonymousBezier) =>
-      set(
-        NamedBeziersAtom,
-        chkAnonymousBezier(args) ? { name, points: args } : args,
-      ),
-  ),
-);
 
-export const NamedPathChainsBackerAtom = atom<Map<string, NamedPathChain>>(
-  new Map(),
-);
 export const NamedPathChainsAtom = atom(
-  (get) => get(NamedPathChainsBackerAtom),
-  (get, set, val: Iterable<NamedPathChain> | NamedPathChain) => {
+  async (get) => (await get(FileContentsAtom)).pathChains,
+  (_, set, val: Iterable<NamedPathChain> | NamedPathChain) => {
     if (chkNamedPathChain(val)) {
-      const npcba = new Map(get(NamedPathChainsBackerAtom));
-      npcba.set(val.name, val);
-      set(NamedPathChainsBackerAtom, npcba);
-      namedPathChains.set(val.name, val);
+      set(FileContentsAtom, val);
     } else {
-      const npc = new Map([...val].map((val) => [val.name, val]));
-      set(NamedPathChainsBackerAtom, npc);
-      namedPathChains.clear();
-      npc.forEach((pc) => namedPathChains.set(pc.name, pc));
+      for (const pathChainItem of val) {
+        set(FileContentsAtom, pathChainItem);
+      }
     }
   },
 );
-export const PathChainNamesAtom = atom((get) =>
-  get(NamedPathChainsAtom).keys(),
-);
-export const PathChainAtomFor = atomFamily((name: string) =>
-  atom(
-    (get) => get(NamedPathChainsAtom).get(name),
-    (_, set, args: NamedPathChain) => set(NamedPathChainsAtom, args),
-  ),
-);
 
-export const AllNamesAtom = atom<Set<string>>(
-  (get) =>
+export const AllNamesAtom = atom(
+  async (get) =>
     new Set<string>([
-      ...get(ValueNamesAtom),
-      ...get(PoseNamesAtom),
-      ...get(BezierNamesAtom),
-      ...get(PathChainNamesAtom),
+      ...(await get(NamedValuesAtom)).map((nv) => nv.name),
+      ...(await get(NamedPosesAtom)).map((np) => np.name),
+      ...(await get(NamedBeziersAtom)).map((nb) => nb.name),
+      ...(await get(NamedPathChainsAtom)).map((npc) => npc.name),
     ]),
 );
