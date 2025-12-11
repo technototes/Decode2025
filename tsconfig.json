@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
+    "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
@@ -11,5 +12,5 @@
     "pretty": true,
     "skipLibCheck": true
   },
-  "include": ["scripts/*.ts", "scripts/helpers/*.ts"]
+  "include": ["bun-env.d.ts", "scripts/**/*.ts", "pedroviz/**/*.ts?"]
 }

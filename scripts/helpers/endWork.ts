@@ -1,9 +1,9 @@
 import simpleGit, { PushResult } from 'simple-git';
-import { Error, Menu, MenuItem } from './menu.js';
-import { hasGithubAccess, onlyRobotConnection } from './connectivity.js';
-import { invoke } from './invoke.js';
 import { DEFAULT_BRANCH_NAME, ReadBranchName } from './branch.js';
+import { hasGithubAccess, onlyRobotConnection } from './connectivity.js';
 import { GetGitHubUrlFromRepo } from './github.js';
+import { invoke } from './invoke.js';
+import { Error, Menu, MenuItem } from './menu.js';
 
 const git = simpleGit();
 

@@ -1,9 +1,6 @@
 // This is a bun-specific replacement for the run-script-os NodeJS thing
 // It takes a script, and invokes the "script:os" command
 // if the script:win/mac/lin command doesn't exist, it falls back to the script:def command
-import path from 'path';
-import fs from 'fs/promises';
-import os from 'os';
 import {
   chkObjectOf,
   hasFieldType,
@@ -11,6 +8,9 @@ import {
   isString,
 } from '@freik/typechk';
 import Bun from 'bun';
+import fs from 'fs/promises';
+import os from 'os';
+import path from 'path';
 
 const osmap = new Map<string, string>([
   ['win32', 'win'],
