@@ -28,7 +28,12 @@ import {
   namedValues,
 } from './API';
 
-export const ThemeAtom = atomWithStorage<'dark' | 'light'>('theme', 'light');
+export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
+  'theme',
+  'light',
+  undefined,
+  { getOnInit: true },
+);
 export const ColorsAtom = atom((get) => {
   const theme = get(ThemeAtom);
   return theme === 'dark' ? lightOnBlack : darkOnWhite;
@@ -46,14 +51,31 @@ export const TeamsAtom = atom(async (get) => {
   const paths = await get(PathsAtom);
   return Object.keys(paths).sort();
 });
-export const SelectedTeamBackingAtom = atom('');
+
+export const SelectedTeamBackingAtom = atomWithStorage<string>(
+  'selectedTeam',
+  '',
+  undefined,
+  { getOnInit: true },
+);
 export const SelectedTeamAtom = atom(
   async (get) => get(SelectedTeamBackingAtom),
-  (get, set, val) => {
+  async (get, set, val: string) => {
     const cur = get(SelectedTeamBackingAtom);
     // Clear the selected file when the team is changed
     if (cur !== val) {
-      set(SelectedFileBackingAtom, '');
+      const curPath = await get(SelectedFileBackingAtom);
+      if (curPath !== '') {
+        const paths = await get(PathsAtom);
+        if (hasField(paths, val)) {
+          const files = paths[val];
+          if (!files.includes(curPath)) {
+            set(SelectedFileBackingAtom, '');
+          } else {
+            set(SelectedFileAtom, curPath);
+          }
+        }
+      }
     }
     set(SelectedTeamBackingAtom, val);
   },
@@ -71,7 +93,12 @@ export const FilesForSelectedTeam = atom(async (get) => {
   return [];
 });
 
-export const SelectedFileBackingAtom = atom('');
+export const SelectedFileBackingAtom = atomWithStorage<string>(
+  'selectedPath',
+  '',
+  undefined,
+  { getOnInit: true },
+);
 export const SelectedFileAtom = atom(
   async (get) => {
     return get(SelectedFileBackingAtom);
@@ -81,10 +108,9 @@ export const SelectedFileAtom = atom(
   // dependencies "correct" (and potentially much more atomic,
   // resulting in fewer UI updates hopefully)
   async (get, set, val: string) => {
-    const prev = get(SelectedFileBackingAtom);
     const team = await get(SelectedTeamAtom);
     set(SelectedFileBackingAtom, val);
-    if (val !== prev && val !== '') {
+    if (val !== '') {
       // TODO: clear any AtomFamiliy cache
       const pcf = await LoadFile(team, val);
       // Set all teh names
