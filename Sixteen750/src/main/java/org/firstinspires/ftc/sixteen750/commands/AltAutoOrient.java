@@ -7,13 +7,11 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.technototes.library.command.Command;
 import com.technototes.library.logger.Log;
-
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
 @Configurable
-
 public class AltAutoOrient implements Command {
 
     public Robot robot;
@@ -48,15 +46,18 @@ public class AltAutoOrient implements Command {
 
     @Override
     public void execute() {
-        wantedPose = new Pose(robot.follower.getPose().getX(), robot.follower.getPose().getY(), robot.follower.getPose().getHeading() + Math.toRadians(robot.limelightSubsystem.getTX()));
+        wantedPose = new Pose(
+            robot.follower.getPose().getX(),
+            robot.follower.getPose().getY(),
+            robot.follower.getPose().getHeading() + Math.toRadians(robot.limelightSubsystem.getTX())
+        );
         robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
         robot.follower.update();
         LauncherSubsystem.targetPower = 1;
     }
 
-//    @Override
-//    public void end(boolean s) {
-//        robot.follower.drivetrain.breakFollowing();
-//    }
-
+    //    @Override
+    //    public void end(boolean s) {
+    //        robot.follower.drivetrain.breakFollowing();
+    //    }
 }

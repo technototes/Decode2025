@@ -52,7 +52,7 @@ public class TurnToTest extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch),
                 new WaitCommand(2),
                 new AltAutoOrient(robot),
-                    CommandScheduler::terminateOpMode
+                CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN
         );
