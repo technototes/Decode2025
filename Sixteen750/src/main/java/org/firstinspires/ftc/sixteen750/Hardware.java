@@ -99,7 +99,4 @@ public class Hardware implements Loggable {
         }
         return volt / count;
     }
-
-    @Override
-    public void periodic() {}
 }

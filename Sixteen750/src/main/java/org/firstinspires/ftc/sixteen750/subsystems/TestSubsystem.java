@@ -93,7 +93,4 @@ public class TestSubsystem implements Loggable {
             TeleCommands.GateDown(robot);
         }
     }
-
-    @Override
-    public void periodic() {}
 }

@@ -44,7 +44,4 @@ public class BrakeSubsystem implements Loggable, Subsystem {
     public void Disengage() {
         setBrakePos(GO_POS);
     }
-
-    @Override
-    public void periodic() {}
 }

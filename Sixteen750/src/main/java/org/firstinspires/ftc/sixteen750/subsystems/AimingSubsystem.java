@@ -86,7 +86,4 @@ public class AimingSubsystem implements Loggable, Subsystem {
     public void GoBall() {
         setLeverPos(LEVER_POS_GO);
     }
-
-    @Override
-    public void periodic() {}
 }
