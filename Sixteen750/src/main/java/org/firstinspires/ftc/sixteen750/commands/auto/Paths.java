@@ -147,6 +147,7 @@ public class Paths {
     public PathChain intake1tolaunch;
     public PathChain launchtointake2;
     public PathChain intake2tolaunch;
+    public PathChain launchtointake3;
     public PathChain launchtopark;
     public PathChain intake3tolaunch;
     public PathChain launchfartointake4;
@@ -170,11 +171,12 @@ public class Paths {
     public PathChain gateintaketolaunchfar;
     public PathChain Rlaunchfartopark;
     public PathChain launchfartopark;
-    public PathChain Rlaunch;
+    public PathChain Rstarttolaunch;
     public PathChain Rlaunchtointake1;
     public PathChain Rintake1tolaunch;
     public PathChain Rlaunchtointake2;
     public PathChain Rintake2tolaunch;
+    public PathChain Rlaunchtointake3;
     public PathChain Rlaunchtopark;
     public PathChain Rintake3tolaunch;
     public PathChain StarttoLaunch;
@@ -252,20 +254,22 @@ public class Paths {
         follower.setMaxPowerScaling(0.3);
         launch = follower
             .pathBuilder()
-            .addPath(new BezierLine(new Pose(32.671, 135.916), new Pose(51.249, 101.338)))
-            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(135))
+            .addPath(new BezierLine(Start, Launch))
+            .setConstantHeadingInterpolation(Math.toRadians(launchHeading1))
+            //.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(135))
             .build();
         follower.setMaxPowerScaling(1);
         launchtointake1 = follower
             .pathBuilder()
             .addPath(
                 new BezierCurve(
-                    new Pose(51.249, 101.338),
+                    Launch,
                     new Pose(73.411, 86.685),
-                    new Pose(18.135, 87.177)
+                    Intake1end
                 )
             )
-            .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+            .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
+            //.setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
             .build();
 
         intake1tolaunch = follower
@@ -273,34 +277,44 @@ public class Paths {
             .addPath(
                 //changing all return-to-launch coordinate points except for the very first one cause its
                 //not touching the white line when shooting (x increases by 10, y decreases by 10)
-                new BezierLine(new Pose(18.135, 87.177), new Pose(51.464, 101.123))
+                new BezierLine(Intake1end, Launch)
             )
-            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+            .setConstantHeadingInterpolation(Math.toRadians(launchHeading2))
+            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
             .build();
 
         launchtointake2 = follower
             .pathBuilder()
             .addPath(
                 new BezierCurve(
-                    new Pose(51.464, 101.123),
+                    Launch,
                     new Pose(80, 61),
-                    new Pose(18.400, 63.132)
+                    Intake2end
                 )
             )
-            .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+            .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
+            //.setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
             .build();
 
         intake2tolaunch = follower
             .pathBuilder()
             .addPath(
                 new BezierCurve(
-                    new Pose(18.400, 63.132),
+                    Intake2end,
                     new Pose(62, 76),
-                    new Pose(51.407, 101.595)
+                    Launch
                 )
             )
-            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+            .setConstantHeadingInterpolation(Math.toRadians(launchHeading3))
+            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
             .build();
+
+        launchtointake3 = follower
+                .pathBuilder()
+                .addPath(new BezierCurve(Launch, new Pose(46.407, 96.652), Intake3end))
+                .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
+                //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+                .build();
 
         launchtopark = follower
             .pathBuilder()
@@ -310,22 +324,25 @@ public class Paths {
 
         intake3tolaunch = follower
             .pathBuilder()
-            .addPath(new BezierLine(new Pose(19.192, 39.617), new Pose(46.407, 96.652)))
-            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+            .addPath(new BezierLine(Intake3end, Launch))
+            .setConstantHeadingInterpolation(Math.toRadians(launchHeading4))
+            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
             .build();
         //red zone autos
-        Rlaunch = follower
+        Rstarttolaunch = follower
             .pathBuilder()
-            .addPath(new BezierLine(new Pose(112, 135.916), new Pose(93, 101.338)))
-            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(45))
+            .addPath(new BezierLine(RStart, RLaunch))
+            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading1))
+            //.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(45))
             .build();
         follower.setMaxPowerScaling(1);
         Rlaunchtointake1 = follower
             .pathBuilder()
             .addPath(
-                new BezierCurve(new Pose(93, 101.338), new Pose(71, 86.685), new Pose(126, 95))
+                new BezierCurve(RLaunch, new Pose(71, 86.685), RIntake1)
             )
-            .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
+            //.setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
             .build();
 
         Rintake1tolaunch = follower
@@ -333,20 +350,29 @@ public class Paths {
             .addPath(
                 //changing all return-to-launch coordinate points except for the very first one cause its
                 //not touching the white line when shooting (x increases by 10, y decreases by 10)
-                new BezierLine(new Pose(126, 95), new Pose(93, 101.123))
+                new BezierLine(RIntake1, RLaunch)
             )
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading2))
+            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
             .build();
 
         Rlaunchtointake2 = follower
             .pathBuilder()
-            .addPath(new BezierCurve(new Pose(93, 101.123), new Pose(64, 61), new Pose(126, 70)))
-            .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+            .addPath(new BezierCurve(RLaunch, new Pose(64, 61), RIntake2end))
+            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
+            //.setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(RintakeHeading))
             .build();
         Rintake2tolaunch = follower
             .pathBuilder()
-            .addPath(new BezierCurve(new Pose(126, 70), new Pose(82, 76), new Pose(93, 101.595)))
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+            .addPath(new BezierCurve(RIntake2end, new Pose(82, 76), RLaunch))
+            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading3))
+            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RlaunchHeading3))
+            .build();
+        Rlaunchtointake3 = follower
+            .pathBuilder()
+            .addPath(new BezierLine(RLaunch, RIntake3end))
+            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
+            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
             .build();
         Rlaunchtopark = follower
             .pathBuilder()
@@ -356,8 +382,9 @@ public class Paths {
 
         Rintake3tolaunch = follower
             .pathBuilder()
-            .addPath(new BezierLine(new Pose(125, 50), new Pose(118, 96.652)))
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+            .addPath(new BezierLine(RIntake3end, RLaunch))
+            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading4))
+            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
             .build();
 
         StarttoLaunch = follower
@@ -648,7 +675,8 @@ public class Paths {
         Rintake4tolaunchfar = follower
             .pathBuilder()
             .addPath(new BezierLine(Rintake4, RfarLaunch))
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RfarlaunchHeading))
+            .setConstantHeadingInterpolation(Math.toRadians(RfarlaunchHeading))
+            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RfarlaunchHeading))
             .setVelocityConstraint(0.3)
             .build();
 
