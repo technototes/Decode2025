@@ -4,6 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.sun.tools.javac.code.Attribute;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
@@ -21,7 +22,8 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     Gamepad gamepad;
     public static double MOTOR_VELOCITY = 1; // 0.5 1.0
     boolean hasHardware;
-    Array pastValuesArray;
+    double[] pastValuesArray;
+    double valuesTotal = 0;
 
     @Log.Number(name = "artifacts")
     public static double artifacts = 0;
@@ -86,13 +88,13 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     }
 
     public void detectBall() {
-        if (getCurrent() < 1.1) {
+        if (getAverageCurrent() < 1.1) {
             artifacts = 0;
-        } else if (getCurrent() < 2) {
+        } else if (getAverageCurrent() < 2) {
             artifacts = 1;
-        } else if (getCurrent() < 3) {
+        } else if (getAverageCurrent() < 3) {
             artifacts = 2;
-        } else if (getCurrent() < 4) {
+        } else if (getAverageCurrent() < 4) {
             artifacts = 3;
             if (gamepad != null) {
                 gamepad.rumble(20);
@@ -100,9 +102,19 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         }
     }
 
+    public double getAverageCurrent(){
+        pastValuesArray = new double[10];
+        for (int i = 0; i < pastValuesArray.length; i++){
+            pastValuesArray[i] = getCurrent();
+            valuesTotal += getCurrent();
+        }
+        return valuesTotal/10;
+    }
+
     @Override
     public void periodic() {
         intakecurrent = getCurrent();
+        getAverageCurrent();
         detectBall();
     }
 }
