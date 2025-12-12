@@ -26,7 +26,7 @@ public class MoveLeft extends CommandOpMode {
     public Robot robot;
     public DriverController controls;
     public Hardware hardware;
-    public static double motor_duration = .3;
+    public static double motor_duration = 1;
 
     @Override
     public void uponInit() {
