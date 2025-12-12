@@ -25,7 +25,7 @@ public class Hardware implements Loggable {
 
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, testMotor;
-    public EncodedMotor intake;
+    public DcMotorEx intake;
     public EncodedMotor launcher1;
     public EncodedMotor launcher2;
     public Servo brake;
@@ -66,7 +66,7 @@ public class Hardware implements Loggable {
             odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         }
         if (Setup.Connected.INTAKESUBSYSTEM) {
-            intake = new EncodedMotor(Setup.HardwareNames.INTAKE_MOTOR);
+            intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
         }
         if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             launcher1 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR1);
@@ -99,4 +99,7 @@ public class Hardware implements Loggable {
         }
         return volt / count;
     }
+
+    @Override
+    public void periodic() {}
 }

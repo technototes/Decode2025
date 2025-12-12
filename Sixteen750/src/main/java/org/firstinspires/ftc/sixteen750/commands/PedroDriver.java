@@ -159,6 +159,9 @@ public class PedroDriver implements Command, Loggable {
     private double prevDriveSpeed = 0;
     private double prevTurnSpeed = 0;
 
+    @Override
+    public void periodic() {}
+
     public enum DrivingStyle {
         Free, // Bot is free to move in all directions
         Straight, // Bot will only move along the X or Y axis, but not both

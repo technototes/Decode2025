@@ -79,6 +79,7 @@ public class DriverController {
         driveRightStick = gamepad.rightStick;
         intakeTrigger = gamepad.rightTrigger;
         autoAim = gamepad.leftTrigger;
+
         //AltAutoAlign = gamepad.leftTrigger;
         // turboButton = gamepad.leftBumper;
         snailButton = gamepad.leftBumper;
