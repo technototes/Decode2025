@@ -11,12 +11,6 @@ and edit PedroPath's. The _reasons_ for this as opposed to just using
    It will create the class for you, and allow you to name points, instead of
    just having random numerical names.
 
-## Stuff I jotted down earlier:
-
-- Image under a canvas that allows you to drag & drop points for paths.
-- Names are auto generated, but editable.
-- Select a robot path code source (different bots/teams)
-
 **Tasks, in order:**
 
 - [x] Read simple path from code
@@ -25,6 +19,7 @@ and edit PedroPath's. The _reasons_ for this as opposed to just using
   - [ ] Edit an existing named value, pose, curve, chain
 - [ ] Reflect those changes in the code
   - [ ] Checksum the code to detect external edits?
+  - [ ] When external edits have occurred, try to resolve the conflicts (ugh...)
 - [ ] Allow editing points by dragging & dropping on the canvas
 - [ ] Highlight hovered-over paths/curves/points (both directions)
 - [ ] Animate the robot along the path
@@ -35,7 +30,7 @@ and edit PedroPath's. The _reasons_ for this as opposed to just using
   - [ ] Bonus: Reflect a path along a line or axis (with or without a bot
         offset?)
 - [ ] Support additional parts of the path builder
-  - [ ] setMaxPowerScaling, etc...
+  - [ ] multiple paths, headings, braking strength, tValues, etc...
 - [ ] Maintain any code that I don't actually parse (keep chunks of code that
       aren't represented in the UI)
   - [ ] Maintain comments

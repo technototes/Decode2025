@@ -25,8 +25,15 @@ import {
   TeamPaths,
   ValueRef,
 } from '../../server/types';
+import { MakeIndexedFile } from './IndexedFile';
 import { fetchApi } from './Storage';
-import { AnonymousPathChain, IndexedPCF, IndexedPCFile, Point } from './types';
+import {
+  AnonymousPathChain,
+  IndexedFile,
+  IndexedPCF,
+  IndexedPCFile,
+  Point,
+} from './types';
 
 let ipcf: IndexedPCF = {
   name: 'empty',
@@ -242,17 +249,13 @@ export async function LoadFile(
 export async function GetFile(
   team: string,
   file: string,
-): Promise<PathChainFile> {
+): Promise<ErrorOr<IndexedFile>> {
   const pcf = await fetchApi(
     `loadpath/${encodeURIComponent(team)}/${encodeURIComponent(file)}`,
     chkPathChainFile,
     EmptyPathChainFile,
   );
-  const curIPCF = IndexPathChainFile(pcf);
-  if (validatePathChainIndex(curIPCF) === true) {
-    return pcf;
-  }
-  return pcf;
+  return MakeIndexedFile(pcf);
 }
 
 export function SetNamedValue(nv: NamedValue): void {
