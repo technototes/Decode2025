@@ -89,8 +89,8 @@
     "prettier-plugin-java": "^2.7.7",
     "prettier-plugin-organize-imports": "^4.3.0",
     "pretty-quick": "^4.2.2",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "simple-git": "^3.30.0",
     "simple-git-hooks": "^2.13.1",
     "typescript": "^5.9.3"

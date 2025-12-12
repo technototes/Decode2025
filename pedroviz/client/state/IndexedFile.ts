@@ -1,3 +1,4 @@
+import { isUndefined } from '@freik/typechk';
 import {
   accError,
   AnonymousBezier,
@@ -17,29 +18,25 @@ import {
   ValueRef,
 } from '../../server/types';
 import { ValidRes } from './API';
-import { AnonymousPathChain, IndexedPCFile } from './types';
-
-type IndexedFile = {
-  getValueNames(): string[];
-  getPoseNames(): string[];
-  getBezierNames(): string[];
-  getPathChainNames(): string[];
-  getValue(name: string): AnonymousValue | undefined;
-  getPose(name: string): AnonymousPose | undefined;
-  getBezier(name: string): AnonymousBezier | undefined;
-  getPathChain(name: string): AnonymousPathChain | undefined;
-  setValue(name: string, value: AnonymousValue): void;
-  setPose(name: string, pose: AnonymousPose): void;
-  setBezier(name: string, bezier: AnonymousBezier): void;
-  setPathChain(name: string, pathChain: AnonymousPathChain): void;
-};
+import { AnonymousPathChain, IndexedFile, IndexedPCFile, Point } from './types';
 
 export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
   let icf: IndexedPCFile = {
-    values: new Map<string, AnonymousValue>(),
-    poses: new Map<string, AnonymousPose>(),
-    beziers: new Map<string, AnonymousBezier>(),
-    pathChains: new Map<string, AnonymousPathChain>(),
+    values: new Map<string, AnonymousValue>(
+      pcf.values.map((nv) => [nv.name, nv.value]),
+    ),
+    poses: new Map<string, AnonymousPose>(
+      pcf.poses.map((np) => [np.name, np.pose]),
+    ),
+    beziers: new Map<string, AnonymousBezier>(
+      pcf.beziers.map((nb) => [nb.name, nb.points]),
+    ),
+    pathChains: new Map<string, AnonymousPathChain>(
+      pcf.pathChains.map((npc) => [
+        npc.name,
+        { paths: npc.paths, heading: npc.heading },
+      ]),
+    ),
   };
 
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
@@ -127,6 +124,25 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
     return res;
   }
 
+  function validateUniqueNames(): ValidRes {
+    const allNames = new Set<string>([
+      ...icf.values.keys(),
+      ...icf.poses.keys(),
+      ...icf.beziers.keys(),
+      ...icf.pathChains.keys(),
+    ]);
+    if (
+      allNames.size !==
+      icf.values.size + icf.poses.size + icf.beziers.size + icf.pathChains.size
+    ) {
+      // TODO: Provide a detailed diagnostic of which names are duplicated
+      return makeError(
+        'Duplicate names found between values, points, beziers, and path chains.',
+      );
+    }
+    return true;
+  }
+
   function validatePathChainIndex(): ErrorOr<true> {
     let good: ValidRes = true;
     icf.poses.forEach((pr, name) => {
@@ -138,6 +154,7 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
     icf.pathChains.forEach((apc, name) => {
       good = accError(checkAnonymousPathChain(apc, name), good);
     });
+    good = accError(validateUniqueNames(), good);
     return isError(good) ? good : true;
   }
 
@@ -197,26 +214,30 @@ export function numFromVal(av: AnonymousValue): number {
   }
 }
 
-export function getValue(vr: ValueRef): number {
-  return numFromVal(
-    isRef(vr) ? ipcf.values[ipcf.namedValues.get(vr)].value : vr,
-  );
+export function getValue(ipcf: IndexedFile, vr: ValueRef): number {
+  const av = isRef(vr) ? ipcf.getValue(vr) : vr;
+  if (isUndefined(av)) {
+    throw new Error(`Invalid ValueRef ${vr}`);
+  }
+  return numFromVal(av);
 }
 
-export function pointFromPose(pr: AnonymousPose): Point {
-  return { x: getValue(pr.x), y: getValue(pr.y) };
+export function pointFromPose(ipcf: IndexedFile, pr: AnonymousPose): Point {
+  return { x: getValue(ipcf, pr.x), y: getValue(ipcf, pr.y) };
 }
 
-export function getPose(pr: PoseRef): AnonymousPose {
+export function getPose(ipcf: IndexedFile, pr: PoseRef): AnonymousPose {
   try {
-    return isRef(pr) ? ipcf.poses[ipcf.namedPoses.get(pr)].pose : pr;
+    return isRef(pr) ? ipcf.getPose(pr) : pr;
   } catch (e) {
-    // console.error(`Invalid PoseRef ${pr}`);
-    throw e;
+    throw new Error(`${e} from invalid PoseRef ${pr}`);
   }
 }
 
-export function pointFromPoseRef(pr: PoseRef): [number, Point] {
+export function pointFromPoseRef(
+  ipcf: IndexedFile,
+  pr: PoseRef,
+): [number, Point] {
   return [getColorFor(getPose(pr)), pointFromPose(getPose(pr))];
 }
 
