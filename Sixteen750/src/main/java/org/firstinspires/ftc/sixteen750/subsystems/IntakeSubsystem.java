@@ -22,8 +22,8 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     Gamepad gamepad;
     public static double MOTOR_VELOCITY = 1; // 0.5 1.0
     boolean hasHardware;
+    int currentIndex = 0;
     double[] pastValuesArray;
-    double valuesTotal = 0;
 
     @Log.Number(name = "artifacts")
     public static double artifacts = 0;
@@ -48,6 +48,8 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         } else {
             intake = null;
         }
+        // Create the array to hold past current values
+        pastValuesArray = new double[10];
     }
 
     public void Intake() {
@@ -87,14 +89,14 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         return intake.getCurrent(CurrentUnit.AMPS);
     }
 
-    public void detectBall() {
-        if (getAverageCurrent() < 1.1) {
+    public void detectBall(double averageCurrent) {
+        if (averageCurrent < 1.1) {
             artifacts = 0;
-        } else if (getAverageCurrent() < 2) {
+        } else if (averageCurrent < 2) {
             artifacts = 1;
-        } else if (getAverageCurrent() < 3) {
+        } else if (averageCurrent < 3) {
             artifacts = 2;
-        } else if (getAverageCurrent() < 4) {
+        } else {
             artifacts = 3;
             if (gamepad != null) {
                 gamepad.rumble(20);
@@ -102,19 +104,20 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         }
     }
 
-    public double getAverageCurrent(){
-        pastValuesArray = new double[10];
-        for (int i = 0; i < pastValuesArray.length; i++){
-            pastValuesArray[i] = getCurrent();
-            valuesTotal += getCurrent();
+    public double getAverageCurrent() {
+        // Calculate the average of the values in the array
+        double valuesTotal = 0;
+        for (int i = 0; i < pastValuesArray.length; i++) {
+            valuesTotal += pastValuesArray[i];
         }
-        return valuesTotal/10;
+        return valuesTotal / 10;
     }
 
     @Override
     public void periodic() {
-        intakecurrent = getCurrent();
-        getAverageCurrent();
-        detectBall();
+        // Add an item to the array and update the index for the next update to the 'circular' array
+        pastValuesArray[currentIndex] = getCurrent();
+        currentIndex = (currentIndex + 1) % pastValuesArray.length;
+        detectBall(getAverageCurrent());
     }
 }
