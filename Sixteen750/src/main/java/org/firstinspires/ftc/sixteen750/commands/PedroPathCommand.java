@@ -11,35 +11,57 @@ public class PedroPathCommand implements Command {
     public PathChain pathChain;
     public Follower follower;
     public Pose begin;
-
+    public double maxPowerScaling;
     public boolean currentPose;
 
-    public PedroPathCommand(Follower f, PathChain p) {
+    public PedroPathCommand(Follower f, PathChain p, double maxPower) {
         follower = f;
         pathChain = p;
+        maxPowerScaling = maxPower;
+        currentPose = false;
+        begin = null;
     }
 
-    public PedroPathCommand(Follower f, Pose startPose, PathChain p) {
+    public PedroPathCommand(Follower f, PathChain p) {
+        this(f, p, 0);
+    }
+
+    public PedroPathCommand(Follower f, Pose startPose, PathChain p, double maxPower) {
         follower = f;
         pathChain = p;
         currentPose = true;
         begin = startPose;
+        maxPowerScaling = maxPower;
     }
 
-    public PedroPathCommand(Follower f, PathChain p, boolean currPose) {
+    public PedroPathCommand(Follower f, PathChain p, boolean currPose, double maxPower) {
         follower = f;
         pathChain = p;
         currentPose = currPose;
         begin = null;
+        maxPowerScaling = maxPower;
+    }
+
+    public PedroPathCommand(Follower f, Pose startPose, PathChain p) {
+        this(f, startPose, p, 0);
+    }
+
+    public PedroPathCommand(Follower f, PathChain p, boolean currPose) {
+        this(f, p, currPose, 0);
     }
 
     @Override
     public void initialize() {
+        // I'm not sure we want to do this here...
         follower.setMaxPowerScaling(Setup.OtherSettings.AUTO_SCALING);
         if (currentPose) {
             follower.setStartingPose(begin == null ? follower.getPose() : begin);
         }
-        follower.followPath(pathChain);
+        if (maxPowerScaling > 0) {
+            follower.followPath(pathChain, maxPowerScaling, false);
+        } else {
+            follower.followPath(pathChain);
+        }
     }
 
     @Override
