@@ -27,8 +27,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Configurable
 public class AutoConstants {
 
-    public static boolean ptechno = false;
-
     // measured 10/14
     public static double botWeightKg = 8.50;
     public static double botWidth = 16.75;
@@ -64,41 +62,14 @@ public class AutoConstants {
         1E-4
     );
 
-    @Configurable
-    public static class PtechnoConst {
-
-        public static double botWeightKg = 4.85;
-        public static double xVelocity = 61.5;
-        public static double yVelocity = 53.3;
-        public static double forwardDeceleration = -35.0;
-        public static double lateralDeceleration = -44.0;
-        public static double linearScale = 1.1;
-        public static double angularScale = 1.0;
-        public static double brakingStrength = 0.1;
-        public static double brakingStart = 0.1;
-        public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(
-            -5.75,
-            0,
-            -Math.PI / 2.0
-        );
-
-        public static double fwdTicksToInches = 135;
-        public static double latTicksToInches = 150;
-        public static double turnTicksToInches = 100;
-    }
-
     public static boolean USE_OTOS = false;
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
             // tune these
-            .mass(ptechno ? PtechnoConst.botWeightKg : botWeightKg)
-            .forwardZeroPowerAcceleration(
-                ptechno ? PtechnoConst.forwardDeceleration : forwardDeceleration
-            )
-            .lateralZeroPowerAcceleration(
-                ptechno ? PtechnoConst.lateralDeceleration : lateralDeceleration
-            )
+            .mass(botWeightKg)
+            .forwardZeroPowerAcceleration(forwardDeceleration)
+            .lateralZeroPowerAcceleration(lateralDeceleration)
             .useSecondaryDrivePIDF(false)
             .useSecondaryHeadingPIDF(false)
             .useSecondaryTranslationalPIDF(false)
@@ -112,8 +83,8 @@ public class AutoConstants {
         return new PathConstraints(
             tValueConstraint,
             timeoutConstraint,
-            ptechno ? PtechnoConst.brakingStrength : brakingStrength,
-            ptechno ? PtechnoConst.brakingStart : brakingStart
+            brakingStrength,
+            brakingStart
         );
     }
 
@@ -128,8 +99,8 @@ public class AutoConstants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(ptechno ? PtechnoConst.xVelocity : xVelocity)
-            .yVelocity(ptechno ? PtechnoConst.yVelocity : yVelocity);
+            .xVelocity(xVelocity)
+            .yVelocity(yVelocity);
     }
 
     public static OTOSConstants getOtosLocalizerConstants() {
@@ -137,9 +108,9 @@ public class AutoConstants {
             .hardwareMapName(OTOS)
             .linearUnit(DistanceUnit.INCH)
             .angleUnit(AngleUnit.RADIANS)
-            .linearScalar(ptechno ? PtechnoConst.linearScale : linearScalar)
-            .angularScalar(ptechno ? PtechnoConst.angularScale : angularScalar)
-            .offset(ptechno ? PtechnoConst.OTOS_OFFSET : OTOS_OFFSET);
+            .linearScalar(linearScalar)
+            .angularScalar(angularScalar)
+            .offset(OTOS_OFFSET);
         // need to tune for OTOS localization
     }
 
@@ -155,9 +126,9 @@ public class AutoConstants {
             .rightRearEncoderDirection(Encoder.FORWARD)
             .robotLength(botLength)
             .robotWidth(botWidth)
-            .forwardTicksToInches(ptechno ? PtechnoConst.fwdTicksToInches : fwdTicksToInches)
-            .strafeTicksToInches(ptechno ? PtechnoConst.latTicksToInches : latTicksToInches)
-            .turnTicksToInches(ptechno ? PtechnoConst.turnTicksToInches : turnTicksToInches);
+            .forwardTicksToInches(fwdTicksToInches)
+            .strafeTicksToInches(latTicksToInches)
+            .turnTicksToInches(turnTicksToInches);
     }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
