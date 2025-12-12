@@ -70,4 +70,7 @@ public class Robot implements Loggable {
     }
 
     public void prepForStart() {}
+
+    @Override
+    public void periodic() {}
 }

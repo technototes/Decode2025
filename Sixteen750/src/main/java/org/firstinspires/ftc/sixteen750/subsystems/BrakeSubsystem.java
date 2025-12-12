@@ -4,11 +4,12 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
+import com.technototes.library.subsystem.Subsystem;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
 @Configurable
-public class BrakeSubsystem implements Loggable {
+public class BrakeSubsystem implements Loggable, Subsystem {
 
     public static double BRAKE_POS = 0.7; // 0.5 1.0
     public static double GO_POS = 0.5;
@@ -43,4 +44,7 @@ public class BrakeSubsystem implements Loggable {
     public void Disengage() {
         setBrakePos(GO_POS);
     }
+
+    @Override
+    public void periodic() {}
 }

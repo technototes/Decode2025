@@ -5,11 +5,12 @@ import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.LogConfig;
 import com.technototes.library.logger.Loggable;
+import com.technototes.library.subsystem.Subsystem;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
 @Configurable
-public class AimingSubsystem implements Loggable {
+public class AimingSubsystem implements Loggable, Subsystem {
 
     public static double HOOD_POS = 0.5; // 0.5 1.0
     public static double HOOD_POS_UP = 1; // 0.5 1.0
@@ -85,4 +86,7 @@ public class AimingSubsystem implements Loggable {
     public void GoBall() {
         setLeverPos(LEVER_POS_GO);
     }
+
+    @Override
+    public void periodic() {}
 }

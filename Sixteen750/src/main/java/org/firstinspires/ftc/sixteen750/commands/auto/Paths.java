@@ -102,7 +102,7 @@ public class Paths {
 
     //Red poses reconfigure these
     public static Pose RStart = new Pose(114, 135.152);
-    public static Pose RLaunch = new Pose(90, 90);
+    public static Pose RLaunch = new Pose(90, 93);
     public static Pose RGoal = new Pose(144, 144);
 
     public static Pose RLaunchend = new Pose(90, 90);
@@ -112,11 +112,11 @@ public class Paths {
     public static Pose RIntake1end = new Pose(123, 88);
     public static Pose RIntake2 = new Pose(104, 60);
     public static Pose RIntake2ControlPoint = new Pose(73, 64.369);
-    public static Pose RIntake2end = new Pose(126, 60);
+    public static Pose RIntake2end = new Pose(128, 60);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
     public static Pose RIntake3 = new Pose(104, 40);
     public static Pose RIntake3ControlPoint = new Pose(68, 41.585);
-    public static Pose RIntake3end = new Pose(126, 40);
+    public static Pose RIntake3end = new Pose(128, 40);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(131.75, 78.5);
     public static Pose RleverControlPoint = new Pose(97.331, 74.620);
@@ -128,12 +128,12 @@ public class Paths {
     public static Pose RintakeCorner = new Pose(132.5, 12.229);
     public static Pose RintakeCornerControlPoint = new Pose(135, 90);
     public static Pose RgateIntake = new Pose(130, 43.000);
-    public static Pose RgateIntakeControlPoint = new Pose(130, 43);
+    public static Pose RgateIntakeControlPoint = new Pose(127, 43);
     public static Pose RfarPark = new Pose(120, 12.735);
-    public static double RlaunchHeading1 = 50.5;
-    public static double RlaunchHeading2 = 45;
-    public static double RlaunchHeading3 = 45;
-    public static double RlaunchHeading4 = 45;
+    public static double RlaunchHeading1 = 46.5;
+    public static double RlaunchHeading2 = 32;
+    public static double RlaunchHeading3 = 40;
+    public static double RlaunchHeading4 = 53;
 
     public static double RintakeHeading = 0;
     public static double RfarlaunchHeading = 51;
@@ -383,7 +383,8 @@ public class Paths {
         Intake1endtoLever = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(20.000, 85.000), new Pose(12.250, 75.500)))
-            .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
+            .setConstantHeadingInterpolation(Math.toRadians(90))
+            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
             .build();
         LevertoLaunch = follower
             .pathBuilder()
