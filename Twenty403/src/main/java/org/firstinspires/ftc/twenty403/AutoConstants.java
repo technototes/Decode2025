@@ -31,8 +31,8 @@ public class AutoConstants {
 
     // measured 10/14
     public static double botWeightKg = 8.50;
-    public static double botWidth = 17.75;
-    public static double botLength = 17.75;
+    public static double botWidth = 16.75;
+    public static double botLength = 11.75;
     public static double xVelocity = 77.84;
     public static double yVelocity = 61.23;
     public static double forwardDeceleration = -25.0;
@@ -44,6 +44,11 @@ public class AutoConstants {
     public static double brakingStrength = 0.09;
     public static double brakingStart = 0.1;
     public static double centripetalScale = 0.0005;
+    // Only used for motor encoders:
+    public static double fwdTicksToInches = 1.0;
+    public static double latTicksToInches = 1.0;
+    public static double turnTicksToInches = 1.0;
+    // Only used for OTOS:
     public static SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(4.75, 0, -Math.PI / 2);
     public static PIDFCoefficients translationPID = new PIDFCoefficients(0.2, 0, 0.02, 0.02);
     public static PIDFCoefficients headingPID = new PIDFCoefficients(0.75, 0.0, 0.075, 0.01);
@@ -82,7 +87,7 @@ public class AutoConstants {
         public static double turnTicksToInches = 100;
     }
 
-    public static boolean USE_OTOS = true;
+    public static boolean USE_OTOS = false;
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
@@ -105,8 +110,8 @@ public class AutoConstants {
 
     public static PathConstraints getPathConstraints() {
         return new PathConstraints(
-            0.99,
-            0.1,
+            tValueConstraint,
+            timeoutConstraint,
             ptechno ? PtechnoConst.brakingStrength : brakingStrength,
             ptechno ? PtechnoConst.brakingStart : brakingStart
         );
@@ -148,11 +153,11 @@ public class AutoConstants {
             .leftRearEncoderDirection(Encoder.FORWARD)
             .rightFrontEncoderDirection(Encoder.FORWARD)
             .rightRearEncoderDirection(Encoder.FORWARD)
-            .forwardTicksToInches(PtechnoConst.fwdTicksToInches)
-            .strafeTicksToInches(PtechnoConst.latTicksToInches)
-            .turnTicksToInches(PtechnoConst.turnTicksToInches)
             .robotLength(botLength)
-            .robotWidth(botWidth);
+            .robotWidth(botWidth)
+            .forwardTicksToInches(ptechno ? PtechnoConst.fwdTicksToInches : fwdTicksToInches)
+            .strafeTicksToInches(ptechno ? PtechnoConst.latTicksToInches : latTicksToInches)
+            .turnTicksToInches(ptechno ? PtechnoConst.turnTicksToInches : turnTicksToInches);
     }
 
     public static Follower createFollower(HardwareMap hardwareMap) {
