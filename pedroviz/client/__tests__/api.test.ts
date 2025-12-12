@@ -11,6 +11,7 @@ import {
   pointFromPose,
   pointFromPoseRef,
 } from '../state/API';
+import { IndexedPCF } from '../state/types';
 
 // Mocks & phony data for my tests:
 const teamPaths: TeamPaths = {
@@ -23,15 +24,15 @@ const badTeamPaths: unknown = {
   team2: { path3: 'path3.java' },
 };
 
-const testPathChainFile: PathChainFile = {
+const testPathChainFile: IndexedPCF = {
   ...EmptyPathChainFile,
-  name: 'path1.java',
 };
 
 const simpleBez: AnonymousBezier = {
   type: 'curve',
   points: [{ x: 'val1', y: 'val1' }, 'pose1', 'pose2'],
 };
+
 const fullPathChainFile: PathChainFile = {
   name: 'path3.java',
   values: [
@@ -77,6 +78,29 @@ const fullPathChainFile: PathChainFile = {
       },
     },
   ],
+};
+
+const fullIndexedPCF: IndexedPCF = {
+  ...fullPathChainFile,
+  namedValues: new Map([
+    ['val1', 0],
+    ['val2', 1],
+    ['val3', 2],
+  ]),
+  namedPoses: new Map([
+    ['pose1', 0],
+    ['pose2', 1],
+    ['pose3', 2],
+  ]),
+  namedBeziers: new Map([
+    ['bez1', 0],
+    ['bez2', 1],
+  ]),
+  namedPathChains: new Map([
+    ['pc1', 0],
+    ['pc2', 1],
+    ['pc3', 2],
+  ]),
 };
 
 const danglingPCF: PathChainFile = {
@@ -192,7 +216,7 @@ describe('API validation', () => {
   test('Full PathChainFile validation, color hashing, and evaluation', async () => {
     globalThis.fetch = MyFetchFunc;
     const res = await LoadFile('team2', 'path3.java');
-    expect(res).toEqual(fullPathChainFile);
+    expect(res).toEqual(fullIndexedPCF);
     expect(numFromVal({ type: 'int', value: 1 })).toEqual(1);
     expect(numFromVal({ type: 'double', value: 2.5 })).toEqual(2.5);
     expect(numFromVal({ type: 'radians', value: 180 })).toEqual(Math.PI);

@@ -26,7 +26,7 @@ import {
   ValueRef,
 } from '../../server/types';
 import { fetchApi } from './Storage';
-import { IndexedPCF, Point } from './types';
+import { AnonymousPathChain, IndexedPCF, IndexedPCFile, Point } from './types';
 
 let ipcf: IndexedPCF = {
   name: 'empty',
@@ -104,7 +104,6 @@ function noDanglingRefsOnBezierRef(br, id: string): ValidRes {
   }
   return noDanglingRefsOnBezier(br, id);
 }
-
 function noDanglingRefsOnChain(
   brs: BezierRef[],
   heading: HeadingType,
@@ -139,6 +138,25 @@ export function RegisterFreshFile(pcf: PathChainFile): void {
   ipcf.namedPoses = new Map(pcf.poses.map((np, i) => [np.name, i]));
   ipcf.namedBeziers = new Map(pcf.beziers.map((nb, i) => [nb.name, i]));
   ipcf.namedPathChains = new Map(pcf.pathChains.map((npc, i) => [npc.name, i]));
+}
+
+export function IndexPathChainFile(pcf: PathChainFile): IndexedPCFile {
+  const values = new Map<string, AnonymousValue>(
+    pcf.values.map((nv) => [nv.name, nv.value]),
+  );
+  const poses = new Map<string, AnonymousPose>(
+    pcf.poses.map((np) => [np.name, np.pose]),
+  );
+  const beziers = new Map<string, AnonymousBezier>(
+    pcf.beziers.map((nb) => [nb.name, nb.points]),
+  );
+  const pathChains = new Map<string, AnonymousPathChain>(
+    pcf.pathChains.map((npc) => [
+      npc.name,
+      { paths: npc.paths, heading: npc.heading },
+    ]),
+  );
+  return { values, poses, beziers, pathChains };
 }
 
 export function validatePathChainFile(pcf: PathChainFile): ErrorOr<true> {
@@ -185,7 +203,7 @@ export async function GetPaths(): Promise<TeamPaths> {
 }
 
 export const EmptyPathChainFile: IndexedPCF = {
-  name: 'empty',
+  name: '',
   values: [],
   poses: [],
   beziers: [],
@@ -219,6 +237,22 @@ export async function LoadFile(
   } else {
     return EmptyPathChainFile;
   }
+}
+
+export async function GetFile(
+  team: string,
+  file: string,
+): Promise<PathChainFile> {
+  const pcf = await fetchApi(
+    `loadpath/${encodeURIComponent(team)}/${encodeURIComponent(file)}`,
+    chkPathChainFile,
+    EmptyPathChainFile,
+  );
+  const curIPCF = IndexPathChainFile(pcf);
+  if (validatePathChainIndex(curIPCF) === true) {
+    return pcf;
+  }
+  return pcf;
 }
 
 export function SetNamedValue(nv: NamedValue): void {
