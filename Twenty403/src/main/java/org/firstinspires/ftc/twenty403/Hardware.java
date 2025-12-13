@@ -20,7 +20,7 @@ import org.firstinspires.ftc.twenty403.helpers.IEncoder;
 
 public class Hardware implements Loggable {
 
-    public List<LynxModule> hubs;
+    public static List<LynxModule> hubs;
 
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top, testMotor;
@@ -80,7 +80,7 @@ public class Hardware implements Loggable {
     }
 
     // We can read the voltage from the different hubs for fun...
-    public double voltage() {
+    public static double voltage() {
         double volt = 0;
         double count = 0;
         for (LynxModule lm : hubs) {

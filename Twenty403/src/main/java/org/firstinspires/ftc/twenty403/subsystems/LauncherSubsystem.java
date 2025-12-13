@@ -24,6 +24,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double DIFFERENCE = 0.0046;
     public static double PEAK_VOLTAGE = 13;
     private static PIDFController launcherPID;
+    private double voltage;
 
     @Log(name = "Launcher Velo: ")
     public static double MOTOR_VELOCITY;
@@ -68,7 +69,11 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // Spin the motors
         // TODO: make the motors spit the thing at the right angle
         if (hasHardware) {
-            setTargetSpeed(TARGET_MOTOR_VELOCITY);
+            if (Hardware.voltage() < 13.0 && Hardware.voltage() > 12.8) {
+                setTargetSpeed(1475);
+            } else {
+                setTargetSpeed(TARGET_MOTOR_VELOCITY);
+            }
         }
         launching = true;
     }
