@@ -163,6 +163,38 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
     return res;
   }
 
+  function getValueRefValue(vr: ValueRef): number {
+    const av = isRef(vr) ? icf.values.get(vr) : vr;
+    if (isUndefined(av)) {
+      throw new Error(`Invalid ValueRef ${vr}`);
+    }
+    return numFromVal(av);
+  }
+
+  function getPoseRefPoint(pr: PoseRef): Point {
+    let ap: AnonymousPose = isRef(pr) ? icf.poses.get(pr) : pr;
+    try {
+      return { x: getValueRefValue(ap.x), y: getValueRefValue(ap.y) };
+    } catch (e) {
+      throw new Error(`${e} from invalid PoseRef ${pr}`);
+    }
+  }
+
+  function getBezierRefPoints(br: BezierRef): Point[] {
+    const ab: AnonymousBezier = isRef(br) ? icf.beziers.get(br) : br;
+    return ab.points.map(getPoseRefPoint);
+  }
+
+  function getHeadingRefValue(hr: HeadingRef): number {
+    if (isRef(hr)) {
+      return getValueRefValue(hr);
+    } else if (chkRadiansRef(hr)) {
+      return (Math.PI * getValueRefValue(hr.radians)) / 180.0;
+    } else {
+      return getValueRefValue(hr);
+    }
+  }
+
   return {
     getValueNames(): string[] {
       return Array.from(icf.values.keys());
@@ -200,6 +232,10 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
     setPathChain(name: string, pathChain: AnonymousPathChain): void {
       icf.pathChains.set(name, pathChain);
     },
+    getValueRefValue,
+    getPoseRefPoint,
+    getBezierRefPoints,
+    getHeadingRefValue,
   };
 }
 
@@ -211,51 +247,5 @@ export function numFromVal(av: AnonymousValue): number {
       return av.value;
     case 'radians':
       return (Math.PI * av.value) / 180.0;
-  }
-}
-
-export function getValue(ipcf: IndexedFile, vr: ValueRef): number {
-  const av = isRef(vr) ? ipcf.getValue(vr) : vr;
-  if (isUndefined(av)) {
-    throw new Error(`Invalid ValueRef ${vr}`);
-  }
-  return numFromVal(av);
-}
-
-export function pointFromPose(ipcf: IndexedFile, pr: AnonymousPose): Point {
-  return { x: getValue(ipcf, pr.x), y: getValue(ipcf, pr.y) };
-}
-
-export function getPose(ipcf: IndexedFile, pr: PoseRef): AnonymousPose {
-  try {
-    return isRef(pr) ? ipcf.getPose(pr) : pr;
-  } catch (e) {
-    throw new Error(`${e} from invalid PoseRef ${pr}`);
-  }
-}
-
-export function pointFromPoseRef(
-  ipcf: IndexedFile,
-  pr: PoseRef,
-): [number, Point] {
-  return [getColorFor(getPose(pr)), pointFromPose(getPose(pr))];
-}
-
-export function getBezier(br: BezierRef): AnonymousBezier {
-  return isRef(br) ? ipcf.beziers[ipcf.namedBeziers.get(br)].points : br;
-}
-
-export function getBezierPoints(br: BezierRef): [number, [number, Point][]] {
-  const ab = getBezier(br);
-  return [getColorFor(ab), ab.points.map(pointFromPoseRef)];
-}
-
-export function getValueFromHeaderRef(hr: HeadingRef): number {
-  if (isRef(hr)) {
-    return getValue(hr);
-  } else if (chkRadiansRef(hr)) {
-    return (Math.PI * getValue(hr.radians)) / 180.0;
-  } else {
-    return getValue(hr);
   }
 }

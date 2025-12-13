@@ -10,8 +10,11 @@ import {
   AnonymousPose,
   AnonymousValue,
   BezierRef,
+  HeadingRef,
   HeadingType,
   PathChainFile,
+  PoseRef,
+  ValueRef,
 } from '../../server/types';
 
 export type AnonymousPathChain = {
@@ -80,4 +83,8 @@ export type IndexedFile = {
   setPose(name: string, pose: AnonymousPose): void;
   setBezier(name: string, bezier: AnonymousBezier): void;
   setPathChain(name: string, pathChain: AnonymousPathChain): void;
+  getValueRefValue(vr: ValueRef): number;
+  getPoseRefPoint(pr: PoseRef): Point;
+  getBezierRefPoints(br: BezierRef): Point[];
+  getHeadingRefValue(hr: HeadingRef): number;
 };

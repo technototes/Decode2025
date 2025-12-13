@@ -223,6 +223,7 @@ export const EmptyPathChainFile: IndexedPCF = {
 let curTeam = '';
 let curFile = '';
 
+/*
 export async function LoadFile(
   team: string,
   file: string,
@@ -245,8 +246,8 @@ export async function LoadFile(
     return EmptyPathChainFile;
   }
 }
-
-export async function GetFile(
+*/
+export async function LoadFile(
   team: string,
   file: string,
 ): Promise<ErrorOr<IndexedFile>> {
