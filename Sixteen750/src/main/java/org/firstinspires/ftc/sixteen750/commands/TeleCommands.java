@@ -30,6 +30,10 @@ public class TeleCommands {
         return Command.create(r.launcherSubsystem::AutoLaunch);
     }
 
+    public static Command FarAutoLaunch(Robot r) {
+        return Command.create(r.launcherSubsystem::FarAutoLaunch);
+    }
+
     public static Command StopLaunch(Robot r) {
         return Command.create(r.launcherSubsystem::Stop);
     }
