@@ -16,9 +16,9 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "Red12BallFar", preselectTeleOp = "Dual Control")
+@Autonomous(name = "Blue12BallFar", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class Red12BallFar extends CommandOpMode {
+public class Blue12BallFar extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -29,7 +29,7 @@ public class Red12BallFar extends CommandOpMode {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
         Paths p = new Paths(robot.follower);
-        robot.follower.setStartingPose(p.getRFar9BallStart());
+        robot.follower.setStartingPose(p.getFar9BallStart());
         CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
@@ -39,24 +39,24 @@ public class Red12BallFar extends CommandOpMode {
                 TeleCommands.FarAutoLaunch(robot),
                 TeleCommands.HoldIntake(robot),
                 TeleCommands.HoodUp(robot),
-                new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
+                new PedroPathCommand(robot.follower, p.StartFartolaunchfar),
                 new WaitCommand(1),
                 Paths.AutoLaunching3Balls(robot),
                 TeleCommands.HoldIntake(robot),
                 // new WaitCommand(0.5),
-                new PedroPathCommand(robot.follower, p.Rlaunchfartointake4, p.power),
+                new PedroPathCommand(robot.follower, p.launchfartointake4, p.power),
                 // new WaitCommand(1),
                 // new WaitCommand(2),
-                new PedroPathCommand(robot.follower, p.Rintake4tolaunchfar),
+                new PedroPathCommand(robot.follower, p.intake4tolaunchfar),
                 Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RlaunchfartointakeCorner, 0.8),
-                new PedroPathCommand(robot.follower, p.RintakeCornertolaunchfar),
+                new PedroPathCommand(robot.follower, p.launchfartointakeCorner, 0.8),
+                new PedroPathCommand(robot.follower, p.intakeCornertolaunchfar),
                 Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.Rlaunchfartogateintake),
+                new PedroPathCommand(robot.follower, p.launchfartogateintake),
                 new WaitCommand(3.5),
-                new PedroPathCommand(robot.follower, p.Rgateintaketolaunchfar),
+                new PedroPathCommand(robot.follower, p.gateintaketolaunchfar),
                 Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.Rlaunchfartopark),
+                new PedroPathCommand(robot.follower, p.launchfartopark),
                 new WaitCommand(1),
                 TeleCommands.StopLaunch(robot),
                 TeleCommands.IntakeStop(robot),
