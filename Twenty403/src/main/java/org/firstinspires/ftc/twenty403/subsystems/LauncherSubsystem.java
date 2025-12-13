@@ -82,7 +82,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // Spin the motors
         // TODO: make the motors spit the thing at the right angle
         if (hasHardware) {
-            setTargetSpeed(1320);
+            setTargetSpeed(1370);
         }
         launching = true;
     }
