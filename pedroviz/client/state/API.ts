@@ -247,16 +247,37 @@ export async function LoadFile(
   }
 }
 */
+
+// last loaded file, I guess?
+const lastLoadedFile = { team: '', file: '', data: null as null | IndexedFile };
 export async function LoadFile(
   team: string,
   file: string,
 ): Promise<ErrorOr<IndexedFile>> {
+  if (
+    lastLoadedFile.team === team &&
+    lastLoadedFile.file === file &&
+    lastLoadedFile.data !== null
+  ) {
+    console.log('using cachewd file for', team, file);
+    return lastLoadedFile.data;
+  }
+  lastLoadedFile.team = team;
+  lastLoadedFile.file = file;
+  lastLoadedFile.data = null;
   const pcf = await fetchApi(
     `loadpath/${encodeURIComponent(team)}/${encodeURIComponent(file)}`,
     chkPathChainFile,
     EmptyPathChainFile,
   );
-  return MakeIndexedFile(pcf);
+  console.log('loaded file from server for', team, file);
+  console.log(pcf);
+  const indexFile = MakeIndexedFile(pcf);
+  if (isError(indexFile)) {
+    return makeError(`Loaded file ${team}/${file} has dangling references.`);
+  }
+  lastLoadedFile.data = indexFile;
+  return indexFile;
 }
 
 export function SetNamedValue(nv: NamedValue): void {

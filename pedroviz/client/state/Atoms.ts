@@ -7,21 +7,16 @@ import {
   chkNamedPathChain,
   chkNamedPose,
   chkNamedValue,
+  isError,
   NamedBezier,
   NamedPathChain,
   NamedPose,
   NamedValue,
 } from '../../server/types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
-import {
-  EmptyPathChainFile,
-  GetPaths,
-  LoadFile,
-  SetNamedBezier,
-  SetNamedPathChain,
-  SetNamedPose,
-  SetNamedValue,
-} from './API';
+import { EmptyPathChainFile, GetPaths, LoadFile } from './API';
+import { MakeIndexedFile } from './IndexedFile';
+import { IndexedFile } from './types';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
   'theme',
@@ -108,30 +103,46 @@ export const SelectedFileAtom = atom(
   },
 );
 
+let fileData: IndexedFile = MakeIndexedFile(EmptyPathChainFile) as IndexedFile;
+// const FileContentsBackerAtom = atom<IndexedFile>(fileData);
 export const FileContentsAtom = atom(
   async (get) => {
     const team = await get(SelectedTeamAtom);
     const path = await get(SelectedFileAtom);
     if (team === '' || path === '') {
-      return EmptyPathChainFile;
+      console.log('No team or path selected');
+      return MakeIndexedFile(EmptyPathChainFile) as IndexedFile;
     }
-    return LoadFile(team, path);
+    const file = await LoadFile(team, path);
+    if (isError(file)) {
+      console.log('Loading returned an error:', file);
+      console.error(file.errors);
+      return MakeIndexedFile(EmptyPathChainFile) as IndexedFile;
+    }
+    console.error('Loaded file', team, path);
+    console.error(fileData.dump());
+    // get(FileContentsBackerAtom);
+    fileData = file;
+    return file;
   },
   (_, __, val: NamedValue | NamedPose | NamedBezier | NamedPathChain) => {
     if (chkNamedValue(val)) {
-      SetNamedValue(val);
+      fileData.setValue(val.name, val.value);
     } else if (chkNamedPose(val)) {
-      SetNamedPose(val);
+      fileData.setPose(val.name, val.pose);
     } else if (chkNamedBezier(val)) {
-      SetNamedBezier(val);
+      fileData.setBezier(val.name, val.points);
     } else if (chkNamedPathChain(val)) {
-      SetNamedPathChain(val);
+      fileData.setPathChain(val.name, {
+        heading: val.heading,
+        paths: val.paths,
+      });
     }
   },
 );
 
 export const NamedValuesAtom = atom(
-  async (get) => (await get(FileContentsAtom)).values,
+  async (get) => (await get(FileContentsAtom)).getValues(),
   async (_, set, val: Iterable<NamedValue> | NamedValue) => {
     if (chkNamedValue(val)) {
       set(FileContentsAtom, val);
@@ -146,7 +157,7 @@ export const NamedValuesAtom = atom(
 );
 
 export const NamedPosesAtom = atom(
-  async (get) => (await get(FileContentsAtom)).poses,
+  async (get) => (await get(FileContentsAtom)).getPoses(),
   (_, set, val: Iterable<NamedPose> | NamedPose) => {
     if (chkNamedPose(val)) {
       set(FileContentsAtom, val);
@@ -159,7 +170,7 @@ export const NamedPosesAtom = atom(
 );
 
 export const NamedBeziersAtom = atom(
-  async (get) => (await get(FileContentsAtom)).beziers,
+  async (get) => (await get(FileContentsAtom)).getBeziers(),
   (_, set, val: Iterable<NamedBezier> | NamedBezier) => {
     if (chkNamedBezier(val)) {
       set(FileContentsAtom, val);
@@ -172,7 +183,7 @@ export const NamedBeziersAtom = atom(
 );
 
 export const NamedPathChainsAtom = atom(
-  async (get) => (await get(FileContentsAtom)).pathChains,
+  async (get) => (await get(FileContentsAtom)).getPathChains(),
   (_, set, val: Iterable<NamedPathChain> | NamedPathChain) => {
     if (chkNamedPathChain(val)) {
       set(FileContentsAtom, val);

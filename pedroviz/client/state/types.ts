@@ -12,6 +12,10 @@ import {
   BezierRef,
   HeadingRef,
   HeadingType,
+  NamedBezier,
+  NamedPathChain,
+  NamedPose,
+  NamedValue,
   PathChainFile,
   PoseRef,
   ValueRef,
@@ -71,20 +75,30 @@ export type IndexedPCFile = {
 export type Point = { x: number; y: number };
 
 export type IndexedFile = {
+  getValues(): NamedValue[];
+  getPoses(): NamedPose[];
+  getBeziers(): NamedBezier[];
+  getPathChains(): NamedPathChain[];
+
   getValueNames(): string[];
   getPoseNames(): string[];
   getBezierNames(): string[];
   getPathChainNames(): string[];
+
   getValue(name: string): AnonymousValue | undefined;
   getPose(name: string): AnonymousPose | undefined;
   getBezier(name: string): AnonymousBezier | undefined;
   getPathChain(name: string): AnonymousPathChain | undefined;
+
   setValue(name: string, value: AnonymousValue): void;
   setPose(name: string, pose: AnonymousPose): void;
   setBezier(name: string, bezier: AnonymousBezier): void;
   setPathChain(name: string, pathChain: AnonymousPathChain): void;
+
   getValueRefValue(vr: ValueRef): number;
   getPoseRefPoint(pr: PoseRef): Point;
   getBezierRefPoints(br: BezierRef): Point[];
   getHeadingRefValue(hr: HeadingRef): number;
+
+  dump(): string;
 };

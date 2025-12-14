@@ -18,7 +18,7 @@ import {
   ValueRef,
 } from '../server/types';
 import { NewNamedValue } from './NewNamedValue';
-import { getBezier, getColorFor, getPose } from './state/API';
+// import { getBezier, getColorFor, getPose } from './state/API';
 import { ColorsAtom, FileContentsAtom, SelectedFileAtom } from './state/Atoms';
 import { Expando } from './ui-tools/Expando';
 
@@ -131,12 +131,12 @@ export function NamedValueList({
 
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name</Text>
+      <Text size={400}>Name {names.length}</Text>
       <Text size={400}>Value</Text>
       <Text size={400}>Units</Text>
-      {names.map((val) => (
+      {/*names.map((val) => (
         <NamedValueElem key={val.name} item={val} />
-      ))}
+      ))*/}
     </div>
   );
 }
@@ -149,8 +149,10 @@ export function AnonymousPoseDisplay({
   pose,
   noHeading,
 }: AnonymousPoseDisplayProps): ReactElement {
-  const colors = useAtomValue(ColorsAtom);
-  const style = { color: colors[getColorFor(pose)] };
+  // const colors = useAtomValue(ColorsAtom);
+  const style = {
+    /* color: colors[getColorFor(pose)]*/
+  };
   return noHeading ? (
     <>
       <ValueRefDisplay style={style} item={pose.x} />
@@ -196,9 +198,9 @@ export function NamedPoseList({ items }: { items: NamedPose[] }): ReactElement {
   };
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name</Text>
+      <Text size={400}>Name {poses.length}</Text>
       <AnonymousPoseHeader />
-      {poses.map((pose) => {
+      {/*poses.map((pose) => {
         const color = getColorFor(pose.pose);
         const style = { color: colors[color % colors.length] };
         return (
@@ -207,20 +209,34 @@ export function NamedPoseList({ items }: { items: NamedPose[] }): ReactElement {
             <AnonymousPoseDisplay pose={pose.pose} />
           </Fragment>
         );
-      })}
+      })*/}
     </div>
   );
 }
 
 function InlinePoseRefDisplay({ pose }: { pose: PoseRef }): ReactElement {
   const colors = useAtomValue(ColorsAtom);
-  const ap = isRef(pose) ? getPose(pose) : pose;
-  const color = getColorFor(ap);
-  const style = { color: colors[color % colors.length] };
+  /*const ap = isRef(pose) ? getPose(pose) : pose;
+  const color = getColorFor(ap);*/
+  // const style = { color: colors[color % colors.length] };
   return isRef(pose) ? (
-    <Text style={style}>{pose}</Text>
+    <Text
+      style={
+        {
+          /*style*/
+        }
+      }
+    >
+      {pose}
+    </Text>
   ) : (
-    <Text style={style}>
+    <Text
+      style={
+        {
+          /*style*/
+        }
+      }
+    >
       (<ValueRefDisplay item={pose.x} />, <ValueRefDisplay item={pose.y} />)
     </Text>
   );
@@ -260,9 +276,9 @@ export function NamedBezierList({
   };
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name</Text>
+      <Text size={400}>Name {beziers.length}</Text>
       <Text size={400}>Poses</Text>
-      {beziers.map((nb, index) => {
+      {/*beziers.map((nb, index) => {
         const color = getColorFor(nb.points);
         const style = {
           color: colors[color % colors.length],
@@ -279,7 +295,7 @@ export function NamedBezierList({
             ))}
           </Fragment>
         );
-      })}
+      })*/}
     </div>
   );
 }
@@ -335,8 +351,8 @@ export function NamedPathChainDisplay({
     <>
       <Text style={rowSpan(1, rowdata)}>{chain.name}</Text>
       {chain.paths.map((br, index) => {
-        const anonBez = getBezier(br);
-        const color = getColorFor(anonBez);
+        /*const anonBez = getBezier(br);
+        const color = getColorFor(anonBez);*/
         if (isRef(br)) {
           // Span both columns for a named curve
           return (
@@ -346,7 +362,7 @@ export function NamedPathChainDisplay({
                 gridColumnStart: 2,
                 gridColumnEnd: 4,
                 justifySelf: 'center',
-                color: colors[color % colors.length],
+                /*color: colors[color % colors.length],*/
               }}
             >
               {br}
@@ -354,7 +370,7 @@ export function NamedPathChainDisplay({
           );
         } else {
           const style = {
-            color: colors[color % colors.length],
+            // color: colors[color % colors.length],
             ...rowSpan(1, rowdata.children[index]),
           };
           return (
@@ -405,7 +421,7 @@ export function PathChainList({
   };
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name</Text>
+      <Text size={400}>Name {paths.length}</Text>
       <Text
         size={400}
         style={{
@@ -416,13 +432,13 @@ export function PathChainList({
       >
         Paths
       </Text>
-      {paths.map((npc, index) => (
+      {/*paths.map((npc, index) => (
         <NamedPathChainDisplay
           key={npc.name}
           chain={npc}
           rowdata={nestedRowData[index]}
         />
-      ))}
+      ))*/}
     </div>
   );
 }
@@ -438,14 +454,18 @@ export function PathsDataDisplay({
   if (selFile.length === 0) {
     return <div>Ple ase select a file to view.</div>;
   }
+  const values = file.getValues();
+  const poses = file.getPoses();
+  const beziers = file.getBeziers();
+  const pathChains = file.getPathChains();
   return (
     <>
       <Expando label="Values" indent={20} size={500} defaultShow={defaultShow}>
-        <NamedValueList items={file.values} />
+        <NamedValueList items={values} />
         <NewNamedValue />
       </Expando>
       <Expando label="Poses" indent={20} size={500} defaultShow={defaultShow}>
-        <NamedPoseList items={file.poses} />
+        <NamedPoseList items={poses} />
         <Button style={{ margin: 10 }}>New Pose</Button>
       </Expando>
       <Expando
@@ -454,7 +474,7 @@ export function PathsDataDisplay({
         size={500}
         defaultShow={defaultShow}
       >
-        <NamedBezierList items={file.beziers} />
+        <NamedBezierList items={beziers} />
         <Button style={{ margin: 10 }}>New Bezier</Button>
       </Expando>
       <Expando
@@ -463,7 +483,7 @@ export function PathsDataDisplay({
         size={500}
         defaultShow={defaultShow}
       >
-        <PathChainList items={file.pathChains} />
+        <PathChainList items={pathChains} />
         <Button style={{ margin: 10 }}>New PathChain</Button>
       </Expando>
     </>

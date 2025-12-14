@@ -18,30 +18,32 @@ import {
   ValueRef,
 } from '../../server/types';
 import { ValidRes } from './API';
-import { AnonymousPathChain, IndexedFile, IndexedPCFile, Point } from './types';
+import { AnonymousPathChain, IndexedFile, Point } from './types';
 
 export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
-  let icf: IndexedPCFile = {
-    values: new Map<string, AnonymousValue>(
-      pcf.values.map((nv) => [nv.name, nv.value]),
-    ),
-    poses: new Map<string, AnonymousPose>(
-      pcf.poses.map((np) => [np.name, np.pose]),
-    ),
-    beziers: new Map<string, AnonymousBezier>(
-      pcf.beziers.map((nb) => [nb.name, nb.points]),
-    ),
-    pathChains: new Map<string, AnonymousPathChain>(
-      pcf.pathChains.map((npc) => [
-        npc.name,
-        { paths: npc.paths, heading: npc.heading },
-      ]),
-    ),
-  };
+  const values = new Map<string, AnonymousValue>(
+    pcf.values.map((nv) => [nv.name, nv.value]),
+  );
+  const namedValues = [...pcf.values];
+  const poses = new Map<string, AnonymousPose>(
+    pcf.poses.map((np) => [np.name, np.pose]),
+  );
+  const namedPoses = [...pcf.poses];
+  const beziers = new Map<string, AnonymousBezier>(
+    pcf.beziers.map((nb) => [nb.name, nb.points]),
+  );
+  const namedBeziers = [...pcf.beziers];
+  const pathChains = new Map<string, AnonymousPathChain>(
+    pcf.pathChains.map((npc) => [
+      npc.name,
+      { paths: npc.paths, heading: npc.heading },
+    ]),
+  );
+  const namedPathChains = [...pcf.pathChains];
 
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
     if (isRef(vr)) {
-      if (!icf.values.has(vr) && !icf.poses.has(vr)) {
+      if (!values.has(vr) && !poses.has(vr)) {
         return makeError(
           `${id}'s "${vr}" value reference appears to be undefined.`,
         );
@@ -67,7 +69,7 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
   }
   function checkPoseRef(pr: PoseRef, id: string): ValidRes {
     if (isRef(pr)) {
-      return icf.poses.has(pr)
+      return poses.has(pr)
         ? true
         : makeError(`${id}'s "${pr}" pose reference appears to be undefined`);
     }
@@ -92,12 +94,13 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
 
   function checkBezierRef(br: BezierRef, id: string): ValidRes {
     if (isRef(br)) {
-      return icf.beziers.has(br)
+      return beziers.has(br)
         ? true
         : makeError(`${id}'s bezier reference appears to be undefined`);
     }
     return checkAnonymousBezier(br, id);
   }
+
   function checkAnonymousPathChain(
     apc: AnonymousPathChain,
     id: string,
@@ -126,14 +129,14 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
 
   function validateUniqueNames(): ValidRes {
     const allNames = new Set<string>([
-      ...icf.values.keys(),
-      ...icf.poses.keys(),
-      ...icf.beziers.keys(),
-      ...icf.pathChains.keys(),
+      ...values.keys(),
+      ...poses.keys(),
+      ...beziers.keys(),
+      ...pathChains.keys(),
     ]);
     if (
       allNames.size !==
-      icf.values.size + icf.poses.size + icf.beziers.size + icf.pathChains.size
+      values.size + poses.size + beziers.size + pathChains.size
     ) {
       // TODO: Provide a detailed diagnostic of which names are duplicated
       return makeError(
@@ -145,13 +148,13 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
 
   function validatePathChainIndex(): ErrorOr<true> {
     let good: ValidRes = true;
-    icf.poses.forEach((pr, name) => {
+    poses.forEach((pr, name) => {
       good = accError(checkPoseRef(pr, name), good);
     });
-    icf.beziers.forEach((br, name) => {
+    beziers.forEach((br, name) => {
       good = accError(checkBezierRef(br, name), good);
     });
-    icf.pathChains.forEach((apc, name) => {
+    pathChains.forEach((apc, name) => {
       good = accError(checkAnonymousPathChain(apc, name), good);
     });
     good = accError(validateUniqueNames(), good);
@@ -164,7 +167,7 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
   }
 
   function getValueRefValue(vr: ValueRef): number {
-    const av = isRef(vr) ? icf.values.get(vr) : vr;
+    const av = isRef(vr) ? values.get(vr) : vr;
     if (isUndefined(av)) {
       throw new Error(`Invalid ValueRef ${vr}`);
     }
@@ -172,7 +175,7 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
   }
 
   function getPoseRefPoint(pr: PoseRef): Point {
-    let ap: AnonymousPose = isRef(pr) ? icf.poses.get(pr) : pr;
+    let ap: AnonymousPose = isRef(pr) ? poses.get(pr) : pr;
     try {
       return { x: getValueRefValue(ap.x), y: getValueRefValue(ap.y) };
     } catch (e) {
@@ -181,7 +184,7 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
   }
 
   function getBezierRefPoints(br: BezierRef): Point[] {
-    const ab: AnonymousBezier = isRef(br) ? icf.beziers.get(br) : br;
+    const ab: AnonymousBezier = isRef(br) ? beziers.get(br) : br;
     return ab.points.map(getPoseRefPoint);
   }
 
@@ -197,45 +200,62 @@ export function MakeIndexedFile(pcf: PathChainFile): ErrorOr<IndexedFile> {
 
   return {
     getValueNames(): string[] {
-      return Array.from(icf.values.keys());
+      return Array.from(values.keys());
     },
     getPoseNames(): string[] {
-      return Array.from(icf.poses.keys());
+      return Array.from(poses.keys());
     },
     getBezierNames(): string[] {
-      return Array.from(icf.beziers.keys());
+      return Array.from(beziers.keys());
     },
     getPathChainNames(): string[] {
-      return Array.from(icf.pathChains.keys());
+      return Array.from(pathChains.keys());
     },
     getValue(name: string): AnonymousValue | undefined {
-      return icf.values.get(name);
+      return values.get(name);
     },
     getPose(name: string): AnonymousPose | undefined {
-      return icf.poses.get(name);
+      return poses.get(name);
     },
     getBezier(name: string): AnonymousBezier | undefined {
-      return icf.beziers.get(name);
+      return beziers.get(name);
     },
     getPathChain(name: string): AnonymousPathChain | undefined {
-      return icf.pathChains.get(name);
+      return pathChains.get(name);
     },
     setValue(name: string, value: AnonymousValue): void {
-      icf.values.set(name, value);
+      values.set(name, value);
     },
     setPose(name: string, pose: AnonymousPose): void {
-      icf.poses.set(name, pose);
+      poses.set(name, pose);
     },
     setBezier(name: string, bezier: AnonymousBezier): void {
-      icf.beziers.set(name, bezier);
+      beziers.set(name, bezier);
     },
     setPathChain(name: string, pathChain: AnonymousPathChain): void {
-      icf.pathChains.set(name, pathChain);
+      pathChains.set(name, pathChain);
     },
     getValueRefValue,
     getPoseRefPoint,
     getBezierRefPoints,
     getHeadingRefValue,
+
+    getValues: () => namedValues,
+    getPoses: () => namedPoses,
+    getBeziers: () => namedBeziers,
+    getPathChains: () => namedPathChains,
+    dump: () => {
+      return (
+        pcf.values.length +
+        ' values, ' +
+        pcf.poses.length +
+        ' poses, ' +
+        pcf.beziers.length +
+        ' beziers, ' +
+        pcf.pathChains.length +
+        ' pathChains.'
+      );
+    },
   };
 }
 
