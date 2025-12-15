@@ -38,6 +38,14 @@ public class TeleCommands {
         return Command.create(r.launcherSubsystem::Stop);
     }
 
+    public static Command Rumble(Robot r) {
+        return Command.create(r.intakeSubsystem::setRumble);
+    }
+
+    public static Command RumbleOff(Robot r) {
+        return Command.create(r.intakeSubsystem::setRumbleOff);
+    }
+
     public static Command IncreaseMotor(Robot r) {
         return Command.create(r.launcherSubsystem::IncreaseMotorVelocity);
     }

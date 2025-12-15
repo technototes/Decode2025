@@ -61,7 +61,7 @@ public class Paths {
     public static Pose Intake1 = new Pose(41.808, 85);
     public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
     public static Pose Intake1end = new Pose(19, 85);
-    public static Pose Lever = new Pose(12, 77);
+    public static Pose Lever = new Pose(16, 77);
     public static Pose Intake2 = new Pose(44, 63);
     public static Pose Intake2ControlPoint = new Pose(72, 61);
     public static Pose Intake2ControlPoint2 = new Pose(46, 64);
@@ -75,29 +75,29 @@ public class Paths {
     public static Pose End = new Pose(19, 105);
     public static Pose FarStart = new Pose(49, 11);
     public static Pose FarLaunch = new Pose(63, 14);
-    public static Pose IntakeCorner = new Pose(11, 12);
-    public static Pose IntakeCornerControlPoint = new Pose(42, 29);
+    public static Pose IntakeCorner = new Pose(10, 12);
+    public static Pose IntakeCornerControlPoint = new Pose(8, 73);
     public static Pose IntakeTunnel = new Pose(8, 27);
     public static Pose farStart = new Pose(54.000, 9.000);
     public static Pose farLaunch = new Pose(57.000, 15.000);
     public static Pose intake4 = new Pose(12, 36);
     public static Pose intake4ControlPoint = new Pose(70.000, 40.000);
-    public static Pose intakeCorner = new Pose(11.480, 12.229);
-    public static Pose intakeCornerControlPoint = new Pose(2.220, 30.666);
-    public static Pose gateIntake = new Pose(7, 43);
+    public static Pose intakeCorner = new Pose(10, 12);
+    public static Pose intakeCornerControlPoint = new Pose(8, 73);
+    public static Pose gateIntake = new Pose(6, 41);
     public static Pose gateIntakeControlPoint = new Pose(15, 35);
     public static Pose farPark = new Pose(21.25, 12.735);
 
-    public static double launchHeading0 = 125;
+    public static double launchHeading0 = 120;
     public static double launchHeading1 = 145;
     public static double launchHeading2 = 145;
-    public static double launchHeading3 = 135;
+    public static double launchHeading3 = 130;
     public static double launchfarheading = 108;
     public static double intakeHeading = 180;
     public static double farlaunchHeading1 = 120;
     public static double farlaunchHeading2 = 130;
-    public static double farlaunchHeading3 = 125;
-    public static double farlaunchHeading4 = 130;
+    public static double farlaunchHeading3 = 105;
+    public static double farlaunchHeading4 = 110;
     public static double cornerIntakeHeading = 250;
     public static double cornerIntakeHeading2 = 0;
     public static double tunnelIntakeHeading = 90;
@@ -126,9 +126,9 @@ public class Paths {
     public static Pose RfarLaunch = new Pose(87.000, 15);
     public static Pose Rintake4 = new Pose(130, 36.000);
     public static Pose Rintake4ControlPoint = new Pose(78.000, 40.000);
-    public static Pose RintakeCorner = new Pose(130, 12.229);
-    public static Pose RintakeCornerControlPoint = new Pose(132, 76);
-    public static Pose RgateIntake = new Pose(130, 43.000);
+    public static Pose RintakeCorner = new Pose(132, 12.229);
+    public static Pose RintakeCornerControlPoint = new Pose(134, 76);
+    public static Pose RgateIntake = new Pose(131, 43.000);
     public static Pose RgateIntakeControlPoint = new Pose(129, 35);
     public static Pose RfarPark = new Pose(120, 12.735);
     public static double RlaunchHeading1 = 49;
@@ -137,10 +137,10 @@ public class Paths {
     public static double RlaunchHeading4 = 53;
 
     public static double RintakeHeading = 0;
-    public static double RfarlaunchHeading = 64;
-    public static double RfarlaunchHeading2 = 68;
-    public static double RfarlaunchHeading3 = 60;
-    public static double RfarlaunchHeading4 = 66;
+    public static double RfarlaunchHeading = 58;
+    public static double RfarlaunchHeading2 = 66;
+    public static double RfarlaunchHeading3 = 53;
+    public static double RfarlaunchHeading4 = 56;
 
     public static double RcornerIntakeHeading = 250;
     public static double RcornerIntakeHeading2 = 0;

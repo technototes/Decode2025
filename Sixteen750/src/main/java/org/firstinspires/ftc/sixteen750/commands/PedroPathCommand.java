@@ -13,6 +13,7 @@ public class PedroPathCommand implements Command {
     public Pose begin;
     public double maxPowerScaling;
     public boolean currentPose;
+    public boolean brake;
 
     public PedroPathCommand(Follower f, PathChain p, double maxPower) {
         follower = f;
@@ -20,6 +21,16 @@ public class PedroPathCommand implements Command {
         maxPowerScaling = maxPower;
         currentPose = false;
         begin = null;
+        brake = false;
+    }
+
+    public PedroPathCommand(Follower f, PathChain p, double maxPower, boolean b) {
+        follower = f;
+        pathChain = p;
+        maxPowerScaling = maxPower;
+        currentPose = false;
+        begin = null;
+        brake = b;
     }
 
     public PedroPathCommand(Follower f, PathChain p) {

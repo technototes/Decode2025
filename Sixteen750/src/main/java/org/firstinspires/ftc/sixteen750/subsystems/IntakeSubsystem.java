@@ -21,6 +21,7 @@ public class IntakeSubsystem implements Loggable, Subsystem {
 
     Gamepad gamepad;
     public static double MOTOR_VELOCITY = 1; // 0.5 1.0
+    public static int duration = 80;
     boolean hasHardware;
     int currentIndex = 0;
     double[] pastValuesArray;
@@ -85,6 +86,14 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         }
     }
 
+    public void setRumble() {
+        duration = 80;
+    }
+
+    public void setRumbleOff() {
+        duration = 0;
+    }
+
     public double getCurrent() {
         return intake.getCurrent(CurrentUnit.AMPS);
     }
@@ -99,7 +108,7 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         } else {
             artifacts = 3;
             if (gamepad != null) {
-                gamepad.rumble(20);
+                gamepad.rumble(duration);
             }
         }
     }
