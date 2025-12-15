@@ -1,9 +1,9 @@
 import { useAtomValue } from 'jotai';
 import { ReactElement, useEffect, useRef } from 'react';
 import { NamedPathChain } from '../../server/types';
-import { getBezierPoints } from '../state/API';
 import {
   ColorsAtom,
+  FileContentsAtom,
   NamedBeziersAtom,
   NamedPathChainsAtom,
   NamedPosesAtom,
@@ -21,6 +21,7 @@ export function ScaledCanvas(): ReactElement {
   const colors = useAtomValue(ColorsAtom);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // const curPathChainFile = useAtomValue(CurPathChainAtom);
+  const file = useAtomValue(FileContentsAtom);
   const pathChains = useAtomValue(NamedPathChainsAtom);
   const beziers = useAtomValue(NamedBeziersAtom);
   const poses = useAtomValue(NamedPosesAtom);
@@ -28,7 +29,7 @@ export function ScaledCanvas(): ReactElement {
   const points = [
     ...pathChains
       .values()
-      .map((npc: NamedPathChain) => npc.paths.map(getBezierPoints)),
+      .map((npc: NamedPathChain) => npc.paths.map(file.getBezierRefPoints)),
   ].flat(1);
 
   useEffect(() => {
@@ -59,8 +60,7 @@ export function ScaledCanvas(): ReactElement {
     ctx.clearRect(0, 0, fix * Scale, fix * Scale);
 
     let count = 0;
-    points.forEach((colorCurve) => {
-      const curveControlPoints = colorCurve[1].map(([, pt]) => pt);
+    points.forEach((curveControlPoints) => {
       const len = bezierLength(curveControlPoints);
       const pts: Point[] = [];
       for (let t = 0; t <= 1.0; t += 1 / len) {
@@ -78,7 +78,7 @@ export function ScaledCanvas(): ReactElement {
       */
       ctx.beginPath();
       ctx.lineWidth = 0.25;
-      ctx.strokeStyle = colors[colorCurve[0] % colors.length];
+      ctx.strokeStyle = colors[count % colors.length];
       count++;
       ctx.moveTo(
         curveControlPoints[0].x * Scale,
@@ -94,8 +94,8 @@ export function ScaledCanvas(): ReactElement {
       ctx.stroke();
       ctx.beginPath();
       ctx.lineWidth = 0.5;
-      for (const [col, pt] of colorCurve[1]) {
-        ctx.strokeStyle = colors[col % colors.length];
+      for (const pt of curveControlPoints) {
+        ctx.strokeStyle = colors[count % colors.length];
         ctx.moveTo(pt.x + PointRadius, pt.y);
         ctx.arc(pt.x, pt.y, PointRadius, 0, 2 * Math.PI);
       }

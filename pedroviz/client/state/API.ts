@@ -25,13 +25,27 @@ import {
   TeamPaths,
   ValueRef,
 } from '../../server/types';
+import { MakeIndexedFile } from './IndexedFile';
 import { fetchApi } from './Storage';
-import { Point } from './types';
+import {
+  AnonymousPathChain,
+  IndexedFile,
+  IndexedPCF,
+  IndexedPCFile,
+  Point,
+} from './types';
 
-export let namedValues: Map<string, NamedValue> = new Map();
-export let namedPoses: Map<string, NamedPose> = new Map();
-export let namedBeziers: Map<string, NamedBezier> = new Map();
-export let namedPathChains: Map<string, NamedPathChain> = new Map();
+let ipcf: IndexedPCF = {
+  name: 'empty',
+  values: [],
+  poses: [],
+  beziers: [],
+  pathChains: [],
+  namedValues: new Map<string, number>(),
+  namedPoses: new Map<string, number>(),
+  namedBeziers: new Map<string, number>(),
+  namedPathChains: new Map<string, number>(),
+};
 
 export type ValidRes = ErrorOr<true>;
 // Some of the logic seems a little odd, because I want the validation to fully
@@ -39,7 +53,7 @@ export type ValidRes = ErrorOr<true>;
 
 function foundValueRef(vr: ValueRef, id: string): ValidRes {
   if (isRef(vr)) {
-    if (!namedValues.has(vr) && !namedPoses.has(vr)) {
+    if (!ipcf.namedValues.has(vr) && !ipcf.namedPoses.has(vr)) {
       return makeError(
         `${id}'s "${vr}" value reference appears to be undefined.`,
       );
@@ -66,7 +80,7 @@ function noDanglingRefsOnPose(pose: AnonymousPose, id: string): ValidRes {
 
 function noDanglingRefsOnPoseRef(pr: PoseRef, id: string): ValidRes {
   if (isRef(pr)) {
-    return namedPoses.has(pr)
+    return ipcf.namedPoses.has(pr)
       ? true
       : makeError(`${id}'s "${pr}" pose reference appears to be undefined`);
   }
@@ -91,13 +105,12 @@ function noDanglingRefsOnBezier(curve: AnonymousBezier, id: string): ValidRes {
 
 function noDanglingRefsOnBezierRef(br, id: string): ValidRes {
   if (isRef(br)) {
-    return namedBeziers.has(br)
+    return ipcf.namedBeziers.has(br)
       ? true
       : makeError(`${id}'s bezier reference appears to be undefined`);
   }
   return noDanglingRefsOnBezier(br, id);
 }
-
 function noDanglingRefsOnChain(
   brs: BezierRef[],
   heading: HeadingType,
@@ -123,10 +136,34 @@ function noDanglingRefsOnChain(
 }
 
 export function RegisterFreshFile(pcf: PathChainFile): void {
-  namedValues = new Map(pcf.values.map((nv) => [nv.name, nv]));
-  namedPoses = new Map(pcf.poses.map((np) => [np.name, np]));
-  namedBeziers = new Map(pcf.beziers.map((nb) => [nb.name, nb]));
-  namedPathChains = new Map(pcf.pathChains.map((npc) => [npc.name, npc]));
+  ipcf.name = pcf.name;
+  ipcf.values = pcf.values;
+  ipcf.poses = pcf.poses;
+  ipcf.beziers = pcf.beziers;
+  ipcf.pathChains = pcf.pathChains;
+  ipcf.namedValues = new Map(pcf.values.map((nv, i) => [nv.name, i]));
+  ipcf.namedPoses = new Map(pcf.poses.map((np, i) => [np.name, i]));
+  ipcf.namedBeziers = new Map(pcf.beziers.map((nb, i) => [nb.name, i]));
+  ipcf.namedPathChains = new Map(pcf.pathChains.map((npc, i) => [npc.name, i]));
+}
+
+export function IndexPathChainFile(pcf: PathChainFile): IndexedPCFile {
+  const values = new Map<string, AnonymousValue>(
+    pcf.values.map((nv) => [nv.name, nv.value]),
+  );
+  const poses = new Map<string, AnonymousPose>(
+    pcf.poses.map((np) => [np.name, np.pose]),
+  );
+  const beziers = new Map<string, AnonymousBezier>(
+    pcf.beziers.map((nb) => [nb.name, nb.points]),
+  );
+  const pathChains = new Map<string, AnonymousPathChain>(
+    pcf.pathChains.map((npc) => [
+      npc.name,
+      { paths: npc.paths, heading: npc.heading },
+    ]),
+  );
+  return { values, poses, beziers, pathChains };
 }
 
 export function validatePathChainFile(pcf: PathChainFile): ErrorOr<true> {
@@ -172,28 +209,114 @@ export async function GetPaths(): Promise<TeamPaths> {
   return teamFileList;
 }
 
-export const EmptyPathChainFile: PathChainFile = {
-  name: 'empty',
+export const EmptyPathChainFile: IndexedPCF = {
+  name: '',
   values: [],
   poses: [],
   beziers: [],
   pathChains: [],
+  namedValues: new Map(),
+  namedPoses: new Map(),
+  namedBeziers: new Map(),
+  namedPathChains: new Map(),
 };
+let curTeam = '';
+let curFile = '';
 
+/*
 export async function LoadFile(
   team: string,
   file: string,
-): Promise<PathChainFile> {
+): Promise<IndexedPCF> {
+  // We cache a single file, because it's likely to be reloaded often
+  if (curTeam === team && curFile === file) {
+    return ipcf;
+  }
+  curTeam = team;
+  curFile = file;
+  const pcf = await fetchApi(
+    `loadpath/${encodeURIComponent(team)}/${encodeURIComponent(file)}`,
+    chkPathChainFile,
+    { name: '', values: [], poses: [], beziers: [], pathChains: [] },
+  );
+  RegisterFreshFile(pcf);
+  if (validatePathChainFile(pcf) === true) {
+    return ipcf;
+  } else {
+    return EmptyPathChainFile;
+  }
+}
+*/
+
+// last loaded file, I guess?
+const lastLoadedFile = { team: '', file: '', data: null as null | IndexedFile };
+export async function LoadFile(
+  team: string,
+  file: string,
+): Promise<ErrorOr<IndexedFile>> {
+  if (
+    lastLoadedFile.team === team &&
+    lastLoadedFile.file === file &&
+    lastLoadedFile.data !== null
+  ) {
+    console.log('using cachewd file for', team, file);
+    return lastLoadedFile.data;
+  }
+  lastLoadedFile.team = team;
+  lastLoadedFile.file = file;
+  lastLoadedFile.data = null;
   const pcf = await fetchApi(
     `loadpath/${encodeURIComponent(team)}/${encodeURIComponent(file)}`,
     chkPathChainFile,
     EmptyPathChainFile,
   );
-  RegisterFreshFile(pcf);
-  if (validatePathChainFile(pcf) === true) {
-    return pcf;
+  console.log('loaded file from server for', team, file);
+  console.log(pcf);
+  const indexFile = MakeIndexedFile(pcf);
+  if (isError(indexFile)) {
+    return makeError(`Loaded file ${team}/${file} has dangling references.`);
+  }
+  lastLoadedFile.data = indexFile;
+  return indexFile;
+}
+
+export function SetNamedValue(nv: NamedValue): void {
+  const idx = ipcf.namedValues.get(nv.name);
+  if (idx !== undefined) {
+    ipcf.values[idx] = nv;
   } else {
-    return EmptyPathChainFile;
+    ipcf.namedValues.set(nv.name, ipcf.values.length);
+    ipcf.values.push(nv);
+  }
+}
+
+export function SetNamedPose(np: NamedPose): void {
+  const idx = ipcf.namedPoses.get(np.name);
+  if (idx !== undefined) {
+    ipcf.poses[idx] = np;
+  } else {
+    ipcf.namedPoses.set(np.name, ipcf.poses.length);
+    ipcf.poses.push(np);
+  }
+}
+
+export function SetNamedBezier(nb: NamedBezier): void {
+  const idx = ipcf.namedBeziers.get(nb.name);
+  if (idx !== undefined) {
+    ipcf.beziers[idx] = nb;
+  } else {
+    ipcf.namedBeziers.set(nb.name, ipcf.beziers.length);
+    ipcf.beziers.push(nb);
+  }
+}
+
+export function SetNamedPathChain(npc: NamedPathChain): void {
+  const idx = ipcf.namedPathChains.get(npc.name);
+  if (idx !== undefined) {
+    ipcf.pathChains[idx] = npc;
+  } else {
+    ipcf.namedPathChains.set(npc.name, ipcf.pathChains.length);
+    ipcf.pathChains.push(npc);
   }
 }
 
@@ -218,7 +341,9 @@ export function numFromVal(av: AnonymousValue): number {
 }
 
 export function getValue(vr: ValueRef): number {
-  return numFromVal(isRef(vr) ? namedValues.get(vr).value : vr);
+  return numFromVal(
+    isRef(vr) ? ipcf.values[ipcf.namedValues.get(vr)].value : vr,
+  );
 }
 
 export function pointFromPose(pr: AnonymousPose): Point {
@@ -227,7 +352,7 @@ export function pointFromPose(pr: AnonymousPose): Point {
 
 export function getPose(pr: PoseRef): AnonymousPose {
   try {
-    return isRef(pr) ? namedPoses.get(pr).pose : pr;
+    return isRef(pr) ? ipcf.poses[ipcf.namedPoses.get(pr)].pose : pr;
   } catch (e) {
     // console.error(`Invalid PoseRef ${pr}`);
     throw e;
@@ -239,7 +364,7 @@ export function pointFromPoseRef(pr: PoseRef): [number, Point] {
 }
 
 export function getBezier(br: BezierRef): AnonymousBezier {
-  return isRef(br) ? namedBeziers.get(br).points : br;
+  return isRef(br) ? ipcf.beziers[ipcf.namedBeziers.get(br)].points : br;
 }
 
 export function getBezierPoints(br: BezierRef): [number, [number, Point][]] {

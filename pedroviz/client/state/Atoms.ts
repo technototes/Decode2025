@@ -3,30 +3,20 @@ import { atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
 import { atomWithStorage } from 'jotai/utils';
 import {
-  AnonymousBezier,
-  AnonymousPose,
-  AnonymousValue,
-  chkAnonymousBezier,
-  chkAnonymousPose,
-  chkAnonymousValue,
   chkNamedBezier,
   chkNamedPathChain,
   chkNamedPose,
   chkNamedValue,
+  isError,
   NamedBezier,
   NamedPathChain,
   NamedPose,
   NamedValue,
 } from '../../server/types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
-import {
-  GetPaths,
-  LoadFile,
-  namedBeziers,
-  namedPathChains,
-  namedPoses,
-  namedValues,
-} from './API';
+import { EmptyPathChainFile, GetPaths, LoadFile } from './API';
+import { MakeIndexedFile } from './IndexedFile';
+import { IndexedFile } from './types';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
   'theme',
@@ -110,149 +100,107 @@ export const SelectedFileAtom = atom(
   async (get, set, val: string) => {
     const team = await get(SelectedTeamAtom);
     set(SelectedFileBackingAtom, val);
-    if (val !== '') {
-      // TODO: clear any AtomFamiliy cache
-      const pcf = await LoadFile(team, val);
-      // Set all teh names
-      set(NamedValuesAtom, pcf.values);
-      set(NamedPosesAtom, pcf.poses);
-      set(NamedBeziersAtom, pcf.beziers);
-      set(NamedPathChainsAtom, pcf.pathChains);
+  },
+);
+
+let fileData: IndexedFile = MakeIndexedFile(EmptyPathChainFile) as IndexedFile;
+// const FileContentsBackerAtom = atom<IndexedFile>(fileData);
+export const FileContentsAtom = atom(
+  async (get) => {
+    const team = await get(SelectedTeamAtom);
+    const path = await get(SelectedFileAtom);
+    if (team === '' || path === '') {
+      console.log('No team or path selected');
+      return MakeIndexedFile(EmptyPathChainFile) as IndexedFile;
+    }
+    const file = await LoadFile(team, path);
+    if (isError(file)) {
+      console.log('Loading returned an error:', file);
+      console.error(file.errors);
+      return MakeIndexedFile(EmptyPathChainFile) as IndexedFile;
+    }
+    console.error('Loaded file', team, path);
+    console.error(fileData.dump());
+    // get(FileContentsBackerAtom);
+    fileData = file;
+    return file;
+  },
+  (_, __, val: NamedValue | NamedPose | NamedBezier | NamedPathChain) => {
+    if (chkNamedValue(val)) {
+      fileData.setValue(val.name, val.value);
+    } else if (chkNamedPose(val)) {
+      fileData.setPose(val.name, val.pose);
+    } else if (chkNamedBezier(val)) {
+      fileData.setBezier(val.name, val.points);
+    } else if (chkNamedPathChain(val)) {
+      fileData.setPathChain(val.name, {
+        heading: val.heading,
+        paths: val.paths,
+      });
     }
   },
 );
 
-const NamedValuesBackerAtom = atom<Map<string, NamedValue>>(new Map());
 export const NamedValuesAtom = atom(
-  (get) => get(NamedValuesBackerAtom),
-  (get, set, val: Iterable<NamedValue> | NamedValue) => {
+  async (get) => (await get(FileContentsAtom)).getValues(),
+  async (_, set, val: Iterable<NamedValue> | NamedValue) => {
     if (chkNamedValue(val)) {
-      const nvba = new Map(get(NamedValuesBackerAtom));
-      nvba.set(val.name, val);
-      set(NamedValuesBackerAtom, nvba);
-      namedValues.set(val.name, val);
+      set(FileContentsAtom, val);
     } else if (Symbol.iterator in Object(val)) {
-      const nv = new Map<string, NamedValue>();
-      for (const valItems of val) {
-        nv.set(valItems.name, valItems);
+      for (const valItem of val) {
+        set(FileContentsAtom, valItem);
       }
-      set(NamedValuesBackerAtom, nv);
-      namedValues.clear();
-      nv.forEach((n) => namedValues.set(n.name, n));
     } else {
       throw new Error('Invalid value passed to NamedValuesAtom setter');
     }
   },
 );
-export const ValueNamesAtom = atom((get) => [
-  ...get(NamedValuesBackerAtom).keys(),
-]);
-export const ValueAtomFor = atomFamily((name: string) =>
-  atom(
-    (get) => get(NamedValuesBackerAtom).get(name),
-    (_, set, args: NamedValue | AnonymousValue) => {
-      set(
-        NamedValuesAtom,
-        chkAnonymousValue(args) ? { name, value: args } : args,
-      );
-    },
-  ),
-);
 
-const NamedPosesBackerAtom = atom<Map<string, NamedPose>>(new Map());
 export const NamedPosesAtom = atom(
-  (get) => get(NamedPosesBackerAtom),
-  (get, set, val: Iterable<NamedPose> | NamedPose) => {
+  async (get) => (await get(FileContentsAtom)).getPoses(),
+  (_, set, val: Iterable<NamedPose> | NamedPose) => {
     if (chkNamedPose(val)) {
-      const npba = new Map(get(NamedPosesBackerAtom));
-      npba.set(val.name, val);
-      set(NamedPosesBackerAtom, npba);
-      namedPoses.set(val.name, val);
+      set(FileContentsAtom, val);
     } else {
-      const np = new Map([...val].map((val) => [val.name, val]));
-      set(NamedPosesBackerAtom, np);
-      namedPoses.clear();
-      np.forEach((p) => namedPoses.set(p.name, p));
+      for (const posItem of val) {
+        set(FileContentsAtom, posItem);
+      }
     }
   },
 );
-export const PoseNamesAtom = atom((get) => [
-  ...get(NamedPosesBackerAtom).keys(),
-]);
-export const PoseAtomFor = atomFamily((name: string) =>
-  atom(
-    (get) => get(NamedPosesAtom).get(name),
-    (_, set, args: NamedPose | AnonymousPose) =>
-      set(NamedPosesAtom, chkAnonymousPose(args) ? { name, pose: args } : args),
-  ),
-);
 
-export const NamedBeziersBackerAtom = atom<Map<string, NamedBezier>>(new Map());
 export const NamedBeziersAtom = atom(
-  (get) => get(NamedBeziersBackerAtom),
-  (get, set, val: Iterable<NamedBezier> | NamedBezier) => {
+  async (get) => (await get(FileContentsAtom)).getBeziers(),
+  (_, set, val: Iterable<NamedBezier> | NamedBezier) => {
     if (chkNamedBezier(val)) {
-      const nbba = new Map(get(NamedBeziersBackerAtom));
-      nbba.set(val.name, val);
-      set(NamedBeziersBackerAtom, nbba);
-      namedBeziers.set(val.name, val);
+      set(FileContentsAtom, val);
     } else {
-      const nb = new Map([...val].map((val) => [val.name, val]));
-      set(NamedBeziersBackerAtom, nb);
-      namedBeziers.clear();
-      nb.forEach((b) => namedBeziers.set(b.name, b));
+      for (const bezItem of val) {
+        set(FileContentsAtom, bezItem);
+      }
     }
   },
 );
-export const BezierNamesAtom = atom((get) => [
-  ...get(NamedBeziersBackerAtom).keys(),
-]);
-export const BezierAtomFor = atomFamily((name: string) =>
-  atom(
-    (get) => get(NamedBeziersAtom).get(name),
-    (_, set, args: NamedBezier | AnonymousBezier) =>
-      set(
-        NamedBeziersAtom,
-        chkAnonymousBezier(args) ? { name, points: args } : args,
-      ),
-  ),
-);
 
-export const NamedPathChainsBackerAtom = atom<Map<string, NamedPathChain>>(
-  new Map(),
-);
 export const NamedPathChainsAtom = atom(
-  (get) => get(NamedPathChainsBackerAtom),
-  (get, set, val: Iterable<NamedPathChain> | NamedPathChain) => {
+  async (get) => (await get(FileContentsAtom)).getPathChains(),
+  (_, set, val: Iterable<NamedPathChain> | NamedPathChain) => {
     if (chkNamedPathChain(val)) {
-      const npcba = new Map(get(NamedPathChainsBackerAtom));
-      npcba.set(val.name, val);
-      set(NamedPathChainsBackerAtom, npcba);
-      namedPathChains.set(val.name, val);
+      set(FileContentsAtom, val);
     } else {
-      const npc = new Map([...val].map((val) => [val.name, val]));
-      set(NamedPathChainsBackerAtom, npc);
-      namedPathChains.clear();
-      npc.forEach((pc) => namedPathChains.set(pc.name, pc));
+      for (const pathChainItem of val) {
+        set(FileContentsAtom, pathChainItem);
+      }
     }
   },
 );
-export const PathChainNamesAtom = atom((get) =>
-  get(NamedPathChainsAtom).keys(),
-);
-export const PathChainAtomFor = atomFamily((name: string) =>
-  atom(
-    (get) => get(NamedPathChainsAtom).get(name),
-    (_, set, args: NamedPathChain) => set(NamedPathChainsAtom, args),
-  ),
-);
 
-export const AllNamesAtom = atom<Set<string>>(
-  (get) =>
+export const AllNamesAtom = atom(
+  async (get) =>
     new Set<string>([
-      ...get(ValueNamesAtom),
-      ...get(PoseNamesAtom),
-      ...get(BezierNamesAtom),
-      ...get(PathChainNamesAtom),
+      ...(await get(NamedValuesAtom)).map((nv) => nv.name),
+      ...(await get(NamedPosesAtom)).map((np) => np.name),
+      ...(await get(NamedBeziersAtom)).map((nb) => nb.name),
+      ...(await get(NamedPathChainsAtom)).map((npc) => npc.name),
     ]),
 );

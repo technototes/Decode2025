@@ -11,7 +11,7 @@ export const firstFtcSrc = path.join(
 );
 
 export function getProjectFilePath(team: string, filename: string): string {
-  return path.join(team, firstFtcSrc, team.toLocaleLowerCase(), filename);
+  return path.join('..', team, firstFtcSrc, team.toLocaleLowerCase(), filename);
 }
 
 export async function isDirectory(path: string) {
