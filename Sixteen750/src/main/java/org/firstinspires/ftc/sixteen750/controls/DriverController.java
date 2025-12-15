@@ -38,6 +38,7 @@ public class DriverController {
     public CommandButton hoodButton;
     public CommandButton override;
     public CommandButton hooddownButton;
+    public CommandButton RumbleToggle;
     public CommandButton holdButton;
     public CommandButton CloseShoot;
     public CommandButton FarShoot;
@@ -95,7 +96,8 @@ public class DriverController {
         CloseShoot = gamepad.dpadRight;
         gateButton = gamepad.ps_cross;
         holdButton = gamepad.ps_circle; // made it not bound the same as decrease velo
-        TripleBallLaunch = gamepad.ps_share; // made the auto launching command testable in tele
+        //TripleBallLaunch = gamepad.ps_share; // made the auto launching command testable in tele
+        RumbleToggle = gamepad.ps_share;
     }
 
     public void bindDriveControls() {
@@ -138,6 +140,7 @@ public class DriverController {
         spitButton.whenReleased(TeleCommands.IntakeStop(robot));
         intakeTrigger.whenPressed(TeleCommands.Intake(robot));
         intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot));
+        RumbleToggle.toggle(TeleCommands.Rumble(robot), TeleCommands.RumbleOff(robot));
     }
 
     // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
