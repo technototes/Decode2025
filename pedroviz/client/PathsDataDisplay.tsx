@@ -19,6 +19,7 @@ import {
 } from '../server/types';
 import { NewNamedValue } from './NewNamedValue';
 // import { getBezier, getColorFor, getPose } from './state/API';
+import { getColorFor } from './state/API';
 import { ColorsAtom, FileContentsAtom, SelectedFileAtom } from './state/Atoms';
 import { Expando } from './ui-tools/Expando';
 
@@ -134,9 +135,9 @@ export function NamedValueList({
       <Text size={400}>Name {names.length}</Text>
       <Text size={400}>Value</Text>
       <Text size={400}>Units</Text>
-      {/*names.map((val) => (
+      {names.map((val) => (
         <NamedValueElem key={val.name} item={val} />
-      ))*/}
+      ))}
     </div>
   );
 }
@@ -200,7 +201,7 @@ export function NamedPoseList({ items }: { items: NamedPose[] }): ReactElement {
     <div style={gridStyle}>
       <Text size={400}>Name {poses.length}</Text>
       <AnonymousPoseHeader />
-      {/*poses.map((pose) => {
+      {poses.map((pose) => {
         const color = getColorFor(pose.pose);
         const style = { color: colors[color % colors.length] };
         return (
@@ -209,7 +210,7 @@ export function NamedPoseList({ items }: { items: NamedPose[] }): ReactElement {
             <AnonymousPoseDisplay pose={pose.pose} />
           </Fragment>
         );
-      })*/}
+      })}
     </div>
   );
 }
@@ -278,7 +279,7 @@ export function NamedBezierList({
     <div style={gridStyle}>
       <Text size={400}>Name {beziers.length}</Text>
       <Text size={400}>Poses</Text>
-      {/*beziers.map((nb, index) => {
+      {beziers.map((nb, index) => {
         const color = getColorFor(nb.points);
         const style = {
           color: colors[color % colors.length],
@@ -295,7 +296,7 @@ export function NamedBezierList({
             ))}
           </Fragment>
         );
-      })*/}
+      })}
     </div>
   );
 }
@@ -432,13 +433,13 @@ export function PathChainList({
       >
         Paths
       </Text>
-      {/*paths.map((npc, index) => (
+      {paths.map((npc, index) => (
         <NamedPathChainDisplay
           key={npc.name}
           chain={npc}
           rowdata={nestedRowData[index]}
         />
-      ))*/}
+      ))}
     </div>
   );
 }
