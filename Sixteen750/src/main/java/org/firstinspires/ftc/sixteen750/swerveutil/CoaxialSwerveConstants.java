@@ -112,17 +112,6 @@ public class CoaxialSwerveConstants {
      */
     public double driveMaxAcceleration = 4.0; // 0 to 1.0 in 0.25 seconds
 
-    /**
-     * Enable slew rate limiting for steering servos
-     * Prevents sudden steering movements
-     */
-    public boolean useSteeringSlewRateLimiting = true;
-
-    /**
-     * Maximum steering power change per second
-     * This smooths out steering servo movements
-     */
-    public double steeringMaxAcceleration = 8.0; // 0 to 1.0 in 0.125 seconds
     public double steeringDeadband = Math.toRadians(2);
 
     public double steeringMinPower = 0.05;
