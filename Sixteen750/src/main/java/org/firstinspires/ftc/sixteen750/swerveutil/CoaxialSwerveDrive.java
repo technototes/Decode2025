@@ -49,6 +49,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
 
     // Voltage tracking
     private double currentVoltage = 12.0;
+    double lastUpdateTime = 0;
     double[] lastAngleError = new double[4];
 
     /**
@@ -101,20 +102,24 @@ public class CoaxialSwerveDrive extends Drivetrain {
         steeringEncoders[0] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.frontLeftEncoderName))
                 .zero(constants.frontLeftEncoderOffset)
-                .setInverted(constants.isFrontLeftEncoderInverted);
+                .setInverted(constants.isFrontLeftEncoderInverted)
+                .setSmoothing(constants.frontLeftSmoothing);
 
         steeringEncoders[1] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.frontRightEncoderName))
                 .zero(constants.frontRightEncoderOffset)
-                .setInverted(constants.isFrontRightEncoderInverted);
+                .setInverted(constants.isFrontRightEncoderInverted)
+                .setSmoothing(constants.frontRightSmoothing);
         steeringEncoders[2] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.rearLeftEncoderName))
                 .zero(constants.rearLeftEncoderOffset)
-                .setInverted(constants.isRearLeftEncoderInverted);
+                .setInverted(constants.isRearLeftEncoderInverted)
+                .setSmoothing(constants.rearLeftSmoothing);
         steeringEncoders[3] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.rearRightEncoderName))
                 .zero(constants.rearRightEncoderOffset)
-                .setInverted(constants.isRearRightEncoderInverted);
+                .setInverted(constants.isRearRightEncoderInverted)
+                .setSmoothing(constants.rearRightSmoothing);
 
         // Set motor directions
         driveMotors[0].setDirection(constants.frontLeftDriveMotorDirection);
@@ -242,8 +247,17 @@ public class CoaxialSwerveDrive extends Drivetrain {
 
             // Calculate angle error
             double angleError = Angle.normDelta(targetAngles[i] - currentAngles[i]);
+            if (Math.abs(angleError) < constants.steeringDeadband) {
+                steeringPowers[i] = 0.0;
+                lastAngleError[i] = angleError;  // Still update for derivative
+                continue;  // Skip PD calculation
+            }
 
-            double derivative = angleError - lastAngleError[i];
+            long currentTime = System.currentTimeMillis();
+            double dt = (currentTime - lastUpdateTime) / 1000.0;
+            double derivative = (angleError - lastAngleError[i]) / dt;
+
+
 
             double steeringPower =
                     constants.steeringKp * angleError
@@ -270,7 +284,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
                 steeringPowers[i] *= voltageScale;
             }
         }
-
+        lastUpdateTime = System.currentTimeMillis();
         // Return interleaved array: [drive0, steer0, drive1, steer1, ...]
         return new double[] {
                 moduleSpeeds[0], steeringPowers[0],

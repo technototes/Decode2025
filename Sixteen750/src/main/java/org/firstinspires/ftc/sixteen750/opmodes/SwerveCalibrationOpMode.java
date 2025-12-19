@@ -60,10 +60,10 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
 
         while (opModeIsActive()) {
             // Read current positions
-            double flPos = flEncoder.getCurrentPosition();
-            double frPos = frEncoder.getCurrentPosition();
-            double blPos = blEncoder.getCurrentPosition();
-            double brPos = brEncoder.getCurrentPosition();
+            double flPos = flEncoder.getRawAngle();
+            double frPos = frEncoder.getRawAngle();
+            double blPos = blEncoder.getRawAngle();
+            double brPos = brEncoder.getRawAngle();
 
             // Read raw voltages for debugging
             double flVolt = flEncoder.getVoltage();

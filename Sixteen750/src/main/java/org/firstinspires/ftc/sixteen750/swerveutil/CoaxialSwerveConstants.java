@@ -38,6 +38,10 @@ public class CoaxialSwerveConstants {
     public double frontRightEncoderOffset = 0.0;
     public double rearLeftEncoderOffset = 0.0;
     public double rearRightEncoderOffset = 0.0;
+    public double frontLeftSmoothing = 0.3;
+    public double frontRightSmoothing = 0.3;
+    public double rearLeftSmoothing = 0.3;
+    public double rearRightSmoothing = 0.3;
 
     // encoder inverted status
     public boolean isFrontLeftEncoderInverted = false;
@@ -201,6 +205,14 @@ public class CoaxialSwerveConstants {
     public CoaxialSwerveConstants withDimensions(double trackWidth, double wheelBase, double wheelDiameter) {
         this.trackWidth = trackWidth;
         this.wheelBase = wheelBase;
+        return this;
+    }
+
+    public CoaxialSwerveConstants withEncoderSmoothing(double fl, double fr, double rl, double rr) {
+        this.frontLeftSmoothing = fl;
+        this.frontRightSmoothing = fr;
+        this.rearLeftSmoothing = rl;
+        this.rearRightSmoothing = rr;
         return this;
     }
 
