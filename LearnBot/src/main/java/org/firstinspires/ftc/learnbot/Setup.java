@@ -26,6 +26,8 @@ public class Setup {
         public static String OTOS = "sparky";
         public static String PINPOINT = "pinpoint";
         public static String LIMELIGHT = "limelight";
+        public static String RED_SWITCH = "asr";
+        public static String BLUE_SWITCH = "asb";
     }
 
     @Configurable

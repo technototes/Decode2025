@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import org.firstinspires.ftc.learnbot.Setup;
+import org.firstinspires.ftc.learnbot.subsystems.AllianceDetection;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
@@ -23,9 +24,13 @@ public class TestBedTele extends LinearOpMode {
     public static double motorVelocity = Math.PI / 2;
     public static double triggerThreshold = 0.2;
     public TelemetryManager ptel;
-
+    public AllianceDetection allianceDetector;
     public CommandAxis trigger;
     public CommandButton button;
+
+    public String getAlliance() {
+        return allianceDetector.get().toString();
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -33,6 +38,11 @@ public class TestBedTele extends LinearOpMode {
         DcMotorEx fr, fl, rr, rl;
         trigger = new CommandAxis(() -> gamepad1.left_trigger);
         button = trigger.getAsButton(triggerThreshold);
+        allianceDetector = new AllianceDetection(
+            this.hardwareMap,
+            Setup.HardwareNames.RED_SWITCH,
+            Setup.HardwareNames.BLUE_SWITCH
+        );
         if (Setup.Connected.DRIVEBASE) {
             fr = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.FRMOTOR);
             fl = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.FLMOTOR);
@@ -68,6 +78,8 @@ public class TestBedTele extends LinearOpMode {
                 String frd = motorData(fr);
                 String rld = motorData(rl);
                 String rrd = motorData(rr);
+                String redOrBlue = getAlliance();
+                telemetry.addData("Alliance", redOrBlue);
                 telemetry.addData("FL", fld);
                 telemetry.addData("FR", frd);
                 telemetry.addData("RL", rld);
@@ -80,6 +92,7 @@ public class TestBedTele extends LinearOpMode {
                 telemetry.addData("cmd trigger", trigger.getAsDouble());
                 telemetry.addData("cmd button", button.getAsBoolean() ? "true" : "false");
 
+                ptel.addData("Alliance", redOrBlue);
                 ptel.addData("FL", fld);
                 ptel.addData("FR", frd);
                 ptel.addData("RL", rld);

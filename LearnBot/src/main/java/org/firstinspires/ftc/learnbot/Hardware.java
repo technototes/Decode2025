@@ -7,6 +7,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
@@ -25,6 +26,7 @@ public class Hardware implements Loggable {
     public HardwareMap map;
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top, testMotor;
+    public DigitalChannel redSwitch, blueSwitch;
     public IEncoder odoF, odoR;
     private OctoQuad octoquad;
     public CRServo bottomLeft, bottomRight;
@@ -66,6 +68,8 @@ public class Hardware implements Loggable {
         if (Setup.Connected.LIMELIGHT) {
             limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         }
+        redSwitch = hwmap.get(DigitalChannel.class, Setup.HardwareNames.RED_SWITCH);
+        blueSwitch = hwmap.get(DigitalChannel.class, Setup.HardwareNames.BLUE_SWITCH);
     }
 
     // We can read the voltage from the different hubs for fun...
