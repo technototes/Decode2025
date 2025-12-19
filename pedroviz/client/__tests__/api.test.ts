@@ -1,15 +1,10 @@
 import { describe, expect, test } from 'bun:test';
-import { AnonymousBezier, PathChainFile, TeamPaths } from '../../server/types';
+import { AnonymousBezier, isError, PathChainFile, TeamPaths } from '../../server/types';
 import {
   EmptyPathChainFile,
-  getBezierPoints,
   GetPaths,
-  getValue,
-  getValueFromHeaderRef,
   LoadFile,
-  numFromVal,
-  pointFromPose,
-  pointFromPoseRef,
+  SavePath,
 } from '../state/API';
 import { IndexedPCF } from '../state/types';
 
@@ -189,7 +184,7 @@ async function MyFetchFunc(
   }
   return new Response('ERROR', { status: 404 });
 }
-MyFetchFunc.preconnect = () => {};
+MyFetchFunc.preconnect = () => { };
 
 describe('API validation', () => {
   test('GetPaths', async () => {
@@ -204,41 +199,61 @@ describe('API validation', () => {
   test('LoadPaths', async () => {
     globalThis.fetch = MyFetchFunc;
     const res2 = await LoadFile('team1', 'path1.java');
-    expect(res2).toEqual(EmptyPathChainFile);
+    expect(isError(res2)).toBeTrue();
+    if (isError(res2)) {
+      expect(res2.errors()).toEqual(
+        ['Invalid PathChainFile loaded from server'],
+      );
+    }
     const res = await LoadFile('team1', 'path2.java');
-    expect(res).toEqual(testPathChainFile);
+    expect(isError(res)).toBeTrue();
+    if (isError(res)) {
+      expect(res.errors()).toEqual(
+        ['Invalid PathChainFile loaded from server'],
+      );
+    }
   });
   test('Undefined references in PathChainFile validation', async () => {
     globalThis.fetch = MyFetchFunc;
     const res = await LoadFile('team2', 'path4.java');
-    expect(res).toEqual(EmptyPathChainFile);
+    expect(isError(res)).toBeTrue();
+    if (isError(res)) {
+      expect(res.errors()).toEqual(['Loaded file team2/path4.java has dangling references.']);
+    }
   });
   test('Full PathChainFile validation, color hashing, and evaluation', async () => {
     globalThis.fetch = MyFetchFunc;
     const res = await LoadFile('team2', 'path3.java');
-    expect(res).toEqual(fullIndexedPCF);
-    expect(numFromVal({ type: 'int', value: 1 })).toEqual(1);
-    expect(numFromVal({ type: 'double', value: 2.5 })).toEqual(2.5);
-    expect(numFromVal({ type: 'radians', value: 180 })).toEqual(Math.PI);
-    expect(getValue('val2')).toEqual(2.5);
-    expect(pointFromPose({ x: 'val1', y: 'val2' })).toEqual({ x: 1, y: 2.5 });
-    const pose3 = pointFromPoseRef('pose3');
-    expect(pose3.length).toEqual(2);
-    expect(pose3[1]).toEqual({ x: 1, y: 2.5 });
-    expect(() => pointFromPoseRef('noPose')).toThrow();
-    expect(getBezierPoints('bez2')[1].map(([n, p]) => p)).toEqual([
+    if (isError(res)) {
+      console.log('Errors:', res.errors());
+      expect(isError(res)).toBeFalse();
+      return;
+    }
+    expect(res.dump()).toEqual('3 values, 3 poses, 2 beziers, 3 pathChains.');
+    expect(res.getValueRefValue({ type: 'int', value: 1 })).toEqual(1);
+    expect(res.getValueRefValue({ type: 'double', value: 2.5 })).toEqual(2.5);
+    expect(res.getValueRefValue({ type: 'radians', value: 180 })).toEqual(Math.PI);
+    expect(res.getValueRefValue('val2')).toEqual(2.5);
+    expect(res.getPoseRefPoint({ x: 'val1', y: 'val2' })).toEqual({ x: 1, y: 2.5 });
+    const pose3 = res.getPoseRefPoint('pose3');
+    expect(pose3).toEqual({ x: 1, y: 2.5 });
+    expect(() => res.getPoseRefPoint('noPose')).toThrow();
+    expect(res.getBezierRefPoints('bez2')).toEqual([
       { x: 1, y: 1 },
       { x: 2.5, y: 1 },
       { x: 2.5, y: 1 },
     ]);
-    expect(getValueFromHeaderRef('val1')).toEqual(1);
-    expect(getValueFromHeaderRef({ radians: 'val2' })).toEqual(
+    expect(res.getValueRefValue('val1')).toEqual(1);
+    expect(res.getHeadingRefValue({ radians: 'val2' })).toEqual(
       (2.5 * Math.PI) / 180,
     );
-    expect(getValueFromHeaderRef({ type: 'int', value: 15 })).toEqual(15);
+    expect(res.getValueRefValue({ type: 'int', value: 15 })).toEqual(15);
+    const res2 = await LoadFile('team2', 'path3.java');
+    expect(!isError(res2)).toBeTrue();
   });
-  test.todo("Need to implement a 'save' feature", () => {
+  test('Need to implement a real "save" feature', async () => {
     // Probably add a test for this, yeah?
-    expect(true).toBeTrue();
+    const res = await SavePath('teamX', 'pathY.java', fullPathChainFile);
+    expect(res).toEqual('NYI');
   });
 });

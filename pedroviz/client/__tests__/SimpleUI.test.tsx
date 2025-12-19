@@ -35,7 +35,7 @@ import {
 } from '../state/Atoms';
 import { getStore } from '../state/Storage';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
-import './jest-dom-types-fix';
+import './jest-dom-types-fix.test';
 
 // Mocks & phony data for my tests:
 const teamPaths: TeamPaths = {

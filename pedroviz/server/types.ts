@@ -27,10 +27,12 @@ export function makeError(
 ): ErrorVal {
   const errors = [];
   errors.push(
-    isString(error) ? [error] : isError(error) ? error.errors() : error,
+    ...(isString(error) ? [error] : isError(error) ? error.errors() : error),
   );
   if (isDefined(more)) {
-    errors.push(isString(more) ? [more] : isError(more) ? more.errors() : more);
+    errors.push(
+      ...(isString(more) ? [more] : isError(more) ? more.errors() : more),
+    );
   }
   return {
     errors: () => errors,

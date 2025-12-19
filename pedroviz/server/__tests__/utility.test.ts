@@ -5,7 +5,7 @@ import { firstFtcSrc, getProjectFilePath, isDirectory } from '../utility';
 
 test('getProjectFilePath simple test', () => {
   expect(getProjectFilePath('TestTeam', 'FileName.java')).toBe(
-    path.join('TestTeam', firstFtcSrc, 'testteam', 'FileName.java'),
+    path.join('..', 'TestTeam', firstFtcSrc, 'testteam', 'FileName.java'),
   );
 });
 

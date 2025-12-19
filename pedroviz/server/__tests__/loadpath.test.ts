@@ -18,9 +18,14 @@ test('raw endpoint invocation', async () => {
 test('loadPathChainsFromFile loads paths correctly', async () => {
   const testPath = getProjectFilePath('TeamA', 'TeamTestPaths.java');
   expect(testPath).toBe(
-    path.join('TeamA', firstFtcSrc, 'teama', 'TeamTestPaths.java'),
+    path.join('..', 'TeamA', firstFtcSrc, 'teama', 'TeamTestPaths.java'),
   );
-  const repoPathToFile = path.join(getTestRepoPath(), testPath);
+  // Need to hack aroun the actual location
+  const repoPathToFile = path.join(
+    getTestRepoPath(),
+    'FtcRobotController',
+    testPath,
+  );
   const paths = await loadPathChainsFromFile(repoPathToFile);
   expect(paths).toBeDefined();
   if (isString(paths)) {

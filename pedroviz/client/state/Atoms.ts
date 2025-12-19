@@ -110,17 +110,17 @@ export const FileContentsAtom = atom(
     const team = await get(SelectedTeamAtom);
     const path = await get(SelectedFileAtom);
     if (team === '' || path === '') {
-      console.log('No team or path selected');
+      // console.log('No team or path selected');
       return MakeIndexedFile(EmptyPathChainFile) as IndexedFile;
     }
     const file = await LoadFile(team, path);
     if (isError(file)) {
-      console.log('Loading returned an error:', file);
-      console.error(file.errors);
+      // console.log('Loading returned an error:', file);
+      // console.error(file.errors);
       return MakeIndexedFile(EmptyPathChainFile) as IndexedFile;
     }
-    console.error('Loaded file', team, path);
-    console.error(fileData.dump());
+    // console.error('Loaded file', team, path);
+    // console.error(fileData.dump());
     // get(FileContentsBackerAtom);
     fileData = file;
     return file;

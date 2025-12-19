@@ -2,8 +2,8 @@
 env = "BUN_PUBLIC_*"
 
 [test]
-root = "pedroviz"
+root = "./"
 coverage = true
 coverageThreshold = 0.9
 coverageSkipTestFiles = true
-preload = ["./pedroviz/client/__tests__/ui-preload.test.ts"]
+preload = ["./client/__tests__/ui-preload.test.ts"]
