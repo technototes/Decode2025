@@ -21,7 +21,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     //    @Log.Number(name = "Motor Power")
     //    public static double MOTOR_POWER = 0.65; // 0.5 1.0
     @Log.Number(name = "Target Velocity")
-    public static double targetLaunchVelocity = 1400;
+    public static double targetLaunchVelocity = autoVelocity;
 
     public static double closetargetLaunchVelocity = 1400;
     public static double fartargetLaunchVelocity = 1775;
@@ -235,7 +235,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     }
 
     public double autoVelocity() {
-        double auto_velocity = (52.985) * (ls.getDistance()) + (1070.448);
+        double auto_velocity = (61.538) * (ls.getDistance()) + (1122.308);
         // x = distance in feet
         return auto_velocity;
     }
