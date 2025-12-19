@@ -1,6 +1,4 @@
 package org.firstinspires.ftc.sixteen750.swerveutil;
-import android.annotation.SuppressLint;
-
 import com.pedropathing.Drivetrain;
 import com.pedropathing.math.Vector;
 import com.pedropathing.math.MathFunctions;
@@ -10,8 +8,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import org.firstinspires.ftc.sixteen750.swerveutil.AbsoluteAnalogEncoder;
-import org.firstinspires.ftc.sixteen750.swerveutil.Angle;
+
 
 /**
  * Coaxial Swerve Drivetrain Implementation
