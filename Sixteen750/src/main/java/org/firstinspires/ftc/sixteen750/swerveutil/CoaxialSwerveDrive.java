@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.sixteen750.swerveutil;
+import android.annotation.SuppressLint;
+
 import com.pedropathing.Drivetrain;
 import com.pedropathing.math.Vector;
 import com.pedropathing.math.MathFunctions;
@@ -10,6 +12,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.sixteen750.swerveutil.AbsoluteAnalogEncoder;
 import org.firstinspires.ftc.sixteen750.swerveutil.Angle;
+
 /**
  * Coaxial Swerve Drivetrain Implementation
  *
@@ -41,8 +44,12 @@ public class CoaxialSwerveDrive extends Drivetrain {
     // Voltage sensor for battery voltage monitoring
     private VoltageSensor voltageSensor;
 
+    // Slew rate limiters for smooth acceleration
+    private SlewRateLimiter[] driveRateLimiters = new SlewRateLimiter[4];
+
     // Voltage tracking
     private double currentVoltage = 12.0;
+    double[] lastAngleError = new double[4];
 
     /**
      * Constructor for the Coaxial Swerve Drivetrain
@@ -57,7 +64,6 @@ public class CoaxialSwerveDrive extends Drivetrain {
         this.nominalVoltage = 12.0;
 
         // Get voltage sensor from the Control Hub
-        // This is typically named "Control Hub" or "Expansion Hub 1"
         try {
             voltageSensor = hardwareMap.voltageSensor.iterator().next();
         } catch (Exception e) {
@@ -70,43 +76,57 @@ public class CoaxialSwerveDrive extends Drivetrain {
         steeringEncoders = new AbsoluteAnalogEncoder[4];
         targetAngles = new double[4];
         currentAngles = new double[4];
+        for (int i = 0; i < 4; i++) {
+            lastAngleError[i] = 0;
+        }
+
+        // Initialize slew rate limiters
+        for (int i = 0; i < 4; i++) {
+            driveRateLimiters[i] = new SlewRateLimiter(constants.driveMaxAcceleration);
+        }
 
         // Get hardware from the hardware map
         driveMotors[0] = hardwareMap.get(DcMotorEx.class, constants.frontLeftDriveMotorName);
         driveMotors[1] = hardwareMap.get(DcMotorEx.class, constants.frontRightDriveMotorName);
-        driveMotors[2] = hardwareMap.get(DcMotorEx.class, constants.rearLeftEncoderName);
-        driveMotors[3] = hardwareMap.get(DcMotorEx.class, constants.rearRightEncoderName);
+        driveMotors[2] = hardwareMap.get(DcMotorEx.class, constants.rearLeftDriveMotorName);
+        driveMotors[3] = hardwareMap.get(DcMotorEx.class, constants.rearRightDriveMotorName);
 
         steeringServos[0] = hardwareMap.get(CRServo.class, constants.frontLeftSteeringServoName);
         steeringServos[1] = hardwareMap.get(CRServo.class, constants.frontRightSteeringServoName);
         steeringServos[2] = hardwareMap.get(CRServo.class, constants.rearLeftSteeringServoName);
-        steeringServos[3] = hardwareMap.get(CRServo.class, constants.rearLeftDriveMotorName);
+        steeringServos[3] = hardwareMap.get(CRServo.class, constants.rearRightSteeringServoName);
 
         // Initialize absolute encoders for steering feedback
+
         steeringEncoders[0] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.frontLeftEncoderName))
-                .zero(constants.frontLeftEncoderOffset);
+                .zero(constants.frontLeftEncoderOffset)
+                .setInverted(constants.isFrontLeftEncoderInverted);
+
         steeringEncoders[1] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.frontRightEncoderName))
-                .zero(constants.frontRightEncoderOffset);
+                .zero(constants.frontRightEncoderOffset)
+                .setInverted(constants.isFrontRightEncoderInverted);
         steeringEncoders[2] = new AbsoluteAnalogEncoder(
-                hardwareMap.get(AnalogInput.class, constants.rearLeftSteeringServoName))
-                .zero(constants.rearLeftEncoderOffset);
+                hardwareMap.get(AnalogInput.class, constants.rearLeftEncoderName))
+                .zero(constants.rearLeftEncoderOffset)
+                .setInverted(constants.isRearLeftEncoderInverted);
         steeringEncoders[3] = new AbsoluteAnalogEncoder(
-                hardwareMap.get(AnalogInput.class, constants.rearLeftDriveMotorName))
-                .zero(constants.rearRightEncoderOffset);
+                hardwareMap.get(AnalogInput.class, constants.rearRightEncoderName))
+                .zero(constants.rearRightEncoderOffset)
+                .setInverted(constants.isRearRightEncoderInverted);
 
         // Set motor directions
         driveMotors[0].setDirection(constants.frontLeftDriveMotorDirection);
         driveMotors[1].setDirection(constants.frontRightDriveMotorDirection);
-        driveMotors[2].setDirection(constants.backLeftDriveMotorDirection);
-        driveMotors[3].setDirection(constants.backRightDriveMotorDirection);
+        driveMotors[2].setDirection(constants.rearLeftDriveMotorDirection);
+        driveMotors[3].setDirection(constants.rearRightDriveMotorDirection);
 
         // Set servo directions
         steeringServos[0].setDirection(constants.frontLeftSteeringServoDirection);
         steeringServos[1].setDirection(constants.frontRightSteeringServoDirection);
-        steeringServos[2].setDirection(constants.backLeftSteeringServoDirection);
-        steeringServos[3].setDirection(constants.backRightSteeringServoDirection);
+        steeringServos[2].setDirection(constants.rearLeftSteeringServoDirection);
+        steeringServos[3].setDirection(constants.rearRightSteeringServoDirection);
 
         // Initialize module positions (relative to robot center)
         // These represent the physical location of each module on the robot
@@ -118,7 +138,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
 
         // Set motor modes
         for (DcMotorEx motor : driveMotors) {
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
     }
@@ -139,10 +159,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
     @Override
     public double[] calculateDrive(Vector correctivePower, Vector headingPower, Vector pathingPower, double robotHeading) {
         // Combine all the input vectors into a single desired movement vector
-        Vector desiredTranslation = new Vector(
-                correctivePower.getXComponent() + pathingPower.getXComponent(),
-            correctivePower.getYComponent() + pathingPower.getYComponent()
-        );
+        Vector desiredTranslation = correctivePower.plus(pathingPower);
 
         // Get the desired rotation (heading power magnitude determines rotation speed)
         double desiredRotation = headingPower.getMagnitude() * Math.signum(headingPower.getXComponent());
@@ -157,9 +174,17 @@ public class CoaxialSwerveDrive extends Drivetrain {
         // Array to store module speeds and angles
         double[] moduleSpeeds = new double[4];
         double[] moduleAngles = new double[4];
-
+        if (desiredTranslation.getMagnitude() < 0.02 &&
+                Math.abs(desiredRotation) < 0.02) {
+            double[] zeroPowers = new double[8];
+            for (int i = 0; i < 8; i++) {
+                zeroPowers[i] = 0;
+            }
+            return zeroPowers;
+        }
         // Calculate the desired state for each swerve module
         for (int i = 0; i < 4; i++) {
+
             // Calculate the rotational contribution for this module
             // Rotation creates a tangent vector perpendicular to the module's position
             double rotationX = -modulePositions[i].getYComponent() * desiredRotation;
@@ -175,20 +200,15 @@ public class CoaxialSwerveDrive extends Drivetrain {
 
             // Optimize the module angle to avoid rotating more than 90 degrees
             // If the module needs to rotate >90°, we can reverse the drive direction instead
-            double angleDifference = moduleAngles[i] - currentAngles[i];
-
-            // Normalize angle difference to [-PI, PI]
-            while (angleDifference > Math.PI) angleDifference -= 2 * Math.PI;
-            while (angleDifference < -Math.PI) angleDifference += 2 * Math.PI;
+            double angleDifference = Angle.normDelta(moduleAngles[i] - currentAngles[i]);
 
             // If we need to turn more than 90 degrees, flip the angle and reverse speed
             if (Math.abs(angleDifference) > Math.PI / 2) {
                 moduleAngles[i] += Math.PI;
                 moduleSpeeds[i] *= -1;
 
-                // Normalize the angle
-                while (moduleAngles[i] > Math.PI) moduleAngles[i] -= 2 * Math.PI;
-                while (moduleAngles[i] < -Math.PI) moduleAngles[i] += 2 * Math.PI;
+                // Normalize the angle [-pi, pi]
+                moduleAngles[i] = Angle.normDelta(moduleAngles[i]);
             }
 
             // Store the target angle for this module
@@ -220,11 +240,25 @@ public class CoaxialSwerveDrive extends Drivetrain {
             // Get actual current angle from absolute encoder
             currentAngles[i] = steeringEncoders[i].getCurrentPosition();
 
-            // Calculate angle error using the Angle utility for proper wrapping
+            // Calculate angle error
             double angleError = Angle.normDelta(targetAngles[i] - currentAngles[i]);
 
-            // PID control for steering (currently just P)
-            steeringPowers[i] = MathFunctions.clamp(angleError * constants.steeringKp, -1, 1);
+            double derivative = angleError - lastAngleError[i];
+
+            double steeringPower =
+                    constants.steeringKp * angleError
+                            - constants.steeringKd * derivative;
+
+            // Small minimum power to overcome static friction
+            if (Math.abs(steeringPower) < constants.steeringMinPower &&
+                    Math.abs(angleError) > constants.steeringDeadband) {
+                steeringPower = Math.signum(steeringPower) * constants.steeringMinPower;
+            }
+
+            steeringPowers[i] = MathFunctions.clamp(steeringPower, -1, 1);
+
+            lastAngleError[i] = angleError;
+
         }
 
         // Apply voltage compensation if enabled
@@ -257,17 +291,31 @@ public class CoaxialSwerveDrive extends Drivetrain {
             throw new IllegalArgumentException("Drive powers array must have length 8 for coaxial swerve");
         }
 
+        double[] limitedPowers = new double[8];
+        for (int i = 0; i < 4; i++) {
+            // Drive motor slew rate limiting
+            if (constants.useDriveSlewRateLimiting) {
+                limitedPowers[i * 2] = driveRateLimiters[i].calculate(drivePowers[i * 2]);
+            } else {
+                limitedPowers[i * 2] = drivePowers[i * 2];
+            }
+
+            limitedPowers[i * 2 + 1] = drivePowers[i * 2 + 1];
+
+
+        }
         // Set drive motor powers
-        driveMotors[0].setPower(drivePowers[0]);
-        driveMotors[1].setPower(drivePowers[2]);
-        driveMotors[2].setPower(drivePowers[4]);
-        driveMotors[3].setPower(drivePowers[6]);
+        driveMotors[0].setPower(limitedPowers[0]);
+        driveMotors[1].setPower(limitedPowers[2]);
+        driveMotors[2].setPower(limitedPowers[4]);
+        driveMotors[3].setPower(limitedPowers[6]);
 
         // Set steering servo powers
-        steeringServos[0].setPower(drivePowers[1]);
-        steeringServos[1].setPower(drivePowers[3]);
-        steeringServos[2].setPower(drivePowers[5]);
-        steeringServos[3].setPower(drivePowers[7]);
+        steeringServos[0].setPower(limitedPowers[1]);
+        steeringServos[1].setPower(limitedPowers[3]);
+        steeringServos[2].setPower(limitedPowers[5]);
+        steeringServos[3].setPower(limitedPowers[7]);
+
     }
 
     @Override
@@ -287,6 +335,11 @@ public class CoaxialSwerveDrive extends Drivetrain {
         }
         for (CRServo servo : steeringServos) {
             servo.setPower(0);
+        }
+
+        // Reset slew rate limiters to zero
+        for (int i = 0; i < 4; i++) {
+            driveRateLimiters[i].reset(0);
         }
     }
 
@@ -349,7 +402,6 @@ public class CoaxialSwerveDrive extends Drivetrain {
         // Return nominal voltage if sensor unavailable
         return nominalVoltage;
     }
-
     @Override
     public String debugString() {
         StringBuilder sb = new StringBuilder();
@@ -364,3 +416,6 @@ public class CoaxialSwerveDrive extends Drivetrain {
         return sb.toString();
     }
 }
+
+
+

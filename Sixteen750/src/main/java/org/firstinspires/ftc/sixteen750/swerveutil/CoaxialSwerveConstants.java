@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.sixteen750.swerveutil;
-import com.bylazar.configurables.annotations.Configurable;
+
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.CRServo;
 
@@ -9,8 +9,9 @@ import com.qualcomm.robotcore.hardware.CRServo;
  * This class contains all the configuration parameters needed for the swerve drivetrain.
  * Modify these values to match your robot's physical configuration.
  */
-@Configurable
 public class CoaxialSwerveConstants {
+
+
 
     // ==================== HARDWARE NAMES ====================
     // Change these to match your robot's configuration file
@@ -38,21 +39,27 @@ public class CoaxialSwerveConstants {
     public double rearLeftEncoderOffset = 0.0;
     public double rearRightEncoderOffset = 0.0;
 
+    // encoder inverted status
+    public boolean isFrontLeftEncoderInverted = false;
+    public boolean isFrontRightEncoderInverted = false;
+    public boolean isRearLeftEncoderInverted = false;
+    public boolean isRearRightEncoderInverted = false;
+
     // ==================== MOTOR DIRECTIONS ====================
     // Set these based on how your motors are mounted
 
     public DcMotorSimple.Direction frontLeftDriveMotorDirection = DcMotorSimple.Direction.FORWARD;
     public DcMotorSimple.Direction frontRightDriveMotorDirection = DcMotorSimple.Direction.REVERSE;
-    public DcMotorSimple.Direction backLeftDriveMotorDirection = DcMotorSimple.Direction.FORWARD;
-    public DcMotorSimple.Direction backRightDriveMotorDirection = DcMotorSimple.Direction.REVERSE;
+    public DcMotorSimple.Direction rearLeftDriveMotorDirection = DcMotorSimple.Direction.FORWARD;
+    public DcMotorSimple.Direction rearRightDriveMotorDirection = DcMotorSimple.Direction.REVERSE;
 
     // ==================== SERVO DIRECTIONS ====================
     // Set these based on how your servos are mounted
 
     public CRServo.Direction frontLeftSteeringServoDirection = CRServo.Direction.FORWARD;
     public CRServo.Direction frontRightSteeringServoDirection = CRServo.Direction.FORWARD;
-    public CRServo.Direction backLeftSteeringServoDirection = CRServo.Direction.FORWARD;
-    public CRServo.Direction backRightSteeringServoDirection = CRServo.Direction.FORWARD;
+    public CRServo.Direction rearLeftSteeringServoDirection = CRServo.Direction.FORWARD;
+    public CRServo.Direction rearRightSteeringServoDirection = CRServo.Direction.FORWARD;
 
     // ==================== PHYSICAL DIMENSIONS ====================
     // All measurements should be in the same unit (inches or meters)
@@ -69,12 +76,6 @@ public class CoaxialSwerveConstants {
      */
     public double wheelBase = 12.0; // inches
 
-    /**
-     * Wheel diameter in inches
-     * Used for calculating distances and velocities
-     */
-    public double wheelDiameter = 4.0; // inches
-
     // ==================== STEERING CONTROL ====================
 
     /**
@@ -83,6 +84,7 @@ public class CoaxialSwerveConstants {
      * Start with a low value (0.5-1.0) and increase if steering is too slow
      */
     public double steeringKp = 1.5;
+    public double steeringKd = 0;
 
     /**
      * Maximum steering speed (radians per second)
@@ -90,38 +92,36 @@ public class CoaxialSwerveConstants {
      */
     public double steeringSpeed = Math.PI; // 180 degrees per second
 
-    // ==================== MOTOR SPECIFICATIONS ====================
+    // ==================== SLEW RATE LIMITING ====================
 
     /**
-     * Maximum RPM of your drive motors
-     * This is used for velocity calculations
-     * Common FTC motors:
-     * - HD Hex Motor: 6000 RPM
-     * - Core Hex Motor: 125 RPM
-     * - goBILDA 5202/5203: 435 RPM
-     * - goBILDA 5204: 312 RPM
+     * Enable slew rate limiting for drive motors
+     * Prevents sudden acceleration/deceleration
      */
-    public double motorMaxRPM = 435.0;
+    public boolean useDriveSlewRateLimiting = true;
 
     /**
-     * Gear ratio from motor to wheel
-     * If your motor drives the wheel directly, this is 1.0
-     * If you have a gear reduction, calculate: motor_teeth / wheel_teeth
-     * Example: 12 tooth motor gear to 60 tooth wheel gear = 12/60 = 0.2
+     * Maximum drive power change per second
+     * Example: 2.0 means power can change from 0 to 1.0 in 0.5 seconds
+     * Higher values = more responsive but jerkier
+     * Lower values = smoother but less responsive
      */
-    public double gearRatio = 1.0;
-
-    // ==================== ENCODER CONFIGURATION ====================
+    public double driveMaxAcceleration = 4.0; // 0 to 1.0 in 0.25 seconds
 
     /**
-     * Ticks per revolution for your drive motors
-     * Common FTC motor encoders:
-     * - HD Hex Motor: 28 ticks/rev
-     * - Core Hex Motor: 288 ticks/rev
-     * - goBILDA motors: 28 ticks/rev (at the motor)
+     * Enable slew rate limiting for steering servos
+     * Prevents sudden steering movements
      */
-    public double motorTicksPerRev = 28.0;
+    public boolean useSteeringSlewRateLimiting = true;
 
+    /**
+     * Maximum steering power change per second
+     * This smooths out steering servo movements
+     */
+    public double steeringMaxAcceleration = 8.0; // 0 to 1.0 in 0.125 seconds
+    public double steeringDeadband = Math.toRadians(2);
+
+    public double steeringMinPower = 0.05;
     /**
      * Constructor with default values
      * You can create instances with different configurations
@@ -168,11 +168,11 @@ public class CoaxialSwerveConstants {
     /**
      * Builder-style method to set encoder names
      */
-    public CoaxialSwerveConstants withEncoderNames(String fl, String fr, String bl, String br) {
+    public CoaxialSwerveConstants withEncoderNames(String fl, String fr, String rl, String rr) {
         this.frontLeftEncoderName = fl;
         this.frontRightEncoderName = fr;
-        this.rearLeftEncoderName = bl;
-        this.rearRightEncoderName = br;
+        this.rearLeftEncoderName = rl;
+        this.rearRightEncoderName = rr;
         return this;
     }
 
@@ -180,11 +180,18 @@ public class CoaxialSwerveConstants {
      * Builder-style method to set encoder offsets
      * Use this after calibrating your modules
      */
-    public CoaxialSwerveConstants withEncoderOffsets(double fl, double fr, double bl, double br) {
+    public CoaxialSwerveConstants withEncoderOffsets(double fl, double fr, double rl, double rr) {
         this.frontLeftEncoderOffset = fl;
         this.frontRightEncoderOffset = fr;
-        this.rearRightEncoderOffset = bl;
-        this.rearRightEncoderOffset = br;
+        this.rearLeftEncoderOffset = rl;
+        this.rearRightEncoderOffset = rr;
+        return this;
+    }
+    public CoaxialSwerveConstants withEncoderInvertation(boolean fl, boolean fr, boolean rl, boolean rr) {
+        this.isFrontLeftEncoderInverted = fl;
+        this.isFrontRightEncoderInverted = fr;
+        this.isRearLeftEncoderInverted = rl;
+        this.isRearRightEncoderInverted = rr;
         return this;
     }
 
@@ -194,16 +201,18 @@ public class CoaxialSwerveConstants {
     public CoaxialSwerveConstants withDimensions(double trackWidth, double wheelBase, double wheelDiameter) {
         this.trackWidth = trackWidth;
         this.wheelBase = wheelBase;
-        this.wheelDiameter = wheelDiameter;
         return this;
     }
 
     /**
      * Builder-style method to set steering parameters
      */
-    public CoaxialSwerveConstants withSteeringParams(double kp, double maxSpeed) {
+    public CoaxialSwerveConstants withSteeringParams(double kp, double kd, double maxSpeed, double db, double minPower) {
         this.steeringKp = kp;
+        this.steeringKd = kd;
         this.steeringSpeed = maxSpeed;
+        this.steeringDeadband = db;
+        this.steeringMinPower = minPower;
         return this;
     }
 }
