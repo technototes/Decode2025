@@ -52,12 +52,6 @@ public class CoaxialSwerveDrive extends Drivetrain {
     double lastUpdateTime = 0;
     double[] lastAngleError = new double[4];
 
-    /**
-     * Constructor for the Coaxial Swerve Drivetrain
-     *
-     * @param hardwareMap the FTC hardware map to get motors and servos
-     * @param constants the constants object containing configuration parameters
-     */
     public CoaxialSwerveDrive(HardwareMap hardwareMap, CoaxialSwerveConstants constants) {
         this.constants = constants;
         this.maxPowerScaling = 1.0;
@@ -143,8 +137,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
 
         // Set motor modes
         for (DcMotorEx motor : driveMotors) {
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -155,10 +148,12 @@ public class CoaxialSwerveDrive extends Drivetrain {
      * 1. What direction each module should point
      * 2. How fast each module should drive
      *
-     * @param correctivePower translational correction vector (for path following)
-     * @param headingPower rotational power for turning
-     * @param pathingPower forward movement vector along the path
-     * @param robotHeading current robot heading in radians
+     * @param correctivePower this Vector includes the centrifugal force scaling Vector as well as a
+     *  translational power Vector to correct onto the Bezier curve the Follower is following.
+     * @param headingPower this Vector points in the direction of the robot's current heading, and
+     *  the magnitude tells the robot how much it should turn and in which direction.
+     * @param pathingPower this Vector points in the direction the robot needs to go to continue along the Path.
+     * @param robotHeading this is the current heading of the robot, which is used to calculate how much power to allocate to each wheel.
      * @return array of 8 values: [drive0, steer0, drive1, steer1, drive2, steer2, drive3, steer3]
      */
     @Override
@@ -167,7 +162,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
         Vector desiredTranslation = correctivePower.plus(pathingPower);
 
         // Get the desired rotation (heading power magnitude determines rotation speed)
-        double desiredRotation = headingPower.getMagnitude() * Math.signum(headingPower.getXComponent());
+        double desiredRotation = headingPower.getXComponent();
 
         // Convert field-relative movement to robot-relative
         // This rotates the desired movement vector by the robot's current heading
@@ -368,7 +363,6 @@ public class CoaxialSwerveDrive extends Drivetrain {
                 DcMotor.ZeroPowerBehavior.BRAKE : DcMotor.ZeroPowerBehavior.FLOAT;
 
         for (DcMotorEx motor : driveMotors) {
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             motor.setZeroPowerBehavior(behavior);
         }
     }
