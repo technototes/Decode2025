@@ -4,12 +4,14 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
+import com.technototes.library.util.PIDFController;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.Setup.OtherSettings;
@@ -37,6 +39,9 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 public class PedroDriver implements Command, Loggable {
 
     public static double VISION_TURN_SCALE = 0.01;
+    public static PIDFCoefficients turnP = new PIDFCoefficients(0, 0, 0, 0);
+    private static PIDFController turnPID = null;
+    public static boolean needsTarget = false;
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -72,6 +77,10 @@ public class PedroDriver implements Command, Loggable {
         if (style == DrivingStyle.Hold) {
             holdPose = follower.getPose();
             follower.holdPoint(new BezierPoint(holdPose), holdPose.getHeading(), false);
+        }
+        if (style == DrivingStyle.Vision) {
+            turnPID = new PIDFController(turnP);
+            needsTarget = true;
         }
     }
 
@@ -288,13 +297,17 @@ public class PedroDriver implements Command, Loggable {
                     // --- Face AprilTag using Limelight ---
                     targetHeading =
                         curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
+                    if (needsTarget) {
+                        needsTarget = false;
+                        turnPID.setTarget(targetHeading);
+                    }
+                    return turnPID.update(curHeading);
                     // return VISION_TURN_SCALE * LimelightSubsystem.Xangle;
                     //lowkey forgot what kevin said but i think it just sets the target heading to
                     //where the limelight is so that vision can make the bot turn that way
                 } else {
                     return rotation;
                 }
-                break;
             case Free:
             case Straight:
             default:
