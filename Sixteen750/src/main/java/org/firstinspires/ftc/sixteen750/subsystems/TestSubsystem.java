@@ -15,12 +15,12 @@ import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 @Configurable
 public class TestSubsystem implements Loggable {
 
-    @Log.Number(name = "Motor Power")
+    //@Log.Number(name = "Motor Power")
     public static double MOTOR_POWER = 0.65; // 0.5 1.0
 
     public static double TARGET_LAUNCH_VELOCITY = 6000;
 
-    @Log.Number(name = "Motor Velocity")
+    //@Log.Number(name = "Motor Velocity")
     public static double CURRENT_LAUNCH_VELOCITY = 0.0;
 
     public static double TESTMOTOR_VELOCITY = 0.25; // 0.5 1.0

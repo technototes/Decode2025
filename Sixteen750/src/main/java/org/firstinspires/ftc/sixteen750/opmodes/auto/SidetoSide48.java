@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.sixteen750.opmodes.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
 @Autonomous(name = "SidetoSide48", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
+@Disabled
 public class SidetoSide48 extends CommandOpMode {
 
     public Robot robot;

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.sixteen750.opmodes.auto;
 
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
@@ -30,28 +32,31 @@ public class TurnToTest extends CommandOpMode {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
         Paths p = new Paths(robot.follower);
-        robot.follower.setStartingPose(p.getRSegmentedCurveStart());
+        robot.follower.setStartingPose(p.getBSegmentedCurveStart());
         CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                new PedroPathCommand(robot.follower, p.RStarttoLaunch),
+                new PedroPathCommand(robot.follower, p.StartToTestPose),
                 new WaitCommand(2),
                 new AltAutoOrient(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake1),
-                new PedroPathCommand(robot.follower, p.RIntake1toIntake1end),
-                new PedroPathCommand(robot.follower, p.RIntake1endtoLaunch),
                 new WaitCommand(2),
-                new AltAutoOrient(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
-                new PedroPathCommand(robot.follower, p.RIntake2toIntake2end),
-                new PedroPathCommand(robot.follower, p.RIntake2endtoLaunch),
-                new WaitCommand(2),
-                new AltAutoOrient(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),
-                new PedroPathCommand(robot.follower, p.RIntake3toIntake3end),
-                new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch),
-                new WaitCommand(2),
-                new AltAutoOrient(robot),
+                //                new PedroPathCommand(robot.follower, p.RLaunchtoIntake1),
+                //                new PedroPathCommand(robot.follower, p.RIntake1toIntake1end),
+                //                new PedroPathCommand(robot.follower, p.RIntake1endtoLaunch),
+                //                new WaitCommand(2),
+                //                new AltAutoOrient(robot),
+                //                new WaitCommand(2),
+                //                new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
+                //                new PedroPathCommand(robot.follower, p.RIntake2toIntake2end),
+                //                new PedroPathCommand(robot.follower, p.RIntake2endtoLaunch),
+                //                new WaitCommand(2),
+                //                new AltAutoOrient(robot),
+                //                new WaitCommand(2),
+                //                new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),
+                //                new PedroPathCommand(robot.follower, p.RIntake3toIntake3end),
+                //                new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch),
+                //                new WaitCommand(2),
+                //                new AltAutoOrient(robot),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN

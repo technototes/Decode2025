@@ -33,10 +33,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double motorVelocity;
 
-    @Log(name = "Launcher Power: ")
+    //@Log(name = "Launcher Power: ")
     public static double power;
 
-    @Log(name = "Error")
+    //@Log(name = "Error")
     public static double err;
 
     @Log(name = "Target Speed: ")
@@ -57,6 +57,9 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public PIDFCoefficients launcherPIDF = new PIDFCoefficients(0, 0.0, 0.0, 0);
     public PIDFController launcherPIDFController;
     public static double FEEDFORWARD_COEFFICIENT = 0.0;
+
+    public static double MINIMUM_VELOCITY = 1140;
+    public static double RPM_PER_FOOT = 62.3;
 
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
@@ -236,7 +239,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public double autoVelocity() {
         // x = distance in feet
-        return (61.538 * ls.getDistance()) / 12 + 1122.307;
+        return (RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY;
     }
 
     @Override

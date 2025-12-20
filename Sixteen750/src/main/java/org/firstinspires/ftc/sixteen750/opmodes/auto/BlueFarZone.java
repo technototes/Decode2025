@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.sixteen750.opmodes.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
 @Autonomous(name = "BlueFarZone", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
+@Disabled
 public class BlueFarZone extends CommandOpMode {
 
     public Robot robot;

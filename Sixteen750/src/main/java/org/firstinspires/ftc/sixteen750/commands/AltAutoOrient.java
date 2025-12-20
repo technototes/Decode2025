@@ -49,7 +49,7 @@ public class AltAutoOrient implements Command {
         wantedPose = new Pose(
             robot.follower.getPose().getX(),
             robot.follower.getPose().getY(),
-            robot.follower.getPose().getHeading() + Math.toRadians(robot.limelightSubsystem.getTX())
+            robot.follower.getPose().getHeading() - Math.toRadians(robot.limelightSubsystem.getTX()) //.getTX .getLimelightRotation()
         );
         robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
         robot.follower.update();

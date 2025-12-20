@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.sixteen750.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.LogConfig;
@@ -28,16 +29,20 @@ public class AimingSubsystem implements Loggable, Subsystem {
     @Log.Number(name = "hoodPos")
     public double hoodPos;
 
+    LimelightSubsystem ls;
+
     boolean hasHardware;
     Servo hood;
     Servo lever;
 
-    public AimingSubsystem(Hardware h) {
+    public AimingSubsystem(Hardware h, LimelightSubsystem lls) {
         hasHardware = Setup.Connected.AIMINGSUBSYSTEM;
         // Do stuff in here
         if (hasHardware) {
             hood = h.hood;
             lever = h.lever;
+            this.ls = lls;
+            CommandScheduler.register(this);
         } else {
             hood = null;
             lever = h.lever;
@@ -85,5 +90,18 @@ public class AimingSubsystem implements Loggable, Subsystem {
 
     public void GoBall() {
         setLeverPos(LEVER_POS_GO);
+    }
+
+    public void DistanceHoodPos() {
+        if (ls.getDistance() > -1 && ls.getDistance() < 35) {
+            setHoodPos(HOOD_POS_DOWN);
+        } else {
+            setHoodPos(HOOD_POS_UP);
+        }
+    }
+
+    @Override
+    public void periodic() {
+        DistanceHoodPos();
     }
 }

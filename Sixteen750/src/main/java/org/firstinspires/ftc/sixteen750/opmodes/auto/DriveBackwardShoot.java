@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.sixteen750.opmodes.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.ParallelCommandGroup;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
 @Autonomous(name = "DriveBackwardShoot", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
+@Disabled
 public class DriveBackwardShoot extends CommandOpMode {
 
     public Robot robot;

@@ -127,7 +127,7 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-        launchButton.whenPressed(TeleCommands.Launch(robot));
+        launchButton.whilePressed(TeleCommands.Launch(robot));
         launchButton.whenReleased(TeleCommands.StopLaunch(robot));
         CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
         FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));

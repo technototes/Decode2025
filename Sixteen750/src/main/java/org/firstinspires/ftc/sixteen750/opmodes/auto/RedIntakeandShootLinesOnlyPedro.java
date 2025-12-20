@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.sixteen750.opmodes.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
 @Autonomous(name = "RedIntakeandShootLinesOnlyPedro", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
+@Disabled
 public class RedIntakeandShootLinesOnlyPedro extends CommandOpMode {
 
     public Robot robot;

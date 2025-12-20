@@ -87,6 +87,7 @@ public class Paths {
     public static Pose gateIntake = new Pose(6, 41);
     public static Pose gateIntakeControlPoint = new Pose(15, 35);
     public static Pose farPark = new Pose(21.25, 12.735);
+    public static Pose testPose = new Pose(72, 72, 145);
 
     public static double launchHeading0 = 120;
     public static double launchHeading1 = 145;
@@ -198,7 +199,7 @@ public class Paths {
     public PathChain RIntake1toIntake1endH;
     public PathChain RIntake1endtoLeverH;
     public PathChain RLevertoLaunchH;
-
+    public PathChain StartToTestPose;
     public PathChain RStarttoLaunch;
     public PathChain RLaunchtoIntake1;
     public PathChain RIntake1toIntake1end;
@@ -782,6 +783,12 @@ public class Paths {
                 Math.toRadians(RtunnelIntakeHeading),
                 Math.toRadians(RfarlaunchHeading4)
             )
+            .build();
+        StartToTestPose = follower
+            .pathBuilder()
+            .addPath(new BezierLine(Start, testPose))
+            .setVelocityConstraint(0.3)
+            .setConstantHeadingInterpolation(Math.toRadians(testPose.getHeading()))
             .build();
     }
 

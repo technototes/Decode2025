@@ -47,14 +47,14 @@ public class Robot implements Loggable {
         if (Setup.Connected.BRAKESUBSYSTEM) {
             this.brakeSubsystem = new BrakeSubsystem(hw);
         }
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
+            this.limelightSubsystem = new LimelightSubsystem(hw);
+        }
         if (Setup.Connected.AIMINGSUBSYSTEM) {
-            this.aimingSubsystem = new AimingSubsystem(hw);
+            this.aimingSubsystem = new AimingSubsystem(hw, limelightSubsystem);
         }
         if (Setup.Connected.TESTSUBSYSTEM) {
             this.testSubsystem = new TestSubsystem(hw);
-        }
-        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
-            this.limelightSubsystem = new LimelightSubsystem(hw);
         }
         if (Setup.Connected.DRIVEBASE) {
             follower = AutoConstants.createFollower(hw.map);
