@@ -13,7 +13,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { describe, expect, test } from 'bun:test';
+import { beforeEach, describe, expect, test } from 'bun:test';
 import { Provider, useAtom } from 'jotai';
 import { ReactElement } from 'react';
 import { AnonymousBezier, PathChainFile, TeamPaths } from '../../server/types';
@@ -155,6 +155,12 @@ function JotaiProvider({
     </Provider>
   );
 }
+
+beforeEach(async () => {
+  // Execute the localStorage clear function within the test environment
+  // This approach is common when using test runners that control a browser context
+  await window.localStorage.clear();
+});
 
 describe('Simplest UI validation', () => {
   test('Themes & colors', async () => {
