@@ -62,6 +62,7 @@ public class Paths {
     public static Pose Intake1ControlPoint = new Pose(61.273, 89.143);
     public static Pose Intake1end = new Pose(19, 85);
     public static Pose Lever = new Pose(16, 77);
+    public static Pose LeverControlPoint = new Pose(35, 73);
     public static Pose Intake2 = new Pose(44, 63);
     public static Pose Intake2ControlPoint = new Pose(72, 61);
     public static Pose Intake2ControlPoint2 = new Pose(46, 64);
@@ -394,7 +395,7 @@ public class Paths {
             .build();
         Intake1endtoLever = follower
             .pathBuilder()
-            .addPath(new BezierLine(new Pose(20.000, 85.000), new Pose(12.250, 75.500)))
+            .addPath(new BezierCurve(Intake1end, LeverControlPoint, Lever))
             .setConstantHeadingInterpolation(Math.toRadians(90))
             //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
             .build();
@@ -612,7 +613,10 @@ public class Paths {
         RLaunchtoEnd = follower
             .pathBuilder()
             .addPath(new BezierLine(RLaunch, REnd))
-            .setLinearHeadingInterpolation(Math.toRadians(RlaunchHeading4), Math.toRadians(90))
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RlaunchHeading4),
+                Math.toRadians(RintakeHeading)
+            )
             .build();
 
         Forward48 = follower
