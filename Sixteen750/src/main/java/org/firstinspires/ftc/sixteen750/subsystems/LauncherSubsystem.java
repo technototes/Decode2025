@@ -235,9 +235,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     }
 
     public double autoVelocity() {
-        double auto_velocity = (61.538) * (ls.getDistance()) + (1122.307);
         // x = distance in feet
-        return auto_velocity;
+        return (61.538 * ls.getDistance()) / 12 + 1122.307;
     }
 
     @Override

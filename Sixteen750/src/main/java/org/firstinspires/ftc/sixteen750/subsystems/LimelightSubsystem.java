@@ -40,7 +40,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
 
     public boolean startup_done;
 
-    public static double SIGN = -1.0;
+    public static double SIGN = 1.0;
     public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 17.2;
     public static double CAMERA_TO_CENTER_OF_ROBOT = 7.2;
     public static double EXTRA_OFFSET = -3;
@@ -67,12 +67,16 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     public boolean getLatestResult() {
         result = limelight.getLatestResult();
         if (result != null) {
+            recentItem = filterItem(result);
+            if (recentItem == null) {
+                return false;
+            }
             //&& result.isValid()
             // Not sure this is the right angle, because the camera is mounted sideways
             // IIRC, you should be using getTy() instead.
-            Xangle = -result.getTy();
-            Yangle = result.getTx() + LIMELIGHT_ANGLE;
-            Area = result.getTa();
+            Xangle = recentItem.getTargetYDegrees();
+            Yangle = -recentItem.getTargetXDegrees() + LIMELIGHT_ANGLE;
+            Area = recentItem.getTargetArea();
             return true;
             //            getLatestResult returns the x-angle, the y-angle,
             //             and the area of the apriltag on the camera
@@ -89,7 +93,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
 
     public double getLimelightRotation() {
         if (getLatestResult()) {
-            return SIGN * Yangle;
+            return SIGN * Xangle;
         } else {
             return 0;
         }
@@ -113,27 +117,34 @@ public class LimelightSubsystem implements Loggable, Subsystem {
         startup_done = false;
     }
 
-    public double getDistance() {
-        LLResult result = limelight.getLatestResult();
-        if (result != null) {
-            List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                if (fr.getFiducialId() == 21) {
-                    return -1;
-                } else if (fr.getFiducialId() == 22) {
-                    return -1;
-                } else if (fr.getFiducialId() == 23) {
-                    return -1;
-                }
-            }
-        }
-        distance =
-            (DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY /
-                Math.tan(Math.toRadians(Yangle) + Math.toRadians(LIMELIGHT_ANGLE))) +
-            CAMERA_TO_CENTER_OF_ROBOT +
-            EXTRA_OFFSET;
-        return distance;
+    LLResultTypes.FiducialResult recentItem = null;
 
+    // We want to ignore the tags on the obelisk
+    public LLResultTypes.FiducialResult filterItem(LLResult result) {
+        List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+        for (LLResultTypes.FiducialResult fr : fiducialResults) {
+            if (fr.getFiducialId() == 21) {
+                continue;
+            } else if (fr.getFiducialId() == 22) {
+                continue;
+            } else if (fr.getFiducialId() == 23) {
+                continue;
+            }
+            return fr;
+        }
+        return null;
+    }
+
+    public double getDistance() {
+        if (getLatestResult()) {
+            distance =
+                (DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY /
+                    Math.tan(Math.toRadians(Yangle))) +
+                CAMERA_TO_CENTER_OF_ROBOT +
+                EXTRA_OFFSET;
+            return distance;
+        }
+        return -1;
         // measurements:
         // center of camera lens to floor - 12.3 inches
         // camera to center of robot(front-back) - 7.2 inches

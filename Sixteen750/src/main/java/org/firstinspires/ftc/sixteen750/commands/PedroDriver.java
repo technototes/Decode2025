@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.sixteen750.commands;
 
-import static org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem.limelight;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Log;
@@ -39,6 +35,8 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
  */
 @Configurable
 public class PedroDriver implements Command, Loggable {
+
+    public static double VISION_TURN_SCALE = 0.01;
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -94,7 +92,7 @@ public class PedroDriver implements Command, Loggable {
     }
 
     public void EnableVisionDriving() {
-        switchDriveStyle(DrivingStyle.Vision_NYI);
+        switchDriveStyle(DrivingStyle.Vision);
     }
 
     public void EnableFreeDriving() {
@@ -165,8 +163,7 @@ public class PedroDriver implements Command, Loggable {
         Right, // Bot will hold a right angle while driving
         Square, // Both Straight & Right driving styles
         Hold, // Stay right where you are (just use Pedro)
-        // NOT YET IMPLEMENTED
-        Vision_NYI, // Bot will use Vision to find the target and aim toward it
+        Vision, // Bot will use Vision to find the target and aim toward it
         None,
     }
 
@@ -286,18 +283,18 @@ public class PedroDriver implements Command, Loggable {
                 // Angle-focused driving styles override target-based driving mode
                 targetHeading = MathUtils.snapToNearestRadiansMultiple(curHeading, Math.PI / 2);
                 break;
-            case Vision_NYI:
+            case Vision:
                 if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
                     // --- Face AprilTag using Limelight ---
                     targetHeading =
                         curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
-                    return Math.toRadians(LimelightSubsystem.Xangle);
+                    // return VISION_TURN_SCALE * LimelightSubsystem.Xangle;
                     //lowkey forgot what kevin said but i think it just sets the target heading to
                     //where the limelight is so that vision can make the bot turn that way
                 } else {
                     return rotation;
                 }
-            //break;
+                break;
             case Free:
             case Straight:
             default:
@@ -361,7 +358,7 @@ public class PedroDriver implements Command, Loggable {
             case Hold:
                 drvMode = "!Hold!";
                 break;
-            case Vision_NYI:
+            case Vision:
                 drvMode = "Vision[NYI]";
                 break;
             default:

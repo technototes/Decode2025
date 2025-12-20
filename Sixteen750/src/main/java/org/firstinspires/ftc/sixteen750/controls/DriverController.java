@@ -45,7 +45,6 @@ public class DriverController {
     public CommandAxis intakeTrigger;
     public CommandAxis autoAim;
     public CommandAxis spitTrigger;
-    public CommandAxis AutoOrient;
     public PedroDriver pedroDriver;
 
     public static double triggerThreshold = 0.1;
@@ -89,7 +88,6 @@ public class DriverController {
         brakeButton = gamepad.ps_triangle;
         hoodButton = gamepad.dpadUp;
         hooddownButton = gamepad.dpadDown;
-        AutoOrient = gamepad.leftTrigger;
         //MotorDecrease = gamepad.dpadDown;
         //MotorIncrease = gamepad.dpadUp;
         FarShoot = gamepad.dpadLeft;
