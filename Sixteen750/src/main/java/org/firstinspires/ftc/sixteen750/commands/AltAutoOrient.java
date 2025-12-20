@@ -17,6 +17,7 @@ public class AltAutoOrient implements Command {
     public Robot robot;
 
     public Pose wantedPose;
+    public boolean firsttime = true;
 
     public AltAutoOrient(Robot r) {
         robot = r;
@@ -24,7 +25,8 @@ public class AltAutoOrient implements Command {
 
     @Override
     public boolean isFinished() {
-        return !robot.follower.isBusy();
+        //return !robot.follower.isBusy();
+        return false;
         // I *believe* that a properly tuned robot shouldn't need all this stuff
         /*
         if (
@@ -46,14 +48,18 @@ public class AltAutoOrient implements Command {
 
     @Override
     public void execute() {
-        wantedPose = new Pose(
-            robot.follower.getPose().getX(),
-            robot.follower.getPose().getY(),
-            robot.follower.getPose().getHeading() - Math.toRadians(robot.limelightSubsystem.getTX()) //.getTX .getLimelightRotation()
-        );
-        robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
-        robot.follower.update();
-        LauncherSubsystem.targetPower = 1;
+        if (firsttime) {
+            robot.follower.update();
+            wantedPose = new Pose(
+                robot.follower.getPose().getX(),
+                robot.follower.getPose().getY(),
+                robot.follower.getPose().getHeading() -
+                    Math.toRadians(robot.limelightSubsystem.getTX()) //.getTX .getLimelightRotation()
+            );
+            robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
+            LauncherSubsystem.targetPower = 1;
+            firsttime = false;
+        }
     }
 
     //    @Override
