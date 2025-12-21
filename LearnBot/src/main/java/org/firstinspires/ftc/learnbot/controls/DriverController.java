@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.learnbot.controls;
 
 import com.technototes.library.command.CycleCommandGroup;
-import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
@@ -9,9 +8,7 @@ import com.technototes.library.logger.Loggable;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup.Connected;
-import org.firstinspires.ftc.learnbot.Setup.OtherSettings;
 import org.firstinspires.ftc.learnbot.commands.JoystickDrive;
-import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
 
 public class DriverController implements Loggable {
 
@@ -29,7 +26,9 @@ public class DriverController implements Loggable {
     public CommandButton rotateModeButton;
     public CommandButton driveModeButton;
     public CommandButton holdPosButton;
+    public CommandButton snapRotButton;
     public JoystickDrive stickDriver;
+    public CycleCommandGroup rotationCommand;
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
@@ -55,6 +54,7 @@ public class DriverController implements Loggable {
         normalButton = gamepad.dpadRight;
         snailButton = gamepad.dpadDown;
         holdPosButton = gamepad.dpadLeft;
+        snapRotButton = gamepad.ps_triangle;
 
         visionButton = gamepad.ps_circle;
     }
@@ -73,25 +73,28 @@ public class DriverController implements Loggable {
             );
         }
 
-        rotateModeButton.whenPressed(
-            new CycleCommandGroup(
-                robot.drivebase::SetSnapRotation,
-                robot.drivebase::SetHoldRotation,
-                robot.drivebase::SetTangentRotation,
-                robot.drivebase::SetVisionRotation,
-                //robot.drivebase::SetTargetBasedRotation,
-                robot.drivebase::SetFreeRotation
-            )
+        rotationCommand = new CycleCommandGroup(
+            robot.drivebase::SetHoldRotation,
+            robot.drivebase::SetTangentRotation,
+            robot.drivebase::SetBidirectionalRotation,
+            robot.drivebase::SetVisionRotation,
+            // robot.drivebase::SetTargetBasedRotation,
+            robot.drivebase::SetFreeRotation
         );
+
+        rotateModeButton.whenPressed(rotationCommand);
         driveModeButton.whenPressed(
             new CycleCommandGroup(
                 robot.drivebase::SetSquareMotion,
-                //robot.drivebase::SetTargetBasedMotion,
+                // robot.drivebase::SetTargetBasedMotion,
                 robot.drivebase::SetFreeMotion
             )
         );
         holdPosButton.whenPressedReleased(robot.drivebase::StayPut, robot.drivebase::ResumeDriving);
-
+        snapRotButton.whenPressedReleased(robot.drivebase::SetSnapRotation, () -> {
+            robot.drivebase.SetFreeRotation();
+            rotationCommand.reset();
+        });
         resetGyroButton.whenPressed(robot.drivebase::ResetGyro);
         // This is a nifty feature students built last year: We can *cycle* through commands!
         botFieldToggleButton.whenReleased(

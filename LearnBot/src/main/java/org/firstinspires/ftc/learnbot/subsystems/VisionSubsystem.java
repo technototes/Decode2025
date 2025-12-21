@@ -2,8 +2,10 @@ package org.firstinspires.ftc.learnbot.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -11,17 +13,21 @@ import com.technototes.library.subsystem.Subsystem;
 @Configurable
 public class VisionSubsystem implements Subsystem, Loggable {
 
-    public static enum CameraOrientation {
+    public enum CameraOrientation {
         USB_BOT_LEFT, // This is 'normal'
         USB_UP,
         USB_BOT_RIGHT, // This is upside down
         USB_DOWN,
     }
 
+    public enum Pipeline {
+        GREEN_COLOR,
+        APRIL_TAG,
+        PURPLE_COLOR,
+        UNKNOWN,
+    }
+
     public static CameraOrientation Camera_Orientation = CameraOrientation.USB_UP;
-    public static int Green_Color_Pipeline = 0;
-    public static int AprilTag_Pipeline = 1;
-    public static int Purple_Color_Pipeline = 2;
     public static double Camera_Tilt_Degrees = 14.0;
 
     @Log(name = "Viz")
@@ -40,47 +46,82 @@ public class VisionSubsystem implements Subsystem, Loggable {
         public double y;
         public double a;
 
-        public TargetInfo(LLResult result) {
-            this.a = result.getTa();
+        private void setXY(double obsX, double obsY) {
             // Translate based on Camera Orientation
             switch (VisionSubsystem.Camera_Orientation) {
                 case USB_BOT_LEFT:
-                    this.x = result.getTx();
-                    this.y = result.getTy() - Camera_Tilt_Degrees;
+                    this.x = obsX;
+                    this.y = obsY - Camera_Tilt_Degrees;
                     break;
                 case USB_UP:
-                    this.x = -result.getTy();
-                    this.y = result.getTx() - Camera_Tilt_Degrees;
+                    this.x = -obsY;
+                    this.y = obsX - Camera_Tilt_Degrees;
                     break;
                 case USB_BOT_RIGHT:
-                    this.x = -result.getTx();
-                    this.y = -result.getTy() + Camera_Tilt_Degrees;
+                    this.x = -obsX;
+                    this.y = -obsY + Camera_Tilt_Degrees;
                     break;
                 case USB_DOWN:
-                    this.x = result.getTy();
-                    this.y = -result.getTx() + Camera_Tilt_Degrees;
+                    this.x = obsY;
+                    this.y = -obsX + Camera_Tilt_Degrees;
                     break;
             }
+        }
+
+        public TargetInfo(LLResultTypes.FiducialResult fr) {
+            this.a = fr.getTargetArea();
+            setXY(fr.getTargetXDegrees(), fr.getTargetYDegrees());
+        }
+
+        public TargetInfo(LLResult result) {
+            this.a = result.getTa();
+            setXY(result.getTx(), result.getTy());
         }
     }
 
     public VisionSubsystem(Limelight3A ll) {
         limelight = ll;
         limelight.start();
+        // I just start it with the AprilTag pipeline, I guess...
+        setPipeline(Pipeline.APRIL_TAG);
         result = null;
+        CommandScheduler.register(this);
     }
 
-    public void setPipeline(int targetPipeline) {
-        limelight.pipelineSwitch(targetPipeline);
+    public void setPipeline(Pipeline targetPipeline) {
+        limelight.pipelineSwitch(targetPipeline.ordinal());
     }
 
-    public int getCurrentPipeline() {
-        return limelight.getLatestResult().getPipelineIndex();
+    public Pipeline getCurrentPipeline() {
+        switch (limelight.getLatestResult().getPipelineIndex()) {
+            case 0:
+                return Pipeline.GREEN_COLOR;
+            case 1:
+                return Pipeline.APRIL_TAG;
+            case 2:
+                return Pipeline.PURPLE_COLOR;
+            default:
+                return Pipeline.UNKNOWN;
+        }
     }
 
     public TargetInfo getCurResult() {
+        rotatedResult = null;
+        if (limelight == null) {
+            return null;
+        }
+        // TODO: Filter to a specific target (using getFiducialResults, IIRC)
         result = limelight.getLatestResult();
-        rotatedResult = (result == null || !result.isValid()) ? null : new TargetInfo(result);
+        if (result == null || !result.isValid()) {
+            return null;
+        }
+        for (LLResultTypes.FiducialResult f : result.getFiducialResults()) {
+            if (f.getFiducialId() == 20) {
+                rotatedResult = new TargetInfo(f);
+                break;
+            }
+            // Testing: We're ignoring target 24, and only look for target 20 (blue, not red)
+        }
         return rotatedResult;
     }
 

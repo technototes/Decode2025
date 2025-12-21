@@ -1,14 +1,17 @@
 package org.firstinspires.ftc.learnbot.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
+import com.technototes.library.util.PIDFController;
 import org.firstinspires.ftc.learnbot.DrivingConstants;
 import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
 
@@ -30,7 +33,11 @@ import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
                    [Audience]
  */
 
+@Configurable
 public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
+
+    private static final double HalfPi = Math.PI * 0.5;
+    private static final double TwoPi = Math.PI * 2;
 
     // Encapsulated to allow easy "previous driving style" tracking
     private static class DrivingStyle {
@@ -62,8 +69,9 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     public enum RotationMode {
         Free,
         Snap,
-        Hold_NYI, // Hold the current heading
-        Tangential, // Aim toward the translational direction (NOT WORKING)
+        Hold, // Hold the current heading
+        Tangential, // Aim toward the translational direction
+        Bidirectional, // Like tangential, but will turn to the closest tangential direction
         Vision, // Use Vision to find the target & aim toward it
         Target_NYI, // The controller is used to specify a desired heading
         None,
@@ -92,6 +100,23 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     // The direction of the 3 axes for manual control: Should be updated by a joystick command
     public double strafe, forward, rotation;
 
+    // These numbers seem a little weird, but the target value is *radians* and the output is
+    // 'stick distance'.
+    public static PIDFCoefficients pidf = new PIDFCoefficients(0.9, 0.3, 0.05, 0);
+    // This is the limit above which we don't consider "error" for the turning PID controller.
+    // 4.5 degree 'range' for the error to start accumulating
+    public static double WIND_UP_LIMIT = HalfPi * 0.05;
+
+    // These are here to let me change the PIDF on they fly, rather than forcing me to constantly
+    // restart the opmode.
+    private double P = 0;
+    private double I = 0;
+    private double D = 0;
+    private double F = 0;
+
+    private PIDFController turningPIDF = new PIDFController(pidf);
+    private boolean turnPidStarted = false;
+
     // TODO: Make this do something PIDF related, because if you don't, this is *super* jiggly...
     public double rotationTransform(double r) {
         if (driveStyle.rotation == RotationMode.Vision) {
@@ -103,6 +128,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     // The offset heading for field-relative controls
     double headingOffsetRadians;
     double targetHeading;
+    double curHeading;
     // used to keep the directions straight
     Alliance alliance;
 
@@ -157,7 +183,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         targetHeading = 0;
         driveStyle = new DrivingStyle();
         // You need the final point there for "wrap-around" to work properly
-        snapRadians = new double[] { -Math.PI, -Math.PI / 2, 0, Math.PI / 2, Math.PI };
+        snapRadians = new double[] { -Math.PI, -HalfPi, 0, HalfPi, Math.PI };
         SetFieldCentricMode();
         SetFreeDriving();
         SetNormalSpeed();
@@ -222,10 +248,11 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             // If we've switched *to* holding a pose, start the follower
             holdPose = follower.getPose();
             follower.holdPoint(new BezierPoint(holdPose), holdPose.getHeading(), false);
-        } else if (pr != RotationMode.Hold_NYI && driveStyle.rotation == RotationMode.Hold_NYI) {
+        } else if (pr != RotationMode.Hold && driveStyle.rotation == RotationMode.Hold) {
             // If we're transitioning to a Rotational hold, just set the pos in the holdPose
             holdPose = follower.getPose();
         }
+        turnPidStarted = false;
     }
 
     public void SetFreeDriving() {
@@ -239,7 +266,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     // The list of rotation points (in degrees) you want to snap to
     public void SetSnapRotation(double... degrees) {
         snapRadians = new double[degrees.length + 1];
-        double lowest = Math.PI * 2;
+        double lowest = TwoPi;
         for (int i = 0; i < degrees.length; i++) {
             snapRadians[i] = MathUtils.posNegRadians(Math.toRadians(degrees[i]));
             if (snapRadians[i] < lowest) {
@@ -249,7 +276,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         // For wrap-around to work properly, we'll add the first location, but past the wrap-around
         // point of the circle. So, if you want to snap to 15 and -170, we'll append 190 so that 175
         // will wind up going to 190 (which then normalizes back to -170). Neat, huh?
-        snapRadians[degrees.length] = lowest + Math.PI * 2;
+        snapRadians[degrees.length] = lowest + TwoPi;
         switchDrivingMode(getTranslationMode(), RotationMode.Snap);
     }
 
@@ -261,16 +288,20 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         switchDrivingMode(getTranslationMode(), RotationMode.Tangential);
     }
 
+    public void SetBidirectionalRotation() {
+        switchDrivingMode(getTranslationMode(), RotationMode.Bidirectional);
+    }
+
     public void SetVisionRotation() {
         switchDrivingMode(getTranslationMode(), RotationMode.Vision);
     }
 
     public void SetHoldRotation() {
-        switchDrivingMode(getTranslationMode(), RotationMode.Hold_NYI);
+        switchDrivingMode(getTranslationMode(), RotationMode.Hold);
     }
 
     public void HoldCurrentPosition() {
-        switchDrivingMode(TranslationMode.Hold, RotationMode.Hold_NYI);
+        switchDrivingMode(TranslationMode.Hold, RotationMode.Hold);
     }
 
     public void SetFreeMotion() {
@@ -334,6 +365,14 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
     @Override
     public void periodic() {
+        if (pidf.p != P || pidf.i != I || pidf.d != D || pidf.f != F) {
+            // Someone changed the PIDF on the panels: Updated it in realtime...
+            turningPIDF = new PIDFController(pidf);
+            P = pidf.p;
+            I = pidf.i;
+            D = pidf.d;
+            F = pidf.f;
+        }
         // If subsystem is busy it is running a path, just ignore the stick.
         ShowDriveInfo();
         if (follower == null) {
@@ -379,9 +418,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     double getRotation() {
         // Negative, because pushing left is negative, but that is a positive change in Pedro's
         // coordinate system.
-        double curHeading = MathUtils.posNegRadians(
-            follower.getHeading() - getHeadingOffsetRadians()
-        );
+        curHeading = MathUtils.posNegRadians(follower.getHeading() - getHeadingOffsetRadians());
         switch (driveStyle.rotation) {
             case Target_NYI:
             // The controller is used to specify a desired heading: NYI
@@ -397,11 +434,11 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
                 // Angle-focused driving styles override target-based driving mode
                 targetHeading = MathUtils.closestTo(curHeading, snapRadians);
                 break;
-            case Hold_NYI:
+            case Hold:
                 // Hold the current heading
                 if (driveStyle.translation != TranslationMode.Hold && holdPose != null) {
                     targetHeading = MathUtils.posNegRadians(
-                        MathUtils.posNegRadians(holdPose.getHeading()) - getHeadingOffsetRadians()
+                        holdPose.getHeading() - getHeadingOffsetRadians()
                     );
                 } else {
                     // This is weird: We have a rotational hold, but not a translational hold, and
@@ -409,13 +446,27 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
                     targetHeading = 0;
                 }
                 break;
-            case Tangential: // Aim toward the translational direction (NOT WORKING)
+            case Tangential: // Aim toward the translational direction
                 // Tangential is an angle-focused driving style, but the heading
                 // is strictly in the direction of the stick. Logically, this is an attempt to
                 // eliminate "actual" strafing: The robot should be oriented to drive forward in the
                 // direction of the stick
                 if (Math.abs(strafe) > 0 || Math.abs(forward) > 0) {
                     targetHeading = MathUtils.posNegRadians(Math.atan2(strafe, forward));
+                } else {
+                    return 0;
+                }
+                break;
+            case Bidirectional: // Align the bot to the translational direction
+                // Bidirectional is an angle-focused driving style, but the heading is strictly in
+                // the direction of the stick, but with a twist: If you flip the direction you're
+                // driving, the bot will drive in reverse, rather than fully rotate.
+                if (Math.abs(strafe) > 0 || Math.abs(forward) > 0) {
+                    targetHeading = MathUtils.posNegRadians(Math.atan2(strafe, forward));
+                    // targetHeading should be within 90 degrees of curHeading, if it's not, flip it
+                    if (Math.abs(MathUtils.posNegRadians(targetHeading - curHeading)) > HalfPi) {
+                        targetHeading = MathUtils.posNegRadians(targetHeading + Math.PI);
+                    }
                 } else {
                     return 0;
                 }
@@ -435,10 +486,25 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             default:
                 return 0;
         }
-        // TODO: Use the Pedro heading PIDF to get this value?
-        return rotationTransform(
-            Math.clamp(MathUtils.posNegRadians(targetHeading - curHeading) * 0.75, -1, 1)
-        );
+        // Use the turn PID controller to get to the target heading
+        if (!turnPidStarted) {
+            turningPIDF.reset();
+            turnPidStarted = true;
+        }
+        if (Math.abs(MathUtils.posNegRadians(targetHeading - curHeading)) > WIND_UP_LIMIT) {
+            // The goal is to prevent *massive* early error from making the I value useless.
+            turningPIDF.reset();
+        }
+        turningPIDF.setTarget(targetHeading);
+        // We need to handle a weird case: When the current/target heading values are close
+        // to the angle wrap-around point, we should switch one of them from -180 to 180 to 0-360
+        // or -360 - 0 instead. This minimizes the error. Without this, when your target heading is
+        // near that wrap-around location, you'll get some serious bot jiggling, without an obvious
+        // reason.
+        if (Math.abs(curHeading - targetHeading) > Math.PI) {
+            curHeading += Math.signum(targetHeading) * TwoPi;
+        }
+        return turningPIDF.update(curHeading);
     }
 
     public PedroPathCommand MakePathCommand(PathChain p) {
@@ -459,50 +525,53 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     private void ShowDriveInfo() {
         switch (driveStyle.rotation) {
             case Free:
-                drvMode = "rFree";
+                drvMode = "rFre";
                 break;
             case Snap:
-                drvMode = "rSnap";
+                drvMode = "rSnp";
                 break;
-            case Hold_NYI:
-                drvMode = "rHold";
+            case Hold:
+                drvMode = "rHld";
                 break;
             case Tangential:
-                drvMode = "rTangent";
+                drvMode = "rTan";
+                break;
+            case Bidirectional:
+                drvMode = "rBid";
                 break;
             case Vision:
-                drvMode = "rVision[NYI]";
+                drvMode = "rViz";
                 break;
             default:
-                drvMode = "rUnknown";
+                drvMode = "rUnk";
                 break;
         }
         switch (driveStyle.translation) {
             case Free:
-                drvMode += "xFree";
+                drvMode += "xFre";
                 break;
             case Square:
-                drvMode += "xSquare";
+                drvMode += "xSqu";
                 break;
             case Hold:
-                drvMode += "xHold";
+                drvMode += "xHld";
                 break;
             case Vision:
-                drvMode += "xVision[NYI]";
+                drvMode += "xViz";
                 break;
             default:
-                drvMode += "xUnknown";
+                drvMode += "xUnk";
                 break;
         }
         switch (driveStyle.perspective) {
             case RobotCentric:
-                drvMode += ":Bot-Centric";
+                drvMode += ":Bot";
                 break;
             case FieldCentric:
-                drvMode += ":Field-Centric";
+                drvMode += ":Fld";
                 break;
             default:
-                drvMode += ":[Unknown]";
+                drvMode += ":[?]";
                 break;
         }
         drvMode += String.format(" Max:%.2f", driveStyle.translationSpeed);
@@ -516,18 +585,14 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         );
     }
 
-    private static void ShowDriveVectors(
-        double fwdVal,
-        double strafeVal,
-        double rot,
-        double offset
-    ) {
+    private void ShowDriveVectors(double fwd, double strafe, double rot, double offset) {
         drvVec = String.format(
-            "f %.2f s %.2f r %.2f [%.1f°]",
-            fwdVal,
-            strafeVal,
+            "f %.2f s %.2f r %.2f@%.1f° [%.1f°]",
+            fwd,
+            strafe,
             rot,
-            Math.toDegrees(offset)
+            Math.toDegrees(curHeading),
+            Math.toDegrees(MathUtils.posNegRadians(offset))
         );
     }
 }
