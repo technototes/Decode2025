@@ -71,18 +71,24 @@ export type AnonymousBezier = { type: 'line' | 'curve'; points: PoseRef[] };
 export type NamedBezier = { name: string; points: AnonymousBezier };
 export type BezierRef = AnonymousBezier | string;
 
+// Reversed headings are not yet handled
+export type ReversedHeading = { reversed?: boolean };
+// Heading timing isn't yet handled
+export type HeadingTiming = { start?: ValueRef; end?: ValueRef };
+// FacingPoint heading's are yet handled, either...
+export type FacingHeading = { type: 'facing'; facing: PoseRef };
+
 export type TangentHeading = { type: 'tangent' };
 export type ConstantHeading = { type: 'constant'; heading: HeadingRef };
 export type InterpolatedHeading = {
   type: 'interpolated';
   headings: [HeadingRef, HeadingRef];
 };
-export type HeadingType =
-  | TangentHeading
-  | ConstantHeading
-  | InterpolatedHeading;
+export type HeadingType = // ReversedHeading & HeadingTiming ( FacingHeading | ...
+  TangentHeading | ConstantHeading | InterpolatedHeading;
 
 // No such thing as an anonymous PathChain
+// Also: I'm not yet handling global vs. last heading modifiers
 export type NamedPathChain = {
   name: string;
   paths: BezierRef[];
@@ -191,3 +197,20 @@ export const chkPathChainFile = chkObjectOfExactType<PathChainFile>({
   beziers: chkArrayOf(chkNamedBezier),
   pathChains: chkArrayOf(chkNamedPathChain),
 });
+
+// Not used yet, but these are the results of evaluating the various types
+declare const brand: unique symbol;
+export type Nominal<T, Brand extends string> = T & { readonly [brand]: Brand };
+export type RealValue = Nominal<number, 'Value'>;
+export type RealPoint = { x: RealValue; y: RealValue };
+export type RealBezier = RealPoint[];
+export type RealPathChain = {
+  paths: RealBezier[];
+  // Tangent, Constant, Linear, FacingPoint:
+  heading: 'tangent' | RealValue | [RealValue, RealValue] | RealPoint;
+};
+
+export const MakeRealValue = (n: number) => n as RealValue;
+export function MakeRealPoint(x: RealValue, y: RealValue): RealPoint {
+  return { x, y };
+}

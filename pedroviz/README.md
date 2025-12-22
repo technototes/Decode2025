@@ -13,15 +13,15 @@ and edit PedroPath's. The _reasons_ for this as opposed to just using
 
 **Tasks, in order:**
 
-- [x] Read simple path from code
-- [x] Display that path on the canvas.
-- [ ] Allow creation & editing values in a text field
+- [x] Read paths from code
+- [x] Display those paths on the canvas.
+- [ ] Highlight hovered-over paths/curves/points (both directions)
+- [ ] Allow creation of values in a text field
   - [ ] Edit an existing named value, pose, curve, chain
 - [ ] Reflect those changes in the code
   - [ ] Checksum the code to detect external edits?
   - [ ] When external edits have occurred, try to resolve the conflicts (ugh...)
 - [ ] Allow editing points by dragging & dropping on the canvas
-- [ ] Highlight hovered-over paths/curves/points (both directions)
 - [ ] Animate the robot along the path
 - [ ] Put the field graphic under the canvas
 - [ ] Have a grid key near/under the canvas
@@ -31,8 +31,8 @@ and edit PedroPath's. The _reasons_ for this as opposed to just using
         offset?)
 - [ ] Support additional parts of the path builder
   - [ ] multiple paths, headings, braking strength, tValues, etc...
-- [ ] Maintain any code that I don't actually parse (keep chunks of code that
-      aren't represented in the UI)
+- [ ] Maintain any code that I don't actually parse from the source code (keep
+      chunks of code that aren't represented in the UI)
   - [ ] Maintain comments
 
 # Docs-n-stuff
