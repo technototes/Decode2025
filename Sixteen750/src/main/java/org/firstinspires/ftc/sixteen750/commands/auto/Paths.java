@@ -49,9 +49,9 @@ public class Paths {
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
-            new WaitCommand(.9),
+            new WaitCommand(1),
             TeleCommands.GateUp(r),
-            TeleCommands.Intake(r)
+            TeleCommands.IntakeStop(r)
             // want to keep launcher running during auto also no need to stop intake
         );
     }
@@ -106,7 +106,7 @@ public class Paths {
     public static double power2 = 0.85;
 
     //Red poses reconfigure these
-    public static Pose RStart = new Pose(114, 135.152);
+    public static Pose RStart = new Pose(113.5, 135.152);
     public static Pose RLaunch = new Pose(90, 93);
     public static Pose RGoal = new Pose(144, 144);
     public static Pose RLaunchend = new Pose(90, 90);
