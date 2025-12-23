@@ -6,9 +6,9 @@ import org.firstinspires.ftc.learnbot.subsystems.VisionSubsystem;
 public class SetVisionPipeline implements Command {
 
     public VisionSubsystem viz;
-    public int pipeline;
+    public VisionSubsystem.Pipeline pipeline;
 
-    public SetVisionPipeline(VisionSubsystem v, int p) {
+    public SetVisionPipeline(VisionSubsystem v, VisionSubsystem.Pipeline p) {
         viz = v;
         pipeline = p;
     }

@@ -14,6 +14,7 @@ public class PIDFController {
     private double lastTimestamp;
     private double minInput, maxInput;
     private boolean bounded;
+    private boolean reset;
 
     // Constructor for PIDFController with PIDCoefficients
     // The feed-forward function takes values (in order) of *target* and *error*
@@ -46,8 +47,13 @@ public class PIDFController {
     }
 
     // Resets the integral sum of the controller
+    // This is used to prevent "wind up": Large early error can dominate small error as the
+    // target is approached, thus rendering the utility of the I controller ineffective.
+    // This also sets the rate of change back to flat for the next observation, so there shouldn't
+    // be any slope-nuttiness going along with it...
     public void reset() {
         integralSum = 0.0;
+        reset = true;
         lastTimestamp = System.nanoTime() / 1e9;
     }
 
@@ -72,7 +78,8 @@ public class PIDFController {
 
         integralSum += error * dt;
 
-        double derivative = (error - lastError) / dt;
+        double derivative = reset ? 0 : (error - lastError) / dt;
+        reset = false;
         lastError = error;
 
         // Calculate PID output
