@@ -10,6 +10,8 @@ import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.PIDFController;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
@@ -28,6 +30,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double fartargetLaunchVelocityforAuto = 1700;
     public static double targetLaunchVelocityforAuto = 1340;
 
+
     @Log.Number(name = "Current Motor Velocity")
     public static double currentLaunchVelocity = 0.0;
 
@@ -38,15 +41,16 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     //@Log(name = "Error")
     public static double err;
-
+    public static double launcher1Current;
+    public static double launcher2Current;
     @Log(name = "Target Speed: ")
     public static double targetSpeed;
 
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherP = new PIDFCoefficients(0.002, 0.00, 0.0, 0);
-    public static double SPIN_F_SCALE = 1.0 / 6000;
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.002, 0.00015, 0.0, 0);
+    public static double SPIN_F_SCALE = 0.00014;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
     public static double PEAK_VOLTAGE = 13;
@@ -93,7 +97,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             } else {
                 SPIN_VOLT_COMP = SPIN_VOLT_COMP + (ADDITION * DIFFERENCE);
             }
-            launcherPID = new PIDFController(launcherP, target ->
+            launcherPID = new PIDFController(launcherPI, target ->
                 target == 0
                     ? 0
                     : (SPIN_F_SCALE * target) +
@@ -157,6 +161,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // }
         return launcher1.getVelocity();
 
+
         // 12.25 stationary voltage - had to decrease velocity by 150 (trial one: true, trial two: true)
         // 11.84 stationary voltage - had to decrease velocity by 100? (trial one:
     }
@@ -183,6 +188,20 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public double getMotorSpeed() {
         if (launcher1 != null) {
             return launcher1.getVelocity();
+        }
+        return -1;
+    }
+
+    public double getMotor1Current() {
+        if (launcher1 != null) {
+            return launcher1.getAmperage(CurrentUnit.AMPS);
+        }
+        return -1;
+    }
+
+    public double getMotor2Current() {
+        if (launcher2 != null) {
+            return launcher2.getAmperage(CurrentUnit.AMPS);
         }
         return -1;
     }
@@ -250,5 +269,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         err = launcherPID.getLastError();
         motorVelocity = getMotorSpeed();
         power = launcher1.getPower();
+        launcher1Current = getMotor1Current();
+        launcher2Current = getMotor2Current();
     }
 }
