@@ -2,6 +2,7 @@ package org.firstinspires.ftc.sixteen750.opmodes;
 
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.AprilTag_Pipeline;
 
+import com.bylazar.telemetry.PanelsTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
@@ -24,6 +25,7 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 @TeleOp(name = "Dual Control")
@@ -35,12 +37,14 @@ public class DualTeleOp extends CommandOpMode {
     public DriverController controlsDriver;
     public Hardware hardware;
     private Limelight3A limelight;
+    private PanelsTelemetry panelsTelemetry;
 
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controlsOperator = new OperatorController(codriverGamepad, robot);
+        panelsTelemetry = PanelsTelemetry.INSTANCE;
         robot.follower.setStartingPose(Paths.getRSegmentedCurveStart());
         // limelight = hardwareMap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         if (Setup.Connected.DRIVEBASE) {
@@ -83,6 +87,15 @@ public class DualTeleOp extends CommandOpMode {
         robot.prepForStart();
     }
 
+    @Override
+    public void runLoop() {
+        panelsTelemetry.getTelemetry().addData("currentLaunchVelocity", String.valueOf(LauncherSubsystem.currentLaunchVelocity));
+        panelsTelemetry.getTelemetry().addData("launcherError", String.valueOf(LauncherSubsystem.err));
+        panelsTelemetry.getTelemetry().addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
+        panelsTelemetry.getTelemetry().addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
+        panelsTelemetry.getTelemetry().addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
+        panelsTelemetry.getTelemetry().update(telemetry);
+    }
     /*
     @Override
     public void runLoop() {
