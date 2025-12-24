@@ -36,7 +36,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 @Configurable
 public class PedroDriver implements Command, Loggable {
 
-    public static double VISION_TURN_SCALE = 0.01;
+    public static double VISION_TURN_SCALE = 0.02 * 30;
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -286,15 +286,19 @@ public class PedroDriver implements Command, Loggable {
             case Vision:
                 if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
                     // --- Face AprilTag using Limelight ---
-                    targetHeading =
-                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
-                    // return VISION_TURN_SCALE * LimelightSubsystem.Xangle;
+//                    targetHeading =
+//                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
+                    // Kooolpool here below was my original prototype for auto orient and it worked decently well
+                    if (limelightSubsystem.getDistance() < 0) {
+                        return rotation;
+                    }
+                     return ((VISION_TURN_SCALE * -LimelightSubsystem.Xangle) / limelightSubsystem.getDistance()) ;
                     //lowkey forgot what kevin said but i think it just sets the target heading to
                     //where the limelight is so that vision can make the bot turn that way
                 } else {
                     return rotation;
                 }
-                break;
+
             case Free:
             case Straight:
             default:
