@@ -37,7 +37,6 @@ import org.firstinspires.ftc.sixteen750.helpers.CustomAdafruitIMU;
  * @author Baron Henderson - 20077 The Indubitables
  * @version 1.0, 6/26/2025
  */
-@Disabled
 @Configurable
 @TeleOp(name = "Tuning", group = "Pedro Pathing")
 public class Tuning extends BetterSelectableOpMode {
@@ -949,6 +948,7 @@ class HeadingTuner extends OpMode {
 
     private Path forwards;
     private Path backwards;
+    private PanelsTelemetry panelsTelemetry;
 
     @Override
     public void init() {
@@ -956,6 +956,7 @@ class HeadingTuner extends OpMode {
             SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
             otos.calibrateImu();
         }
+        panelsTelemetry = PanelsTelemetry.INSTANCE;
     }
 
     /**
@@ -993,6 +994,7 @@ class HeadingTuner extends OpMode {
     public void loop() {
         follower.update();
         draw();
+        panelsTelemetry.getTelemetry().addData("CurrentHeading", String.valueOf(follower.getHeading()));
 
         if (!follower.isBusy()) {
             if (forward) {
@@ -1006,6 +1008,7 @@ class HeadingTuner extends OpMode {
 
         telemetryM.debug("Turn the robot manually to test the Heading PIDF(s).");
         telemetryM.update(telemetry);
+        panelsTelemetry.getTelemetry().update();
     }
 }
 

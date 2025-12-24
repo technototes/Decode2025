@@ -35,6 +35,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double currentLaunchVelocity = 0.0;
 
     public static double motorVelocity;
+    public static double addtionamount;
 
     //@Log(name = "Launcher Power: ")
     public static double power;
@@ -219,14 +220,14 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void IncreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            targetLaunchVelocity += 50;
+            addtionamount  += 5;
         }
     }
 
     public void DecreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            targetLaunchVelocity -= 50;
+            addtionamount -= 5;
         }
     }
 
@@ -258,7 +259,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public double autoVelocity() {
         // x = distance in feet
-        return (RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY;
+        return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
     }
 
     @Override

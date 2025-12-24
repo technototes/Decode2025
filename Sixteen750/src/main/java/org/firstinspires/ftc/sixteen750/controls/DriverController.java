@@ -88,10 +88,10 @@ public class DriverController {
         brakeButton = gamepad.ps_triangle;
         hoodButton = gamepad.dpadUp;
         hooddownButton = gamepad.dpadDown;
-        //MotorDecrease = gamepad.dpadDown;
-        //MotorIncrease = gamepad.dpadUp;
-        FarShoot = gamepad.dpadLeft;
-        CloseShoot = gamepad.dpadRight;
+        MotorDecrease = gamepad.dpadLeft;
+        MotorIncrease = gamepad.dpadRight;
+//        FarShoot = gamepad.dpadLeft;
+//        CloseShoot = gamepad.dpadRight;
         gateButton = gamepad.ps_cross;
         holdButton = gamepad.ps_circle; // made it not bound the same as decrease velo
         //TripleBallLaunch = gamepad.ps_share; // made the auto launching command testable in tele
@@ -129,8 +129,10 @@ public class DriverController {
     public void bindLaunchControls() {
         launchButton.whilePressed(TeleCommands.Launch(robot));
         launchButton.whenReleased(TeleCommands.StopLaunch(robot));
-        CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
-        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
+//        CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
+//        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
+        MotorIncrease.whenPressed(robot.launcherSubsystem::IncreaseMotorVelocity);
+        MotorDecrease.whenPressed(robot.launcherSubsystem::DecreaseMotorVelocity);
     }
 
     public void bindIntakeControls() {
@@ -162,13 +164,8 @@ public class DriverController {
         gateButton.whenPressed(TeleCommands.GateDown(robot));
         gateButton.whenReleased(TeleCommands.GateUp(robot));
 
-        // hoodButton.whenPressed(new CycleCommandGroup(
-        //         TeleCommands.HoodUp(robot.aimingSubsystem),
-        //         TeleCommands.HoodDown(robot.aimingSubsystem)
-        // ));
-        hoodButton.whenPressed(TeleCommands.HoodUp(robot));
-        hooddownButton.whenPressed(TeleCommands.HoodDown(robot));
 
+//
         holdButton.whilePressed(TeleCommands.HoldIntake(robot));
         holdButton.whenReleased(TeleCommands.IntakeStop(robot));
     }
