@@ -40,8 +40,10 @@ public class AutoConstants {
     // These are hand tuned to work how we want
     public static double brakingStrength = 1;
     public static double brakingStart = 1;
-    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.5, 0, 0.03, 0.03); //11-7 tuning i = 0.00055
+    public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.5, 0, 0.03, 0.03);//11-7 tuning i = 0.00055
+    public static PIDFCoefficients second_headingPIDF = new PIDFCoefficients(0.5, 0.05  , 0.03, 0);
     public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.07, 0, 0.009, 0.02); //11-7 tuning i = 0.00015
+
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
     // (D is "Derivative" in PIDF...)
@@ -138,6 +140,8 @@ public class AutoConstants {
             .lateralZeroPowerAcceleration(latDeceleration)
             // .holdPointTranslationalScaling(1)
             .headingPIDFCoefficients(headingPIDF)
+            .useSecondaryHeadingPIDF(true)
+            .secondaryHeadingPIDFCoefficients(second_headingPIDF)
             .drivePIDFCoefficients(drivePIDF)
             .translationalPIDFCoefficients(translationPIDF)
             .centripetalScaling(centripetalScaling);
