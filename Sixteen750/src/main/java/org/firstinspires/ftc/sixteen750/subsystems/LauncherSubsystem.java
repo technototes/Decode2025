@@ -65,6 +65,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
+    public static double REGRESSION_A = 0.000333;
+    public static double REGRESSION_B = -0.0875;
+    public static double REGRESSION_C = 11.8945;
+    public static double REGRESSION_D = 984.784;
+
+
+
 
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
@@ -259,7 +266,9 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public double autoVelocity() {
         // x = distance in feet
-        return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
+        double x = ls.getDistance();
+        return REGRESSION_A * Math.pow(x,3) + REGRESSION_B * Math.pow(x,2) + REGRESSION_C * x + REGRESSION_D;
+        //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
     }
 
     @Override
