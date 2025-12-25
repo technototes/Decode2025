@@ -50,8 +50,8 @@ public class Paths {
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
             new WaitCommand(1),
-            TeleCommands.GateUp(r),
-            TeleCommands.IntakeStop(r)
+            TeleCommands.GateUp(r)
+
             // want to keep launcher running during auto also no need to stop intake
         );
     }
@@ -102,12 +102,13 @@ public class Paths {
     public static double cornerIntakeHeading = 250;
     public static double cornerIntakeHeading2 = 0;
     public static double tunnelIntakeHeading = 90;
-    public static double power = 0.3;
+    public static double power = 0.38;
     public static double power2 = 0.85;
 
     //Red poses reconfigure these
     public static Pose RStart = new Pose(113.5, 135.152);
     public static Pose RLaunch = new Pose(90, 93);
+    public static Pose RLaunchStart = new Pose(85,88);
     public static Pose RGoal = new Pose(144, 144);
     public static Pose RLaunchend = new Pose(90, 90);
     public static Pose RIntake1 = new Pose(95, 88);
@@ -115,11 +116,11 @@ public class Paths {
     public static Pose RIntake1end = new Pose(125, 88);
     public static Pose RIntake2 = new Pose(95, 60);
     public static Pose RIntake2ControlPoint = new Pose(73, 64.369);
-    public static Pose RIntake2end = new Pose(130, 60);
+    public static Pose RIntake2end = new Pose(128, 60);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
     public static Pose RIntake3 = new Pose(95, 40);
     public static Pose RIntake3ControlPoint = new Pose(68, 41.585);
-    public static Pose RIntake3end = new Pose(130, 40);
+    public static Pose RIntake3end = new Pose(128, 40);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(131.75, 78.5);
     public static Pose RleverControlPoint = new Pose(97.331, 74.620);
@@ -139,10 +140,14 @@ public class Paths {
     public static double RlaunchHeading4 = 53;
 
     public static double RintakeHeading = 0;
-    public static double RfarlaunchHeading = 58;
-    public static double RfarlaunchHeading2 = 66;
-    public static double RfarlaunchHeading3 = 53;
-    public static double RfarlaunchHeading4 = 56;
+    public static double RfarlaunchHeading = 60;
+    //58
+    public static double RfarlaunchHeading2 = 60;
+    // 66;
+    public static double RfarlaunchHeading3 = 60;
+    //53;
+    public static double RfarlaunchHeading4 = 60;
+        //56;
 
     public static double RcornerIntakeHeading = 250;
     public static double RcornerIntakeHeading2 = 0;
@@ -613,7 +618,7 @@ public class Paths {
         RLaunchtoEnd = follower
             .pathBuilder()
             .addPath(new BezierLine(RLaunch, REnd))
-            .setLinearHeadingInterpolation(Math.toRadians(RlaunchHeading4), Math.toRadians(90))
+            .setLinearHeadingInterpolation(Math.toRadians(RlaunchHeading4), Math.toRadians(0))
             .build();
 
         Forward48 = follower
