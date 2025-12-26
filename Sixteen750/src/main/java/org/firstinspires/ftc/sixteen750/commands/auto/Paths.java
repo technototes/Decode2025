@@ -102,7 +102,7 @@ public class Paths {
     public static double cornerIntakeHeading = 250;
     public static double cornerIntakeHeading2 = 0;
     public static double tunnelIntakeHeading = 90;
-    public static double power = 0.42;
+    public static double power = 0.38;
     public static double power2 = 0.75;
 
     //Red poses reconfigure these
@@ -118,13 +118,13 @@ public class Paths {
     public static Pose RIntake2ControlPoint = new Pose(73, 64.369);
     public static Pose RIntake2end = new Pose(128, 60);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
-    public static Pose RIntake3 = new Pose(95, 40);
-    public static Pose RIntake3ControlPoint = new Pose(68, 41.585);
-    public static Pose RIntake3end = new Pose(128, 40);
+    public static Pose RIntake3 = new Pose(96, 39);
+    public static Pose RIntake3ControlPoint = new Pose(70, 41.585);
+    public static Pose RIntake3end = new Pose(134, 39);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(131.75, 78.5);
     public static Pose RleverControlPoint = new Pose(97.331, 74.620);
-    public static Pose REnd = new Pose(120, 76);
+    public static Pose REnd = new Pose(110, 76);
     public static Pose RfarStart = new Pose(90.000, 9.000);
     public static Pose RfarLaunch = new Pose(87.000, 15);
     public static Pose Rintake4 = new Pose(130, 36.000);
@@ -134,8 +134,8 @@ public class Paths {
     public static Pose RgateIntake = new Pose(131, 43.000);
     public static Pose RgateIntakeControlPoint = new Pose(129, 35);
     public static Pose RfarPark = new Pose(120, 12.735);
-    public static double RlaunchHeading1 = 49;
-    public static double RlaunchHeading2 = 31;
+    public static double RlaunchHeading1 = 42;
+    public static double RlaunchHeading2 = 28;
     public static double RlaunchHeading3 = 38;
     public static double RlaunchHeading4 = 52;
 
