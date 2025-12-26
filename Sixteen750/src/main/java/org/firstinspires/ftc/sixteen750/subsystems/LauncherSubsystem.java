@@ -28,7 +28,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double closetargetLaunchVelocity = 1400;
     public static double fartargetLaunchVelocity = 1775;
     public static double fartargetLaunchVelocityforAuto = 1700;
-    public static double targetLaunchVelocityforAuto1 = 1420;
+    public static double targetLaunchVelocityforAuto1 = 1480;
     public static double targetLaunchVelocityforAuto2 = 1355;
 
 
