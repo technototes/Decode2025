@@ -37,7 +37,7 @@ public class BlueSegmentedCurve extends CommandOpMode {
             new SequentialCommandGroup(
                 new LLSetup(robot),
                 TeleCommands.GateUp(robot),
-                TeleCommands.AutoLaunch(robot),
+                TeleCommands.AutoLaunch1(robot),
                 TeleCommands.Intake(robot),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.StarttoLaunch),
