@@ -33,7 +33,7 @@ public class RedSegmentedCurveLeverHeadingTest extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 TeleCommands.GateUp(robot),
-                TeleCommands.AutoLaunch(robot),
+                TeleCommands.AutoLaunch1(robot),
                 TeleCommands.Intake(robot),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.RStarttoLaunchH),

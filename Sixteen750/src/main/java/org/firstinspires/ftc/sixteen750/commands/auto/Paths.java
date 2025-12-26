@@ -24,7 +24,7 @@ public class Paths {
             new ParallelCommandGroup(
                 TeleCommands.Intake(r),
                 TeleCommands.GateUp(r),
-                TeleCommands.AutoLaunch(r)
+                TeleCommands.AutoLaunch1(r)
             ),
             new WaitCommand(3),
             TeleCommands.GateDown(r),
@@ -43,14 +43,14 @@ public class Paths {
 
     public static Command AutoLaunching3Balls(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.IntakeStop(r),
             TeleCommands.GateUp(r),
             TeleCommands.Intake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
             new WaitCommand(1),
-            TeleCommands.GateUp(r)
+            TeleCommands.GateUp(r),
+            TeleCommands.IntakeStop(r)
 
             // want to keep launcher running during auto also no need to stop intake
         );
@@ -102,8 +102,8 @@ public class Paths {
     public static double cornerIntakeHeading = 250;
     public static double cornerIntakeHeading2 = 0;
     public static double tunnelIntakeHeading = 90;
-    public static double power = 0.38;
-    public static double power2 = 0.8;
+    public static double power = 0.42;
+    public static double power2 = 0.75;
 
     //Red poses reconfigure these
     public static Pose RStart = new Pose(113.5, 135.152);
@@ -124,20 +124,20 @@ public class Paths {
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(131.75, 78.5);
     public static Pose RleverControlPoint = new Pose(97.331, 74.620);
-    public static Pose REnd = new Pose(124, 16);
+    public static Pose REnd = new Pose(120, 76);
     public static Pose RfarStart = new Pose(90.000, 9.000);
     public static Pose RfarLaunch = new Pose(87.000, 15);
     public static Pose Rintake4 = new Pose(130, 36.000);
     public static Pose Rintake4ControlPoint = new Pose(78.000, 40.000);
-    public static Pose RintakeCorner = new Pose(132, 12.229);
+    public static Pose RintakeCorner = new Pose(132, 12.229); 
     public static Pose RintakeCornerControlPoint = new Pose(134, 76);
     public static Pose RgateIntake = new Pose(131, 43.000);
     public static Pose RgateIntakeControlPoint = new Pose(129, 35);
     public static Pose RfarPark = new Pose(120, 12.735);
     public static double RlaunchHeading1 = 49;
-    public static double RlaunchHeading2 = 32;
-    public static double RlaunchHeading3 = 40;
-    public static double RlaunchHeading4 = 53;
+    public static double RlaunchHeading2 = 31;
+    public static double RlaunchHeading3 = 38;
+    public static double RlaunchHeading4 = 52;
 
     public static double RintakeHeading = 0;
     public static double RfarlaunchHeading = 60;
