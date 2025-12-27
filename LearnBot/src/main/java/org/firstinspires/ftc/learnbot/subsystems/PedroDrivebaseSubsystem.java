@@ -6,6 +6,7 @@ import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -117,18 +118,19 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     private PIDFController turningPIDF = new PIDFController(pidf);
     private boolean turnPidStarted = false;
 
-    // TODO: Make this do something PIDF related, because if you don't, this is *super* jiggly...
     public double rotationTransform(double r) {
-        if (driveStyle.rotation == RotationMode.Vision) {
-            return r * DrivingConstants.Control.TAG_ALIGNMENT_GAIN;
-        }
+        // This gives you more sensitivity at the low end:
+        // .25^2 = .0625, .5^2 = .25, .75^2 = .5625, etc...
         return Math.copySign(r * r * driveStyle.rotationSpeed, r);
     }
 
     // The offset heading for field-relative controls
     double headingOffsetRadians;
     double targetHeading;
+    double directedHeading; // used for Target-based rotation mode
+    ElapsedTime lastReading; // also used for Target-based rotation mode
     double curHeading;
+
     // used to keep the directions straight
     Alliance alliance;
 
@@ -182,6 +184,9 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         rotation = 0;
         targetHeading = 0;
         driveStyle = new DrivingStyle();
+        directedHeading = Double.NaN;
+        lastReading = new ElapsedTime();
+        // Snap to these angles
         // You need the final point there for "wrap-around" to work properly
         snapRadians = new double[] { -Math.PI, -HalfPi, 0, HalfPi, Math.PI };
         SetFieldCentricMode();
@@ -251,6 +256,9 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         } else if (pr != RotationMode.Hold && driveStyle.rotation == RotationMode.Hold) {
             // If we're transitioning to a Rotational hold, just set the pos in the holdPose
             holdPose = follower.getPose();
+        }
+        if (r == RotationMode.Target_NYI) {
+            directedHeading = Double.NaN;
         }
         turnPidStarted = false;
     }
@@ -524,6 +532,9 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
 
     private void ShowDriveInfo() {
         switch (driveStyle.rotation) {
+            case Target_NYI:
+                drvMode = "rTgt";
+                break;
             case Free:
                 drvMode = "rFre";
                 break;
