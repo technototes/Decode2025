@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.learnbot;
 
 import com.bylazar.configurables.annotations.Configurable;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Rotation;
 
 public class Setup {
 
@@ -26,8 +24,8 @@ public class Setup {
         public static String OTOS = "sparky";
         public static String PINPOINT = "pinpoint";
         public static String LIMELIGHT = "limelight";
-        public static String RED_SWITCH = "asr";
-        public static String BLUE_SWITCH = "asb";
+        public static String ALLIANCE_SWITCH_RED = "asr";
+        public static String ALLIANCE_SWITCH_BLUE = "asb";
     }
 
     @Configurable
