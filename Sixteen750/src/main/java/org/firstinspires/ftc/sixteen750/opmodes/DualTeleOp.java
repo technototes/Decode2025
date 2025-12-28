@@ -89,12 +89,12 @@ public class DualTeleOp extends CommandOpMode {
 
     @Override
     public void runLoop() {
-//        panelsTelemetry.getTelemetry().addData("currentLaunchVelocity", String.valueOf(LauncherSubsystem.currentLaunchVelocity));
-//        panelsTelemetry.getTelemetry().addData("launcherError", String.valueOf(LauncherSubsystem.err));
-//        panelsTelemetry.getTelemetry().addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
-//        panelsTelemetry.getTelemetry().addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
-//        panelsTelemetry.getTelemetry().addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
-//        panelsTelemetry.getTelemetry().update(telemetry);
+        panelsTelemetry.getTelemetry().addData("currentLaunchVelocity", String.valueOf(LauncherSubsystem.currentLaunchVelocity));
+        panelsTelemetry.getTelemetry().addData("launcherError", String.valueOf(LauncherSubsystem.err));
+        panelsTelemetry.getTelemetry().addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
+        panelsTelemetry.getTelemetry().addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
+        panelsTelemetry.getTelemetry().addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
+       panelsTelemetry.getTelemetry().update(telemetry);
     }
     /*
     @Override
