@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.sixteen750.opmodes.auto;
 
+import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.AprilTag_Pipeline;
+
 import com.bylazar.telemetry.PanelsTelemetry;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
@@ -9,6 +12,8 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
@@ -25,7 +30,7 @@ public class RedSegmentedCurveLever extends CommandOpMode {
     public DriverController controls;
     public Hardware hardware;
     private PanelsTelemetry panelsTelemetry;
-
+    private Limelight3A limelight;
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
@@ -34,13 +39,14 @@ public class RedSegmentedCurveLever extends CommandOpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE;
         robot.follower.setStartingPose(p.getRSegmentedCurveStart());
         CommandScheduler.scheduleForState(
+                new AltAutoVelocity(robot).alongWith(
             new SequentialCommandGroup(
                 TeleCommands.GateUp(robot),
-                TeleCommands.Launch(robot),
+
                 TeleCommands.Intake(robot),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.RStarttoLaunch, p.power2),
-                new WaitCommand(0.7),
+                new WaitCommand(0.1),
                 Paths.AutoLaunching3Balls(robot),
                 // new WaitCommand(0.5),
                 new PedroPathCommand(robot.follower, p.RLaunchtoIntake1),
@@ -65,13 +71,30 @@ public class RedSegmentedCurveLever extends CommandOpMode {
                 new WaitCommand(0.05),
                 new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch).alongWith(TeleCommands.IntakeStop(robot)),
                 Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoEnd, p.power2).alongWith(TeleCommands.StopLaunch(robot)),
+                new PedroPathCommand(robot.follower, p.RLaunchtoEnd, p.power2),
                     TeleCommands.IntakeStop(robot),
 
                 CommandScheduler::terminateOpMode
-            ),
+            )),
             OpModeState.RUN
         );
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
+            limelight = hardware.limelight;
+            limelight.setPollRateHz(100);
+
+            telemetry.setMsTransmissionInterval(11);
+
+            limelight.pipelineSwitch(AprilTag_Pipeline);
+            CommandScheduler.register(robot.limelightSubsystem);
+
+            /*
+             * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
+             */
+            limelight.start();
+        }
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
+            CommandScheduler.register(robot.launcherSubsystem);
+        }
     }
 
     public void uponStart() {
@@ -88,5 +111,8 @@ public class RedSegmentedCurveLever extends CommandOpMode {
 
     public void end() {
         HeadingHelper.savePose(robot.follower.getPose());
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
+            limelight.stop();
+        }
     }
 }
