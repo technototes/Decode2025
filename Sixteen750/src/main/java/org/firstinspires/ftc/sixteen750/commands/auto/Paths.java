@@ -12,6 +12,7 @@ import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
@@ -53,7 +54,7 @@ public class Paths {
             TeleCommands.IntakeStop(r)
 
             // want to keep launcher running during auto also no need to stop intake
-        );
+        ).raceWith(new AltAutoOrient(r));
     }
 
     public static Pose Start = new Pose(30.748, 135.152);
