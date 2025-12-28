@@ -10,6 +10,7 @@ import com.technototes.library.logger.Log;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 @Configurable
 public class AltAutoOrient implements Command {
@@ -48,18 +49,39 @@ public class AltAutoOrient implements Command {
 
     @Override
     public void execute() {
-        if (firsttime) {
-            robot.follower.update();
-            wantedPose = new Pose(
-                robot.follower.getPose().getX(),
-                robot.follower.getPose().getY(),
-                robot.follower.getPose().getHeading() -
-                    Math.toRadians(robot.limelightSubsystem.getTX()) //.getTX .getLimelightRotation()
-            );
-            robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
-            LauncherSubsystem.targetPower = 1;
-            firsttime = false;
+        //if (firsttime) {
+//            robot.follower.update();
+//            wantedPose = new Pose(
+//                robot.follower.getPose().getX(),
+//                robot.follower.getPose().getY(),
+//                robot.follower.getPose().getHeading() -
+//                    Math.toRadians(robot.limelightSubsystem.getTX()) //.getTX .getLimelightRotation()
+//            );
+//            robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
+//            LauncherSubsystem.targetPower = 1;
+//            firsttime = false;
+        //}
+        double rotation = 0;
+        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
+            // --- Face AprilTag using Limelight ---
+//                    targetHeading =
+//                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
+            // Kooolpool here below was my original prototype for auto orient and it worked decently well
+            if (robot.limelightSubsystem.getDistance() >= 0) {
+
+                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) / robot.limelightSubsystem.getDistance());
+            }
+            //lowkey forgot what kevin said but i think it just sets the target heading to
+            //where the limelight is so that vision can make the bot turn that way
         }
+        robot.follower.setTeleOpDrive(
+                0,
+                0,
+                rotation,
+               false,
+                0
+        );
+
     }
 
     //    @Override
