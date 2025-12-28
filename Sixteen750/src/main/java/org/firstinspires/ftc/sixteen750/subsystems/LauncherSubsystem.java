@@ -28,8 +28,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double closetargetLaunchVelocity = 1400;
     public static double fartargetLaunchVelocity = 1775;
     public static double fartargetLaunchVelocityforAuto = 1700;
-    public static double targetLaunchVelocityforAuto1 = 1420;
-    public static double targetLaunchVelocityforAuto2 = 1355;
+    public static double targetLaunchVelocityforAuto1 = 1950;
+    public static double targetLaunchVelocityforAuto2 = 1825;
 
 
     @Log.Number(name = "Current Motor Velocity")
@@ -51,8 +51,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.002, 0.00015, 0.0, 0);
-    public static double SPIN_F_SCALE = 0.00014;
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.0026, 0.0002, 0.0, 0);
+    public static double SPIN_F_SCALE = 0.00018;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
     public static double PEAK_VOLTAGE = 13;
@@ -66,10 +66,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
-    public static double REGRESSION_A = 0.000333;
-    public static double REGRESSION_B = -0.0875;
-    public static double REGRESSION_C = 11.8945;
-    public static double REGRESSION_D = 984.784;
+    public static double REGRESSION_A = 0.000448;
+    public static double REGRESSION_B = -0.1177;
+    public static double REGRESSION_C = 16.012;
+    public static double REGRESSION_D = 1400;
 
 
 
