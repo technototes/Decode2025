@@ -66,10 +66,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
-    public static double REGRESSION_A = 0.000448;
-    public static double REGRESSION_B = -0.1177;
-    public static double REGRESSION_C = 16.012;
-    public static double REGRESSION_D = 1400;
+    public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
+    public static double REGRESSION_B = 1607.677; // minimum velocity for close zone launch speed formula
+    public static double REGRESSION_C = 20.000; // multiplier for x for far zone launch speed formula
+    public static double REGRESSION_D = 108.333; // minimum velocity for far zone launch speed formula
 
 
 
@@ -277,7 +277,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public double autoVelocity() {
         // x = distance in feet
         double x = ls.getDistance();
-        return REGRESSION_A * Math.pow(x,3) + REGRESSION_B * Math.pow(x,2) + REGRESSION_C * x + REGRESSION_D;
+        if(x<100){
+            return REGRESSION_A * x + REGRESSION_B;
+        } else {
+            return REGRESSION_C * x + REGRESSION_D;
+        }
+
         //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
     }
 
@@ -285,7 +290,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void periodic() {
         autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
-        setMotorPower(launcherPID.update(getMotorSpeed()));
+        if (launcherPID.getTarget() != 0){
+            setMotorPower(launcherPID.update(getMotorSpeed()));
+        } else {
+            setMotorPower(0);
+        }
+
         err = launcherPID.getLastError();
         motorVelocity = getMotorSpeed();
         power = launcher1.getPower();
