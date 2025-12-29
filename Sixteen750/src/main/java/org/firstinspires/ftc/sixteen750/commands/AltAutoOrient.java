@@ -81,6 +81,8 @@ public class AltAutoOrient implements Command {
                false,
                 0
         );
+        robot.follower.update();
+
 
     }
 
