@@ -286,19 +286,21 @@ public class PedroDriver implements Command, Loggable {
             case Vision:
                 if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
                     // --- Face AprilTag using Limelight ---
-//                    targetHeading =
-//                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
+                    //                    targetHeading =
+                    //                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
                     // Kooolpool here below was my original prototype for auto orient and it worked decently well
                     if (limelightSubsystem.getDistance() < 0) {
                         return rotation;
                     }
-                     return ((VISION_TURN_SCALE * -LimelightSubsystem.Xangle) / limelightSubsystem.getDistance()) ;
+                    return (
+                        (VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
+                        limelightSubsystem.getDistance()
+                    );
                     //lowkey forgot what kevin said but i think it just sets the target heading to
                     //where the limelight is so that vision can make the bot turn that way
                 } else {
                     return rotation;
                 }
-
             case Free:
             case Straight:
             default:

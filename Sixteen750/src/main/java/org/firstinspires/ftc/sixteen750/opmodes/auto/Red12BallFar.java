@@ -33,39 +33,45 @@ public class Red12BallFar extends CommandOpMode {
         robot.follower.setStartingPose(p.getRFar9BallStart());
         CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
-                new AltAutoVelocity(robot).alongWith(
-            new SequentialCommandGroup(
-                new LLSetup(robot),
-                TeleCommands.GateUp(robot),
+            new AltAutoVelocity(robot).alongWith(
+                new SequentialCommandGroup(
+                    new LLSetup(robot),
+                    TeleCommands.GateUp(robot),
                     TeleCommands.Intake(robot),
-
-//                TeleCommands.SetFarShoot(robot),
-//                TeleCommands.FarAutoLaunch(robot),
-//                TeleCommands.HoldIntake(robot),
-                TeleCommands.HoodUp(robot),
-                new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
-                new WaitCommand(1),
-                Paths.AutoLaunching3Balls(robot),
-//                TeleCommands.HoldIntake(robot),
-                // new WaitCommand(0.5),
-                new PedroPathCommand(robot.follower, p.Rlaunchfartointake4, p.power).alongWith(TeleCommands.Intake(robot)),
-                new WaitCommand(0.3),
-                // new WaitCommand(2),
-                new PedroPathCommand(robot.follower, p.Rintake4tolaunchfar),
-                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RlaunchfartointakeCorner, 0.7).alongWith(TeleCommands.Intake(robot)),
-                new PedroPathCommand(robot.follower, p.RintakeCornertolaunchfar),
-                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.Rlaunchfartogateintake).alongWith(TeleCommands.Intake(robot)),
-                new WaitCommand(3.5),
-                new PedroPathCommand(robot.follower, p.Rgateintaketolaunchfar),
-                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.Rlaunchfartopark),
-                new WaitCommand(1),
-//                TeleCommands.StopLaunch(robot),
-                TeleCommands.IntakeStop(robot),
-                CommandScheduler::terminateOpMode
-            )),
+                    //                TeleCommands.SetFarShoot(robot),
+                    //                TeleCommands.FarAutoLaunch(robot),
+                    //                TeleCommands.HoldIntake(robot),
+                    TeleCommands.HoodUp(robot),
+                    new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
+                    new WaitCommand(1),
+                    Paths.AutoLaunching3Balls(robot),
+                    //                TeleCommands.HoldIntake(robot),
+                    // new WaitCommand(0.5),
+                    new PedroPathCommand(robot.follower, p.Rlaunchfartointake4, p.power).alongWith(
+                        TeleCommands.Intake(robot)
+                    ),
+                    new WaitCommand(0.3),
+                    // new WaitCommand(2),
+                    new PedroPathCommand(robot.follower, p.Rintake4tolaunchfar),
+                    Paths.AutoLaunching3Balls(robot),
+                    new PedroPathCommand(robot.follower, p.RlaunchfartointakeCorner, 0.7).alongWith(
+                        TeleCommands.Intake(robot)
+                    ),
+                    new PedroPathCommand(robot.follower, p.RintakeCornertolaunchfar),
+                    Paths.AutoLaunching3Balls(robot),
+                    new PedroPathCommand(robot.follower, p.Rlaunchfartogateintake).alongWith(
+                        TeleCommands.Intake(robot)
+                    ),
+                    new WaitCommand(3.5),
+                    new PedroPathCommand(robot.follower, p.Rgateintaketolaunchfar),
+                    Paths.AutoLaunching3Balls(robot),
+                    new PedroPathCommand(robot.follower, p.Rlaunchfartopark),
+                    new WaitCommand(1),
+                    //                TeleCommands.StopLaunch(robot),
+                    TeleCommands.IntakeStop(robot),
+                    CommandScheduler::terminateOpMode
+                )
+            ),
             OpModeState.RUN
         );
     }

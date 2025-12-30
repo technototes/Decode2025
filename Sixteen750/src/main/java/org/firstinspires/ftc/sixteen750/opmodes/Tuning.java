@@ -994,7 +994,9 @@ class HeadingTuner extends OpMode {
     public void loop() {
         follower.update();
         draw();
-        panelsTelemetry.getTelemetry().addData("CurrentHeading", String.valueOf(follower.getHeading()));
+        panelsTelemetry
+            .getTelemetry()
+            .addData("CurrentHeading", String.valueOf(follower.getHeading()));
 
         if (!follower.isBusy()) {
             if (forward) {

@@ -29,6 +29,7 @@ public class TeleCommands {
     public static Command AutoLaunch1(Robot r) {
         return Command.create(r.launcherSubsystem::AutoLaunch1);
     }
+
     public static Command AutoLaunch2(Robot r) {
         return Command.create(r.launcherSubsystem::AutoLaunch2);
     }

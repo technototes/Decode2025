@@ -31,6 +31,7 @@ public class RedSegmentedCurveLever extends CommandOpMode {
     public Hardware hardware;
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
+
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
@@ -39,43 +40,53 @@ public class RedSegmentedCurveLever extends CommandOpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE;
         robot.follower.setStartingPose(p.getRSegmentedCurveStart());
         CommandScheduler.scheduleForState(
-                new AltAutoVelocity(robot).alongWith(
-            new SequentialCommandGroup(
-                TeleCommands.GateUp(robot),
-
-                TeleCommands.Intake(robot),
-                TeleCommands.HoodUp(robot),
-                new PedroPathCommand(robot.follower, p.RStarttoLaunch, p.power2),
-                new WaitCommand(0.1),
-                Paths.AutoLaunching3Balls(robot),
-                // new WaitCommand(0.5),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake1),
-
-                // new WaitCommand(1),
-                new PedroPathCommand(robot.follower, p.RIntake1toIntake1end, p.power).alongWith(TeleCommands.Intake(robot)),
-                new WaitCommand(0.05),
-                 //   TeleCommands.AutoLaunch2(robot),
-                new PedroPathCommand(robot.follower, p.RIntake1endtoLever),
-                new WaitCommand(0.7),
-                new PedroPathCommand(robot.follower, p.RLevertoLaunch).alongWith(TeleCommands.IntakeStop(robot)),
-                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
-                new PedroPathCommand(robot.follower, p.RIntake2toIntake2end, p.power).alongWith(TeleCommands.Intake(robot)),
-                new WaitCommand(0.05),
+            new AltAutoVelocity(robot).alongWith(
+                new SequentialCommandGroup(
+                    TeleCommands.GateUp(robot),
+                    TeleCommands.Intake(robot),
+                    TeleCommands.HoodUp(robot),
+                    new PedroPathCommand(robot.follower, p.RStarttoLaunch, p.power2),
+                    new WaitCommand(0.1),
+                    Paths.AutoLaunching3Balls(robot),
+                    // new WaitCommand(0.5),
+                    new PedroPathCommand(robot.follower, p.RLaunchtoIntake1),
+                    // new WaitCommand(1),
+                    new PedroPathCommand(robot.follower, p.RIntake1toIntake1end, p.power).alongWith(
+                        TeleCommands.Intake(robot)
+                    ),
+                    new WaitCommand(0.05),
+                    //   TeleCommands.AutoLaunch2(robot),
+                    new PedroPathCommand(robot.follower, p.RIntake1endtoLever),
+                    new WaitCommand(0.7),
+                    new PedroPathCommand(robot.follower, p.RLevertoLaunch).alongWith(
+                        TeleCommands.IntakeStop(robot)
+                    ),
+                    Paths.AutoLaunching3Balls(robot),
+                    new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
+                    new PedroPathCommand(robot.follower, p.RIntake2toIntake2end, p.power).alongWith(
+                        TeleCommands.Intake(robot)
+                    ),
+                    new WaitCommand(0.05),
                     //TeleCommands.AutoLaunch2(robot),
 
-                    new PedroPathCommand(robot.follower, p.RIntake2endtoLaunch).alongWith(TeleCommands.IntakeStop(robot)),
-                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),
-                new PedroPathCommand(robot.follower, p.RIntake3toIntake3end, p.power).alongWith(TeleCommands.Intake(robot)),
-                new WaitCommand(0.05),
-                new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch).alongWith(TeleCommands.IntakeStop(robot)),
-                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.RLaunchtoEnd, p.power2),
+                    new PedroPathCommand(robot.follower, p.RIntake2endtoLaunch).alongWith(
+                        TeleCommands.IntakeStop(robot)
+                    ),
+                    Paths.AutoLaunching3Balls(robot),
+                    new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),
+                    new PedroPathCommand(robot.follower, p.RIntake3toIntake3end, p.power).alongWith(
+                        TeleCommands.Intake(robot)
+                    ),
+                    new WaitCommand(0.05),
+                    new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch).alongWith(
+                        TeleCommands.IntakeStop(robot)
+                    ),
+                    Paths.AutoLaunching3Balls(robot),
+                    new PedroPathCommand(robot.follower, p.RLaunchtoEnd, p.power2),
                     TeleCommands.IntakeStop(robot),
-
-                CommandScheduler::terminateOpMode
-            )),
+                    CommandScheduler::terminateOpMode
+                )
+            ),
             OpModeState.RUN
         );
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
@@ -100,12 +111,26 @@ public class RedSegmentedCurveLever extends CommandOpMode {
     public void uponStart() {
         robot.prepForStart();
     }
+
     public void runLoop() {
-        panelsTelemetry.getTelemetry().addData("currentLaunchVelocity", String.valueOf(LauncherSubsystem.currentLaunchVelocity));
-        panelsTelemetry.getTelemetry().addData("launcherError", String.valueOf(LauncherSubsystem.err));
-        panelsTelemetry.getTelemetry().addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
-        panelsTelemetry.getTelemetry().addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
-        panelsTelemetry.getTelemetry().addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
+        panelsTelemetry
+            .getTelemetry()
+            .addData(
+                "currentLaunchVelocity",
+                String.valueOf(LauncherSubsystem.currentLaunchVelocity)
+            );
+        panelsTelemetry
+            .getTelemetry()
+            .addData("launcherError", String.valueOf(LauncherSubsystem.err));
+        panelsTelemetry
+            .getTelemetry()
+            .addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
+        panelsTelemetry
+            .getTelemetry()
+            .addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
+        panelsTelemetry
+            .getTelemetry()
+            .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
         panelsTelemetry.getTelemetry().update(telemetry);
     }
 

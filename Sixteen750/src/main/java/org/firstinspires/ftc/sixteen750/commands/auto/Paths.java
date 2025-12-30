@@ -44,7 +44,7 @@ public class Paths {
 
     public static Command AutoLaunching3Balls(Robot r) {
         return new SequentialCommandGroup(
-                TeleCommands.IntakeStop(r),
+            TeleCommands.IntakeStop(r),
             TeleCommands.GateUp(r),
             TeleCommands.Intake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
@@ -55,7 +55,8 @@ public class Paths {
             TeleCommands.IntakeStop(r)
 
             // want to keep launcher running during auto also no need to stop intake
-        ).raceWith(new AltAutoOrient(r));
+        )
+            .raceWith(new AltAutoOrient(r));
     }
 
     public static Pose Start = new Pose(30.748, 135.152);
@@ -110,7 +111,7 @@ public class Paths {
     //Red poses reconfigure these
     public static Pose RStart = new Pose(113.5, 135.152);
     public static Pose RLaunch = new Pose(90, 93);
-    public static Pose RLaunchStart = new Pose(85,88);
+    public static Pose RLaunchStart = new Pose(85, 88);
     public static Pose RGoal = new Pose(144, 144);
     public static Pose RLaunchend = new Pose(90, 90);
     public static Pose RIntake1 = new Pose(95, 88);
@@ -131,7 +132,7 @@ public class Paths {
     public static Pose RfarLaunch = new Pose(87.000, 15);
     public static Pose Rintake4 = new Pose(130, 36.000);
     public static Pose Rintake4ControlPoint = new Pose(78.000, 40.000);
-    public static Pose RintakeCorner = new Pose(132, 12.229); 
+    public static Pose RintakeCorner = new Pose(132, 12.229);
     public static Pose RintakeCornerControlPoint = new Pose(134, 76);
     public static Pose RgateIntake = new Pose(131, 43.000);
     public static Pose RgateIntakeControlPoint = new Pose(129, 35);
@@ -149,7 +150,7 @@ public class Paths {
     public static double RfarlaunchHeading3 = 65;
     //53;
     public static double RfarlaunchHeading4 = 65;
-        //56;
+    //56;
 
     public static double RcornerIntakeHeading = 250;
     public static double RcornerIntakeHeading2 = 0;

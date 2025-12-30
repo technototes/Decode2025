@@ -10,7 +10,6 @@ import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.PIDFController;
-
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
@@ -31,12 +30,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double targetLaunchVelocityforAuto1 = 1950;
     public static double targetLaunchVelocityforAuto2 = 1825;
 
-
     @Log.Number(name = "Current Motor Velocity")
     public static double currentLaunchVelocity = 0.0;
 
     public static double motorVelocity;
-    public static double addtionamount;
+    public static double additionAmount;
+    public static double additionDelta = 5;
 
     //@Log(name = "Launcher Power: ")
     public static double power;
@@ -45,6 +44,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double err;
     public static double launcher1Current;
     public static double launcher2Current;
+
     @Log(name = "Target Speed: ")
     public static double targetSpeed;
 
@@ -70,9 +70,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
     public static double REGRESSION_C = 20.000; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D = 108.333; // minimum velocity for far zone launch speed formula
-
-
-
 
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
@@ -152,6 +149,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             //            launcher2.setVelocity(TargetLaunchVelocity);
         }
     }
+
     public void AutoLaunch2() {
         // Spin the motors pid goes here
         if (hasHardware) {
@@ -160,7 +158,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             //            launcher2.setVelocity(TargetLaunchVelocity);
         }
     }
-
 
     public void FarAutoLaunch() {
         // Spin the motors pid goes here
@@ -178,7 +175,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         //     return ready = false;
         // }
         return launcher1.getVelocity();
-
 
         // 12.25 stationary voltage - had to decrease velocity by 150 (trial one: true, trial two: true)
         // 11.84 stationary voltage - had to decrease velocity by 100? (trial one:
@@ -231,21 +227,20 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             //launcher1.setPower(0);
             //launcher2.setPower(0);
             launcherPID.setTarget(0);
-
         }
     }
 
     public void IncreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            addtionamount  += 5;
+            additionAmount += additionDelta;
         }
     }
 
     public void DecreaseMotorVelocity() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            addtionamount -= 5;
+            additionAmount -= additionDelta;
         }
     }
 
@@ -278,7 +273,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public double autoVelocity() {
         // x = distance in feet
         double x = ls.getDistance();
-        if(x<100){
+        if (x < 100) {
             return REGRESSION_A * x + REGRESSION_B;
         } else {
             return REGRESSION_C * x + REGRESSION_D;
@@ -291,7 +286,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void periodic() {
         autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
-        if (launcherPID.getTarget() != 0){
+        if (launcherPID.getTarget() != 0) {
             setMotorPower(launcherPID.update(getMotorSpeed()));
         } else {
             setMotorPower(0);
