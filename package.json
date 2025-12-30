@@ -60,7 +60,9 @@
     "os": "bun run scripts/os.ts",
     "- // z-": "",
     "- // z ": "Type check the scripts (BUG: It's typechecking node_modules too!)",
-    "types": "tsc --noEmit -p tsconfig.json"
+    "types": "tsc --noEmit -p tsconfig.json",
+    "- //": "This is just a shortcut helper script for now to launch the pedropath visualizer",
+    "pv": "bun run open http://localhost:3000 && cd pedroviz && bun install && bun pvdev"
   },
   "dependencies": {
     "@freik/containers": "^0.4.4",
