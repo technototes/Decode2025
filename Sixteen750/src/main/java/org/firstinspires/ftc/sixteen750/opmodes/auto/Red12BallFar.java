@@ -43,30 +43,40 @@ public class Red12BallFar extends CommandOpMode {
                     //                TeleCommands.HoldIntake(robot),
                     TeleCommands.HoodUp(robot),
                     new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
-                    new WaitCommand(1),
+                    new WaitCommand(0.2),
                     Paths.AutoLaunching3Balls(robot),
                     //                TeleCommands.HoldIntake(robot),
                     // new WaitCommand(0.5),
-                    new PedroPathCommand(robot.follower, p.Rlaunchfartointake4, p.power).alongWith(
-                        TeleCommands.Intake(robot)
-                    ),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.Rlaunchfartointake4,
+                        p.powerforintake4
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new WaitCommand(0.3),
                     // new WaitCommand(2),
                     new PedroPathCommand(robot.follower, p.Rintake4tolaunchfar),
                     Paths.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.RlaunchfartointakeCorner, 0.7).alongWith(
-                        TeleCommands.Intake(robot)
-                    ),
-                    new PedroPathCommand(robot.follower, p.RintakeCornertolaunchfar),
+                    //                new PedroPathCommand(robot.follower, p.RlaunchfartointakeCorner, 0.7).alongWith(TeleCommands.Intake(robot)),
+                    //                new PedroPathCommand(robot.follower, p.RintakeCornertolaunchfar),
+
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.RlaunchfartointakeCornerNew,
+                        0.5
+                    ).alongWith(TeleCommands.Intake(robot)),
+                    new PedroPathCommand(robot.follower, p.RintakeCornerNewtolaunchfar),
+                    //the two paths above is a new way to intake the corner balls
+                    //the two commented paths above these new ones is the old way to intake the corner balls
+
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.Rlaunchfartogateintake).alongWith(
                         TeleCommands.Intake(robot)
                     ),
-                    new WaitCommand(3.5),
+                    new WaitCommand(2.5),
                     new PedroPathCommand(robot.follower, p.Rgateintaketolaunchfar),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.Rlaunchfartopark),
-                    new WaitCommand(1),
+                    //new WaitCommand(1),
                     //                TeleCommands.StopLaunch(robot),
                     TeleCommands.IntakeStop(robot),
                     CommandScheduler::terminateOpMode
