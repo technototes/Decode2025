@@ -24,6 +24,11 @@ public class AltAutoOrient implements Command {
         robot = r;
     }
 
+//    @Override
+//    public void initialize() {
+//        robot.follower.startTeleOpDrive();
+//    }
+
     @Override
     public boolean isFinished() {
         //return !robot.follower.isBusy();
@@ -84,10 +89,12 @@ public class AltAutoOrient implements Command {
         robot.follower.update();
 
 
+
     }
 
-    //    @Override
-    //    public void end(boolean s) {
-    //        robot.follower.drivetrain.breakFollowing();
-    //    }
+//        @Override
+//        public void end(boolean s) {
+//           // robot.follower.drivetrain.breakFollowing();
+//            robot.follower.breakFollowing();
+//        }
 }

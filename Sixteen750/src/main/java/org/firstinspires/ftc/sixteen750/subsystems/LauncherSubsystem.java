@@ -51,8 +51,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.0026, 0.0002, 0.0, 0);
-    public static double SPIN_F_SCALE = 0.00018;
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.00025, 0.0, 0);
+    public static double SPIN_F_SCALE = 0.00021;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
     public static double PEAK_VOLTAGE = 13;
@@ -67,7 +67,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
     public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
-    public static double REGRESSION_B = 1607.677; // minimum velocity for close zone launch speed formula
+    public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
     public static double REGRESSION_C = 20.000; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D = 108.333; // minimum velocity for far zone launch speed formula
 
@@ -295,6 +295,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             setMotorPower(launcherPID.update(getMotorSpeed()));
         } else {
             setMotorPower(0);
+            launcherPID.update(getMotorSpeed());
+            launcherPID.reset();
         }
 
         err = launcherPID.getLastError();

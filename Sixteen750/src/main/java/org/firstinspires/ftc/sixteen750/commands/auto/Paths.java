@@ -142,13 +142,13 @@ public class Paths {
     public static double RlaunchHeading4 = 45;
 
     public static double RintakeHeading = 0;
-    public static double RfarlaunchHeading = 60;
+    public static double RfarlaunchHeading = 65;
     //58
-    public static double RfarlaunchHeading2 = 60;
+    public static double RfarlaunchHeading2 = 65;
     // 66;
-    public static double RfarlaunchHeading3 = 60;
+    public static double RfarlaunchHeading3 = 65;
     //53;
-    public static double RfarlaunchHeading4 = 60;
+    public static double RfarlaunchHeading4 = 65;
         //56;
 
     public static double RcornerIntakeHeading = 250;
