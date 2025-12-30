@@ -47,6 +47,7 @@ public class IntakeSubsystem implements Loggable, Subsystem {
             intakecurrent = getCurrent();
             CommandScheduler.register(this);
             gamepad = null;
+            intake.setDirection(DcMotorSimple.Direction.REVERSE);
         } else {
             intake = null;
         }
@@ -57,7 +58,6 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     public void Intake() {
         // Spin the motors
         if (hasHardware) {
-            intake.setDirection(DcMotorSimple.Direction.REVERSE);
             intake.setPower(MOTOR_VELOCITY);
         }
     }
@@ -69,8 +69,8 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     public void Spit() {
         // Spin the motors
         if (hasHardware) {
-            intake.setDirection(DcMotorSimple.Direction.FORWARD);
-            intake.setPower(MOTOR_VELOCITY);
+            //intake.setDirection(DcMotorSimple.Direction.FORWARD);
+            intake.setPower(-MOTOR_VELOCITY);
         }
     }
 

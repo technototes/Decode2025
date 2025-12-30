@@ -19,6 +19,7 @@ public class AltAutoOrient implements Command {
 
     public Pose wantedPose;
     public boolean firsttime = true;
+    public Pose currentPose;
 
     public AltAutoOrient(Robot r) {
         robot = r;
@@ -66,6 +67,7 @@ public class AltAutoOrient implements Command {
         //            LauncherSubsystem.targetPower = 1;
         //            firsttime = false;
         //}
+        currentPose = robot.follower.getPose();
         double rotation = 0;
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             // --- Face AprilTag using Limelight ---
@@ -79,6 +81,7 @@ public class AltAutoOrient implements Command {
             //lowkey forgot what kevin said but i think it just sets the target heading to
             //where the limelight is so that vision can make the bot turn that way
         }
+        //robot.follower.holdPoint(new BezierPoint(currentPose), currentPose.getHeading()-rotation, false);
         robot.follower.setTeleOpDrive(0, 0, rotation, false, 0);
         robot.follower.update();
     }
