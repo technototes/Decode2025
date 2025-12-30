@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "pretty": true,
+    "skipLibCheck": true
+  },
+  "include": ["bun-env.d.ts", "**/*.ts?"]
+}
