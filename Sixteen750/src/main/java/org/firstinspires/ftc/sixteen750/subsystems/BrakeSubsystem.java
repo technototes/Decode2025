@@ -11,7 +11,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 @Configurable
 public class BrakeSubsystem implements Loggable, Subsystem {
 
-    public static double BRAKE_POS = 0.7; // 0.5 1.0
+    public static double BRAKE_POS = 0.75; // 0.5 1.0
     public static double GO_POS = 0.5;
 
     //@Log(name = "brakePos")

@@ -21,6 +21,7 @@ public class IntakeSubsystem implements Loggable, Subsystem {
 
     Gamepad gamepad;
     public static double MOTOR_VELOCITY = 1; // 0.5 1.0
+    public static double SLOW_MOTOR_VELOCITY = 0.8; // 0.5 1.0
     public static int duration = 80;
     boolean hasHardware;
     int currentIndex = 0;
@@ -76,7 +77,7 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     public void Hold() {
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake.setPower(MOTOR_VELOCITY / 1.1); // needed to make hold a little bit faster to keep spinning at atleast a slow speed
+            intake.setPower(SLOW_MOTOR_VELOCITY); // needed to make hold a little bit faster to keep spinning at atleast a slow speed
         }
     }
 
@@ -99,11 +100,11 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     }
 
     public void detectBall(double averageCurrent) {
-        if (averageCurrent < 1.1) {
+        if (averageCurrent < 1.65) {
             artifacts = 0;
-        } else if (averageCurrent < 2) {
-            artifacts = 1;
         } else if (averageCurrent < 3) {
+            artifacts = 1;
+        } else if (averageCurrent < 4.5) {
             artifacts = 2;
         } else {
             artifacts = 3;

@@ -26,7 +26,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double closetargetLaunchVelocity = 1400;
     public static double fartargetLaunchVelocity = 1775;
-    public static double fartargetLaunchVelocityforAuto = 1700;
+    public static double fartargetLaunchVelocityforAuto = 2400;
     public static double targetLaunchVelocityforAuto1 = 1950;
     public static double targetLaunchVelocityforAuto2 = 1825;
 
@@ -51,7 +51,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.00025, 0.0, 0);
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.00020, 0.0, 0);
     public static double SPIN_F_SCALE = 0.00021;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
