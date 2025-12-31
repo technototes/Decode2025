@@ -59,20 +59,38 @@ public class Paths {
             .raceWith(new AltAutoOrient(r));
     }
 
+    public static Command AutoLaunching3BallsSlowIntake(Robot r) {
+        return new SequentialCommandGroup(
+            TeleCommands.IntakeStop(r),
+            TeleCommands.GateUp(r),
+            TeleCommands.HoldIntake(r),
+            // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
+            //switched to slow intake to remove the up down up down of the gate aswell as drain less power
+            TeleCommands.GateDown(r),
+            new WaitCommand(1.25),
+            TeleCommands.GateUp(r),
+            TeleCommands.IntakeStop(r)
+
+            // want to keep launcher running during auto also no need to stop intake
+        )
+            .raceWith(new AltAutoOrient(r));
+    }
+
     public static Pose Start = new Pose(30.5, 135.152);
     public static Pose Launch = new Pose(54, 93);
-    public static Pose Intake1 = new Pose(49, 88);
+    public static Pose Intake1 = new Pose(49, 86);
     public static Pose Intake1ControlPoint = new Pose(61, 89.143);
-    public static Pose Intake1end = new Pose(19, 88);
-    public static Pose Lever = new Pose(12.25, 78.5);
-    public static Pose Intake2 = new Pose(49, 60);
+    public static Pose Intake1end = new Pose(19, 86);
+    public static Pose Lever = new Pose(17, 77);
+    public static Pose LeverControlPoint = new Pose(24, 74.620);
+    public static Pose Intake2 = new Pose(49, 62);
     public static Pose Intake2ControlPoint = new Pose(71, 64.369);
     public static Pose Intake2ControlPoint2 = new Pose(46, 64);
-    public static Pose Intake2end = new Pose(16, 60);
+    public static Pose Intake2end = new Pose(16, 62);
     public static Pose Intake2endControlPoint = new Pose(49, 65.696);
-    public static Pose Intake3 = new Pose(48, 37);
+    public static Pose Intake3 = new Pose(48, 41);
     public static Pose Intake3ControlPoint = new Pose(74, 41.585);
-    public static Pose Intake3end = new Pose(10, 37);
+    public static Pose Intake3end = new Pose(16, 41);
     public static Pose Intake3endControlPoint = new Pose(62.000, 84.000);
     public static Pose Startfar;
     public static Pose End = new Pose(34, 76);
@@ -83,25 +101,35 @@ public class Paths {
     public static Pose IntakeTunnel = new Pose(8, 27);
     public static Pose farStart = new Pose(54.000, 9.000);
     public static Pose farLaunch = new Pose(57.000, 15.000);
-    public static Pose intake4 = new Pose(12, 36);
+    public static Pose farLaunch2 = new Pose(57.000, 15.000);
+    public static Pose farLaunch3 = new Pose(57.000, 15.000);
+    public static Pose farLaunch4 = new Pose(57.000, 15.000);
+    public static Pose intake4 = new Pose(16, 36);
     public static Pose intake4ControlPoint = new Pose(70.000, 40.000);
     public static Pose intakeCorner = new Pose(10, 12);
     public static Pose intakeCornerControlPoint = new Pose(8, 73);
+    public static Pose intakeSweep = new Pose(20, 9);
+    public static Pose intakeSweepControlPoint = new Pose(10, 76);
+    public static Pose intakeEdgeControlPoint = new Pose(10, 76);
+    public static Pose intakeNewCorner = new Pose(16.5, 7.7);
+    public static Pose intakeNewEdge = new Pose(12.5, 17);
     public static Pose gateIntake = new Pose(6, 41);
     public static Pose gateIntakeControlPoint = new Pose(15, 35);
     public static Pose farPark = new Pose(21.25, 12.735);
     public static Pose testPose = new Pose(72, 72, 145);
 
-    public static double launchHeading0 = 138; //120
+    public static double launchHeading0 = 136; //120
     public static double launchHeading1 = 152; //145
     public static double launchHeading2 = 142; //145
     public static double launchHeading3 = 135; //130
     public static double launchfarheading = 108;
     public static double intakeHeading = 180;
-    public static double farlaunchHeading1 = 120;
-    public static double farlaunchHeading2 = 130;
-    public static double farlaunchHeading3 = 105;
-    public static double farlaunchHeading4 = 110;
+    public static double SweepIntakeHeading = 237;
+    public static double NewCornerIntakeHeading = -147;
+    public static double farlaunchHeading1 = 117;
+    public static double farlaunchHeading2 = 117;
+    public static double farlaunchHeading3 = 115;
+    public static double farlaunchHeading4 = 115;
     public static double cornerIntakeHeading = 250;
     public static double cornerIntakeHeading2 = 0;
     public static double tunnelIntakeHeading = 90;
@@ -118,48 +146,57 @@ public class Paths {
     public static Pose RIntake1 = new Pose(95, 88);
     public static Pose RIntake1ControlPoint = new Pose(83, 89.143);
     public static Pose RIntake1end = new Pose(125, 88);
-    public static Pose RIntake2 = new Pose(95, 60);
+    public static Pose RIntake2 = new Pose(95, 62);
     public static Pose RIntake2ControlPoint = new Pose(73, 64.369);
-    public static Pose RIntake2end = new Pose(128, 60);
+    public static Pose RIntake2end = new Pose(128, 62);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
-    public static Pose RIntake3 = new Pose(95, 39);
+    public static Pose RIntake3 = new Pose(95, 41);
     public static Pose RIntake3ControlPoint = new Pose(70, 41.585);
-    public static Pose RIntake3end = new Pose(128, 39);
+    public static Pose RIntake3end = new Pose(128, 41);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
-    public static Pose Rlever = new Pose(131.75, 78.5);
-    public static Pose RleverControlPoint = new Pose(97.331, 74.620);
-    public static Pose REnd = new Pose(110, 76);
+    public static Pose Rlever = new Pose(127, 77);
+    public static Pose RleverControlPoint = new Pose(120, 74.620);
+    public static Pose REnd = new Pose(90, 84);
     public static Pose RfarStart = new Pose(90.000, 9.000);
-    public static Pose RfarLaunch = new Pose(87.000, 15);
-    public static Pose Rintake4 = new Pose(130, 36.000);
+    public static Pose RfarLaunch = new Pose(87.000, 17);
+    public static Pose RfarLaunch2 = new Pose(87.000, 19);
+    public static Pose RfarLaunch3 = new Pose(87.000, 19);
+    public static Pose RfarLaunch4 = new Pose(87.000, 24);
+    public static Pose Rintake4 = new Pose(128, 36.000);
     public static Pose Rintake4ControlPoint = new Pose(78.000, 40.000);
     public static Pose RintakeCorner = new Pose(132, 12.229);
     public static Pose RintakeCornerControlPoint = new Pose(134, 76);
-    public static Pose RintakeNewCorner = new Pose(129.5, 7.7); //new way to intake corner balls
+    public static Pose RintakeSweep = new Pose(132, 16);
+    public static Pose RintakeSweepControlPoint = new Pose(134, 76);
+    public static Pose RintakeEdgeControlPoint = new Pose(134, 76);
+    public static Pose RintakeNewCorner = new Pose(127.5, 7.7); //new way to intake corner balls
+    public static Pose RintakeNewEdge = new Pose(126.5, 17); //new way to intake corner balls
     public static Pose RintakeNewCornerControlPoint = new Pose(131, 56); //pull the control point in more (decrease y)
-    public static Pose RgateIntake = new Pose(131, 43.000);
+    public static Pose RgateIntake = new Pose(132, 45.000);
     public static Pose RgateIntakeControlPoint = new Pose(129, 35);
     public static Pose RfarPark = new Pose(120, 12.735);
     public static double RlaunchHeading1 = 42;
-    public static double RlaunchHeading2 = 28;
-    public static double RlaunchHeading3 = 38;
-    public static double RlaunchHeading4 = 45;
+    public static double RlaunchHeading2 = 34;
+    public static double RlaunchHeading3 = 41;
+    public static double RlaunchHeading4 = 48;
 
     public static double RintakeHeading = 0;
     public static double RfarlaunchHeading = 67;
     //58
     public static double RfarlaunchHeading2 = 67;
     // 66;
-    public static double RfarlaunchHeading3 = 67;
+    public static double RfarlaunchHeading3 = 69;
     //53;
-    public static double RfarlaunchHeading4 = 67;
+    public static double RfarlaunchHeading4 = 68;
     //56;
 
     public static double RcornerIntakeHeading = 250;
     public static double RcornerIntakeHeading2 = 0;
-    public static double RtunnelIntakeHeading = 90;
+    public static double RtunnelIntakeHeading = 50;
 
     public static double RNewCornerIntakeHeading = -33;
+    public static double RSweepIntakeHeading = -57;
+
     //public static double RNewCornerIntakeHeading2 = 0;
 
     public PathChain launch;
@@ -191,6 +228,11 @@ public class Paths {
     public PathChain launchfartointakeCorner;
     public PathChain launchfartogateintake;
     public PathChain gateintaketolaunchfar;
+    public PathChain launchfartointakeSweep;
+    public PathChain intakeSweeptolaunchfar;
+    public PathChain launchfartointakeEdgeNew;
+    public PathChain intakeEdgeNewtolaunchfar;
+
     public PathChain Rlaunchfartopark;
     public PathChain launchfartopark;
     public PathChain Rstarttolaunch;
@@ -239,6 +281,10 @@ public class Paths {
     public PathChain RLaunchtoEnd;
     public PathChain Rlaunchfartogateintake;
     public PathChain Rgateintaketolaunchfar;
+    public PathChain RintakeEdgeNewtolaunchfar;
+    public PathChain RlaunchfartointakeEdgeNew;
+    public PathChain RlaunchfartointakeSweep;
+    public PathChain RintakeSweeptolaunchfar;
 
     public static Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
@@ -411,8 +457,8 @@ public class Paths {
             .build();
         Intake1endtoLever = follower
             .pathBuilder()
-            .addPath(new BezierLine(new Pose(20.000, 85.000), new Pose(12.250, 75.500)))
-            .setConstantHeadingInterpolation(Math.toRadians(90))
+            .addPath(new BezierCurve(Intake1end, LeverControlPoint, Lever))
+            .setConstantHeadingInterpolation(Math.toRadians(180))
             //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
             .build();
         LevertoLaunch = follower
@@ -565,7 +611,8 @@ public class Paths {
         RIntake1endtoLever = follower
             .pathBuilder()
             .addPath(new BezierCurve(RIntake1end, RleverControlPoint, Rlever))
-            .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
+            .setConstantHeadingInterpolation(Math.toRadians(0))
+            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
             .build();
 
         RLevertoLaunch = follower
@@ -665,13 +712,13 @@ public class Paths {
         Rlaunchfartointake4 = follower
             .pathBuilder()
             .addPath(new BezierCurve(RfarLaunch, Rintake4ControlPoint, Rintake4))
-            .setConstantHeadingInterpolation(Math.toRadians(0))
+            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
             .setVelocityConstraint(0.3)
             .build();
 
         Rintake4tolaunchfar = follower
             .pathBuilder()
-            .addPath(new BezierLine(Rintake4, RfarLaunch))
+            .addPath(new BezierLine(Rintake4, RfarLaunch2))
             .setConstantHeadingInterpolation(Math.toRadians(RfarlaunchHeading2))
             //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RfarlaunchHeading))
             .setVelocityConstraint(0.3)
@@ -679,7 +726,7 @@ public class Paths {
 
         RlaunchfartointakeCorner = follower
             .pathBuilder()
-            .addPath(new BezierCurve(RfarLaunch, RintakeCornerControlPoint, RintakeCorner))
+            .addPath(new BezierCurve(RfarLaunch2, RintakeCornerControlPoint, RintakeCorner))
             //            .setLinearHeadingInterpolation(
             //                Math.toRadians(RlaunchHeading1),
             //                Math.toRadians(RcornerIntakeHeading)
@@ -691,7 +738,7 @@ public class Paths {
 
         RintakeCornertolaunchfar = follower
             .pathBuilder()
-            .addPath(new BezierLine(RintakeCorner, RfarLaunch))
+            .addPath(new BezierLine(RintakeCorner, RfarLaunch3))
             .setVelocityConstraint(0.3)
             .setLinearHeadingInterpolation(
                 Math.toRadians(RcornerIntakeHeading2),
@@ -702,7 +749,7 @@ public class Paths {
         RlaunchfartointakeCornerNew = follower
             //new way to intake corner balls
             .pathBuilder()
-            .addPath(new BezierCurve(RfarLaunch, RintakeCornerControlPoint, RintakeNewCorner))
+            .addPath(new BezierCurve(RfarLaunch3, RintakeCornerControlPoint, RintakeNewCorner))
             //            .setLinearHeadingInterpolation(
             //                Math.toRadians(RlaunchHeading1),
             //                Math.toRadians(RcornerIntakeHeading)
@@ -715,7 +762,53 @@ public class Paths {
         RintakeCornerNewtolaunchfar = follower
             //new way to intake corner balls
             .pathBuilder()
-            .addPath(new BezierLine(RintakeNewCorner, RfarLaunch))
+            .addPath(new BezierLine(RintakeNewCorner, RfarLaunch4))
+            .setVelocityConstraint(0.3)
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RNewCornerIntakeHeading),
+                Math.toRadians(RfarlaunchHeading3)
+            )
+            .build();
+        RlaunchfartointakeSweep = follower
+            .pathBuilder()
+            .addPath(new BezierLine(RfarLaunch3, RintakeSweep))
+            //            .setLinearHeadingInterpolation(
+            //                Math.toRadians(RlaunchHeading1),
+            //                Math.toRadians(RcornerIntakeHeading)
+            //            )
+            //.setTangentHeadingInterpolation() //test this
+            .setConstantHeadingInterpolation(Math.toRadians(RSweepIntakeHeading))
+            .setVelocityConstraint(0.3)
+            .build();
+
+        RintakeSweeptolaunchfar = follower
+            //new way to intake corner balls
+            .pathBuilder()
+            .addPath(new BezierLine(RintakeSweep, RfarLaunch4))
+            .setVelocityConstraint(0.3)
+            .setLinearHeadingInterpolation(
+                Math.toRadians(RSweepIntakeHeading),
+                Math.toRadians(RfarlaunchHeading4)
+            )
+            .build();
+
+        RlaunchfartointakeEdgeNew = follower
+            //new way to intake corner balls
+            .pathBuilder()
+            .addPath(new BezierCurve(RfarLaunch3, RintakeEdgeControlPoint, RintakeNewEdge))
+            //            .setLinearHeadingInterpolation(
+            //                Math.toRadians(RlaunchHeading1),
+            //                Math.toRadians(RcornerIntakeHeading)
+            //            )
+            //.setTangentHeadingInterpolation() //test this
+            .setConstantHeadingInterpolation(Math.toRadians(RNewCornerIntakeHeading))
+            .setVelocityConstraint(0.3)
+            .build();
+
+        RintakeEdgeNewtolaunchfar = follower
+            //new way to intake corner balls
+            .pathBuilder()
+            .addPath(new BezierLine(RintakeNewEdge, RfarLaunch4))
             .setVelocityConstraint(0.3)
             .setLinearHeadingInterpolation(
                 Math.toRadians(RNewCornerIntakeHeading),
@@ -725,7 +818,7 @@ public class Paths {
 
         Rlaunchfartopark = follower
             .pathBuilder()
-            .addPath(new BezierLine(RfarLaunch, RfarPark))
+            .addPath(new BezierLine(RfarLaunch4, RfarPark))
             .setLinearHeadingInterpolation(Math.toRadians(RfarlaunchHeading), Math.toRadians(0))
             .setVelocityConstraint(0.3)
             .build();
@@ -762,6 +855,52 @@ public class Paths {
         //                .setVelocityConstraint(0.3)
         //                .build();
 
+        launchfartointakeSweep = follower
+            .pathBuilder()
+            .addPath(new BezierLine(farLaunch3, intakeSweep))
+            //            .setLinearHeadingInterpolation(
+            //                Math.toRadians(RlaunchHeading1),
+            //                Math.toRadians(RcornerIntakeHeading)
+            //            )
+            //.setTangentHeadingInterpolation() //test this
+            .setConstantHeadingInterpolation(Math.toRadians(SweepIntakeHeading))
+            .setVelocityConstraint(0.3)
+            .build();
+
+        intakeSweeptolaunchfar = follower
+            //new way to intake corner balls
+            .pathBuilder()
+            .addPath(new BezierLine(intakeSweep, farLaunch4))
+            .setVelocityConstraint(0.3)
+            .setLinearHeadingInterpolation(
+                Math.toRadians(SweepIntakeHeading),
+                Math.toRadians(farlaunchHeading4)
+            )
+            .build();
+
+        launchfartointakeEdgeNew = follower
+            //new way to intake corner balls
+            .pathBuilder()
+            .addPath(new BezierCurve(farLaunch3, intakeEdgeControlPoint, intakeNewEdge))
+            //            .setLinearHeadingInterpolation(
+            //                Math.toRadians(RlaunchHeading1),
+            //                Math.toRadians(RcornerIntakeHeading)
+            //            )
+            //.setTangentHeadingInterpolation() //test this
+            .setConstantHeadingInterpolation(Math.toRadians(NewCornerIntakeHeading))
+            .setVelocityConstraint(0.3)
+            .build();
+
+        intakeEdgeNewtolaunchfar = follower
+            //new way to intake corner balls
+            .pathBuilder()
+            .addPath(new BezierLine(intakeNewEdge, farLaunch4))
+            .setVelocityConstraint(0.3)
+            .setLinearHeadingInterpolation(
+                Math.toRadians(NewCornerIntakeHeading),
+                Math.toRadians(farlaunchHeading3)
+            )
+            .build();
         launchfartointakeCorner = follower
             .pathBuilder()
             .addPath(new BezierCurve(farLaunch, intakeCornerControlPoint, intakeCorner))

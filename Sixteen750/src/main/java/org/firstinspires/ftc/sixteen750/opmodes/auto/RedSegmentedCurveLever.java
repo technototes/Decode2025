@@ -55,7 +55,7 @@ public class RedSegmentedCurveLever extends CommandOpMode {
                     ),
                     new WaitCommand(0.05),
                     //   TeleCommands.AutoLaunch2(robot),
-                    new PedroPathCommand(robot.follower, p.RIntake1endtoLever),
+                    new PedroPathCommand(robot.follower, p.RIntake1endtoLever, p.power2),
                     new WaitCommand(0.7),
                     new PedroPathCommand(robot.follower, p.RLevertoLaunch).alongWith(
                         TeleCommands.IntakeStop(robot)

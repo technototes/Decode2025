@@ -36,7 +36,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 @Configurable
 public class PedroDriver implements Command, Loggable {
 
-    public static double VISION_TURN_SCALE = 0.02 * 30;
+    public static double VISION_TURN_SCALE = 1;
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
