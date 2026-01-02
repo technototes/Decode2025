@@ -79,3 +79,9 @@ body {
 .col3 {
   grid-column: 5;
 }
+
+.vcentered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -2,6 +2,7 @@ import { isString } from '@freik/typechk';
 import { expect, test } from 'bun:test';
 import path from 'path';
 import { LoadPath, loadPathChainsFromFile } from '../loadpath';
+import { BezierName, PathChainName, PoseName, ValueName } from '../types';
 import { firstFtcSrc, getProjectFilePath } from '../utility';
 
 function getTestRepoPath(): string {
@@ -36,89 +37,125 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     return;
   }
   // This currently failing, as I haven't implemented the parsing yet.
-  expect(paths.values.length).toBe(4);
+  expect(paths.values.length).toBe(7);
   expect(paths.values[0]).toEqual({
-    name: 'org',
-    value: { type: 'double', value: 72.0 },
+    name: 'org' as ValueName,
+    value: { double: 72.0 },
   });
   expect(paths.values[1]).toEqual({
-    name: 'step',
-    value: { type: 'int', value: 80 },
+    name: 'step' as ValueName,
+    value: { int: 80 },
   });
   expect(paths.values[2]).toEqual({
-    name: 'one80',
-    value: { type: 'radians', value: 180 },
+    name: 'ninety' as ValueName,
+    value: { int: 90 },
   });
   expect(paths.values[3]).toEqual({
-    name: 'step_mid',
-    value: { type: 'double', value: 74.0 },
+    name: 'one80' as ValueName,
+    value: { radians: { int: 180 } },
+  });
+  expect(paths.values[4]).toEqual({
+    name: 'step_mid' as ValueName,
+    value: { double: 74.0 },
+  });
+  expect(paths.values[4]).toEqual({
+    name: 'step_mid' as ValueName,
+    value: { double: 74.0 },
+  });
+  expect(paths.values[5]).toEqual({
+    name: 'radRef' as ValueName,
+    value: { radians: 'ninety' as ValueName },
+  });
+  expect(paths.values[6]).toEqual({
+    name: 'valRef' as ValueName,
+    value: 'org' as ValueName,
   });
 
   expect(paths.poses.length).toBe(6);
   expect(paths.poses[0]).toEqual({
-    name: 'start',
-    pose: { x: 'org', y: 'org', heading: { type: 'int', value: 0 } },
+    name: 'start' as PoseName,
+    pose: { x: 'org' as ValueName, y: 'org' as ValueName, heading: { int: 0 } },
   });
   expect(paths.poses[1]).toEqual({
-    name: 'step1',
-    pose: { x: 'step', y: 'org', heading: { type: 'radians', value: 90 } },
+    name: 'step1' as PoseName,
+    pose: {
+      x: 'step' as ValueName,
+      y: 'org' as ValueName,
+      heading: { radians: { int: 90 } },
+    },
   });
   expect(paths.poses[2]).toEqual({
-    name: 'step2',
-    pose: { x: 'step', y: 'step', heading: 'one80' },
+    name: 'step2' as PoseName,
+    pose: {
+      x: 'step' as ValueName,
+      y: 'step' as ValueName,
+      heading: 'one80' as ValueName,
+    },
   });
   expect(paths.poses[3]).toEqual({
-    name: 'step23_mid',
-    pose: { x: 'step_mid', y: 'step_mid' },
+    name: 'step23_mid' as PoseName,
+    pose: { x: 'step_mid' as ValueName, y: 'step_mid' as ValueName },
   });
   expect(paths.poses[4]).toEqual({
-    name: 'step3',
-    pose: { x: 'org', y: 'step', heading: { type: 'double', value: -0.7854 } },
+    name: 'step3' as PoseName,
+    pose: {
+      x: 'org' as ValueName,
+      y: 'step' as ValueName,
+      heading: { double: -0.7854 },
+    },
   });
   expect(paths.poses[5]).toEqual({
-    name: 'step4',
+    name: 'step4' as PoseName,
     pose: {
-      x: { type: 'double', value: 72.0 },
-      y: { type: 'int', value: 72 },
-      heading: { type: 'radians', value: -30 },
+      x: { double: 72.0 },
+      y: { int: 72 },
+      heading: { radians: { int: -30 } },
     },
   });
 
   expect(paths.beziers.length).toBe(4);
   expect(paths.beziers[0]).toEqual({
-    name: 'start_to_step1',
+    name: 'start_to_step1' as BezierName,
     points: {
-      points: ['start', 'step1'],
+      points: ['start' as PoseName, 'step1' as PoseName],
       type: 'line',
     },
   });
   expect(paths.beziers[1]).toEqual({
-    name: 'step2_to_step3',
+    name: 'step2_to_step3' as BezierName,
     points: {
-      points: ['step2', 'step23_mid', 'step3'],
+      points: [
+        'step2' as PoseName,
+        'step23_mid' as PoseName,
+        'step3' as PoseName,
+      ],
       type: 'curve',
     },
   });
   expect(paths.beziers[2]).toEqual({
-    name: 'step4_to_start',
+    name: 'step4_to_start' as BezierName,
     points: {
-      points: ['step4', { x: 'org', y: { type: 'int', value: 15 } }, 'start'],
+      points: [
+        'step4' as PoseName,
+        { x: 'org' as ValueName, y: { int: 15 } },
+        'start' as PoseName,
+      ],
       type: 'curve',
     },
   });
   expect(paths.beziers[3]).toEqual({
-    name: 'another_line',
+    name: 'another_line' as BezierName,
     points: {
       points: [
         {
-          x: { type: 'double', value: 1.2 },
-          y: 'step_mid',
-          heading: { type: 'double', value: 0.0 },
+          x: { double: 1.2 },
+          y: 'step_mid' as ValueName,
+          heading: { double: 0.0 },
         },
         {
-          x: { type: 'int', value: 1 },
-          y: { type: 'double', value: 3.4 },
-          heading: { type: 'radians', value: 60 },
+          x: { int: 1 },
+          y: { double: 3.4 },
+          heading: { radians: { int: 60 } },
         },
       ],
       type: 'line',
@@ -127,50 +164,67 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
 
   expect(paths.pathChains.length).toBe(5);
   expect(paths.pathChains[0]).toEqual({
-    name: 'Path1',
-    paths: ['start_to_step1'],
-    heading: { type: 'interpolated', headings: ['start', 'step1'] },
+    name: 'Path1' as PathChainName,
+    paths: ['start_to_step1' as BezierName],
+    heading: {
+      type: 'interpolated',
+      headings: ['start' as PoseName, 'step1' as PoseName],
+    },
   });
   expect(paths.pathChains[1]).toEqual({
-    name: 'Path2',
-    paths: [{ type: 'curve', points: ['step1', 'step2'] }],
+    name: 'Path2' as PathChainName,
+    paths: [
+      { type: 'curve', points: ['step1' as PoseName, 'step2' as PoseName] },
+    ],
     heading: {
       type: 'interpolated',
       headings: [
         {
-          type: 'radians',
-          value: 90,
+          radians: { int: 90 },
         },
-        { radians: 'step_mid' },
+        { radians: 'step_mid' as ValueName },
       ],
     },
   });
   expect(paths.pathChains[2]).toEqual({
-    name: 'Path3',
-    paths: ['step2_to_step3'],
-    heading: { type: 'interpolated', headings: ['step_mid', 'step3'] },
+    name: 'Path3' as PathChainName,
+    paths: ['step2_to_step3' as BezierName],
+    heading: {
+      type: 'interpolated',
+      headings: ['step_mid' as PoseName, 'step3' as PoseName],
+    },
   });
   expect(paths.pathChains[3]).toEqual({
-    name: 'Path4',
-    paths: [{ type: 'line', points: ['step3', 'step4'] }],
-    heading: { type: 'constant', heading: 'one80' },
+    name: 'Path4' as PathChainName,
+    paths: [
+      { type: 'line', points: ['step3' as PoseName, 'step4' as PoseName] },
+    ],
+    heading: { type: 'constant', heading: 'one80' as ValueName },
   });
   expect(paths.pathChains[4]).toEqual({
-    name: 'AnotherPath',
+    name: 'AnotherPath' as PathChainName,
     paths: [
       {
         type: 'line',
         points: [
-          { x: { type: 'int', value: 0 }, y: { type: 'int', value: 0 } },
-          { x: { type: 'int', value: 20 }, y: { type: 'int', value: 20 } },
+          { x: { int: 0 }, y: { int: 0 } },
+          { x: { int: 20 }, y: { int: 20 } },
         ],
       },
-      { type: 'curve', points: ['step1', 'step2', 'step3', 'step4'] },
-      'step4_to_start',
+      {
+        type: 'curve',
+        points: [
+          'step1' as PoseName,
+          'step2' as PoseName,
+          'step3' as PoseName,
+          'step4' as PoseName,
+        ],
+      },
+      'step4_to_start' as BezierName,
     ],
     heading: {
       type: 'interpolated',
-      headings: [{ radians: 'step' }, 'step4'],
+      headings: [{ radians: 'step' as ValueName }, 'radRef' as PoseName],
     },
   });
 });

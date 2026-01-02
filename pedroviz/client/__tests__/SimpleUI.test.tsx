@@ -16,22 +16,33 @@ import {
 import { beforeEach, describe, expect, test } from 'bun:test';
 import { Provider, useAtom } from 'jotai';
 import { ReactElement } from 'react';
-import { AnonymousBezier, PathChainFile, TeamPaths } from '../../server/types';
+import {
+  AnonymousBezier,
+  BezierName,
+  Path,
+  PathChainFile,
+  PathChainName,
+  PoseName,
+  Team,
+  TeamPaths,
+  ValueName,
+} from '../../server/types';
 import { select_a_bot, select_a_file } from '../constants';
 import { PathsDataDisplay } from '../PathsDataDisplay';
 import { PathSelector } from '../PathSelector';
-import { EmptyPathChainFile } from '../state/API';
 import {
   ColorForNumber,
   ColorsAtom,
   FilesForSelectedTeam,
-  NamedBeziersAtom,
-  NamedPathChainsAtom,
-  NamedPosesAtom,
-  NamedValuesAtom,
+  MappedBeziersAtom,
+  MappedPathChainsAtom,
+  MappedPosesAtom,
+  MappedValuesAtom,
+  PoseAtomFamily,
   SelectedFileAtom,
   SelectedTeamAtom,
   ThemeAtom,
+  ValueAtomFamily,
 } from '../state/Atoms';
 import { getStore } from '../state/Storage';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
@@ -39,61 +50,98 @@ import './jest-dom-types-fix.test';
 
 // Mocks & phony data for my tests:
 const teamPaths: TeamPaths = {
-  team1: ['path1.java', 'path2.java'],
-  team2: ['path3.java', 'path4.java'],
+  ['team1' as Team]: ['path1.java' as Path, 'path2.java' as Path],
+  ['team2' as Team]: ['path3.java' as Path, 'path4.java' as Path],
 };
 
 const testPathChainFile: PathChainFile = {
-  ...EmptyPathChainFile,
+  values: [],
+  poses: [],
+  beziers: [],
+  pathChains: [],
   name: 'path1.java',
 };
 
 const simpleBez: AnonymousBezier = {
   type: 'curve',
-  points: [{ x: 'val1', y: 'val1' }, 'pose1', 'pose2'],
+  points: [
+    { x: 'val1' as ValueName, y: 'val1' as ValueName },
+    'pose1' as PoseName,
+    'pose2' as PoseName,
+  ],
 };
 const fullPathChainFile: PathChainFile = {
   name: 'path3.java',
   values: [
-    { name: 'val1', value: { type: 'int', value: 1 } },
-    { name: 'val2', value: { type: 'double', value: 2.5 } },
-    { name: 'val3', value: { type: 'radians', value: 90 } },
+    { name: 'val1' as ValueName, value: { int: 1 } },
+    { name: 'val2' as ValueName, value: { double: 2.5 } },
+    { name: 'val3' as ValueName, value: { radians: { int: 90 } } },
   ],
   poses: [
-    { name: 'pose1', pose: { x: { type: 'double', value: 2.5 }, y: 'val1' } },
     {
-      name: 'pose2',
-      pose: { x: 'val2', y: 'val1', heading: { type: 'radians', value: 60 } },
+      name: 'pose1' as PoseName,
+      pose: { x: { double: 2.5 }, y: 'val1' as ValueName },
     },
     {
-      name: 'pose3',
-      pose: { x: 'val1', y: 'val2', heading: 'val3' },
+      name: 'pose2' as PoseName,
+      pose: {
+        x: 'val2' as ValueName,
+        y: 'val1' as ValueName,
+        heading: { radians: { int: 60 } },
+      },
+    },
+    {
+      name: 'pose3' as PoseName,
+      pose: {
+        x: 'val1' as ValueName,
+        y: 'val2' as ValueName,
+        heading: 'val3' as ValueName,
+      },
     },
   ],
   beziers: [
-    { name: 'bez1', points: { type: 'line', points: ['pose1', 'pose2'] } },
     {
-      name: 'bez2',
+      name: 'bez1' as BezierName,
+      points: {
+        type: 'line',
+        points: ['pose1' as PoseName, 'pose2' as PoseName],
+      },
+    },
+    {
+      name: 'bez2' as BezierName,
       points: simpleBez,
     },
   ],
   pathChains: [
     {
-      name: 'pc1',
-      paths: ['bez1', 'bez2'],
+      name: 'pc1' as PathChainName,
+      paths: ['bez1' as BezierName, 'bez2' as BezierName],
       heading: { type: 'tangent' },
     },
     {
-      name: 'pc2',
-      paths: ['bez2', { type: 'line', points: ['pose1', 'pose3'] }],
-      heading: { type: 'constant', heading: 'pose3' },
+      name: 'pc2' as PathChainName,
+      paths: [
+        'bez2' as BezierName,
+        { type: 'line', points: ['pose1' as PoseName, 'pose3' as PoseName] },
+      ],
+      heading: { type: 'constant', heading: 'pose3' as PoseName },
     },
     {
-      name: 'pc3',
-      paths: ['bez1', { type: 'curve', points: ['pose1', 'pose3', 'pose2'] }],
+      name: 'pc3' as PathChainName,
+      paths: [
+        'bez1' as BezierName,
+        {
+          type: 'curve',
+          points: [
+            'pose1' as PoseName,
+            'pose3' as PoseName,
+            'pose2' as PoseName,
+          ],
+        },
+      ],
       heading: {
         type: 'interpolated',
-        headings: ['pose2', { radians: { type: 'int', value: 135 } }],
+        headings: ['pose2' as PoseName, { radians: { int: 135 } }],
       },
     },
   ],
@@ -246,29 +294,32 @@ describe('SchemaAtom tests', () => {
         </JotaiProvider>,
       );
     });
-    store.set(SelectedTeamAtom, 'team2');
-    store.set(SelectedFileAtom, 'path3.java');
-    await waitFor(async () => {
+    await act(async () => {
+      await store.set(SelectedTeamAtom, 'team2');
+      await store.set(SelectedFileAtom, 'path3.java');
+    });
+    await act(async () => {
       expect(await store.get(SelectedFileAtom)).toBe('path3.java');
     });
-    expect(store.get(NamedValuesAtom)).toBeDefined();
-    expect(store.get(NamedPosesAtom)).toBeDefined();
-    expect(store.get(NamedBeziersAtom)).toBeDefined();
-    expect(store.get(NamedPathChainsAtom)).toBeDefined();
+    expect(await store.get(MappedValuesAtom)).toBeDefined();
+    expect(await store.get(MappedPosesAtom)).toBeDefined();
+    expect(await store.get(MappedBeziersAtom)).toBeDefined();
+    expect(await store.get(MappedPathChainsAtom)).toBeDefined();
     await act(() =>
-      store.set(NamedValuesAtom, {
-        name: 'valX',
-        value: { type: 'int', value: 42 },
-      }),
+      store.set(ValueAtomFamily('valX' as ValueName), { int: 42 }),
     );
-    waitFor(async () => {
-      expect(await store.get(NamedValuesAtom)).toHaveProperty('valX');
-      expect(await store.get(NamedPosesAtom)).toHaveProperty('poseX');
+    await waitFor(async () => {
+      expect(
+        (await store.get(MappedValuesAtom)).has('valX' as ValueName),
+      ).toBeTrue();
+      expect(
+        (await store.get(MappedPosesAtom)).has('poseX' as PoseName),
+      ).toBeFalse();
     });
     await act(() =>
-      store.set(NamedPosesAtom, {
-        name: 'poseX',
-        pose: { x: 'valX', y: 'valX' },
+      store.set(PoseAtomFamily('poseX' as PoseName), {
+        x: 'valX' as ValueName,
+        y: 'valX' as ValueName,
       }),
     );
   });

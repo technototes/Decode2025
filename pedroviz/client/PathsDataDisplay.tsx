@@ -1,29 +1,33 @@
-import { Button, Input, InputProps, Text } from '@fluentui/react-components';
-import { isDefined, isString } from '@freik/typechk';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { Button, Text } from '@fluentui/react-components';
+import { isDefined } from '@freik/typechk';
+import { useAtomValue } from 'jotai';
 import { CSSProperties, Fragment, ReactElement } from 'react';
 import {
-  AnonymousPose,
-  AnonymousValue,
-  chkRadiansRef,
   HeadingRef,
   HeadingType,
+  isRadiansRef,
   isRef,
-  NamedBezier,
-  NamedPathChain,
-  NamedPose,
-  NamedValue,
+  PoseName,
   PoseRef,
   RadiansRef,
+  ValueName,
   ValueRef,
 } from '../server/types';
-import { NewNamedValue } from './NewNamedValue';
 // import { getBezier, getColorFor, getPose } from './state/API';
+import { NewPose } from './Displays/NewPose';
+import { NewValue } from './Displays/NewValue';
+import { NamedPoseList } from './Displays/PoseDisplay';
+import { AnonymousValueDisplay, NamedValueList } from './Displays/ValueDisplay';
 import { getColorFor } from './state/API';
-import { ColorsAtom, FileContentsAtom, SelectedFileAtom } from './state/Atoms';
+import {
+  ColorsAtom,
+  MappedBeziersAtom,
+  MappedPathChainsAtom,
+  SelectedFileAtom,
+} from './state/Atoms';
+import { AnonymousPathChain } from './types';
 import { Expando } from './ui-tools/Expando';
-
-type ItemWithStyle<Type> = { item: Type; style?: CSSProperties };
+import { ItemWithStyle } from './ui-tools/types';
 
 function MathToRadianDisplay({
   item,
@@ -37,31 +41,18 @@ function MathToRadianDisplay({
   );
 }
 
-function AnonymousValueDisplay({
+export function GeneralRefDisplay({
   item,
   ...props
-}: ItemWithStyle<AnonymousValue>): ReactElement {
-  switch (item.type) {
-    case 'radians':
-      return (
-        <MathToRadianDisplay
-          item={{ type: 'double', value: item.value }}
-          {...props}
-        />
-      );
-    case 'double':
-      return <Text {...props}>{item.value.toFixed(3)}</Text>;
-    case 'int':
-      return <Text {...props}>{item.value.toFixed(0)}</Text>;
-  }
+}: ItemWithStyle<ValueName | PoseName>) {
+  return <Text {...props}>{item}</Text>;
 }
-
 export function ValueRefDisplay({
   item,
   ...props
 }: ItemWithStyle<ValueRef>): ReactElement {
-  return isString(item) ? (
-    <Text {...props}>{item}</Text>
+  return isRef(item) ? (
+    <GeneralRefDisplay item={item} {...props} />
   ) : (
     <AnonymousValueDisplay item={item} {...props} />
   );
@@ -74,145 +65,20 @@ function RadiansRefDisplay({
   return <MathToRadianDisplay item={item.radians} {...props} />;
 }
 
-function HeadingRefDisplay({
+export function HeadingRefDisplay({
   item,
   ...props
 }: ItemWithStyle<HeadingRef>): ReactElement {
   if (isDefined(item)) {
-    return chkRadiansRef(item) ? (
-      <RadiansRefDisplay item={item} {...props} />
-    ) : (
-      <ValueRefDisplay item={item} {...props} />
-    );
+    if (isRadiansRef(item)) {
+      return <RadiansRefDisplay item={item} {...props} />;
+    } else if (isRef(item)) {
+      return <GeneralRefDisplay item={item} {...props} />;
+    } else {
+      return <AnonymousValueDisplay item={item} {...props} />;
+    }
   }
   return <>&nbsp;</>;
-}
-
-export function NamedValueElem({ item }: { item: NamedValue }): ReactElement {
-  const setNamedVal = useSetAtom(FileContentsAtom);
-  const onChange: InputProps['onChange'] = (_, data) => {
-    const newVal = Number.parseFloat(data.value);
-    if (!isNaN(newVal)) {
-      setNamedVal({
-        name: item.name,
-        value: { type: item.value.type, value: newVal },
-      });
-    }
-  };
-  return (
-    <>
-      <Text>{item.name}</Text>
-      <Input
-        type="number"
-        value={item.value.value.toString()}
-        onChange={onChange}
-        input={{ style: { textAlign: 'right' } }}
-      />
-      <Text>
-        {` ${item.value.type === 'radians' ? 'degrees' : item.value.type}`}
-      </Text>
-    </>
-  );
-}
-
-export function NamedValueList({
-  items,
-}: {
-  items: NamedValue[];
-}): ReactElement {
-  const names = items.sort((a, b) => a.name.localeCompare(b.name));
-  const gridStyle: CSSProperties = {
-    display: 'grid',
-    columnGap: '10pt',
-    gridTemplateColumns: '1fr auto auto',
-    justifyItems: 'end',
-    justifySelf: 'start',
-    alignItems: 'center',
-  };
-
-  return (
-    <div style={gridStyle}>
-      <Text size={400}>Name {names.length}</Text>
-      <Text size={400}>Value</Text>
-      <Text size={400}>Units</Text>
-      {names.map((val) => (
-        <NamedValueElem key={val.name} item={val} />
-      ))}
-    </div>
-  );
-}
-
-export type AnonymousPoseDisplayProps = {
-  pose: AnonymousPose;
-  noHeading?: boolean;
-};
-export function AnonymousPoseDisplay({
-  pose,
-  noHeading,
-}: AnonymousPoseDisplayProps): ReactElement {
-  // const colors = useAtomValue(ColorsAtom);
-  const style = {
-    /* color: colors[getColorFor(pose)]*/
-  };
-  return noHeading ? (
-    <>
-      <ValueRefDisplay style={style} item={pose.x} />
-      <ValueRefDisplay style={style} item={pose.y} />
-    </>
-  ) : (
-    <>
-      <ValueRefDisplay style={style} item={pose.x} />
-      <ValueRefDisplay style={style} item={pose.y} />
-      <HeadingRefDisplay style={style} item={pose.heading} />
-    </>
-  );
-}
-
-export function AnonymousPoseHeader({
-  noHeading,
-}: {
-  noHeading?: boolean;
-}): ReactElement {
-  return noHeading ? (
-    <>
-      <Text size={400}>X</Text>
-      <Text size={400}>Y</Text>
-    </>
-  ) : (
-    <>
-      <Text size={400}>X</Text>
-      <Text size={400}>Y</Text>
-      <Text size={400}>Heading</Text>
-    </>
-  );
-}
-
-export function NamedPoseList({ items }: { items: NamedPose[] }): ReactElement {
-  const poses = items.sort((a, b) => a.name.localeCompare(b.name));
-  const colors = useAtomValue(ColorsAtom);
-  const gridStyle: CSSProperties = {
-    display: 'grid',
-    columnGap: '10pt',
-    gridTemplateColumns: '1fr auto auto auto',
-    justifyItems: 'end',
-    justifySelf: 'start',
-  };
-  return (
-    <div style={gridStyle}>
-      <Text size={400}>Name {poses.length}</Text>
-      <AnonymousPoseHeader />
-      {poses.map((pose) => {
-        const color = getColorFor(pose.pose);
-        const style = { color: colors[color % colors.length] };
-        return (
-          <Fragment key={`pr-${pose.name}-1`}>
-            <Text style={style}>{pose.name}</Text>
-            <AnonymousPoseDisplay pose={pose.pose} />
-          </Fragment>
-        );
-      })}
-    </div>
-  );
 }
 
 function InlinePoseRefDisplay({ pose }: { pose: PoseRef }): ReactElement {
@@ -255,18 +121,16 @@ function rowSpan(offset: number, rd: RowData): CSSProperties {
   };
 }
 
-export function NamedBezierList({
-  items,
-}: {
-  items: NamedBezier[];
-}): ReactElement {
-  const beziers = items.sort((a, b) => a.name.localeCompare(b.name));
+export function NamedBezierList(): ReactElement {
+  const beziers = useAtomValue(MappedBeziersAtom);
   const colors = useAtomValue(ColorsAtom);
   const rowData: RowData[] = [];
   let count = 1;
-  for (const b of beziers) {
-    rowData.push({ offset: count, size: b.points.points.length });
-    count += b.points.points.length;
+  for (const [name, b] of beziers.entries()) {
+    if (!isRef(b)) {
+      rowData.push({ offset: count, size: b.points.length });
+      count += b.points.length;
+    }
   }
   const gridStyle: CSSProperties = {
     display: 'grid',
@@ -277,26 +141,33 @@ export function NamedBezierList({
   };
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name {beziers.length}</Text>
+      <Text size={400}>Name {beziers.size}</Text>
       <Text size={400}>Poses</Text>
-      {beziers.map((nb, index) => {
-        const color = getColorFor(nb.points);
-        const style = {
-          color: colors[color % colors.length],
-          ...rowSpan(1, rowData[index]),
-        };
-        return (
-          <Fragment key={`br-${nb.name}`}>
-            <Text style={style}>{nb.name}</Text>
-            {nb.points.points.map((pr, index) => (
-              <InlinePoseRefDisplay
-                key={`br-${nb.name}-${index}-2`}
-                pose={pr}
-              />
-            ))}
-          </Fragment>
-        );
-      })}
+      {[
+        ...beziers
+          .entries()
+          .filter(([, br]) => !isRef(br))
+          .map(([name, br], index) => {
+            if (!isRef(br)) {
+              const color = getColorFor(br);
+              const style = {
+                color: colors[color % colors.length],
+                ...rowSpan(1, rowData[index]),
+              };
+              return (
+                <Fragment key={`br-${name}`}>
+                  <Text style={style}>{name}</Text>
+                  {br.points.map((pr, index) => (
+                    <InlinePoseRefDisplay
+                      key={`br-${name}-${index}-2`}
+                      pose={pr}
+                    />
+                  ))}
+                </Fragment>
+              );
+            }
+          }),
+      ]}
     </div>
   );
 }
@@ -343,15 +214,15 @@ export function NamedPathChainDisplay({
   chain,
   rowdata,
 }: {
-  chain: NamedPathChain;
+  chain: [string, AnonymousPathChain];
   rowdata: NestedRowData;
 }): ReactElement {
   const colors = useAtomValue(ColorsAtom);
   // This renders into a container grid that's 3 columns wide
   return (
     <>
-      <Text style={rowSpan(1, rowdata)}>{chain.name}</Text>
-      {chain.paths.map((br, index) => {
+      <Text style={rowSpan(1, rowdata)}>{chain[0]}</Text>
+      {chain[1].paths.map((br, index) => {
         /*const anonBez = getBezier(br);
         const color = getColorFor(anonBez);*/
         if (isRef(br)) {
@@ -384,17 +255,13 @@ export function NamedPathChainDisplay({
           );
         }
       })}
-      <HeadingTypeDisplay heading={chain.heading} />
+      <HeadingTypeDisplay heading={chain[1].heading} />
     </>
   );
 }
 
-export function PathChainList({
-  items,
-}: {
-  items: NamedPathChain[];
-}): ReactElement {
-  const paths = items.sort((a, b) => a.name.localeCompare(b.name));
+export function PathChainList(): ReactElement {
+  const items = useAtomValue(MappedPathChainsAtom);
   // I need to collect row spans for:
   // 1- The name, a running total of all prior path chains, plus a total count
   //    of this path's chains.
@@ -402,7 +269,7 @@ export function PathChainList({
   //    the prior rows, plus the count of the current curve's control points
   let count = 1;
   let nestedRowData: NestedRowData[] = [];
-  for (const pc of paths) {
+  for (const [_, pc] of items) {
     const children: RowData[] = [];
     const offset = count;
     for (const b of pc.paths) {
@@ -422,7 +289,7 @@ export function PathChainList({
   };
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name {paths.length}</Text>
+      <Text size={400}>Name {items.size}</Text>
       <Text
         size={400}
         style={{
@@ -433,13 +300,17 @@ export function PathChainList({
       >
         Paths
       </Text>
-      {paths.map((npc, index) => (
-        <NamedPathChainDisplay
-          key={npc.name}
-          chain={npc}
-          rowdata={nestedRowData[index]}
-        />
-      ))}
+      {[
+        ...items
+          .entries()
+          .map((pc, index) => (
+            <NamedPathChainDisplay
+              key={pc[0]}
+              chain={pc}
+              rowdata={nestedRowData[index]}
+            />
+          )),
+      ]}
     </div>
   );
 }
@@ -449,42 +320,26 @@ export function PathsDataDisplay({
 }: {
   expand?: boolean;
 }): ReactElement {
-  const defaultShow = !!expand;
   const selFile = useAtomValue(SelectedFileAtom);
-  const file = useAtomValue(FileContentsAtom);
   if (selFile.length === 0) {
-    return <div>Ple ase select a file to view.</div>;
+    return <div>Please select a file to view.</div>;
   }
-  const values = file.getValues();
-  const poses = file.getPoses();
-  const beziers = file.getBeziers();
-  const pathChains = file.getPathChains();
   return (
     <>
-      <Expando label="Values" indent={20} size={500} defaultShow={defaultShow}>
-        <NamedValueList items={values} />
-        <NewNamedValue />
+      <Expando label="Values" indent={20} size={500}>
+        <NamedValueList />
+        <NewValue />
       </Expando>
-      <Expando label="Poses" indent={20} size={500} defaultShow={defaultShow}>
-        <NamedPoseList items={poses} />
-        <Button style={{ margin: 10 }}>New Pose</Button>
+      <Expando label="Poses" indent={20} size={500}>
+        <NamedPoseList />
+        <NewPose />
       </Expando>
-      <Expando
-        label="Bezier Lines/Curves"
-        indent={20}
-        size={500}
-        defaultShow={defaultShow}
-      >
-        <NamedBezierList items={beziers} />
+      <Expando label="Bezier Lines/Curves" indent={20} size={500}>
+        <NamedBezierList />
         <Button style={{ margin: 10 }}>New Bezier</Button>
       </Expando>
-      <Expando
-        label="PathChains"
-        indent={20}
-        size={500}
-        defaultShow={defaultShow}
-      >
-        <PathChainList items={pathChains} />
+      <Expando label="PathChains" indent={20} size={500}>
+        <PathChainList />
         <Button style={{ margin: 10 }}>New PathChain</Button>
       </Expando>
     </>

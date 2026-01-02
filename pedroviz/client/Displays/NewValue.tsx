@@ -1,5 +1,3 @@
-import { ReactElement } from 'react';
-
 import {
   Button,
   Dialog,
@@ -15,91 +13,118 @@ import {
   Radio,
   RadioGroup,
   RadioGroupProps,
+  Select,
 } from '@fluentui/react-components';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { useState } from 'react';
-import { NamedValue } from '../server/types';
-import { AllNamesAtom, NamedValuesAtom } from './state/Atoms';
+import { useAtomValue } from 'jotai';
+import { useAtomCallback } from 'jotai/utils';
+import { ReactElement, useState } from 'react';
+import {
+  AnonymousValue,
+  RadiansRef,
+  ValueName,
+  ValueRef,
+} from '../../server/types';
+import { MappedValuesAtom, ValueAtomFamily } from '../state/Atoms';
+import { ValidationData, ValidData } from '../types';
+import { CheckValidName } from './Validation';
 
-const validName: RegExp = /^[A-Za-z_][a-zA-Z0-9_]*$/;
+type ValType = 'int' | 'double' | 'degrees';
 
-export function NewNamedValue(): ReactElement {
-  const allNames = useAtomValue(AllNamesAtom);
-
-  const setNamedValue = useSetAtom(NamedValuesAtom);
-  const [name, setName] = useState('newValName');
+export function NewValue(): ReactElement {
+  const [name, setName] = useState<ValueName>('newValName' as ValueName);
+  const [isVal, setIsVal] = useState<boolean>(true);
   const [valStr, setValStr] = useState('0.000');
-  const [valType, setValType] = useState<'int' | 'double' | 'degrees'>(
-    'double',
+  const [varStr, setVarStr] = useState('');
+  const [valType, setValType] = useState<ValType>('double');
+  const allNames = useAtomValue(MappedValuesAtom);
+  const setNamedValue = useAtomCallback((_, set, val: ValueRef | RadiansRef) =>
+    set(ValueAtomFamily(name), val),
   );
 
-  const checkName = (nm: string): [string, 'error' | 'none'] => {
-    if (allNames.has(nm)) {
-      return ['Please use a unique name.', 'error'];
-    } else if (!validName.test(nm)) {
-      return ['Please enter a valid Java variable name.', 'error'];
-    }
-    return ['', 'none'];
-  };
-  const checkValue = (vl: string): [string, 'error' | 'none'] => {
+  const checkValue = (vl: string): ValidationData => {
     if (valType !== 'int' && isNaN(Number.parseFloat(vl))) {
-      return ['Please enter a valid floating point number', 'error'];
+      return {
+        message: 'Please enter a valid floating point number',
+        state: 'error',
+      };
     } else if (valType === 'int' && isNaN(Number.parseInt(vl))) {
-      return ['Please enter a valid integer', 'error'];
+      return { message: 'Please enter a valid integer', state: 'error' };
     }
-    return ['', 'none'];
+    return ValidData;
   };
 
-  const [validNameMessage, nameValidationState] = checkName(name.trim());
-  const [validValueMessage, valueValidationState] = checkValue(valStr);
+  const { message: validNameMessage, state: nameValidationState } =
+    CheckValidName(allNames, name.trim() as ValueName, false);
+  const { message: validValueMessage, state: valueValidationState } =
+    checkValue(valStr);
 
   const saveEnabled =
     nameValidationState === 'none' && valueValidationState === 'none';
   const typeChange: RadioGroupProps['onChange'] = (_, data) => {
-    const numericVal = Number.parseFloat(valStr);
     switch (data.value) {
       case 'int':
-        setValType('int');
-        setValStr(isNaN(numericVal) ? '0' : numericVal.toFixed(0));
-        break;
       case 'double':
-        setValType('double');
-        setValStr(isNaN(numericVal) ? '0.0' : numericVal.toFixed(3));
-        break;
       case 'degrees':
-        setValType('degrees');
-        setValStr(isNaN(numericVal) ? '0.0' : numericVal.toFixed(1));
-        break;
+        setValType(data.value);
+        setValStr(formatNum(data.value, Number.parseFloat(valStr)));
     }
   };
   const valueChange: InputProps['onChange'] = (_, data) => {
     setValStr(data.value);
   };
   const nameChange: InputProps['onChange'] = (_, data) => {
-    setName(data.value);
+    setName(data.value as ValueName);
   };
 
-  const formatNum = (val: number): string => {
+  const formatNum = (valType: ValType, val: number): string => {
+    val = isNaN(val) ? 0 : val;
     switch (valType) {
       case 'int':
         return val.toFixed(0);
       case 'double':
-        return val.toFixed(3);
+        return val.toFixed(2);
       case 'degrees':
         return val.toFixed(1);
     }
   };
 
   const saveValue = () => {
-    const nv: NamedValue = {
-      name,
-      value: {
-        type: valType === 'degrees' ? 'radians' : valType,
-        value: Number.parseFloat(valStr),
-      },
-    };
-    setNamedValue(nv);
+    if (isVal) {
+      const value = Number.parseFloat(valStr);
+      const obj: AnonymousValue = Number.isInteger(value)
+        ? { int: value }
+        : { double: value };
+      if (valType === 'degrees') {
+        setNamedValue({ radians: obj });
+      } else {
+        setNamedValue(obj);
+      }
+    } else {
+      if (valType === 'degrees') {
+        setNamedValue({ radians: varStr as ValueName });
+      } else {
+        setNamedValue(varStr as ValueName);
+      }
+    }
   };
+
+  const label = (
+    <Select
+      value={isVal ? 'Value' : 'Variable'}
+      onChange={(_, data) => setIsVal(data.value === 'Value')}
+    >
+      <option>Value</option>
+      <option>Variable</option>
+    </Select>
+  );
+
+  const valOrVar = isVal ? (
+    <Input value={valStr} onChange={valueChange} />
+  ) : (
+    <Select value={varStr} onChange={(_, data) => setVarStr(data.value)}>
+      {[...allNames.keys().map((nv) => <option key={nv}>{nv}</option>)]}
+    </Select>
+  );
 
   return (
     <Dialog>
@@ -128,11 +153,11 @@ export function NewNamedValue(): ReactElement {
               </Field>
               <Field
                 className="col3"
-                label="Value"
+                label={label}
                 validationMessage={validValueMessage}
                 validationState={valueValidationState}
               >
-                <Input value={valStr} onChange={valueChange} />
+                {valOrVar}
               </Field>
             </div>
           </DialogContent>

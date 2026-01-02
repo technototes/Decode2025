@@ -1,0 +1,22 @@
+{
+  "printWidth": 80,
+  "endOfLine": "lf",
+  "trailingComma": "all",
+  "singleQuote": true,
+  "proseWrap": "always",
+  "tabWidth": 2,
+  "useTabs": false,
+  "arrowParens": "always",
+  "plugins": ["prettier-plugin-java", "prettier-plugin-organize-imports"],
+  "overrides": [
+    {
+      "files": "*.json",
+      "options": { "parser": "json" }
+    },
+    { "files": "*.mts", "options": { "parser": "typescript" } },
+    {
+      "files": "*.java",
+      "options": { "tabWidth": 4, "printWidth": 100, "arrowParens": "avoid" }
+    }
+  ]
+}

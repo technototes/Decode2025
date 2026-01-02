@@ -12,5 +12,5 @@
     "pretty": true,
     "skipLibCheck": true
   },
-  "include": ["bun-env.d.ts", "**/*.ts?"]
+  "include": ["bun-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

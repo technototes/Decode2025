@@ -4,7 +4,7 @@ import {
   webLightTheme,
 } from '@fluentui/react-components';
 import { Provider, useAtomValue } from 'jotai';
-import { ReactElement } from 'react';
+import { ReactElement, Suspense } from 'react';
 import { PathsDataDisplay } from './PathsDataDisplay';
 import { PathSelector } from './PathSelector';
 import { Settings } from './Settings';
@@ -17,21 +17,23 @@ import './index.css';
 export function MyApp(): ReactElement {
   return (
     <div className="app">
-      <div className="header">
-        <div className="header-left">
-          <PathSelector />
+      <Suspense>
+        <div className="header">
+          <div className="header-left">
+            <PathSelector />
+          </div>
+          <div className="header-center">Viz4Pedro</div>
+          <div className="header-right">
+            <Settings />
+          </div>
         </div>
-        <div className="header-center">Vote4Pedro</div>
-        <div className="header-right">
-          <Settings />
+        <div className="sidebar">
+          <PathsDataDisplay />
         </div>
-      </div>
-      <div className="sidebar">
-        <PathsDataDisplay />
-      </div>
-      <div className="display">
-        <ScaledCanvas />
-      </div>
+        <div className="display">
+          <ScaledCanvas />
+        </div>
+      </Suspense>
     </div>
   );
 }

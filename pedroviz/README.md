@@ -9,28 +9,41 @@ and edit PedroPath's. The _reasons_ for this as opposed to just using
    your wifi. BOOO!
 2. This should integrate into your code. No more copying stuff back and forth!
    It will create the class for you, and allow you to name points, instead of
-   just having random numerical names.
+   just having random numerical names. Honestly, using Panels to update things
+   live would be _amazing_: Your code and the bot on the field are kept in sync!
 
 **Tasks, in order:**
 
 - [x] Read paths from code
 - [x] Display those paths on the canvas.
-- [ ] Highlight hovered-over paths/curves/points (both directions)
-- [ ] Allow creation of values in a text field
-  - [ ] Edit an existing named value, pose, curve, chain
+- [ ] Allow creation:
+  - [x] Named values
+  - [ ] Named poses
+  - [ ] Named curves
+  - [ ] Named PathChains
+- [ ] Edit existing:
+  - [x] Named values
+  - [ ] Named poses
+  - [ ] Named curves
+  - [ ] Named PathChains
 - [ ] Reflect those changes in the code
   - [ ] Checksum the code to detect external edits?
   - [ ] When external edits have occurred, try to resolve the conflicts (ugh...)
 - [ ] Allow editing points by dragging & dropping on the canvas
+- [ ] Highlight hovered-over paths/curves/points (both directions)
 - [ ] Animate the robot along the path
 - [ ] Put the field graphic under the canvas
 - [ ] Have a grid key near/under the canvas
 - [ ] Enable "warning" lines: warn if the robot crosses a line on a path
+  - [ ] Specify robot dimensions
 - [ ] Specify different alliance paths
-  - [ ] Bonus: Reflect a path along a line or axis (with or without a bot
-        offset?)
+  - [ ] Bonus: Reflect a path along a line or axis
 - [ ] Support additional parts of the path builder
-  - [ ] multiple paths, headings, braking strength, tValues, etc...
+  - [ ] multiple paths
+  - [ ] path headings (global and last)
+  - [ ] max velocity
+  - [ ] braking strength
+  - [ ] tValues
 - [ ] Maintain any code that I don't actually parse from the source code (keep
       chunks of code that aren't represented in the UI)
   - [ ] Maintain comments

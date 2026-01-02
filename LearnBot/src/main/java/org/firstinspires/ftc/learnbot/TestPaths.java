@@ -20,12 +20,14 @@ public class TestPaths {
     public static double extra = 25.0;
     public static double extra2 = 27.0;
     public static double one80 = Math.toRadians(180);
-    public static double ninety = Math.toRadians(90);
+    public static double refVal = edge;
     public static int sixty = 60;
+    public static int ninetyD = 90;
+    public static double ninety = Math.toRadians(ninetyD);
 
     public static Pose start = new Pose(org, org, Math.toRadians(0));
     public static Pose step1 = new Pose(edge, org, ninety);
-    public static Pose step2 = new Pose(edge, edge, 35);
+    public static Pose step2 = new Pose(edge, refVal, 35);
     public static Pose step3 = new Pose(extra, extra2, Math.toRadians(sixty));
     public static Pose step4 = new Pose(org, org, one80);
     public static Pose stepb = new Pose(extra, extra, Math.toRadians(sixty));

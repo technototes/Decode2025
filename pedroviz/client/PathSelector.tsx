@@ -1,7 +1,9 @@
+import { Text } from '@fluentui/react-components';
 import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
 import { select_a_bot, select_a_file } from './constants';
 import {
+  BlurAtom,
   FilesForSelectedTeam,
   SelectedFileAtom,
   SelectedTeamAtom,
@@ -39,11 +41,14 @@ export function FileSelector(): ReactElement {
 }
 
 export function PathSelector(): ReactElement {
+  const blur = useAtomValue(BlurAtom);
   return (
     <>
       <TeamSelector />
       &nbsp;
       <FileSelector />
+      &nbsp;
+      <Text>{blur}</Text>
     </>
   );
 }
