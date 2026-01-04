@@ -47,7 +47,7 @@ public class BlueSegmentedCurveLever extends CommandOpMode {
                     new WaitCommand(0.05),
                     //   TeleCommands.AutoLaunch2(robot),
                     new PedroPathCommand(robot.follower, p.Intake1endtoLever),
-                    new WaitCommand(0.7),
+                    new WaitCommand(0.5),
                     new PedroPathCommand(robot.follower, p.LevertoLaunch).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),
@@ -68,7 +68,7 @@ public class BlueSegmentedCurveLever extends CommandOpMode {
                     new PedroPathCommand(robot.follower, p.Intake3toIntake3end, p.power).alongWith(
                         TeleCommands.Intake(robot)
                     ),
-                    new WaitCommand(0.05),
+                    new WaitCommand(0.1),
                     new PedroPathCommand(robot.follower, p.Intake3endtoLaunch).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),
