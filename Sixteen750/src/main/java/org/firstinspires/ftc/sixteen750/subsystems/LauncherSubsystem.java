@@ -69,7 +69,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
     public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
     public static double REGRESSION_C = 20.000; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 108.333; // minimum velocity for far zone launch speed formula
+    public static double REGRESSION_D = 308.333; // minimum velocity for far zone launch speed formula
 
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;

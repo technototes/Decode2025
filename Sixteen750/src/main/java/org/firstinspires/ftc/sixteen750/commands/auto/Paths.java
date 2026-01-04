@@ -81,7 +81,7 @@ public class Paths {
     public static Pose Intake1 = new Pose(49, 86);
     public static Pose Intake1ControlPoint = new Pose(61, 89.143);
     public static Pose Intake1end = new Pose(19, 86);
-    public static Pose Lever = new Pose(17, 77);
+    public static Pose Lever = new Pose(17, 76);
     public static Pose LeverControlPoint = new Pose(24, 74.620);
     public static Pose Intake2 = new Pose(49, 62);
     public static Pose Intake2ControlPoint = new Pose(71, 64.369);
@@ -156,7 +156,7 @@ public class Paths {
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(127, 77);
     public static Pose RleverControlPoint = new Pose(120, 74.620);
-    public static Pose REnd = new Pose(90, 84);
+    public static Pose REnd = new Pose(95, 84);
     public static Pose RfarStart = new Pose(90.000, 9.000);
     public static Pose RfarLaunch = new Pose(87.000, 17);
     public static Pose RfarLaunch2 = new Pose(87.000, 19);
@@ -476,7 +476,7 @@ public class Paths {
 
         LaunchtoIntake2 = follower
             .pathBuilder()
-            .addPath(new BezierCurve(Launch, Intake2ControlPoint, Intake2ControlPoint2, Intake2))
+            .addPath(new BezierCurve(Launch, Intake2ControlPoint, Intake2))
             .setLinearHeadingInterpolation(
                 Math.toRadians(launchHeading1),
                 Math.toRadians(intakeHeading)
