@@ -89,7 +89,7 @@ public class Hardware implements Loggable {
             limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         }
         if (Setup.Connected.TURRETSUBSYSTEM) {
-            turretMotor = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.TURRET);
+            turretMotor = new EncodedMotor<>(Setup.HardwareNames.TURRET);
         }
     }
 
