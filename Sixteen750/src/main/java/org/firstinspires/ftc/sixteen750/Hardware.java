@@ -37,6 +37,7 @@ public class Hardware implements Loggable {
     public Servo testServo;
     public Limelight3A limelight;
     public HardwareMap map;
+    public EncodedMotor<DcMotorEx> turretMotor;
 
     /* Put other hardware here! */
 
@@ -86,6 +87,9 @@ public class Hardware implements Loggable {
         }
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
+        }
+        if (Setup.Connected.TURRETSUBSYSTEM) {
+            turretMotor = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.TURRET);
         }
     }
 
