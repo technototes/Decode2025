@@ -8,9 +8,9 @@ import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.PIDFController;
-
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
+
 @Configurable
 public class TurretSubsystem implements Subsystem, Loggable {
 
@@ -26,6 +26,7 @@ public class TurretSubsystem implements Subsystem, Loggable {
     PIDFCoefficients turretPID = new PIDFCoefficients(0, 0, 0, 0);
     PIDFController turretPIDF = new PIDFController(turretPID);
     boolean hasHardware;
+
     public TurretSubsystem(Hardware h) {
         hasHardware = Setup.Connected.TURRETSUBSYSTEM;
         if (hasHardware) {
@@ -63,6 +64,7 @@ public class TurretSubsystem implements Subsystem, Loggable {
             turretMotor.setPower(power);
         }
     }
+
     @Override
     public void periodic() {
         setTurretPower(turretPIDF.update(getTurretPos()));
