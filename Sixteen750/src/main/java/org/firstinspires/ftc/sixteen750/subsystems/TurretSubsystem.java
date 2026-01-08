@@ -33,6 +33,10 @@ public class TurretSubsystem implements Subsystem, Loggable {
         }
     }
 
+    public TurretSubsystem() {
+        hasHardware = false;
+    }
+
     private double getEncoderAngleInDegrees() {
         return (getTurretPos() / (TICKS_PER_REV * GEAR_RATIO)) * 360.0;
     }

@@ -63,6 +63,8 @@ public class Robot implements Loggable {
         }
         if (Setup.Connected.TURRETSUBSYSTEM) {
             this.turretSubsystem = new TurretSubsystem(hw);
+        } else {
+            this.turretSubsystem = new TurretSubsystem();
         }
     }
 
