@@ -5,8 +5,10 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.command.Command;
 import com.technototes.library.logger.Log;
+import com.technototes.library.util.PIDFController;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
@@ -20,9 +22,12 @@ public class AltAutoOrient implements Command {
     public Pose wantedPose;
     public boolean firsttime = true;
     public Pose currentPose;
+    PIDFController pid;
+    public static PIDFCoefficients pidvalues = new PIDFCoefficients(0, 0, 0, 0);
 
     public AltAutoOrient(Robot r) {
         robot = r;
+        pid = new PIDFController(pidvalues);
     }
 
     //    @Override
@@ -75,8 +80,9 @@ public class AltAutoOrient implements Command {
             //                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
             // Kooolpool here below was my original prototype for auto orient and it worked decently well
             if (robot.limelightSubsystem.getDistance() >= 0) {
-                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
-                    robot.limelightSubsystem.getDistance());
+                rotation = pid.update(LimelightSubsystem.Xangle);
+                //                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
+                //                    robot.limelightSubsystem.getDistance());
             }
             //lowkey forgot what kevin said but i think it just sets the target heading to
             //where the limelight is so that vision can make the bot turn that way

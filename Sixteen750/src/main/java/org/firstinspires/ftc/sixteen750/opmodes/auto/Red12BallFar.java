@@ -73,6 +73,7 @@ public class Red12BallFar extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.RlaunchfartointakeSweep, 0.5).alongWith(
                     TeleCommands.Intake(robot)
                 ),
+                new WaitCommand(0.4),
                 new PedroPathCommand(robot.follower, p.RintakeSweeptolaunchfar),
                 //the two paths above is a new way to intake the corner balls
                 //the two commented paths above these new ones is the old way to intake the corner balls
