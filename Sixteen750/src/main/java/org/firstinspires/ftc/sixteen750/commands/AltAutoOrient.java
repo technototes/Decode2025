@@ -22,18 +22,22 @@ public class AltAutoOrient implements Command {
     public Pose wantedPose;
     public boolean firsttime = true;
     public Pose currentPose;
+    public static double SIGN = -1;
+    public static double maxvalue = 2;
     PIDFController pid;
-    public static PIDFCoefficients pidvalues = new PIDFCoefficients(0, 0, 0, 0);
+    public static PIDFCoefficients pidvalues = new PIDFCoefficients(-0.017, -0.00017, -0.0017, 0);
 
     public AltAutoOrient(Robot r) {
         robot = r;
         pid = new PIDFController(pidvalues);
+        pid.setTarget(0);
+        //pid.setInputBounds(-maxvalue, maxvalue);
     }
 
-    //    @Override
-    //    public void initialize() {
-    //        robot.follower.startTeleOpDrive();
-    //    }
+    @Override
+    public void initialize() {
+        robot.follower.startTeleOpDrive();
+    }
 
     @Override
     public boolean isFinished() {
@@ -80,9 +84,9 @@ public class AltAutoOrient implements Command {
             //                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
             // Kooolpool here below was my original prototype for auto orient and it worked decently well
             if (robot.limelightSubsystem.getDistance() >= 0) {
-                rotation = pid.update(LimelightSubsystem.Xangle);
-                //                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
-                //                    robot.limelightSubsystem.getDistance());
+                rotation = pid.update(LimelightSubsystem.Xangle * SIGN);
+                //                                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
+                //                                    robot.limelightSubsystem.getDistance());
             }
             //lowkey forgot what kevin said but i think it just sets the target heading to
             //where the limelight is so that vision can make the bot turn that way
