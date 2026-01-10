@@ -11,6 +11,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.SafetySubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.TestSubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.TurretSubsystem;
 
 public class Robot implements Loggable {
 
@@ -26,6 +27,7 @@ public class Robot implements Loggable {
     public AimingSubsystem aimingSubsystem;
     public LimelightSubsystem limelightSubsystem;
     public TestSubsystem testSubsystem;
+    public TurretSubsystem turretSubsystem;
     public Follower follower;
     private Hardware hardware;
 
@@ -58,6 +60,11 @@ public class Robot implements Loggable {
         }
         if (Setup.Connected.DRIVEBASE) {
             follower = AutoConstants.createFollower(hw.map);
+        }
+        if (Setup.Connected.TURRETSUBSYSTEM) {
+            this.turretSubsystem = new TurretSubsystem(hw);
+        } else {
+            this.turretSubsystem = new TurretSubsystem();
         }
     }
 
