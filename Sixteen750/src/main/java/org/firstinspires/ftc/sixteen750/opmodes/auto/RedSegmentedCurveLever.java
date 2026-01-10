@@ -42,6 +42,7 @@ public class RedSegmentedCurveLever extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new AltAutoVelocity(robot).alongWith(
                 new SequentialCommandGroup(
+                    //TeleCommands.AutoLaunch1(robot),
                     TeleCommands.GateUp(robot),
                     TeleCommands.Intake(robot),
                     TeleCommands.HoodUp(robot),

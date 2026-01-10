@@ -28,7 +28,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double fartargetLaunchVelocity = 1775;
     public static double fartargetLaunchVelocityforAuto = 2400;
     public static double targetLaunchVelocityforAuto1 = 1950;
-    public static double targetLaunchVelocityforAuto2 = 1825;
+    public static double targetLaunchVelocityforAuto2 = 1850;
 
     @Log.Number(name = "Current Motor Velocity")
     public static double currentLaunchVelocity = 0.0;
@@ -57,6 +57,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double DIFFERENCE = 0.0046;
     public static double PEAK_VOLTAGE = 13;
     private static PIDFController launcherPID;
+    public static double lastAutoVelocity = 0;
 
     boolean hasHardware;
     public Robot robot;
@@ -68,8 +69,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double RPM_PER_FOOT = 62.3;
     public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
     public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
-    public static double REGRESSION_C = 20.000; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 308.333; // minimum velocity for far zone launch speed formula
+    public static double REGRESSION_C = 19; // multiplier for x for far zone launch speed formula
+    public static double REGRESSION_D = 175; // minimum velocity for far zone launch speed formula
 
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
@@ -145,8 +146,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // Spin the motors pid goes here
         if (hasHardware) {
             setTargetSpeed(targetLaunchVelocityforAuto1); //change to auto aim velocity
-            //            launcher1.setVelocity(TargetLaunchVelocity);
-            //            launcher2.setVelocity(TargetLaunchVelocity);
+            //launcher1.setVelocity(targetLaunchVelocityforAuto1);
+            //launcher2.setVelocity(targetLaunchVelocityforAuto1);
         }
     }
 
@@ -273,8 +274,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public double autoVelocity() {
         // x = distance in feet
         double x = ls.getDistance();
-        if (x < 100) {
-            return REGRESSION_A * x + REGRESSION_B;
+
+        if (x < 100 && x > 0) {
+            lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
+            return lastAutoVelocity;
+        }
+        if (x < 0) {
+            return lastAutoVelocity;
         } else {
             return REGRESSION_C * x + REGRESSION_D;
         }
