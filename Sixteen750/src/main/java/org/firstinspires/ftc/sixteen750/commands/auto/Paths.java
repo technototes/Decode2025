@@ -56,24 +56,29 @@ public class Paths {
 
             // want to keep launcher running during auto also no need to stop intake
         )
+            //.alongWith(new AltAutoOrient(r));
             .raceWith(new AltAutoOrient(r));
     }
 
     public static Command AutoLaunching3BallsSlowIntake(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.IntakeStop(r),
-            TeleCommands.GateUp(r),
+            new ParallelCommandGroup(
+                //TeleCommands.IntakeStop(r),
+                TeleCommands.GateUp(r),
+                new WaitCommand(0.5)
+            )
+                .raceWith(new AltAutoOrient(r)),
             TeleCommands.HoldIntake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
-            new WaitCommand(1.25),
+            new WaitCommand(1.5),
             TeleCommands.GateUp(r),
             TeleCommands.IntakeStop(r)
 
             // want to keep launcher running during auto also no need to stop intake
-        )
-            .raceWith(new AltAutoOrient(r));
+        );
+        //.raceWith(new AltAutoOrient(r));
     }
 
     public static Pose Start = new Pose(30.5, 135.152);
@@ -166,11 +171,11 @@ public class Paths {
     public static Pose Rintake4ControlPoint = new Pose(78.000, 40.000);
     public static Pose RintakeCorner = new Pose(132, 11.229);
     public static Pose RintakeCornerControlPoint = new Pose(134, 76);
-    public static Pose RintakeSweep = new Pose(132, 17);
-    public static Pose RintakeSweepControlPoint = new Pose(134, 76);
-    public static Pose RintakeEdgeControlPoint = new Pose(134, 76);
+    public static Pose RintakeHorizontal = new Pose(132, 18);
+    public static Pose RintakeHorizontalControlPoint = new Pose(134, 76);
+    public static Pose RintakeVerticalControlPoint = new Pose(134, 76);
     public static Pose RintakeNewCorner = new Pose(127.5, 7.7); //new way to intake corner balls
-    public static Pose RintakeNewEdge = new Pose(129, 19); //new way to intake corner balls
+    public static Pose RintakeVertical = new Pose(129, 16); //new way to intake corner balls
     public static Pose RintakeNewCornerControlPoint = new Pose(131, 56); //pull the control point in more (decrease y)
     public static Pose RgateIntake = new Pose(132, 45.000);
     public static Pose RgateIntakeControlPoint = new Pose(129, 35);
@@ -747,7 +752,7 @@ public class Paths {
             .build();
         RlaunchfartointakeSweep = follower
             .pathBuilder()
-            .addPath(new BezierLine(RfarLaunch3, RintakeSweep))
+            .addPath(new BezierLine(RfarLaunch3, RintakeHorizontal))
             //            .setLinearHeadingInterpolation(
             //                Math.toRadians(RlaunchHeading1),
             //                Math.toRadians(RcornerIntakeHeading)
@@ -760,7 +765,7 @@ public class Paths {
         RintakeSweeptolaunchfar = follower
             //new way to intake corner balls
             .pathBuilder()
-            .addPath(new BezierLine(RintakeSweep, RfarLaunch4))
+            .addPath(new BezierLine(RintakeHorizontal, RfarLaunch4))
             .setVelocityConstraint(0.3)
             .setLinearHeadingInterpolation(
                 Math.toRadians(RSweepIntakeHeading),
@@ -771,7 +776,7 @@ public class Paths {
         RlaunchfartointakeEdgeNew = follower
             //new way to intake corner balls
             .pathBuilder()
-            .addPath(new BezierCurve(RfarLaunch3, RintakeEdgeControlPoint, RintakeNewEdge))
+            .addPath(new BezierCurve(RfarLaunch3, RintakeVerticalControlPoint, RintakeVertical))
             //            .setLinearHeadingInterpolation(
             //                Math.toRadians(RlaunchHeading1),
             //                Math.toRadians(RcornerIntakeHeading)
@@ -784,7 +789,7 @@ public class Paths {
         RintakeEdgeNewtolaunchfar = follower
             //new way to intake corner balls
             .pathBuilder()
-            .addPath(new BezierLine(RintakeNewEdge, RfarLaunch4))
+            .addPath(new BezierLine(RintakeVertical, RfarLaunch4))
             .setVelocityConstraint(0.3)
             .setLinearHeadingInterpolation(
                 Math.toRadians(RNewCornerIntakeHeading),
