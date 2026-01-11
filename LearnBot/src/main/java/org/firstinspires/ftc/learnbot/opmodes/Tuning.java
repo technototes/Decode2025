@@ -21,14 +21,12 @@ import com.pedropathing.geometry.*;
 import com.pedropathing.math.*;
 import com.pedropathing.paths.*;
 import com.pedropathing.util.*;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.structure.BetterSelectableOpMode;
 import java.util.ArrayList;
 import java.util.List;
 import org.firstinspires.ftc.learnbot.DrivingConstants;
-import org.firstinspires.ftc.learnbot.Setup;
 
 /**
  * This is the Tuning class. It contains a selection menu for various tuning OpModes.
@@ -89,15 +87,9 @@ public class Tuning extends BetterSelectableOpMode {
     @Override
     public void onSelect() {
         if (follower == null) {
-            follower = DrivingConstants.createFollower(hardwareMap);
             PanelsConfigurables.INSTANCE.refreshClass(this);
-            if (Setup.Connected.OTOS) {
-                SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-                otos.calibrateImu();
-            }
-        } else {
-            follower = DrivingConstants.createFollower(hardwareMap);
         }
+        follower = DrivingConstants.createFollower(hardwareMap);
 
         follower.setStartingPose(new Pose());
 
@@ -225,12 +217,24 @@ class ForwardTuner extends OpMode {
         drawOnlyCurrent();
     }
 
+    @Override
+    public void start() {
+        follower.startTeleopDrive();
+        follower.update();
+    }
+
     /**
      * This updates the robot's pose estimate, and updates the Panels telemetry with the
      * calculated multiplier and draws the robot.
      */
     @Override
     public void loop() {
+        follower.setTeleOpDrive(
+            -gamepad1.left_stick_y,
+            -gamepad1.left_stick_x,
+            -gamepad1.right_stick_x,
+            true
+        );
         follower.update();
 
         telemetryM.debug("Distance Moved: " + (follower.getPose().getX() - 72));
@@ -287,12 +291,24 @@ class LateralTuner extends OpMode {
         drawOnlyCurrent();
     }
 
+    @Override
+    public void start() {
+        follower.startTeleopDrive();
+        follower.update();
+    }
+
     /**
      * This updates the robot's pose estimate, and updates the Panels telemetry with the
      * calculated multiplier and draws the robot.
      */
     @Override
     public void loop() {
+        follower.setTeleOpDrive(
+            -gamepad1.left_stick_y,
+            -gamepad1.left_stick_x,
+            -gamepad1.right_stick_x,
+            true
+        );
         follower.update();
 
         telemetryM.debug("Distance Moved: " + (follower.getPose().getY() - 72));
@@ -350,12 +366,24 @@ class TurnTuner extends OpMode {
         drawOnlyCurrent();
     }
 
+    @Override
+    public void start() {
+        follower.startTeleopDrive();
+        follower.update();
+    }
+
     /**
      * This updates the robot's pose estimate, and updates the Panels telemetry with the
      * calculated multiplier and draws the robot.
      */
     @Override
     public void loop() {
+        follower.setTeleOpDrive(
+            -gamepad1.left_stick_y,
+            -gamepad1.left_stick_x,
+            -gamepad1.right_stick_x,
+            true
+        );
         follower.update();
 
         telemetryM.debug("Total Angle: " + follower.getTotalHeading());

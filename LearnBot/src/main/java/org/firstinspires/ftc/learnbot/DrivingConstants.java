@@ -100,15 +100,15 @@ public class DrivingConstants {
     // while still saying the path is complete.
     public static double acceptableHeading = 2.5;
 
-    // @Configurable
+    @Configurable
     public static class OTOSConfig {
 
-        public static double linearScalar = 1.4;
+        public static double linearScalar = 1.0;
         public static double angularScalar = 1.0;
         public static SparkFunOTOS.Pose2D DEVICE_POSITION = new SparkFunOTOS.Pose2D(
-            4.75,
-            0,
-            -Math.PI / 2
+            -60 / 25.4,
+            35 / 25.4,
+            0
         );
     }
 
@@ -137,7 +137,7 @@ public class DrivingConstants {
         USE_PINPOINT,
     }
 
-    public static LocalizerSelection WhichLocalizer = LocalizerSelection.USE_PINPOINT;
+    public static LocalizerSelection WhichLocalizer = LocalizerSelection.USE_OTOS;
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
@@ -227,13 +227,17 @@ public class DrivingConstants {
             .mecanumDrivetrain(getDriveConstants());
         switch (WhichLocalizer) {
             case USE_OTOS:
-                fb = fb.OTOSLocalizer(getOtosLocalizerConstants());
+                if (Setup.Connected.OTOS) {
+                    fb = fb.OTOSLocalizer(getOtosLocalizerConstants());
+                }
                 break;
             case USE_MOTORS:
                 fb = fb.driveEncoderLocalizer(getDriveEncoderConstants());
                 break;
             case USE_PINPOINT:
-                fb = fb.pinpointLocalizer(getPinpointConstants());
+                if (Setup.Connected.PINPOINT) {
+                    fb = fb.pinpointLocalizer(getPinpointConstants());
+                }
                 break;
         }
         Follower f = fb.build();

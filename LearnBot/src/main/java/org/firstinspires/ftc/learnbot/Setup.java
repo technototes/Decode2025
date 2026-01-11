@@ -9,8 +9,9 @@ public class Setup {
 
         public static boolean DRIVEBASE = true;
         public static boolean TESTSUBSYSTEM = false;
-        public static boolean LIMELIGHT = true;
-        public static boolean OTOS = false;
+        public static boolean LIMELIGHT = false;
+        public static boolean OTOS = true;
+        public static boolean PINPOINT = false;
     }
 
     @Configurable
@@ -21,7 +22,7 @@ public class Setup {
         public static String RLMOTOR = "rl";
         public static String RRMOTOR = "rr";
         public static String IMU = "imu";
-        public static String OTOS = "sparky";
+        public static String OTOS = "sensor_otos";
         public static String PINPOINT = "pinpoint";
         public static String LIMELIGHT = "limelight";
         public static String ALLIANCE_SWITCH_RED = "asr";
