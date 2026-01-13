@@ -1,9 +1,15 @@
 # TODO's for V2:
 
-[ ] Basic drivebase validation [ ] PedroPath Tuner [ ] Turret work [ ] PID for
-Turret [ ] Unwind for Turret [ ] Auto-orient for vision [ ] PID tuning for
-launcher [ ] Hood servo settings [ ] Tweaking intake [ ] Pose/odometry during
-tele/auto ("Targetting Subsystem")
+- [ ] Basic drivebase validation
+- [ ] PedroPath Tuner
+- [ ] Turret work
+  - [ ] PID for Turret
+  - [ ] Unwind for Turret
+  - [ ] Auto-orient for vision
+- [ ] PID tuning for launcher
+- [ ] Hood servo settings
+- [ ] Tweaking intake
+- [ ] Pose/odometry during tele/auto ("Targetting Subsystem")
 
 ## NOTICE
 
