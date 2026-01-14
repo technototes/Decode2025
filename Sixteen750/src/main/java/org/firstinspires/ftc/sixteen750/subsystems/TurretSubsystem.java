@@ -15,18 +15,19 @@ import org.firstinspires.ftc.sixteen750.Setup;
 public class TurretSubsystem implements Subsystem, Loggable {
 
     public EncodedMotor<DcMotorEx> turretMotor;
-    public static double turretAngle = 0;
-    public static double turretTicks = 0;
-    public static double turretPow = 0;
+    public double turretAngle = 0;
+    public double turretTicks = 0;
+    public double turretPow = 0;
     public static double turretOffsetDegrees = 0;
+    public static double turretPos = 0;
     public static double TICKS_PER_REV = 384.5;
     public static double GEAR_RATIO = 4.0;
 
     @Log(name = "Turret")
     public String TurretSubsytemInfoToDS;
 
-    PIDFCoefficients turretPID = new PIDFCoefficients(0, 0, 0, 0);
-    PIDFController turretPIDF = new PIDFController(turretPID);
+    public static PIDFCoefficients turretPID = new PIDFCoefficients(0, 0, 0, 0);
+    public PIDFController turretPIDF = new PIDFController(turretPID);
     boolean hasHardware;
 
     public TurretSubsystem(Hardware h) {
@@ -40,7 +41,7 @@ public class TurretSubsystem implements Subsystem, Loggable {
         hasHardware = false;
     }
 
-    private double getEncoderAngleInDegrees() {
+    public double getEncoderAngleInDegrees() {
         return (getTurretPos() / (TICKS_PER_REV * GEAR_RATIO)) * 360.0;
     }
 
@@ -48,7 +49,7 @@ public class TurretSubsystem implements Subsystem, Loggable {
         return (angle / 360.0) * TICKS_PER_REV * GEAR_RATIO;
     }
 
-    private double getTurretPos() {
+    public double getTurretPos() {
         if (hasHardware) {
             return turretMotor.getSensorValue();
         }
@@ -57,11 +58,11 @@ public class TurretSubsystem implements Subsystem, Loggable {
 
     public void setTurretPos(double pos) {
         if (hasHardware) {
-            turretPIDF.setTarget(pos + degreesToPosition(turretOffsetDegrees));
+            turretPIDF.setTarget(degreesToPosition(pos + turretOffsetDegrees));
         }
     }
 
-    private double getTurretPow() {
+    public double getTurretPow() {
         if (hasHardware) {
             return turretMotor.getPower();
         }
@@ -74,6 +75,9 @@ public class TurretSubsystem implements Subsystem, Loggable {
             turretMotor.setPower(power);
         }
     }
+    public void turretzero() {
+        setTurretPos(turretPos);
+    }
 
     @Override
     public void periodic() {
@@ -82,7 +86,7 @@ public class TurretSubsystem implements Subsystem, Loggable {
         turretPow = getTurretPow();
         turretTicks = getTurretPos();
         TurretSubsytemInfoToDS = String.format(
-            "Angle: %.1f Power: %.2f Pos: %i",
+            "Angle: %.1f Power: %.2f Pos: %.2f",
             getEncoderAngleInDegrees(),
             getTurretPow(),
             getTurretPos()
