@@ -22,10 +22,10 @@ public class AltAutoOrient implements Command {
     public Pose wantedPose;
     public boolean firsttime = true;
     public Pose currentPose;
-    public static double SIGN = -1;
+    public static double SIGN = 1;
     public static double maxvalue = 2;
     PIDFController pid;
-    public static PIDFCoefficients pidvalues = new PIDFCoefficients(-0.017, -0.00017, -0.0017, 0);
+    public static PIDFCoefficients pidvalues = new PIDFCoefficients(0.017, 0, 0.0017, 0);
 
     public AltAutoOrient(Robot r) {
         robot = r;
