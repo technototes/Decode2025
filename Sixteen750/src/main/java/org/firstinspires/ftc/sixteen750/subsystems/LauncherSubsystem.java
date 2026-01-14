@@ -51,7 +51,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.00020, 0.0, 0);
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
+    public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
+        0.0015,
+        0.0000,
+        0.0,
+        0
+    ); //p = 0.004, i = 0.00020
     public static double SPIN_F_SCALE = 0.00021;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
@@ -71,6 +77,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
     public static double REGRESSION_C = 17; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D = 115; // minimum velocity for far zone launch speed formula
+    public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
+    public static double REGRESSION_D_AUTO = 115; // minimum velocity for far zone launch speed formula
 
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
@@ -276,16 +284,34 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         double x = ls.getDistance();
 
         if (x < 100 && x > 0) {
+            launcherPI.p = 0.0015;
+            launcherPI.i = 0;
             lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
             return lastAutoVelocity;
         }
         if (x < 0) {
             return lastAutoVelocity;
         } else {
+            launcherPI.p = 0.004;
+            launcherPI.i = 0.0002;
             return REGRESSION_C * x + REGRESSION_D;
         }
 
         //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
+    }
+
+    public void setRegressionC() {
+        // Spin the motors pid goes here
+        if (hasHardware) {
+            REGRESSION_C = REGRESSION_C_AUTO;
+        }
+    }
+
+    public void setRegressionD() {
+        // Spin the motors pid goes here
+        if (hasHardware) {
+            REGRESSION_D = REGRESSION_D_AUTO;
+        }
     }
 
     @Override

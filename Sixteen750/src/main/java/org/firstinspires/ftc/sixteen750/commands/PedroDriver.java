@@ -4,12 +4,14 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.MathUtils;
+import com.technototes.library.util.PIDFController;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.Setup.OtherSettings;
@@ -37,6 +39,9 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 public class PedroDriver implements Command, Loggable {
 
     public static double VISION_TURN_SCALE = 0.7;
+    public static PIDFCoefficients turnpidvalues = new PIDFCoefficients(0.017, 0, 0.0017, 0);
+    PIDFController pid;
+    public static double SIGN = 1;
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -198,6 +203,8 @@ public class PedroDriver implements Command, Loggable {
         headingOffset = 0.0;
         alliance = all;
         holdPose = null;
+        pid = new PIDFController(turnpidvalues);
+        pid.setTarget(0);
         x = DeadZoneScale(xyStick.getXSupplier());
         y = DeadZoneScale(xyStick.getYSupplier());
         r = DeadZoneScale(rotStick.getXSupplier());
@@ -292,10 +299,10 @@ public class PedroDriver implements Command, Loggable {
                     if (limelightSubsystem.getDistance() < 0) {
                         return rotation;
                     }
-                    return (
-                        (VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
-                        limelightSubsystem.getDistance()
-                    );
+                    return pid.update(LimelightSubsystem.Xangle * SIGN);
+                    //                        (VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
+                    //                        limelightSubsystem.getDistance()
+                    //                    );
                     //lowkey forgot what kevin said but i think it just sets the target heading to
                     //where the limelight is so that vision can make the bot turn that way
                 } else {

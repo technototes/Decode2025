@@ -42,21 +42,22 @@ public class TestOpmode extends CommandOpMode {
             new SequentialCommandGroup(
                 new LLSetup(robot),
                 new ParallelCommandGroup(
-                    new AltAutoVelocity(robot),
+                    new AltAutoOrient(robot)
+                    //new AltAutoVelocity(robot),
                     //new AltAutoOrient(robot),
                     //new DriveAutoCommand(robot.follower, 0.5),
                     //                    TeleCommands.HoldIntake(robot),
                     //                    TeleCommands.GateUp(robot),
                     //                    TeleCommands.HoodUp(robot)
-                    Paths.AutoLaunching3BallsSlowIntake(robot)
+                    // Paths.AutoLaunching3BallsSlowIntake(robot)
                 ),
                 //                new WaitCommand(0.5),
                 //                new ParallelCommandGroup(
                 //                    //new DriveAutoCommand(robot.follower, 0),
                 //                ),
-                new WaitCommand(2),
-                TeleCommands.GateDown(robot),
-                new WaitCommand(6),
+                //                new WaitCommand(2),
+                //                TeleCommands.GateDown(robot),
+                //                new WaitCommand(6),
                 //p.AutoLaunching3Balls(robot),
                 //                new WaitCommand(4),
                 //                TeleCommands.GateDown(robot),
@@ -69,8 +70,8 @@ public class TestOpmode extends CommandOpMode {
                 //                new WaitCommand(0.5),
                 //                TeleCommands.GateDown(robot),
                 //                new WaitCommand(2),
-                TeleCommands.StopLaunch(robot),
-                TeleCommands.IntakeStop(robot),
+                //                TeleCommands.StopLaunch(robot),
+                //                TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN

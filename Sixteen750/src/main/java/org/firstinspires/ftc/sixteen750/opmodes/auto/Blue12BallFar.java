@@ -51,15 +51,15 @@ public class Blue12BallFar extends CommandOpMode {
                 // new WaitCommand(2),
                 new PedroPathCommand(robot.follower, p.intake4tolaunchfar),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
-                new PedroPathCommand(robot.follower, p.launchfartointakeEdgeNew, 0.5).alongWith(
+                new PedroPathCommand(robot.follower, p.launchfartointakeVertical, 0.6).alongWith(
                     TeleCommands.Intake(robot)
                 ),
-                new PedroPathCommand(robot.follower, p.intakeEdgeNewtolaunchfar),
+                new PedroPathCommand(robot.follower, p.intakeVerticaltolaunchfar),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
-                new PedroPathCommand(robot.follower, p.launchfartointakeSweep, 0.5).alongWith(
+                new PedroPathCommand(robot.follower, p.launchfartointakeHorizontal, 0.6).alongWith(
                     TeleCommands.Intake(robot)
                 ),
-                new PedroPathCommand(robot.follower, p.intakeSweeptolaunchfar),
+                new PedroPathCommand(robot.follower, p.intakeHorizontaltolaunchfar),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
                 //                new PedroPathCommand(robot.follower, p.launchfartointakeCorner, 0.7),
                 //                new PedroPathCommand(robot.follower, p.intakeCornertolaunchfar),
