@@ -1,15 +1,22 @@
 package org.firstinspires.ftc.learnbot.opmodes;
 
+import android.annotation.SuppressLint;
+import androidx.annotation.NonNull;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.MovingStatistics;
 import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
-import org.firstinspires.ftc.learnbot.Setup;
+import java.util.function.BooleanSupplier;
+import org.firstinspires.ftc.learnbot.Setup.*;
 import org.firstinspires.ftc.learnbot.subsystems.AllianceDetection;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -17,7 +24,50 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 @SuppressWarnings("unused")
 @Configurable
 @TeleOp(name = "Test Bed", group = "--Testing--")
+@SuppressLint("DefaultLocale")
+@Disabled
 public class TestBedTele extends LinearOpMode {
+
+    public static int samples = 100;
+
+    public static class MotorConfig {
+
+        DcMotorEx motor;
+        MovingStatistics stats;
+        BooleanSupplier trigger;
+        String name;
+        String status;
+
+        public MotorConfig(HardwareMap hwmap, String nm, boolean reversed, BooleanSupplier trig) {
+            trigger = trig;
+            name = nm;
+            motor = hwmap.get(DcMotorEx.class, name);
+            motor.setDirection(reversed ? Direction.REVERSE : Direction.FORWARD);
+            stats = new MovingStatistics(samples);
+            status = nm;
+        }
+
+        public void setVelo() {
+            motor.setVelocity(trigger.getAsBoolean() ? motorVelocity : 0, AngleUnit.RADIANS);
+            double pos = motor.getCurrentPosition();
+            double vel = motor.getVelocity();
+            double amps = motor.getCurrent(CurrentUnit.AMPS);
+            stats.add(amps);
+            status = String.format(
+                "%.2f %.2f/s %.3fA (mean: %.3fA)",
+                pos,
+                vel,
+                amps,
+                stats.getMean()
+            );
+        }
+
+        @Override
+        @NonNull
+        public String toString() {
+            return status;
+        }
+    }
 
     public static double motorPower = 0.2;
     // Radians/second?
@@ -27,6 +77,7 @@ public class TestBedTele extends LinearOpMode {
     public AllianceDetection allianceDetector;
     public CommandAxis trigger;
     public CommandButton button;
+    public MotorConfig[] motors;
 
     public String getAlliance() {
         return allianceDetector.get().toString();
@@ -40,84 +91,63 @@ public class TestBedTele extends LinearOpMode {
         button = trigger.getAsButton(triggerThreshold);
         allianceDetector = new AllianceDetection(
             this.hardwareMap,
-            Setup.HardwareNames.RED_SWITCH,
-            Setup.HardwareNames.BLUE_SWITCH
+            HardwareNames.ALLIANCE_SWITCH_RED,
+            HardwareNames.ALLIANCE_SWITCH_BLUE
         );
-        if (Setup.Connected.DRIVEBASE) {
-            fr = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.FRMOTOR);
-            fl = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.FLMOTOR);
-            rr = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.RRMOTOR);
-            rl = this.hardwareMap.get(DcMotorEx.class, Setup.HardwareNames.RLMOTOR);
-            fl.setDirection(DcMotorSimple.Direction.REVERSE);
-            rl.setDirection(DcMotorSimple.Direction.REVERSE);
-            rr.setDirection(DcMotorSimple.Direction.FORWARD);
-            fr.setDirection(DcMotorSimple.Direction.FORWARD);
+        if (Connected.DRIVEBASE) {
+            motors = new MotorConfig[4];
+            motors[0] = new MotorConfig(hardwareMap, HardwareNames.FLMOTOR, true, () ->
+                triggered(gamepad1.left_trigger)
+            );
+            motors[1] = new MotorConfig(hardwareMap, HardwareNames.FRMOTOR, true, () ->
+                triggered(gamepad1.right_trigger)
+            );
+            motors[2] = new MotorConfig(hardwareMap, HardwareNames.RLMOTOR, true, () ->
+                gamepad1.left_bumper
+            );
+            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RRMOTOR, true, () ->
+                gamepad1.right_bumper
+            );
         } else {
-            fl = null;
-            fr = null;
-            rl = null;
-            rr = null;
+            motors = null;
         }
 
         ptel = PanelsTelemetry.INSTANCE.getTelemetry();
         waitForStart();
+        MovingStatistics loopStats = new MovingStatistics(samples);
+        MovingStatistics avgLoopTime = new MovingStatistics(samples);
+        ElapsedTime loopTime = new ElapsedTime();
         while (opModeIsActive()) {
-            sleep(5);
-            if (Setup.Connected.DRIVEBASE) {
-                fl.setVelocity(
-                    triggered(gamepad1.left_trigger) ? motorVelocity : 0,
-                    AngleUnit.RADIANS
-                );
-                fr.setVelocity(
-                    triggered(gamepad1.right_trigger) ? motorVelocity : 0,
-                    AngleUnit.RADIANS
-                );
-                rl.setVelocity(gamepad1.left_bumper ? motorVelocity : 0, AngleUnit.RADIANS);
-                rr.setVelocity(gamepad1.right_bumper ? motorVelocity : 0, AngleUnit.RADIANS);
-                String fld = motorData(fl);
-                String frd = motorData(fr);
-                String rld = motorData(rl);
-                String rrd = motorData(rr);
-                String redOrBlue = getAlliance();
-                telemetry.addData("Alliance", redOrBlue);
-                telemetry.addData("FL", fld);
-                telemetry.addData("FR", frd);
-                telemetry.addData("RL", rld);
-                telemetry.addData("RR", rrd);
-                telemetry.addData("leftX", gamepad1.left_stick_x);
-                telemetry.addData("leftY", gamepad1.left_stick_y);
-                telemetry.addData("rightX", gamepad1.right_stick_x);
-                telemetry.addData("rightY", gamepad1.right_stick_y);
-                telemetry.addData("ltrig", gamepad1.left_trigger);
-                telemetry.addData("cmd trigger", trigger.getAsDouble());
-                telemetry.addData("cmd button", button.getAsBoolean() ? "true" : "false");
-
-                ptel.addData("Alliance", redOrBlue);
-                ptel.addData("FL", fld);
-                ptel.addData("FR", frd);
-                ptel.addData("RL", rld);
-                ptel.addData("RR", rrd);
-                ptel.addData("leftX", gamepad1.left_stick_x);
-                ptel.addData("leftY", gamepad1.left_stick_y);
-                ptel.addData("rightX", gamepad1.right_stick_x);
-                ptel.addData("rightY", gamepad1.right_stick_y);
-                ptel.addData("ltrig", gamepad1.left_trigger);
-                ptel.addData("cmd trigger", trigger.getAsDouble());
-                ptel.addData("cmd button", button.getAsBoolean() ? "true" : "false");
+            double lps = 1.0 / loopTime.seconds();
+            loopTime.reset();
+            loopStats.add(lps);
+            double mean = loopStats.getMean();
+            double stddev = loopStats.getStandardDeviation();
+            addData("Alliance", getAlliance());
+            if (Connected.DRIVEBASE) {
+                for (MotorConfig m : motors) {
+                    m.setVelo();
+                    addData(m.name, m.toString());
+                }
             }
+            addData("lX", String.format("%.3f", gamepad1.left_stick_x));
+            addData("lY", String.format("%.3f", gamepad1.left_stick_y));
+            addData("rX", String.format("%.3f", gamepad1.right_stick_x));
+            addData("rY", String.format("%.3f", gamepad1.right_stick_y));
+            addData("lT", String.format("%.3f", gamepad1.left_trigger));
+            addData("rT", String.format("%.3f", gamepad1.right_trigger));
+            addData("LPS", String.format("%.1f avg %.1f stddev %.2f", lps, mean, stddev));
             ptel.update();
             telemetry.update();
         }
     }
 
-    public static boolean triggered(double d) {
-        return d > triggerThreshold;
+    private void addData(String caption, String data) {
+        telemetry.addData(caption, data);
+        ptel.addData(caption, data);
     }
 
-    public static String motorData(DcMotorEx motor) {
-        double pos = motor.getCurrentPosition();
-        double vel = motor.getVelocity();
-        double amps = motor.getCurrent(CurrentUnit.AMPS);
-        return String.format("%.2f %.2f/s %.3fA", pos, vel, amps);
+    public static boolean triggered(double d) {
+        return d > triggerThreshold;
     }
 }

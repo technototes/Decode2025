@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.learnbot;
 
 import com.bylazar.configurables.annotations.Configurable;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Rotation;
 
 public class Setup {
 
@@ -11,8 +9,9 @@ public class Setup {
 
         public static boolean DRIVEBASE = true;
         public static boolean TESTSUBSYSTEM = false;
-        public static boolean LIMELIGHT = true;
-        public static boolean OTOS = false;
+        public static boolean LIMELIGHT = false;
+        public static boolean OTOS = true;
+        public static boolean PINPOINT = false;
     }
 
     @Configurable
@@ -23,11 +22,11 @@ public class Setup {
         public static String RLMOTOR = "rl";
         public static String RRMOTOR = "rr";
         public static String IMU = "imu";
-        public static String OTOS = "sparky";
+        public static String OTOS = "sensor_otos";
         public static String PINPOINT = "pinpoint";
         public static String LIMELIGHT = "limelight";
-        public static String RED_SWITCH = "asr";
-        public static String BLUE_SWITCH = "asb";
+        public static String ALLIANCE_SWITCH_RED = "asr";
+        public static String ALLIANCE_SWITCH_BLUE = "asb";
     }
 
     @Configurable

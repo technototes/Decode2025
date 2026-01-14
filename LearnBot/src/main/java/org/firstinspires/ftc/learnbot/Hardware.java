@@ -7,17 +7,17 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
-import com.technototes.library.hardware.sensor.AdafruitIMU;
 import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.hardware.sensor.IMU;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Loggable;
 import java.util.List;
+import org.firstinspires.ftc.learnbot.Setup.HardwareNames;
 import org.firstinspires.ftc.learnbot.helpers.IEncoder;
+import org.firstinspires.ftc.learnbot.subsystems.AllianceDetection;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 
 public class Hardware implements Loggable {
@@ -26,7 +26,7 @@ public class Hardware implements Loggable {
     public HardwareMap map;
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top, testMotor;
-    public DigitalChannel redSwitch, blueSwitch;
+    public AllianceDetection allianceDetection;
     public IEncoder odoF, odoR;
     private OctoQuad octoquad;
     public CRServo bottomLeft, bottomRight;
@@ -41,21 +41,21 @@ public class Hardware implements Loggable {
     public Hardware(HardwareMap hwmap) {
         map = hwmap;
         hubs = hwmap.getAll(LynxModule.class);
-        // imu = new AdafruitIMU(Setup.HardwareNames.EXTERNALIMU, AdafruitIMU.Orientation.Pitch);
+        // imu = new AdafruitIMU(HardwareNames.EXTERNALIMU, AdafruitIMU.Orientation.Pitch);
         imu = new IMU(
             Setup.HardwareNames.IMU,
             RevHubOrientationOnRobot.LogoFacingDirection.UP,
             RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
         );
         if (Setup.Connected.DRIVEBASE) {
-            fl = new EncodedMotor<>(Setup.HardwareNames.FLMOTOR);
-            fr = new EncodedMotor<>(Setup.HardwareNames.FRMOTOR);
-            rl = new EncodedMotor<>(Setup.HardwareNames.RLMOTOR);
-            rr = new EncodedMotor<>(Setup.HardwareNames.RRMOTOR);
+            fl = new EncodedMotor<>(HardwareNames.FLMOTOR);
+            fr = new EncodedMotor<>(HardwareNames.FRMOTOR);
+            rl = new EncodedMotor<>(HardwareNames.RLMOTOR);
+            rr = new EncodedMotor<>(HardwareNames.RRMOTOR);
             follower = DrivingConstants.createFollower(hwmap);
         }
         if (Setup.Connected.OTOS) {
-            odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            odo = hwmap.get(SparkFunOTOS.class, HardwareNames.OTOS);
         }
         //        if (Setup.Connected.OCTOQUAD) {
         //            octoquad = hwmap.get(OctoQuad.class, Setup.HardwareNames.OCTOQUAD);
@@ -66,10 +66,13 @@ public class Hardware implements Loggable {
         //            }
         //        }
         if (Setup.Connected.LIMELIGHT) {
-            limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
+            limelight = hwmap.get(Limelight3A.class, HardwareNames.LIMELIGHT);
         }
-        redSwitch = hwmap.get(DigitalChannel.class, Setup.HardwareNames.RED_SWITCH);
-        blueSwitch = hwmap.get(DigitalChannel.class, Setup.HardwareNames.BLUE_SWITCH);
+        allianceDetection = new AllianceDetection(
+            hwmap,
+            HardwareNames.ALLIANCE_SWITCH_RED,
+            HardwareNames.ALLIANCE_SWITCH_BLUE
+        );
     }
 
     // We can read the voltage from the different hubs for fun...

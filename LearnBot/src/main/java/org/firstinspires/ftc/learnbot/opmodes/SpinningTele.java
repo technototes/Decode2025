@@ -6,6 +6,7 @@ import com.bylazar.gamepad.PanelsGamepad;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.logger.Loggable;
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 @Configurable
 @SuppressWarnings("unused")
 @TeleOp(name = "Spinning")
+@Disabled
 public class SpinningTele extends CommandOpMode implements Loggable {
 
     public SpinningBot robot;
