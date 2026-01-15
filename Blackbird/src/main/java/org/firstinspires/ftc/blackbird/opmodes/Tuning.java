@@ -15,19 +15,20 @@ import com.bylazar.field.PanelsField;
 import com.bylazar.field.Style;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.ErrorCalculator;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.*;
 import com.pedropathing.math.*;
 import com.pedropathing.paths.*;
 import com.pedropathing.util.*;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.structure.BetterSelectableOpMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import org.firstinspires.ftc.blackbird.AutoConstants;
+import org.firstinspires.ftc.blackbird.Setup;
+import org.firstinspires.ftc.blackbird.helpers.CustomAdafruitIMU;
 
 /**
  * This is the Tuning class. It contains a selection menu for various tuning OpModes.
@@ -37,7 +38,6 @@ import org.firstinspires.ftc.blackbird.AutoConstants;
  */
 @Configurable
 @TeleOp(name = "Tuning", group = "Pedro Pathing")
-// @Disabled
 public class Tuning extends BetterSelectableOpMode {
 
     public static Follower follower;
@@ -173,14 +173,10 @@ class LocalizationTest extends OpMode {
         );
         follower.update();
 
-        telemetryM.debug(String.format(Locale.ENGLISH, "x:%.4f", follower.getPose().getX()));
-        telemetryM.debug(String.format(Locale.ENGLISH, "y:%.4f", follower.getPose().getY()));
-        telemetryM.debug(
-            String.format(Locale.ENGLISH, "heading:%.4f", follower.getPose().getHeading())
-        );
-        telemetryM.debug(
-            String.format(Locale.ENGLISH, "total heading:%.4f", follower.getTotalHeading())
-        );
+        telemetryM.debug("x:" + follower.getPose().getX());
+        telemetryM.debug("y:" + follower.getPose().getY());
+        telemetryM.debug("heading:" + follower.getPose().getHeading());
+        telemetryM.debug("total heading:" + follower.getTotalHeading());
         telemetryM.update(telemetry);
 
         draw();
@@ -250,13 +246,10 @@ class ForwardTuner extends OpMode {
                 " inches."
         );
         telemetryM.debug(
-            String.format(
-                Locale.ENGLISH,
-                "Multiplier: %.5f",
+            "Multiplier: " +
                 (DISTANCE /
                     ((follower.getPose().getX() - 72) /
                         follower.getPoseTracker().getLocalizer().getForwardMultiplier()))
-            )
         );
         telemetryM.update(telemetry);
 
@@ -327,13 +320,10 @@ class LateralTuner extends OpMode {
                 " inches."
         );
         telemetryM.debug(
-            String.format(
-                Locale.ENGLISH,
-                "Multiplier: %.5f",
+            "Multiplier: " +
                 (DISTANCE /
                     ((follower.getPose().getY() - 72) /
                         follower.getPoseTracker().getLocalizer().getLateralMultiplier()))
-            )
         );
         telemetryM.update(telemetry);
 
@@ -405,13 +395,10 @@ class TurnTuner extends OpMode {
                 " radians."
         );
         telemetryM.debug(
-            String.format(
-                Locale.ENGLISH,
-                "Multiplier: %.5f",
+            "Multiplier: " +
                 (ANGLE /
                     (follower.getTotalHeading() /
                         follower.getPoseTracker().getLocalizer().getTurningMultiplier()))
-            )
         );
         telemetryM.update(telemetry);
 
