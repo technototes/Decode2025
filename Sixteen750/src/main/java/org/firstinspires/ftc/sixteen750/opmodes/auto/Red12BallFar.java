@@ -9,6 +9,7 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
 import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
@@ -38,6 +39,8 @@ public class Red12BallFar extends CommandOpMode {
             //new AltAutoVelocity(robot).alongWith(
             new SequentialCommandGroup(
                 new LLSetup(robot),
+                TeleCommands.SetRegressionCAuto(robot),
+                TeleCommands.SetRegressionDAuto(robot),
                 TeleCommands.GateUp(robot),
                 TeleCommands.Intake(robot),
                 TeleCommands.SetFarShoot(robot),
@@ -73,7 +76,7 @@ public class Red12BallFar extends CommandOpMode {
                     TeleCommands.Intake(robot)
                 ),
                 new WaitCommand(0.4),
-                new PedroPathCommand(robot.follower, p.RintakeHorizontaltolaunchfar),
+                new PedroPathCommand(robot.follower, p.RintakeHorizontaltolaunchfar, 0.9),
                 //the two paths above is a new way to intake the corner balls
                 //the two commented paths above these new ones is the old way to intake the corner balls
 

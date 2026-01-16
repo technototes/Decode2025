@@ -33,6 +33,8 @@ public class Blue12BallFar extends CommandOpMode {
         CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
+                TeleCommands.SetRegressionCAuto(robot),
+                TeleCommands.SetRegressionDAuto(robot),
                 new LLSetup(robot),
                 TeleCommands.GateUp(robot),
                 TeleCommands.SetFarShoot(robot),
@@ -59,7 +61,7 @@ public class Blue12BallFar extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.launchfartointakeHorizontal, 0.6).alongWith(
                     TeleCommands.Intake(robot)
                 ),
-                new PedroPathCommand(robot.follower, p.intakeHorizontaltolaunchfar),
+                new PedroPathCommand(robot.follower, p.intakeHorizontaltolaunchfar, 0.9),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
                 //                new PedroPathCommand(robot.follower, p.launchfartointakeCorner, 0.7),
                 //                new PedroPathCommand(robot.follower, p.intakeCornertolaunchfar),

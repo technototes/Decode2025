@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
@@ -54,7 +55,9 @@ public class DualTeleOp extends CommandOpMode {
             CommandScheduler.scheduleForState(
                 new SequentialCommandGroup(
                     HeadingHelper.RestorePreviousPosition(robot.follower),
-                    DrivingCommands.ResetGyro(controlsDriver.pedroDriver)
+                    DrivingCommands.ResetGyro(controlsDriver.pedroDriver),
+                    TeleCommands.SetRegressionCTeleop(robot),
+                    TeleCommands.SetRegressionDTeleop(robot)
                 ),
                 OpModeState.INIT
             );
@@ -87,6 +90,7 @@ public class DualTeleOp extends CommandOpMode {
         robot.prepForStart();
     }
 
+    /*
     @Override
     public void runLoop() {
         panelsTelemetry
@@ -109,6 +113,7 @@ public class DualTeleOp extends CommandOpMode {
             .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
         panelsTelemetry.getTelemetry().update(telemetry);
     }
+    */
 
     /*
     @Override

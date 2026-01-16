@@ -86,16 +86,16 @@ public class Paths {
     public static Pose Intake1 = new Pose(49, 86);
     public static Pose Intake1ControlPoint = new Pose(61, 89.143);
     public static Pose Intake1end = new Pose(19, 86);
-    public static Pose Lever = new Pose(17, 76);
-    public static Pose LeverControlPoint = new Pose(24, 74.620);
+    public static Pose Lever = new Pose(17, 78);
+    public static Pose LeverControlPoint = new Pose(22, 76);
     public static Pose Intake2 = new Pose(49, 62);
     public static Pose Intake2ControlPoint = new Pose(71, 64.369);
     public static Pose Intake2ControlPoint2 = new Pose(46, 64);
     public static Pose Intake2end = new Pose(16, 62);
     public static Pose Intake2endControlPoint = new Pose(49, 65.696);
-    public static Pose Intake3 = new Pose(48, 41);
+    public static Pose Intake3 = new Pose(48, 39);
     public static Pose Intake3ControlPoint = new Pose(74, 41.585);
-    public static Pose Intake3end = new Pose(16, 41);
+    public static Pose Intake3end = new Pose(16, 39);
     public static Pose Intake3endControlPoint = new Pose(62.000, 84.000);
     public static Pose Startfar;
     public static Pose End = new Pose(34, 76);
@@ -113,7 +113,7 @@ public class Paths {
     public static Pose intake4ControlPoint = new Pose(70.000, 40.000);
     public static Pose intakeCorner = new Pose(10, 12);
     public static Pose intakeCornerControlPoint = new Pose(8, 73);
-    public static Pose intakeHorizontal = new Pose(20, 9);
+    public static Pose intakeHorizontal = new Pose(20, 18);
     public static Pose intakeSweepControlPoint = new Pose(10, 76);
     public static Pose intakeVerticalControlPoint = new Pose(10, 76);
     public static Pose intakeNewCorner = new Pose(16.5, 7.7);
@@ -159,8 +159,8 @@ public class Paths {
     public static Pose RIntake3ControlPoint = new Pose(70, 41.585);
     public static Pose RIntake3end = new Pose(128, 41);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
-    public static Pose Rlever = new Pose(125, 77);
-    public static Pose RleverControlPoint = new Pose(120, 74.620);
+    public static Pose Rlever = new Pose(125, 79);
+    public static Pose RleverControlPoint = new Pose(118, 76);
     public static Pose REnd = new Pose(95, 84);
     public static Pose RfarStart = new Pose(90.000, 9.000);
     public static Pose RfarLaunch = new Pose(87.000, 17);
@@ -190,9 +190,9 @@ public class Paths {
     //58
     public static double RfarlaunchHeading2 = 66;
     // 66;
-    public static double RfarlaunchHeading3 = 67;
+    public static double RfarlaunchHeading3 = 63;
     //53;
-    public static double RfarlaunchHeading4 = 67;
+    public static double RfarlaunchHeading4 = 60;
     //56;
 
     public static double RcornerIntakeHeading = 250;
@@ -255,8 +255,10 @@ public class Paths {
     public PathChain LaunchtoIntake2;
     public PathChain Intake2toIntake2end;
     public PathChain Intake2endtoLaunch;
+    public PathChain RIntake2endtoLever;
     public PathChain LaunchtoIntake3;
     public PathChain Intake3toIntake3end;
+    public PathChain Intake2endtoLever;
     public PathChain Intake3endtoLaunch;
     public PathChain RStarttoLaunchH;
     public PathChain RLaunchtoIntake1H;
@@ -635,6 +637,17 @@ public class Paths {
             .pathBuilder()
             .addPath(new BezierCurve(RIntake2end, RIntake2endControlPoint, RLaunch))
             .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading3))
+            .build();
+
+        RIntake2endtoLever = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(RIntake2end, RleverControlPoint, Rlever))
+            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading3))
+            .build();
+        Intake2endtoLever = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(Intake2end, LeverControlPoint, Lever))
+            .setConstantHeadingInterpolation(Math.toRadians(launchHeading3))
             .build();
 
         RLaunchtoIntake3 = follower

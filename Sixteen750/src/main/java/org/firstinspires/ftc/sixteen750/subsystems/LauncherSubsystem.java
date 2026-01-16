@@ -26,7 +26,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double closetargetLaunchVelocity = 1400;
     public static double fartargetLaunchVelocity = 1775;
-    public static double fartargetLaunchVelocityforAuto = 2400;
+    public static double fartargetLaunchVelocityforAuto = 2300;
     public static double targetLaunchVelocityforAuto1 = 1950;
     public static double targetLaunchVelocityforAuto2 = 1850;
 
@@ -75,8 +75,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double RPM_PER_FOOT = 62.3;
     public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
     public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
-    public static double REGRESSION_C = 17; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 115; // minimum velocity for far zone launch speed formula
+    public static double REGRESSION_C = 20; // multiplier for x for far zone launch speed formula
+    public static double REGRESSION_D = 215; // minimum velocity for far zone launch speed formula - 130
+    public static double REGRESSION_C_TELEOP = 20; // multiplier for x for far zone launch speed formula
+    public static double REGRESSION_D_TELEOP = 130; // minimum velocity for far zone launch speed formula
     public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D_AUTO = 115; // minimum velocity for far zone launch speed formula
 
@@ -284,8 +286,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         double x = ls.getDistance();
 
         if (x < 100 && x > 0) {
-            launcherPI.p = 0.0015;
-            launcherPI.i = 0;
+            //launcherPI.p = 0.0015;
+            //launcherPI.i = 0;
             lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
             return lastAutoVelocity;
         }
@@ -300,18 +302,24 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
     }
 
-    public void setRegressionC() {
+    public void setRegressionCAuto() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            REGRESSION_C = REGRESSION_C_AUTO;
-        }
+        REGRESSION_C = REGRESSION_C_AUTO;
     }
 
-    public void setRegressionD() {
+    public void setRegressionDAuto() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            REGRESSION_D = REGRESSION_D_AUTO;
-        }
+        REGRESSION_D = REGRESSION_D_AUTO;
+    }
+
+    public void setRegressionCTeleop() {
+        // Spin the motors pid goes here
+        REGRESSION_C = REGRESSION_C_TELEOP;
+    }
+
+    public void setRegressionDTeleop() {
+        // Spin the motors pid goes here
+        REGRESSION_D = REGRESSION_D_TELEOP;
     }
 
     @Override
