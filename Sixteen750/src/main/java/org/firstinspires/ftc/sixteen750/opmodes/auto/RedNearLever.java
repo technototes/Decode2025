@@ -22,9 +22,9 @@ import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "RedSegmentedCurveLever", preselectTeleOp = "Dual Control")
+@Autonomous(name = "RedNearLever1️⃣", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class RedSegmentedCurveLever extends CommandOpMode {
+public class RedNearLever extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;

@@ -121,4 +121,20 @@ public class TeleCommands {
     public static Command ReadVelocity(Robot r) {
         return Command.create(r.launcherSubsystem::readVelocity);
     }
+
+    public static Command SetRegressionCAuto(Robot r) {
+        return Command.create(r.launcherSubsystem::setRegressionCAuto);
+    }
+
+    public static Command SetRegressionDAuto(Robot r) {
+        return Command.create(r.launcherSubsystem::setRegressionDAuto);
+    }
+
+    public static Command SetRegressionCTeleop(Robot r) {
+        return Command.create(r.launcherSubsystem::setRegressionCTeleop);
+    }
+
+    public static Command SetRegressionDTeleop(Robot r) {
+        return Command.create(r.launcherSubsystem::setRegressionDTeleop);
+    }
 }
