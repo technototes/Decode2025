@@ -20,6 +20,8 @@ public class Setup {
         public static boolean AIMINGSUBSYSTEM = true;
         public static boolean BRAKESUBSYSTEM = true;
         public static boolean TURRETSUBSYSTEM = false;
+
+        public static boolean BLACKBIRD = false;
     }
 
     @Configurable

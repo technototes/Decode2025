@@ -44,14 +44,36 @@ public class Hardware implements Loggable {
     public Hardware(HardwareMap hwmap) {
         map = hwmap;
         hubs = hwmap.getAll(LynxModule.class);
-        if (Setup.Connected.EXTERNAL_IMU) {
-            imu = new AdafruitIMU(Setup.HardwareNames.EXTERNAL_IMU, AdafruitIMU.Orientation.Pitch);
+        if (Setup.Connected.BLACKBIRD) {
+            // For Blackbird:
+            if (Setup.Connected.EXTERNAL_IMU) {
+                // TODO: Is this Yaw, Pitch, or Roll?
+                imu = new AdafruitIMU(
+                    Setup.HardwareNames.EXTERNAL_IMU,
+                    AdafruitIMU.Orientation.Pitch
+                );
+            } else {
+                // The ControlHub is on the other side for Blackbird (cuz mech gonna mech)
+                imu = new IMU(
+                    Setup.HardwareNames.IMU,
+                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                    RevHubOrientationOnRobot.UsbFacingDirection.UP
+                );
+            }
         } else {
-            imu = new IMU(
-                Setup.HardwareNames.IMU,
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP
-            );
+            // For Cardinal:
+            if (Setup.Connected.EXTERNAL_IMU) {
+                imu = new AdafruitIMU(
+                    Setup.HardwareNames.EXTERNAL_IMU,
+                    AdafruitIMU.Orientation.Pitch
+                );
+            } else {
+                imu = new IMU(
+                    Setup.HardwareNames.IMU,
+                    RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                    RevHubOrientationOnRobot.UsbFacingDirection.UP
+                );
+            }
         }
         if (Setup.Connected.DRIVEBASE) {
             fl = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.FL_DRIVE_MOTOR);
