@@ -30,9 +30,17 @@ public class LinePaths {
     public PathChain RIntake3_to_Intake3end;
     public PathChain RIntake3end_to_Launch;
     public PathChain RLaunch_to_Move;
+    public PathChain Forward48;
+    public PathChain Backward48;
+    public PathChain SideLeft48;
+    public PathChain SideRight48;
 
     public Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
+    }
+
+    public static Pose getForward48Start() {
+        return new Pose(56.000, 8.000, Math.toRadians(90));
     }
 
     public Pose getRStart() {
@@ -130,6 +138,29 @@ public class LinePaths {
             .addPath(new BezierLine(launch, move))
             //.setLinearHeadingInterpolation(Math.toRadians(125), Math.toRadians(125))
             .setConstantHeadingInterpolation(Math.toRadians(125))
+            .build();
+        Forward48 = follower
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(56.000, 8.000), new Pose(56.000, 56.000)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+            .setVelocityConstraint(0.5)
+            .build();
+        Backward48 = follower
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(56.000, 56.000), new Pose(56.000, 8.000)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+            .build();
+
+        SideLeft48 = follower
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(56.000, 8.000), new Pose(8, 8.000)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+            .build();
+
+        SideRight48 = follower
+            .pathBuilder()
+            .addPath(new BezierLine(new Pose(8, 8.000), new Pose(56.000, 8.000)))
+            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
             .build();
         //red auto paths
 
