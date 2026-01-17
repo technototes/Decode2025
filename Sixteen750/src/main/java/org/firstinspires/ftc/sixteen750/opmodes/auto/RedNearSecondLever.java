@@ -66,11 +66,11 @@ public class RedNearSecondLever extends CommandOpMode {
                     new WaitCommand(0.05),
                     //TeleCommands.AutoLaunch2(robot),
 
-                    new PedroPathCommand(robot.follower, p.RIntake2endtoLever).alongWith(
+                    new PedroPathCommand(robot.follower, p.RIntake2endtoLever2).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),
                     new WaitCommand(0.5),
-                    new PedroPathCommand(robot.follower, p.RLevertoLaunch),
+                    new PedroPathCommand(robot.follower, p.RLever2toLaunch),
                     new WaitCommand(0.05),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),

@@ -9,6 +9,7 @@ import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
+import org.firstinspires.ftc.sixteen750.commands.auto.LinePaths;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
@@ -27,7 +28,7 @@ public class SidetoSide48 extends CommandOpMode {
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
-        Paths p = new Paths(robot.follower);
+        LinePaths p = new LinePaths(robot.follower);
         robot.follower.setStartingPose(p.getForward48Start());
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(

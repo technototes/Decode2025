@@ -69,11 +69,11 @@ public class BlueNearFirstandSecondLever extends CommandOpMode {
                     new WaitCommand(0.05),
                     //TeleCommands.AutoLaunch2(robot),
 
-                    new PedroPathCommand(robot.follower, p.Intake2endtoLever).alongWith(
+                    new PedroPathCommand(robot.follower, p.Intake2endtoLever2, 0.9).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),
                     new WaitCommand(0.5),
-                    new PedroPathCommand(robot.follower, p.LevertoLaunch),
+                    new PedroPathCommand(robot.follower, p.Lever2toLaunch),
                     new WaitCommand(0.05),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.LaunchtoIntake3),
