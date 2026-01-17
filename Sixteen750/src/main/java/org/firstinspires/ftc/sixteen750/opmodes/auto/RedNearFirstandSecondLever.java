@@ -22,9 +22,9 @@ import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "RedNearLever2️⃣", preselectTeleOp = "Dual Control")
+@Autonomous(name = "RedNearLever1️⃣2️⃣", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class RedNearSecondLever extends CommandOpMode {
+public class RedNearFirstandSecondLever extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -55,8 +55,11 @@ public class RedNearSecondLever extends CommandOpMode {
                         TeleCommands.Intake(robot)
                     ),
                     new WaitCommand(0.05),
-                    //   TeleCommands.AutoLaunch2(robot),
-                    new PedroPathCommand(robot.follower, p.RIntake1endtoLaunch, p.power2),
+                    new PedroPathCommand(robot.follower, p.RIntake1endtoLever).alongWith(
+                        TeleCommands.IntakeStop(robot)
+                    ),
+                    new WaitCommand(0.5),
+                    new PedroPathCommand(robot.follower, p.RLevertoLaunch, p.power2),
                     new WaitCommand(0.05),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),

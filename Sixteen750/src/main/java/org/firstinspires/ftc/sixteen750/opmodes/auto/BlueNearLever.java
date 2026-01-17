@@ -16,7 +16,7 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "BlueSegmentedCurveLever", preselectTeleOp = "Dual Control")
+@Autonomous(name = "BlueNearLever1️⃣", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 public class BlueNearLever extends CommandOpMode {
 

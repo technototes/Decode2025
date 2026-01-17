@@ -27,7 +27,7 @@ public class Blue12BallFar extends CommandOpMode {
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
-        robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
+        robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Net);
         Paths p = new Paths(robot.follower);
         robot.follower.setStartingPose(p.getFar9BallStart());
         CommandScheduler.register(robot.limelightSubsystem);
@@ -46,9 +46,11 @@ public class Blue12BallFar extends CommandOpMode {
                 Paths.AutoLaunching3BallsSlowIntake(robot),
                 TeleCommands.HoldIntake(robot),
                 // new WaitCommand(0.5),
-                new PedroPathCommand(robot.follower, p.launchfartointake4, p.power).alongWith(
-                    TeleCommands.Intake(robot)
-                ),
+                new PedroPathCommand(
+                    robot.follower,
+                    p.launchfartointake4,
+                    p.powerforintake4
+                ).alongWith(TeleCommands.Intake(robot)),
                 new WaitCommand(0.3),
                 // new WaitCommand(2),
                 new PedroPathCommand(robot.follower, p.intake4tolaunchfar),
@@ -57,12 +59,12 @@ public class Blue12BallFar extends CommandOpMode {
                     TeleCommands.Intake(robot)
                 ),
                 new PedroPathCommand(robot.follower, p.intakeVerticaltolaunchfar),
-                Paths.AutoLaunching3BallsSlowIntake(robot),
+                Paths.AutoLaunching3BallsSlowIntakeFar(robot),
                 new PedroPathCommand(robot.follower, p.launchfartointakeHorizontal, 0.6).alongWith(
                     TeleCommands.Intake(robot)
                 ),
                 new PedroPathCommand(robot.follower, p.intakeHorizontaltolaunchfar, 0.9),
-                Paths.AutoLaunching3BallsSlowIntake(robot),
+                Paths.AutoLaunching3BallsSlowIntakeFar(robot),
                 //                new PedroPathCommand(robot.follower, p.launchfartointakeCorner, 0.7),
                 //                new PedroPathCommand(robot.follower, p.intakeCornertolaunchfar),
                 //                Paths.AutoLaunching3Balls(robot),

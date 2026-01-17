@@ -13,6 +13,7 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoOrientFar;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
@@ -81,13 +82,34 @@ public class Paths {
         //.raceWith(new AltAutoOrient(r));
     }
 
+    public static Command AutoLaunching3BallsSlowIntakeFar(Robot r) {
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                //TeleCommands.IntakeStop(r),
+                TeleCommands.GateUp(r),
+                new WaitCommand(0.7)
+            )
+                .raceWith(new AltAutoOrientFar(r)),
+            TeleCommands.HoldIntake(r),
+            // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
+            //switched to slow intake to remove the up down up down of the gate aswell as drain less power
+            TeleCommands.GateDown(r),
+            new WaitCommand(1.5),
+            TeleCommands.GateUp(r),
+            TeleCommands.IntakeStop(r)
+
+            // want to keep launcher running during auto also no need to stop intake
+        );
+        //.raceWith(new AltAutoOrient(r));
+    }
+
     public static Pose Start = new Pose(30.5, 135.152);
     public static Pose Launch = new Pose(54, 93);
     public static Pose Intake1 = new Pose(49, 86);
     public static Pose Intake1ControlPoint = new Pose(61, 89.143);
     public static Pose Intake1end = new Pose(19, 86);
-    public static Pose Lever = new Pose(17, 78);
-    public static Pose LeverControlPoint = new Pose(22, 76);
+    public static Pose Lever = new Pose(18, 77);
+    public static Pose LeverControlPoint = new Pose(24, 76);
     public static Pose Intake2 = new Pose(49, 62);
     public static Pose Intake2ControlPoint = new Pose(71, 64.369);
     public static Pose Intake2ControlPoint2 = new Pose(46, 64);
@@ -642,12 +664,12 @@ public class Paths {
         RIntake2endtoLever = follower
             .pathBuilder()
             .addPath(new BezierCurve(RIntake2end, RleverControlPoint, Rlever))
-            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading3))
+            .setTangentHeadingInterpolation()
             .build();
         Intake2endtoLever = follower
             .pathBuilder()
             .addPath(new BezierCurve(Intake2end, LeverControlPoint, Lever))
-            .setConstantHeadingInterpolation(Math.toRadians(launchHeading3))
+            .setTangentHeadingInterpolation()
             .build();
 
         RLaunchtoIntake3 = follower
@@ -834,7 +856,7 @@ public class Paths {
 
         intake4tolaunchfar = follower
             .pathBuilder()
-            .addPath(new BezierLine(intake4, farLaunch))
+            .addPath(new BezierLine(intake4, farLaunch2))
             .setLinearHeadingInterpolation(
                 Math.toRadians(intakeHeading),
                 Math.toRadians(farlaunchHeading2)
@@ -851,7 +873,7 @@ public class Paths {
 
         launchfartointakeHorizontal = follower
             .pathBuilder()
-            .addPath(new BezierLine(farLaunch3, intakeHorizontal))
+            .addPath(new BezierLine(farLaunch2, intakeHorizontal))
             //            .setLinearHeadingInterpolation(
             //                Math.toRadians(RlaunchHeading1),
             //                Math.toRadians(RcornerIntakeHeading)
@@ -864,7 +886,7 @@ public class Paths {
         intakeHorizontaltolaunchfar = follower
             //new way to intake corner balls
             .pathBuilder()
-            .addPath(new BezierLine(intakeHorizontal, farLaunch4))
+            .addPath(new BezierLine(intakeHorizontal, farLaunch3))
             .setVelocityConstraint(0.3)
             .setLinearHeadingInterpolation(
                 Math.toRadians(HorizontalIntakeHeading),
