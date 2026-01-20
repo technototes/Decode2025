@@ -9,12 +9,12 @@ import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
-import com.pedropathing.ftc.localization.constants.OTOSConstants;
+import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.pedropathing.ftc.localization.constants.TwoWheelConstants;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathConstraints;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.blackbird.Setup.HardwareNames;
@@ -73,27 +73,36 @@ public class AutoConstants {
     //public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
     //public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
 
-    @Configurable
-    public static class DriveEncoderConfig {
+    // @Configurable
+    public static class DriveEncoderLocalizer {
 
         public static double fwdTicksToInches = 0.008;
         public static double strafeTicksToInches = -0.009;
         public static double turnTicksToInches = 0.018;
+
+        public static DriveEncoderConstants get() {
+            return new DriveEncoderConstants()
+                .forwardTicksToInches(fwdTicksToInches)
+                .strafeTicksToInches(strafeTicksToInches)
+                .turnTicksToInches(turnTicksToInches)
+                .robotLength(robotLength)
+                .robotWidth(robotWidth)
+                .rightFrontMotorName(HardwareNames.FR_DRIVE_MOTOR)
+                .rightRearMotorName(HardwareNames.RR_DRIVE_MOTOR)
+                .leftRearMotorName(HardwareNames.RL_DRIVE_MOTOR)
+                .leftFrontMotorName(HardwareNames.FL_DRIVE_MOTOR)
+                .leftFrontEncoderDirection(Encoder.FORWARD)
+                .leftRearEncoderDirection(Encoder.REVERSE)
+                .rightFrontEncoderDirection(Encoder.REVERSE)
+                .rightRearEncoderDirection(Encoder.FORWARD);
+        }
     }
 
-    @Configurable
-    public static class OTOSConfig {
+    // @Configurable
+    public static class TwoWheelLocalizer {
 
-        public static SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(1.50, 0.0, 180);
-        public static double linearscalar = -1.08; //1.9
-        public static double angularscalar = 0.9;
-    }
-
-    @Configurable
-    public static class TwoWheelConfig {
-
-        public static String forwardName = HardwareNames.ODOFB;
-        public static String strafeName = HardwareNames.ODORL;
+        public static String forwardName = HardwareNames.ODO_FWDBACK;
+        public static String strafeName = HardwareNames.ODO_STRAFE;
         public static double forwardTicksToInches = ((17.5 / 25.4) * 2 * Math.PI) / 8192; // 5.42, 5.47, 5.49
         public static double strafeTicksToInches = ((17.5 / 25.4) * 2 * Math.PI) / 8192; // 5.37, 5.39, 5.38
         public static double forwardPodYOffset = -3.9; // From Colin's CAD 10/31
@@ -104,32 +113,48 @@ public class AutoConstants {
             RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         public static RevHubOrientationOnRobot.UsbFacingDirection usbDir =
             RevHubOrientationOnRobot.UsbFacingDirection.UP;
+
+        public static TwoWheelConstants get() {
+            TwoWheelConstants tc = new TwoWheelConstants()
+                .forwardEncoder_HardwareMapName(forwardName)
+                .strafeEncoder_HardwareMapName(strafeName)
+                .forwardPodY(forwardPodYOffset)
+                .strafePodX(strafePodXOffset)
+                .forwardTicksToInches(forwardTicksToInches)
+                .strafeTicksToInches(strafeTicksToInches)
+                .forwardEncoderDirection(forwardReversed ? Encoder.REVERSE : Encoder.FORWARD)
+                .strafeEncoderDirection(strafeReversed ? Encoder.REVERSE : Encoder.FORWARD);
+            if (Setup.Connected.EXTERNAL_IMU) {
+                tc = tc.customIMU(new CustomAdafruitIMU());
+            } else {
+                tc = tc
+                    .IMU_HardwareMapName(Setup.HardwareNames.IMU)
+                    .IMU_Orientation(new RevHubOrientationOnRobot(logoDir, usbDir));
+            }
+            return tc;
+        }
     }
 
-    public static TwoWheelConstants getTwoWheelLocalizerConstants() {
-        TwoWheelConstants tc = new TwoWheelConstants()
-            .forwardEncoder_HardwareMapName(TwoWheelConfig.forwardName)
-            .strafeEncoder_HardwareMapName(TwoWheelConfig.strafeName)
-            .forwardPodY(TwoWheelConfig.forwardPodYOffset)
-            .strafePodX(TwoWheelConfig.strafePodXOffset)
-            .forwardTicksToInches(TwoWheelConfig.forwardTicksToInches)
-            .strafeTicksToInches(TwoWheelConfig.strafeTicksToInches)
-            .forwardEncoderDirection(
-                TwoWheelConfig.forwardReversed ? Encoder.REVERSE : Encoder.FORWARD
-            )
-            .strafeEncoderDirection(
-                TwoWheelConfig.strafeReversed ? Encoder.REVERSE : Encoder.FORWARD
-            );
-        if (Setup.Connected.EXTERNAL_IMU) {
-            tc = tc.customIMU(new CustomAdafruitIMU());
-        } else {
-            tc = tc
-                .IMU_HardwareMapName(Setup.HardwareNames.IMU)
-                .IMU_Orientation(
-                    new RevHubOrientationOnRobot(TwoWheelConfig.logoDir, TwoWheelConfig.usbDir)
-                );
+    @Configurable
+    public static class PinpointLocalizer {
+
+        public static double FORWARD_POD_Y_OFFSET = -1.5;
+        public static double STRAFE_POD_X_OFFSET = 2.3;
+        public static GoBildaPinpointDriver.EncoderDirection FORWARD_DIR =
+            GoBildaPinpointDriver.EncoderDirection.FORWARD;
+        public static GoBildaPinpointDriver.EncoderDirection STRAFE_DIR =
+            GoBildaPinpointDriver.EncoderDirection.REVERSED;
+
+        public static PinpointConstants get() {
+            return new PinpointConstants()
+                .hardwareMapName(HardwareNames.PINPOINT)
+                .distanceUnit(DistanceUnit.INCH)
+                .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
+                .forwardEncoderDirection(FORWARD_DIR)
+                .strafeEncoderDirection(STRAFE_DIR)
+                .forwardPodY(FORWARD_POD_Y_OFFSET)
+                .strafePodX(STRAFE_POD_X_OFFSET);
         }
-        return tc;
     }
 
     public static FollowerConstants getFollowerConstants() {
@@ -138,7 +163,6 @@ public class AutoConstants {
             .mass(botWeightKg)
             .forwardZeroPowerAcceleration(fwdDeceleration)
             .lateralZeroPowerAcceleration(latDeceleration)
-            // .holdPointTranslationalScaling(1)
             .headingPIDFCoefficients(headingPIDF)
             .useSecondaryHeadingPIDF(true)
             .secondaryHeadingPIDFCoefficients(second_headingPIDF)
@@ -175,45 +199,11 @@ public class AutoConstants {
             .yVelocity(yvelocity);
     }
 
-    /*
-    public static DriveEncoderConstants getEncoderConstants() {
-        return new DriveEncoderConstants()
-                .forwardTicksToInches(DriveEncoderConfig.fwdTicksToInches)
-                .strafeTicksToInches(DriveEncoderConfig.strafeTicksToInches)
-                .turnTicksToInches(DriveEncoderConfig.turnTicksToInches)
-                .robotLength(robotLength)
-                .robotWidth(robotWidth)
-                .rightFrontMotorName(HardwareNames.FR_DRIVE_MOTOR)
-                .rightRearMotorName(HardwareNames.RR_DRIVE_MOTOR)
-                .leftRearMotorName(HardwareNames.RL_DRIVE_MOTOR)
-                .leftFrontMotorName(HardwareNames.FL_DRIVE_MOTOR)
-                .leftFrontEncoderDirection(Encoder.FORWARD)
-                .leftRearEncoderDirection(Encoder.REVERSE)
-                .rightFrontEncoderDirection(Encoder.REVERSE)
-                .rightRearEncoderDirection(Encoder.FORWARD);
-    }
-
-    public static OTOSConstants getOTOSConstants() {
-        return new OTOSConstants()
-            .hardwareMapName(HardwareNames.OTOS)
-            .linearUnit(DistanceUnit.INCH)
-            .angleUnit(AngleUnit.RADIANS)
-            .linearScalar(OTOSConfig.linearscalar)
-            .angularScalar(OTOSConfig.angularscalar);
-    }
-    */
-
     public static Follower createFollower(HardwareMap hardwareMap) {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
         Follower fol = new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
-            //.driveEncoderLocalizer(getEncoderConstants())
-            //.OTOSLocalizer(getOTOSConstants())
             .mecanumDrivetrain(getDriveConstants())
-            .twoWheelLocalizer(getTwoWheelLocalizerConstants())
+            .pinpointLocalizer(PinpointLocalizer.get())
             .build();
         //        fol.setMaxPowerScaling(0.5);
         return fol;

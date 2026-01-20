@@ -70,16 +70,8 @@ public class TeleCommands {
         return Command.create(r.intakeSubsystem::Spit);
     }
 
-    public static Command EngageBrake(Robot r) {
-        return Command.create(r.brakeSubsystem::Engage);
-    }
-
     public static Command HoldIntake(Robot r) {
         return Command.create(r.intakeSubsystem::Hold);
-    }
-
-    public static Command DisengageBrake(Robot r) {
-        return Command.create(r.brakeSubsystem::Disengage);
     }
 
     public static Command Aim(Robot r) {

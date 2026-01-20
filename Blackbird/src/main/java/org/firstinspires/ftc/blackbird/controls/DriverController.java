@@ -65,9 +65,6 @@ public class DriverController {
         if (Setup.Connected.INTAKESUBSYSTEM) {
             bindIntakeControls();
         }
-        if (Setup.Connected.BRAKESUBSYSTEM) {
-            bindBrakeControls();
-        }
         if (Setup.Connected.AIMINGSUBSYSTEM) {
             bindAimControls();
         }
@@ -145,11 +142,6 @@ public class DriverController {
 
     // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
     // spitTrigger.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
-
-    public void bindBrakeControls() {
-        brakeButton.whilePressed(TeleCommands.EngageBrake(robot));
-        brakeButton.whenReleased(TeleCommands.DisengageBrake(robot));
-    }
 
     public void bindAimControls() {
         // if(yippee) {

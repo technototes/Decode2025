@@ -14,11 +14,9 @@ public class Setup {
         public static boolean ODOSUBSYSTEM = true;
         public static boolean SAFETYSUBSYSTEM = false;
         public static boolean EXTERNAL_IMU = false;
-        public static boolean OTOS = false;
         public static boolean INTAKESUBSYSTEM = true;
         public static boolean LAUNCHERSUBSYSTEM = true;
         public static boolean AIMINGSUBSYSTEM = true;
-        public static boolean BRAKESUBSYSTEM = true;
         public static boolean TURRETSUBSYSTEM = true;
 
         public static boolean BLACKBIRD = true;
@@ -33,15 +31,14 @@ public class Setup {
         public static String RR_DRIVE_MOTOR = "rr";
         public static String IMU = "imu";
         public static String EXTERNAL_IMU = "adafruit-imu";
-        public static String ODORL = "intake/odorl";
-        public static String ODOFB = "launcher2/odofb";
-        public static String OTOS = "sparky";
-        public static String INTAKE_MOTOR = "intake/odorl";
+        public static String INTAKE_MOTOR = "intake";
         public static String LAUNCHER_MOTOR1 = "launcher1";
         public static String LAUNCHER_MOTOR2 = "launcher2";
-        public static String BRAKE_SERVO = "brake";
         public static String HOOD_SERVO = "hood";
+        public static String ODO_STRAFE = "odostrafe";
+        public static String ODO_FWDBACK = "odofb";
         public static String LEVER_SERVO = "lever";
+        public static String PINPOINT = "pinpoint";
         public static String TESTSERVO = "testservo";
         public static String TESTMOTOR = "testmotor";
         public static String TESTCRSERVO = "testcrservo";
