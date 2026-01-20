@@ -11,7 +11,7 @@ public class Setup {
         public static boolean TESTSUBSYSTEM = false;
         public static boolean LIMELIGHTSUBSYSTEM = true;
         public static boolean DRIVEBASE = true;
-        public static boolean ODOSUBSYSTEM = true;
+        public static boolean ODOSUBSYSTEM = false;
         public static boolean SAFETYSUBSYSTEM = false;
         public static boolean EXTERNAL_IMU = false;
         public static boolean INTAKESUBSYSTEM = true;

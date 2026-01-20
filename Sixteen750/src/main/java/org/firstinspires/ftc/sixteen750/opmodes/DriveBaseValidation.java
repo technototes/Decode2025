@@ -77,43 +77,28 @@ public class DriveBaseValidation extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // First, get the hardware
-        motors = new MotorConfig[] {
-            Connected.DRIVEBASE
-                ? new MotorConfig(hardwareMap, HardwareNames.FL_DRIVE_MOTOR, true, () ->
-                      triggered(gamepad1.left_trigger)
-                  )
-                : null,
-            Connected.DRIVEBASE
-                ? new MotorConfig(hardwareMap, HardwareNames.FR_DRIVE_MOTOR, false, () ->
-                      triggered(gamepad1.right_trigger)
-                  )
-                : null,
-            Connected.DRIVEBASE
-                ? new MotorConfig(hardwareMap, HardwareNames.RL_DRIVE_MOTOR, true, () ->
-                      gamepad1.left_bumper
-                  )
-                : null,
-            Connected.DRIVEBASE
-                ? new MotorConfig(hardwareMap, HardwareNames.RR_DRIVE_MOTOR, false, () ->
-                      gamepad1.right_bumper
-                  )
-                : null,
-            Connected.LAUNCHERSUBSYSTEM
-                ? new MotorConfig(hardwareMap, HardwareNames.LAUNCHER_MOTOR1, false, () ->
-                      gamepad1.dpad_up
-                  )
-                : null,
-            Connected.LAUNCHERSUBSYSTEM
-                ? new MotorConfig(hardwareMap, HardwareNames.LAUNCHER_MOTOR2, true, () ->
-                      gamepad1.dpad_up
-                  )
-                : null,
-            Connected.INTAKESUBSYSTEM
-                ? new MotorConfig(hardwareMap, HardwareNames.INTAKE_MOTOR, false, () ->
-                      gamepad1.dpad_down
-                  )
-                : null,
-        };
+        DcMotorEx fr, fl, rr, rl;
+        trigger = new CommandAxis(() -> gamepad1.left_trigger);
+        button = trigger.getAsButton(triggerThreshold);
+
+        if (Connected.DRIVEBASE) {
+            motors = new MotorConfig[4];
+            motors[0] = new MotorConfig(hardwareMap, HardwareNames.FL_DRIVE_MOTOR, true, () ->
+                triggered(gamepad1.left_trigger)
+            );
+            motors[1] = new MotorConfig(hardwareMap, HardwareNames.FR_DRIVE_MOTOR, true, () ->
+                triggered(gamepad1.right_trigger)
+            );
+            motors[2] = new MotorConfig(hardwareMap, HardwareNames.RL_DRIVE_MOTOR, true, () ->
+                gamepad1.left_bumper
+            );
+            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RR_DRIVE_MOTOR, true, () ->
+                gamepad1.right_bumper
+            );
+        } else {
+            motors = null;
+        }
+
         ptel = PanelsTelemetry.INSTANCE.getTelemetry();
         waitForStart();
         MovingStatistics loopStats = new MovingStatistics(samples);
@@ -125,13 +110,18 @@ public class DriveBaseValidation extends LinearOpMode {
             loopStats.add(lps);
             double mean = loopStats.getMean();
             double stddev = loopStats.getStandardDeviation();
-            for (MotorConfig m : motors) {
-                if (m == null) {
-                    continue;
+            if (Connected.DRIVEBASE) {
+                for (MotorConfig m : motors) {
+                    m.setVelo();
+                    addData(m.name, m.toString());
                 }
-                m.setVelo();
-                addData(m.name, m.toString());
             }
+            addData("lX", String.format("%.3f", gamepad1.left_stick_x));
+            addData("lY", String.format("%.3f", gamepad1.left_stick_y));
+            addData("rX", String.format("%.3f", gamepad1.right_stick_x));
+            addData("rY", String.format("%.3f", gamepad1.right_stick_y));
+            addData("lT", String.format("%.3f", gamepad1.left_trigger));
+            addData("rT", String.format("%.3f", gamepad1.right_trigger));
             addData("LPS", String.format("%.1f avg %.1f stddev %.2f", lps, mean, stddev));
             ptel.update();
             telemetry.update();

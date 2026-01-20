@@ -27,7 +27,6 @@ public class Hardware implements Loggable {
     public DcMotorEx intake;
     public EncodedMotor launcher1;
     public EncodedMotor launcher2;
-    public Servo brake;
     public Servo hood;
     public Servo lever;
     public MotorEncoder odoRL, odoFB;

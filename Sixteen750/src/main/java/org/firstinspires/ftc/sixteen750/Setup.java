@@ -8,12 +8,12 @@ public class Setup {
     @Configurable
     public static class Connected {
 
-        public static final boolean TESTSUBSYSTEM = false;
+        public static final boolean TESTSUBSYSTEM = true;
         public static final boolean LIMELIGHTSUBSYSTEM = true;
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = true;
         public static boolean SAFETYSUBSYSTEM = false;
-        public static boolean EXTERNAL_IMU = false;
+        public static boolean EXTERNAL_IMU = true;
         public static boolean OTOS = false;
         public static boolean INTAKESUBSYSTEM = true;
         public static boolean LAUNCHERSUBSYSTEM = true;
@@ -30,10 +30,10 @@ public class Setup {
         public static String RR_DRIVE_MOTOR = "rr";
         public static String IMU = "imu";
         public static String EXTERNAL_IMU = "adafruit-imu";
-        public static String ODORL = "odorl";
-        public static String ODOFB = "odofb";
+        public static String ODORL = "intake/odo";
+        public static String ODOFB = "odof";
         public static String OTOS = "sparky";
-        public static String INTAKE_MOTOR = "intake";
+        public static String INTAKE_MOTOR = "intake/odo";
         public static String LAUNCHER_MOTOR1 = "launcher1";
         public static String LAUNCHER_MOTOR2 = "launcher2";
         public static String BRAKE_SERVO = "brake";
@@ -43,7 +43,6 @@ public class Setup {
         public static String TESTMOTOR = "testmotor";
         public static String TESTCRSERVO = "testcrservo";
         public static String LIMELIGHT = "limelight";
-        public static String PINPOINT = "pinpoint";
         public static int Green_Color_Pipeline = 0;
         // public static int Classifier_Pipeline = 2;
         // public static int Object_Detection_Pipeline = 3;

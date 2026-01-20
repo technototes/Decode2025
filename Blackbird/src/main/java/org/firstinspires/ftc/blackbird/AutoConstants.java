@@ -138,8 +138,8 @@ public class AutoConstants {
     @Configurable
     public static class PinpointLocalizer {
 
-        public static double FORWARD_POD_Y_OFFSET = -1.5;
-        public static double STRAFE_POD_X_OFFSET = 2.3;
+        public static double FORWARD_POD_Y_OFFSET = -2.5;
+        public static double STRAFE_POD_X_OFFSET = 2.25;
         public static GoBildaPinpointDriver.EncoderDirection FORWARD_DIR =
             GoBildaPinpointDriver.EncoderDirection.FORWARD;
         public static GoBildaPinpointDriver.EncoderDirection STRAFE_DIR =
