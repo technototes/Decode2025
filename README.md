@@ -6,8 +6,8 @@
   - [ ] ODO Pedro Tuning
 - [ ] PedroPath Motion Tuner
 - [ ] Turret work
-  - [ ] PID for Turret
-  - [ ] Positioning for Turret
+  - [x] PID for Turret
+  - [x] Positioning for Turret
   - [ ] Auto-orient for vision
 - [ ] PID tuning for launcher
 - [ ] Hood servo settings

@@ -16,6 +16,7 @@ public class TestingController {
     public CommandButton motorPowerButton;
     public CommandButton motorVelocityButton;
     public CommandButton TurretMoveToPose;
+    public CommandButton TurretMoveToPose90;
 
     public TestingController(CommandGamepad g, Robot r) {
         robot = r;
@@ -28,12 +29,14 @@ public class TestingController {
         // motorPowerButton = gamepad.ps_circle;
         // motorVelocityButton = gamepad.ps_triangle;
         TurretMoveToPose = gamepad.ps_cross;
+        TurretMoveToPose90 = gamepad.ps_square;
     }
 
     private void bindButtonControls() {
         // motorPowerButton.whenPressed(TeleCommands.MotorPowerTest(robot));
         // motorPowerButton.whenReleased(TeleCommands.)
         // motorVelocityButton.whenPressed(TeleCommands.MotorVelocityTest(robot));
-        TurretMoveToPose.whenPressed(Command.create(robot.turretSubsystem::turretzero));
+        TurretMoveToPose.whenPressed(Command.create(robot.turretSubsystem::turretGoToZero));
+        TurretMoveToPose90.whenPressed(Command.create(robot.turretSubsystem::turretGoTo90));
     }
 }

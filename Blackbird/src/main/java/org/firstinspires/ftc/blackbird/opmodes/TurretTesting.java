@@ -54,12 +54,10 @@ public class TurretTesting extends CommandOpMode {
 
     @Override
     public void runLoop() {
-        robot.turretSubsystem.setTurretPos(
-            robot.turretSubsystem.turretPIDF.update(robot.turretSubsystem.getTurretPos())
-        );
-        robot.turretSubsystem.turretAngle = robot.turretSubsystem.getEncoderAngleInDegrees();
-        robot.turretSubsystem.turretPow = robot.turretSubsystem.getTurretPow();
-        robot.turretSubsystem.turretTicks = robot.turretSubsystem.getTurretPos();
+        // robot.turretSubsystem.setTurretPos(robot.turretSubsystem.turretPIDF.update(robot.turretSubsystem.getTurretPos()));
+        // robot.turretSubsystem.turretAngle = robot.turretSubsystem.getEncoderAngleInDegrees();
+        // robot.turretSubsystem.turretPow = robot.turretSubsystem.getTurretPow();
+        // robot.turretSubsystem.turretTicks = robot.turretSubsystem.getTurretPos();
         telemetry.addData("Turret", robot.turretSubsystem.TurretSubsytemInfoToDS);
         panelsTelemetry.getTelemetry().addData("TurretPos", robot.turretSubsystem.turretTicks);
         panelsTelemetry.getTelemetry().update(telemetry);

@@ -8,8 +8,8 @@ public class Setup {
     @Configurable
     public static class Connected {
 
-        public static final boolean TESTSUBSYSTEM = false;
-        public static final boolean LIMELIGHTSUBSYSTEM = true;
+        public static boolean TESTSUBSYSTEM = false;
+        public static boolean LIMELIGHTSUBSYSTEM = true;
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = true;
         public static boolean SAFETYSUBSYSTEM = false;
@@ -19,7 +19,7 @@ public class Setup {
         public static boolean LAUNCHERSUBSYSTEM = true;
         public static boolean AIMINGSUBSYSTEM = true;
         public static boolean BRAKESUBSYSTEM = true;
-        public static boolean TURRETSUBSYSTEM = false;
+        public static boolean TURRETSUBSYSTEM = true;
 
         public static boolean BLACKBIRD = true;
     }
