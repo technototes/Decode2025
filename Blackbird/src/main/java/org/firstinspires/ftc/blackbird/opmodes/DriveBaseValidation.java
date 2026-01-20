@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.sixteen750.opmodes;
+package org.firstinspires.ftc.blackbird.opmodes;
 
 import androidx.annotation.NonNull;
 import com.bylazar.configurables.annotations.Configurable;
@@ -14,10 +14,10 @@ import com.qualcomm.robotcore.util.MovingStatistics;
 import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import java.util.function.BooleanSupplier;
+import org.firstinspires.ftc.blackbird.Setup.Connected;
+import org.firstinspires.ftc.blackbird.Setup.HardwareNames;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.sixteen750.Setup.Connected;
-import org.firstinspires.ftc.sixteen750.Setup.HardwareNames;
 
 @Configurable
 @TeleOp(name = "Drivebase Testbed")

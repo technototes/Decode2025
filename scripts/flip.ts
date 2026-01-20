@@ -31,6 +31,7 @@ const technoLib: FileList = {
   key: 'TechnoLibLocal',
   files: [
     'LearnBot/build.gradle',
+    'Blackbird/build.gradle',
     'Sixteen750/build.gradle',
     'Twenty403/build.gradle',
     'build.dependencies.gradle',
