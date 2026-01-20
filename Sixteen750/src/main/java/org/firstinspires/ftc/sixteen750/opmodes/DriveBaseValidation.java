@@ -77,7 +77,6 @@ public class DriveBaseValidation extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // First, get the hardware
-        DcMotorEx fr, fl, rr, rl;
         trigger = new CommandAxis(() -> gamepad1.left_trigger);
         button = trigger.getAsButton(triggerThreshold);
 
@@ -86,13 +85,13 @@ public class DriveBaseValidation extends LinearOpMode {
             motors[0] = new MotorConfig(hardwareMap, HardwareNames.FL_DRIVE_MOTOR, true, () ->
                 triggered(gamepad1.left_trigger)
             );
-            motors[1] = new MotorConfig(hardwareMap, HardwareNames.FR_DRIVE_MOTOR, true, () ->
+            motors[1] = new MotorConfig(hardwareMap, HardwareNames.FR_DRIVE_MOTOR, false, () ->
                 triggered(gamepad1.right_trigger)
             );
             motors[2] = new MotorConfig(hardwareMap, HardwareNames.RL_DRIVE_MOTOR, true, () ->
                 gamepad1.left_bumper
             );
-            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RR_DRIVE_MOTOR, true, () ->
+            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RR_DRIVE_MOTOR, false, () ->
                 gamepad1.right_bumper
             );
         } else {

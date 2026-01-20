@@ -75,6 +75,7 @@ public class TurretSubsystem implements Subsystem, Loggable {
             turretMotor.setPower(power);
         }
     }
+
     public void turretzero() {
         setTurretPos(turretPos);
     }
