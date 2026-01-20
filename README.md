@@ -9,7 +9,9 @@
   - [x] PID for Turret
   - [x] Positioning for Turret
   - [ ] Auto-orient for vision
-- [ ] PID tuning for launcher
+- [ ] Re-implement launcher (including PID tuning)
+  - [ ] Stop using SetVelocity, as we only have 1 encoder
+  - [ ] Read velocity, but use custom PID (for both motors)
 - [ ] Hood servo settings
 - [ ] Tweaking intake
 - [ ] Pose/odometry during tele/auto ("Targetting Subsystem")
