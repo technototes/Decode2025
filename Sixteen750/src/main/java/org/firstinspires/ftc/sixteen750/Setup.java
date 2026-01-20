@@ -19,9 +19,6 @@ public class Setup {
         public static boolean LAUNCHERSUBSYSTEM = true;
         public static boolean AIMINGSUBSYSTEM = true;
         public static boolean BRAKESUBSYSTEM = true;
-        public static boolean TURRETSUBSYSTEM = false;
-
-        public static boolean BLACKBIRD = true;
     }
 
     @Configurable
@@ -46,7 +43,6 @@ public class Setup {
         public static String TESTMOTOR = "testmotor";
         public static String TESTCRSERVO = "testcrservo";
         public static String LIMELIGHT = "limelight";
-        public static String TURRET = "turret";
         public static int Green_Color_Pipeline = 0;
         // public static int Classifier_Pipeline = 2;
         // public static int Object_Detection_Pipeline = 3;

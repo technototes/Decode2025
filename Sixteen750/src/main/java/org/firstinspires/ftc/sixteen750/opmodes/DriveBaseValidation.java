@@ -113,11 +113,6 @@ public class DriveBaseValidation extends LinearOpMode {
                       gamepad1.dpad_down
                   )
                 : null,
-            Connected.TURRETSUBSYSTEM
-                ? new MotorConfig(hardwareMap, HardwareNames.TURRET, false, () ->
-                      gamepad1.dpad_left
-                  )
-                : null,
         };
         ptel = PanelsTelemetry.INSTANCE.getTelemetry();
         waitForStart();

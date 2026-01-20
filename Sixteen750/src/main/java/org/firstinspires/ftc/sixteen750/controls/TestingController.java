@@ -31,9 +31,7 @@ public class TestingController {
     }
 
     private void bindButtonControls() {
-        // motorPowerButton.whenPressed(TeleCommands.MotorPowerTest(robot));
-        // motorPowerButton.whenReleased(TeleCommands.)
-        // motorVelocityButton.whenPressed(TeleCommands.MotorVelocityTest(robot));
-        TurretMoveToPose.whenPressed(Command.create(robot.turretSubsystem::turretzero));
+        motorPowerButton.whenPressed(TeleCommands.MotorPowerTest(robot));
+        motorVelocityButton.whenPressed(TeleCommands.MotorVelocityTest(robot));
     }
 }
