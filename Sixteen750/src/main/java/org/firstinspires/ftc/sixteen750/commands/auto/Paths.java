@@ -82,6 +82,27 @@ public class Paths {
         //.raceWith(new AltAutoOrient(r));
     }
 
+    public static Command AutoLaunching3BallsNormalIntake(Robot r) {
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                //TeleCommands.IntakeStop(r),
+                TeleCommands.GateUp(r),
+                new WaitCommand(0.7)
+            )
+                .raceWith(new AltAutoOrient(r)),
+            TeleCommands.Intake(r),
+            // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
+            //switched to slow intake to remove the up down up down of the gate aswell as drain less power
+            TeleCommands.GateDown(r),
+            new WaitCommand(1.5),
+            TeleCommands.GateUp(r),
+            TeleCommands.IntakeStop(r)
+
+            // want to keep launcher running during auto also no need to stop intake
+        );
+        //.raceWith(new AltAutoOrient(r));
+    }
+
     public static Command AutoLaunching3BallsSlowIntakeFar(Robot r) {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
@@ -108,9 +129,9 @@ public class Paths {
     public static Pose Intake1 = new Pose(49, 86);
     public static Pose Intake1ControlPoint = new Pose(61, 89.143);
     public static Pose Intake1end = new Pose(19, 86);
-    public static Pose Lever = new Pose(18, 77);
+    public static Pose Lever = new Pose(18, 75);
     public static Pose Lever2 = new Pose(18, 67);
-    public static Pose LeverControlPoint = new Pose(24, 76);
+    public static Pose LeverControlPoint = new Pose(26, 75);
     public static Pose LeverControlPoint2 = new Pose(33, 68); // x:30, y:73 - old point, new point needs to be tested
     public static Pose Intake2 = new Pose(49, 62);
     public static Pose Intake2ControlPoint = new Pose(71, 64.369);
@@ -129,7 +150,7 @@ public class Paths {
     public static Pose IntakeCornerControlPoint = new Pose(8, 73);
     public static Pose IntakeTunnel = new Pose(8, 27);
     public static Pose farStart = new Pose(54.000, 9.000);
-    public static Pose farLaunch = new Pose(57.000, 15.000);
+    public static Pose farLaunch = new Pose(57.000, 18.000);
     public static Pose farLaunch2 = new Pose(57.000, 15.000);
     public static Pose farLaunch3 = new Pose(57.000, 15.000);
     public static Pose farLaunch4 = new Pose(57.000, 15.000);
@@ -144,7 +165,7 @@ public class Paths {
     public static Pose intakeVertical = new Pose(12.5, 17);
     public static Pose gateIntake = new Pose(6, 41);
     public static Pose gateIntakeControlPoint = new Pose(15, 35);
-    public static Pose farPark = new Pose(21.25, 13.735);
+    public static Pose farPark = new Pose(19.25, 12.735);
     public static Pose testPose = new Pose(72, 72, 145);
 
     public static double launchHeading0 = 133; //120
@@ -157,8 +178,8 @@ public class Paths {
     public static double NewCornerIntakeHeading = -147;
     public static double farlaunchHeading1 = 117;
     public static double farlaunchHeading2 = 117;
-    public static double farlaunchHeading3 = 115;
-    public static double farlaunchHeading4 = 115;
+    public static double farlaunchHeading3 = 117;
+    public static double farlaunchHeading4 = 117;
     public static double cornerIntakeHeading = 250;
     public static double cornerIntakeHeading2 = 0;
     public static double tunnelIntakeHeading = 90;
@@ -266,6 +287,7 @@ public class Paths {
 
     public PathChain Rlaunchfartopark;
     public PathChain launchfartopark;
+    public PathChain parktolaunchfar;
     public PathChain Rstarttolaunch;
     public PathChain Rlaunchtointake1;
     public PathChain Rintake1tolaunch;
@@ -656,29 +678,23 @@ public class Paths {
         RIntake2endtoLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(RIntake2end, RIntake2endControlPoint, RLaunch))
-            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
+            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading3))
             .build();
         RLever2toLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(Rlever2, RLaunch))
-            .setLinearHeadingInterpolation(
-                Math.toRadians(RintakeHeading),
-                Math.toRadians(RlaunchHeading1)
-            )
+            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading1))
             .build();
         Lever2toLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(Lever2, Launch))
-            .setLinearHeadingInterpolation(
-                Math.toRadians(intakeHeading),
-                Math.toRadians(launchHeading1)
-            )
+            .setConstantHeadingInterpolation(Math.toRadians(launchHeading1))
             .build();
 
         RIntake2endtoLever2 = follower
             .pathBuilder()
             .addPath(new BezierCurve(RIntake2end, RleverControlPoint2, Rlever2))
-            .setTangentHeadingInterpolation()
+            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
             .build();
         Intake2endtoLever2 = follower
             .pathBuilder()
@@ -950,7 +966,13 @@ public class Paths {
         launchfartopark = follower
             .pathBuilder()
             .addPath(new BezierLine(farLaunch, farPark))
-            .setLinearHeadingInterpolation(Math.toRadians(farlaunchHeading4), Math.toRadians(180))
+            .setConstantHeadingInterpolation(Math.toRadians(180))
+            .setVelocityConstraint(0.3)
+            .build();
+        parktolaunchfar = follower
+            .pathBuilder()
+            .addPath(new BezierLine(farPark, farLaunch))
+            .setConstantHeadingInterpolation(Math.toRadians(farlaunchHeading4))
             .setVelocityConstraint(0.3)
             .build();
         Rlaunchfartogateintake = follower

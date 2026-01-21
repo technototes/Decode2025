@@ -25,7 +25,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double targetLaunchVelocity = 1150;
 
     public static double closetargetLaunchVelocity = 1400;
-    public static double fartargetLaunchVelocity = 1775;
+    public static double fartargetLaunchVelocity = 1850;
     public static double fartargetLaunchVelocityforAuto = 2300;
     public static double targetLaunchVelocityforAuto1 = 1950;
     public static double targetLaunchVelocityforAuto2 = 1850;
@@ -76,7 +76,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
     public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
     public static double REGRESSION_C = 20; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 215; // minimum velocity for far zone launch speed formula - 130
+    public static double REGRESSION_D = 320; // minimum velocity for far zone launch speed formula - 130, 255
     public static double REGRESSION_C_TELEOP = 20; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D_TELEOP = 130; // minimum velocity for far zone launch speed formula
     public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
@@ -302,6 +302,27 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
     }
 
+    public double autoVelocityForAuto() {
+        // x = distance in feet
+        double x = ls.getDistance();
+
+        if (x < 100 && x > 0) {
+            //launcherPI.p = 0.0015;
+            //launcherPI.i = 0;
+            lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
+            return lastAutoVelocity;
+        }
+        if (x < 0) {
+            return lastAutoVelocity;
+        } else {
+            launcherPI.p = 0.004;
+            launcherPI.i = 0.0002;
+            return REGRESSION_C_AUTO * x + REGRESSION_D_AUTO;
+        }
+
+        //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
+    }
+
     public void setRegressionCAuto() {
         // Spin the motors pid goes here
         REGRESSION_C = REGRESSION_C_AUTO;
@@ -320,6 +341,11 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void setRegressionDTeleop() {
         // Spin the motors pid goes here
         REGRESSION_D = REGRESSION_D_TELEOP;
+    }
+
+    public void increaseRegressionDTeleop() {
+        // Spin the motors pid goes here
+        REGRESSION_D += 15;
     }
 
     @Override
