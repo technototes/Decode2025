@@ -137,4 +137,8 @@ public class TeleCommands {
     public static Command SetRegressionDTeleop(Robot r) {
         return Command.create(r.launcherSubsystem::setRegressionDTeleop);
     }
+
+    public static Command IncreaseRegressionDTeleop(Robot r) {
+        return Command.create(r.launcherSubsystem::increaseRegressionDTeleop);
+    }
 }

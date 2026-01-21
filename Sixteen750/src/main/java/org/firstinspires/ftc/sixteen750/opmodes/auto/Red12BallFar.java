@@ -49,7 +49,7 @@ public class Red12BallFar extends CommandOpMode {
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
                 new WaitCommand(0.5),
-                Paths.AutoLaunching3BallsSlowIntake(robot),
+                Paths.AutoLaunching3BallsNormalIntake(robot),
                 //                TeleCommands.HoldIntake(robot),
                 // new WaitCommand(0.5),
                 new PedroPathCommand(
@@ -60,7 +60,7 @@ public class Red12BallFar extends CommandOpMode {
                 new WaitCommand(0.3),
                 // new WaitCommand(2),
                 new PedroPathCommand(robot.follower, p.Rintake4tolaunchfar),
-                Paths.AutoLaunching3BallsSlowIntake(robot),
+                Paths.AutoLaunching3BallsNormalIntake(robot),
                 //                new PedroPathCommand(robot.follower, p.RlaunchfartointakeCorner, 0.7).alongWith(TeleCommands.Intake(robot)),
                 //                new PedroPathCommand(robot.follower, p.RintakeCornertolaunchfar),
 
@@ -71,7 +71,7 @@ public class Red12BallFar extends CommandOpMode {
                 //the two paths above is a new way to intake the corner balls
                 //the two commented paths above these new ones is the old way to intake the corner balls
 
-                Paths.AutoLaunching3BallsSlowIntake(robot),
+                Paths.AutoLaunching3BallsNormalIntake(robot),
                 new PedroPathCommand(robot.follower, p.RlaunchfartointakeHorizontal, 0.6).alongWith(
                     TeleCommands.Intake(robot)
                 ),
@@ -80,7 +80,7 @@ public class Red12BallFar extends CommandOpMode {
                 //the two paths above is a new way to intake the corner balls
                 //the two commented paths above these new ones is the old way to intake the corner balls
 
-                Paths.AutoLaunching3BallsSlowIntake(robot),
+                Paths.AutoLaunching3BallsNormalIntake(robot),
                 //                    new PedroPathCommand(robot.follower, p.RlaunchfartointakeCornerNew,
                 //                        0.5
                 //                    ).alongWith(TeleCommands.Intake(robot)),

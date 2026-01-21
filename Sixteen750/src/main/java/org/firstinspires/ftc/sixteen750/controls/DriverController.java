@@ -46,6 +46,7 @@ public class DriverController {
     public CommandAxis autoAim;
     public CommandAxis spitTrigger;
     public PedroDriver pedroDriver;
+    public CommandButton increaseD;
 
     public static double triggerThreshold = 0.1;
 
@@ -86,7 +87,8 @@ public class DriverController {
         launchButton = gamepad.rightBumper;
         spitButton = gamepad.ps_square;
         brakeButton = gamepad.ps_triangle;
-        hoodButton = gamepad.dpadUp;
+        increaseD = gamepad.dpadUp;
+        //hoodButton = gamepad.dpadUp;
         hooddownButton = gamepad.dpadDown;
         MotorDecrease = gamepad.dpadLeft;
         MotorIncrease = gamepad.dpadRight;
@@ -133,6 +135,7 @@ public class DriverController {
         //        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
         MotorIncrease.whenPressed(robot.launcherSubsystem::IncreaseMotorVelocity);
         MotorDecrease.whenPressed(robot.launcherSubsystem::DecreaseMotorVelocity);
+        increaseD.whenPressed(robot.launcherSubsystem::increaseRegressionDTeleop);
     }
 
     public void bindIntakeControls() {
