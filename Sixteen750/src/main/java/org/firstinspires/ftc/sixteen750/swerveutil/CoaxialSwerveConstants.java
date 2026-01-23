@@ -2,6 +2,7 @@ package org.firstinspires.ftc.sixteen750.swerveutil;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 /**
  * Constants class for the Coaxial Swerve Drivetrain
@@ -87,8 +88,7 @@ public class CoaxialSwerveConstants {
      * Higher values make steering more aggressive but can cause oscillation
      * Start with a low value (0.5-1.0) and increase if steering is too slow
      */
-    public double steeringKp = 1.5;
-    public double steeringKd = 0;
+    PIDFCoefficients steeringPIDF = new PIDFCoefficients(0, 0, 0,0);
 
     /**
      * Maximum steering speed (radians per second)
@@ -208,9 +208,8 @@ public class CoaxialSwerveConstants {
     /**
      * Builder-style method to set steering parameters
      */
-    public CoaxialSwerveConstants withSteeringParams(double kp, double kd, double maxSpeed, double db, double minPower) {
-        this.steeringKp = kp;
-        this.steeringKd = kd;
+    public CoaxialSwerveConstants withSteeringParams(PIDFCoefficients steeringPIDF, double maxSpeed, double db, double minPower) {
+        this.steeringPIDF = steeringPIDF;
         this.steeringSpeed = maxSpeed;
         this.steeringDeadband = db;
         this.steeringMinPower = minPower;

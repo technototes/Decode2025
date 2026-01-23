@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.technototes.library.util.PIDFController;
 
 
 /**
@@ -44,10 +46,11 @@ public class CoaxialSwerveDrive extends Drivetrain {
     // Slew rate limiters for smooth acceleration
     private SlewRateLimiter[] driveRateLimiters = new SlewRateLimiter[4];
 
+    // PIDF Controllers for steering
+    private PIDFController[] steeringControllers = new PIDFController[4];
+
     // Voltage tracking
     private double currentVoltage = 12.0;
-    double lastUpdateTime = 0;
-    double[] lastAngleError = new double[4];
 
     public CoaxialSwerveDrive(HardwareMap hardwareMap, CoaxialSwerveConstants constants) {
         this.constants = constants;
@@ -68,13 +71,15 @@ public class CoaxialSwerveDrive extends Drivetrain {
         steeringEncoders = new AbsoluteAnalogEncoder[4];
         targetAngles = new double[4];
         currentAngles = new double[4];
-        for (int i = 0; i < 4; i++) {
-            lastAngleError[i] = 0;
-        }
 
         // Initialize slew rate limiters
         for (int i = 0; i < 4; i++) {
             driveRateLimiters[i] = new SlewRateLimiter(constants.driveMaxAcceleration);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            steeringControllers[i] = new PIDFController(constants.steeringPIDF);
+            steeringControllers[i].setInputBounds(-Math.PI, Math.PI);
         }
 
         // Get hardware from the hardware map
@@ -89,7 +94,6 @@ public class CoaxialSwerveDrive extends Drivetrain {
         steeringServos[3] = hardwareMap.get(CRServo.class, constants.rearRightSteeringServoName);
 
         // Initialize absolute encoders for steering feedback
-
         steeringEncoders[0] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.frontLeftEncoderName))
                 .zero(constants.frontLeftEncoderOffset)
@@ -101,11 +105,13 @@ public class CoaxialSwerveDrive extends Drivetrain {
                 .zero(constants.frontRightEncoderOffset)
                 .setInverted(constants.isFrontRightEncoderInverted)
                 .setSmoothing(constants.frontRightSmoothing);
+
         steeringEncoders[2] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.rearLeftEncoderName))
                 .zero(constants.rearLeftEncoderOffset)
                 .setInverted(constants.isRearLeftEncoderInverted)
                 .setSmoothing(constants.rearLeftSmoothing);
+
         steeringEncoders[3] = new AbsoluteAnalogEncoder(
                 hardwareMap.get(AnalogInput.class, constants.rearRightEncoderName))
                 .zero(constants.rearRightEncoderOffset)
@@ -171,6 +177,8 @@ public class CoaxialSwerveDrive extends Drivetrain {
         // Array to store module speeds and angles
         double[] moduleSpeeds = new double[4];
         double[] moduleAngles = new double[4];
+
+        // If essentially no movement commanded, return zero powers
         if (desiredTranslation.getMagnitude() < 0.02 &&
                 Math.abs(desiredRotation) < 0.02) {
             double[] zeroPowers = new double[8];
@@ -179,9 +187,9 @@ public class CoaxialSwerveDrive extends Drivetrain {
             }
             return zeroPowers;
         }
+
         // Calculate the desired state for each swerve module
         for (int i = 0; i < 4; i++) {
-
             // Calculate the rotational contribution for this module
             // Rotation creates a tangent vector perpendicular to the module's position
             double rotationX = -modulePositions[i].getYComponent() * desiredRotation;
@@ -231,40 +239,34 @@ public class CoaxialSwerveDrive extends Drivetrain {
             moduleSpeeds[i] *= maxPowerScaling;
         }
 
-        // Calculate steering servo powers based on angle error
+        // Calculate steering servo powers using PIDF controllers
         double[] steeringPowers = new double[4];
         for (int i = 0; i < 4; i++) {
-            // Get actual current angle from absolute encoder
-            currentAngles[i] = steeringEncoders[i].getCurrentPosition();
+            // Get actual current angle from absolute encoder and normalize
+            currentAngles[i] = Angle.normDelta(steeringEncoders[i].getCurrentPosition());
 
-            // Calculate angle error
-            double angleError = Angle.normDelta(targetAngles[i] - currentAngles[i]);
+            // Set the target for the controller (already normalized in loop above)
+            steeringControllers[i].setTarget(targetAngles[i]);
+
+            // Use PIDF controller to calculate steering power
+            // Always call update() to keep controller state consistent
+            double steeringPower = steeringControllers[i].update(currentAngles[i]);
+
+            // Get the error for deadband and minimum power checks
+            double angleError = steeringControllers[i].getLastError();
+
+            // Apply deadband - set power to zero if error is small
             if (Math.abs(angleError) < constants.steeringDeadband) {
                 steeringPowers[i] = 0.0;
-                lastAngleError[i] = angleError;  // Still update for derivative
-                continue;  // Skip PD calculation
+                continue;
             }
 
-            long currentTime = System.currentTimeMillis();
-            double dt = (currentTime - lastUpdateTime) / 1000.0;
-            double derivative = (angleError - lastAngleError[i]) / dt;
-
-
-
-            double steeringPower =
-                    constants.steeringKp * angleError
-                            - constants.steeringKd * derivative;
-
             // Small minimum power to overcome static friction
-            if (Math.abs(steeringPower) < constants.steeringMinPower &&
-                    Math.abs(angleError) > constants.steeringDeadband) {
+            if (Math.abs(steeringPower) < constants.steeringMinPower) {
                 steeringPower = Math.signum(steeringPower) * constants.steeringMinPower;
             }
 
             steeringPowers[i] = MathFunctions.clamp(steeringPower, -1, 1);
-
-            lastAngleError[i] = angleError;
-
         }
 
         // Apply voltage compensation if enabled
@@ -276,7 +278,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
                 steeringPowers[i] *= voltageScale;
             }
         }
-        lastUpdateTime = System.currentTimeMillis();
+
         // Return interleaved array: [drive0, steer0, drive1, steer1, ...]
         return new double[] {
                 moduleSpeeds[0], steeringPowers[0],
@@ -307,9 +309,8 @@ public class CoaxialSwerveDrive extends Drivetrain {
             }
 
             limitedPowers[i * 2 + 1] = drivePowers[i * 2 + 1];
-
-
         }
+
         // Set drive motor powers
         driveMotors[0].setPower(limitedPowers[0]);
         driveMotors[1].setPower(limitedPowers[2]);
@@ -321,7 +322,6 @@ public class CoaxialSwerveDrive extends Drivetrain {
         steeringServos[1].setPower(limitedPowers[3]);
         steeringServos[2].setPower(limitedPowers[5]);
         steeringServos[3].setPower(limitedPowers[7]);
-
     }
 
     @Override
@@ -346,6 +346,11 @@ public class CoaxialSwerveDrive extends Drivetrain {
         // Reset slew rate limiters to zero
         for (int i = 0; i < 4; i++) {
             driveRateLimiters[i].reset(0);
+        }
+
+        // Reset PIDF controllers
+        for (int i = 0; i < 4; i++) {
+            steeringControllers[i].reset();
         }
     }
 
@@ -407,20 +412,19 @@ public class CoaxialSwerveDrive extends Drivetrain {
         // Return nominal voltage if sensor unavailable
         return nominalVoltage;
     }
+
     @Override
     public String debugString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Coaxial Swerve Drivetrain Debug:\n");
         for (int i = 0; i < 4; i++) {
-            sb.append(String.format("Module %d: Speed=%.2f, Angle=%.2f°, Target=%.2f°\n",
+            sb.append(String.format("Module %d: Speed=%.2f, Angle=%.2f°, Target=%.2f°, Error=%.2f°\n",
                     i, driveMotors[i].getPower(),
                     Math.toDegrees(currentAngles[i]),
-                    Math.toDegrees(targetAngles[i])));
+                    Math.toDegrees(targetAngles[i]),
+                    Math.toDegrees(steeringControllers[i].getLastError())));
         }
         sb.append(String.format("Voltage: %.2fV\n", currentVoltage));
         return sb.toString();
     }
 }
-
-
-
