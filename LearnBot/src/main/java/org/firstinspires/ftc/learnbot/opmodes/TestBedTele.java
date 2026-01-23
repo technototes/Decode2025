@@ -25,7 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 @Configurable
 @TeleOp(name = "Test Bed", group = "--Testing--")
 @SuppressLint("DefaultLocale")
-@Disabled
+// @Disabled
 public class TestBedTele extends LinearOpMode {
 
     public static int samples = 100;
@@ -99,13 +99,13 @@ public class TestBedTele extends LinearOpMode {
             motors[0] = new MotorConfig(hardwareMap, HardwareNames.FLMOTOR, true, () ->
                 triggered(gamepad1.left_trigger)
             );
-            motors[1] = new MotorConfig(hardwareMap, HardwareNames.FRMOTOR, true, () ->
+            motors[1] = new MotorConfig(hardwareMap, HardwareNames.FRMOTOR, false, () ->
                 triggered(gamepad1.right_trigger)
             );
             motors[2] = new MotorConfig(hardwareMap, HardwareNames.RLMOTOR, true, () ->
                 gamepad1.left_bumper
             );
-            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RRMOTOR, true, () ->
+            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RRMOTOR, false, () ->
                 gamepad1.right_bumper
             );
         } else {
