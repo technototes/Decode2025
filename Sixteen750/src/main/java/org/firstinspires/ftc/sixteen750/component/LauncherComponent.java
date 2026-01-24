@@ -3,18 +3,22 @@ package org.firstinspires.ftc.sixteen750.component;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.MovingStatistics;
 import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
+import com.technototes.library.subsystem.TargetAcquisition;
 import com.technototes.library.util.PIDFController;
 import java.util.Locale;
 import java.util.function.DoubleSupplier;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.sixteen750.subsystems.TargetAcquisition;
 
 @Configurable
 public class LauncherComponent implements Loggable, Subsystem {
@@ -248,6 +252,20 @@ public class LauncherComponent implements Loggable, Subsystem {
                   // decreases over time. I don't think this is what we're trying to accomplish.
                   (Config.SPIN_VOLT_COMP * Math.min(Config.PEAK_VOLTAGE, voltage.getAsDouble()))
         );
+        // A quick wander around google comes up with something like this:
+
+        // launcherMyPID = new PIDFController(Config.launcherPID, target ->
+        //    (Config.kStaticFriction + Config.kVelocityConstant * target) / voltage.getAsDouble());
+
+        // The point is that motor RPM scales linearly with voltage, so to compensate, you should
+        // divide by voltage: Don't try to scale something by a delta from peak. Just divide.
+
+        // To get solve that formula, get a fresh battery, run it at full power and measure the RPM.
+        // (Well, and figure out kStaticFriction, too: The lowest value that will still get the
+        // launcher barely moving)
+
+        // These capabilities should probably go in the "validation" function at the bottom :D
+
         setTargetSpeed(0);
         CommandScheduler.register(this);
     }
@@ -484,6 +502,118 @@ public class LauncherComponent implements Loggable, Subsystem {
             getMotor2Current()
         );
         return res;
+    }
+
+    // TODO: Code that measures kStaticFriction and kVelocityConstant for a FeedFwd function
+    public void feedFwdHelper(Telemetry tel, Gamepad gamepad) {
+        // Wait until a button's been pressed, then first identify kStaticFriction, by watching to
+        // see when the motor just barely starts moving (then back off by a couple percent)
+        motorHelperPower(0);
+        while (!anyButtonsPressed(gamepad)) {
+            tel.addLine("Please press a button on the gamepad to begin test");
+            tel.update();
+        }
+        while (anyButtonsPressed(gamepad)) {
+            tel.addLine("Release the button to begin the test");
+            tel.update();
+        }
+        // Okay, slowly raise the power applied to launcher1 until w
+        double staticFriction = 0.001;
+        double staticFrictionStep = 0.001;
+        ElapsedTime lastUpdate = new ElapsedTime();
+        while (true) {
+            double v = voltage.getAsDouble();
+            motorHelperPower(staticFriction / v);
+            tel.addLine("Press a button to abort");
+            tel.addData("kStaticFriction", staticFriction);
+            tel.addData("Voltage", v);
+            tel.update();
+            if (anyButtonsPressed(gamepad)) {
+                motorHelperPower(0);
+                return;
+            }
+            if (lastUpdate.milliseconds() >= 50) {
+                // We update every 25 milliseconds, just to give it time to trigger
+                if (getMotor1Velocity() != 0) {
+                    break;
+                }
+                lastUpdate.reset();
+                staticFriction += staticFrictionStep;
+            }
+        }
+        // If we're here, the system started moving. Stop the motors and set kStaticFriction to
+        // just below what was necessary to start the system moving.
+        staticFriction -= staticFrictionStep;
+        motorHelperPower(0);
+        // Display the kStaticFriction value we got:
+        while (!anyButtonsPressed(gamepad)) {
+            tel.addData("kStaticFriction-->>", staticFriction);
+            tel.addLine("Press a button to start the velocity measurement");
+            tel.update();
+        }
+        // Next up: Velocity!
+        while (anyButtonsPressed(gamepad)) {
+            tel.addData("kStaticFriction!", staticFriction);
+            tel.addLine("Release the button to start the velocity measurement");
+            tel.update();
+        }
+        lastUpdate.reset();
+        double velocityConstant = 0;
+        MovingStatistics velocityConstantStats = new MovingStatistics(50);
+        while (!anyButtonsPressed(gamepad)) {
+            motorHelperPower(1);
+            if (lastUpdate.milliseconds() >= 50) {
+                double vel = getMotor1Velocity();
+                double vol = voltage.getAsDouble();
+                if (vel != 0) {
+                    // power = (kStaticFriction + kVelocity * RPM) / v
+                    // So
+                    //   1 = (kSF + kV * RPM) / v;
+                    // Multiply both sides by v
+                    //   v = kSF + kV * RPM
+                    // move kStaticFriction over:
+                    //   v - KSF = kV * RPM
+                    // swap sides
+                    //   kv * RPM = v - kSF
+                    // and divide both sides by RPM
+                    // kv = (v - kSF) / RPM
+                    velocityConstant = (vol - staticFriction) / vel;
+                    velocityConstantStats.add(velocityConstant);
+                }
+            }
+            tel.addData("kStaticFriction!", staticFriction);
+            tel.addLine("Press a button to stop velocity measurement");
+            tel.addData("kVelocityConstant", velocityConstant);
+            tel.addData("Average kV", velocityConstantStats.getMean());
+            tel.update();
+        }
+    }
+
+    private static boolean anyButtonsPressed(Gamepad g) {
+        return (
+            g.a ||
+            g.b ||
+            g.x ||
+            g.y ||
+            g.dpad_down ||
+            g.dpad_up ||
+            g.dpad_left ||
+            g.dpad_right ||
+            g.options ||
+            g.share ||
+            g.left_bumper ||
+            g.right_bumper ||
+            g.start
+        );
+    }
+
+    private void motorHelperPower(double p) {
+        if (hasLaunch1()) {
+            launcher1.setPower(p);
+        }
+        if (hasLaunch2()) {
+            launcher2.setPower(p);
+        }
     }
 
     private boolean hasLaunch1() {
