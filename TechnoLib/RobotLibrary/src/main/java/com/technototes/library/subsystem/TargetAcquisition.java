@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.sixteen750.subsystems;
+package com.technototes.library.subsystem;
 
 // This should be promoted to a library interface, so it's available for anything to use/implement
 public interface TargetAcquisition {
