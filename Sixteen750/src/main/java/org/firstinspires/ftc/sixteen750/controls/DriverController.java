@@ -8,13 +8,10 @@ import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
-import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem.LauncherCommand;
 
 public class DriverController {
 
@@ -130,13 +127,13 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-        launchButton.whilePressed(LauncherSubsystem.Commands.Launch(robot.launcherSubsystem));
-        launchButton.whenReleased(LauncherSubsystem.Commands.StopLaunch(robot.launcherSubsystem));
-        //        CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
-        //        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
-        MotorIncrease.whenPressed(robot.launcherSubsystem::IncreaseMotorVelocity);
-        MotorDecrease.whenPressed(robot.launcherSubsystem::DecreaseMotorVelocity);
-        increaseD.whenPressed(robot.launcherSubsystem::increaseRegressionDTeleop);
+        launchButton.whilePressed(LauncherCommand.Launch());
+        launchButton.whenReleased(LauncherCommand.StopLaunch());
+        // CloseShoot.whenPressed(LauncherCommand.SetCloseShoot());
+        // FarShoot.whenPressed(LauncherCommand.SetFarShoot());
+        MotorIncrease.whenPressed(LauncherCommand.IncreaseMotor());
+        MotorDecrease.whenPressed(LauncherCommand.DecreaseMotor());
+        increaseD.whenPressed(LauncherCommand.IncreaseRegressionDTeleop());
     }
 
     public void bindIntakeControls() {

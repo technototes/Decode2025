@@ -11,68 +11,48 @@ import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.PIDFController;
+import java.util.Locale;
+import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.sixteen750.Hardware;
-import org.firstinspires.ftc.sixteen750.Robot;
-import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
 public class LauncherSubsystem implements Loggable, Subsystem {
 
-    public class Commands {
+    // This is a little strange: It's a place to tuck away a reference to the Launcher Subsystem,
+    // so that all the commands can get to it there.
+    // It let's us do this:
+    //    button.whenPressed(LauncherSubsystem.Commands.IncreaseMotor());
+    // Instead of this:
+    //    button.whenPressed(LauncherSubsystem.Commands.IncreaseMotor(r.launcherSubsystem));
+    private static LauncherSubsystem self = null;
 
-        public Command Launch(LauncherSubsystem l) {
-            return Command.create(l::Launch);
-        }
-
-        public Command SetFarShoot(LauncherSubsystem l) {
-            return Command.create(l::FarShoot);
-        }
-
-        public static Command SetCloseShoot(LauncherSubsystem l) {
-            return Command.create(l::CloseShoot);
-        }
-
-        public static Command AutoLaunch1(LauncherSubsystem l) {
-            return Command.create(l::AutoLaunch1);
-        }
-
-        public static Command AutoLaunch2(LauncherSubsystem l) {
-            return Command.create(l::AutoLaunch2);
-        }
-
-        public static Command FarAutoLaunch(LauncherSubsystem l) {
-            return Command.create(l::FarAutoLaunch);
-        }
-
-        public static Command StopLaunch(LauncherSubsystem l) {
-            return Command.create(l::Stop);
-        }
-    }
-
+    // *ALL* the configuration should go in here. I moved some things that had been constants up
+    // to here, as they are "bot build configuration": are the motors reversed.
+    // TODO: Make "are there 1 or 2 motors" a configuration setting
     public static class Config {
+
+        // Is the primary intake motor reversed?
+        public static boolean PrimaryReversed = true;
+        // Is the secondary intake motor reversed?
+        public static boolean SecondaryReversed = false;
 
         //    @Log.Number(name = "Motor Power")
         //    public static double MOTOR_POWER = 0.65; // 0.5 1.0
-        public static double closetargetLaunchVelocity = 1400;
-        public static double fartargetLaunchVelocity = 1850;
-        public static double fartargetLaunchVelocityforAuto = 2300;
-        public static double targetLaunchVelocityforAuto1 = 1950;
-        public static double targetLaunchVelocityforAuto2 = 1850;
+        public static double CloseTargetLaunchVelocity = 1400;
+        public static double FarTargetLaunchVelocity = 1850;
+        public static double FarTargetLaunchVelocityForAuto = 2300;
+        public static double TargetLaunchVelocityForAuto1 = 1950;
+        public static double TargetLaunchVelocityForAuto2 = 1850;
 
+        // TODO: Document this better
         public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
-        public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
-            0.0015,
-            0.0000,
-            0.0,
-            0
-        ); //p = 0.004, i = 0.00020
         public static double SPIN_F_SCALE = 0.00021;
         public static double SPIN_VOLT_COMP = 0.0216;
         public static double DIFFERENCE = 0.0046;
         public static double PEAK_VOLTAGE = 13;
 
+        // TODO: Make this more configurable. Maybe just turn it into a little helper function that
+        // lives in this class?
         public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
         public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
         public static double REGRESSION_C = 20; // multiplier for x for far zone launch speed formula
@@ -81,6 +61,90 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         public static double REGRESSION_D_TELEOP = 130; // minimum velocity for far zone launch speed formula
         public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
         public static double REGRESSION_D_AUTO = 115; // minimum velocity for far zone launch speed formula
+    }
+
+    // *All* commands for the subsystem belong in here. It's easy for the simple "call a method"
+    // commands, but for more comlicated commands, scroll down to see AutoVelocity
+    public static class LauncherCommand {
+
+        public static Command Launch() {
+            return Command.create(self::Launch);
+        }
+
+        public static Command SetFarShoot() {
+            return Command.create(self::FarShoot);
+        }
+
+        public static Command SetCloseShoot() {
+            return Command.create(self::CloseShoot);
+        }
+
+        public static Command AutoLaunch1() {
+            return Command.create(self::AutoLaunch1);
+        }
+
+        public static Command AutoLaunch2() {
+            return Command.create(self::AutoLaunch2);
+        }
+
+        public static Command FarAutoLaunch() {
+            return Command.create(self::FarAutoLaunch);
+        }
+
+        public static Command StopLaunch() {
+            return Command.create(self::Stop);
+        }
+
+        public static Command IncreaseMotor() {
+            return Command.create(self::IncreaseMotorVelocity);
+        }
+
+        public static Command DecreaseMotor() {
+            return Command.create(self::DecreaseMotorVelocity);
+        }
+
+        public static Command ReadVelocity() {
+            return Command.create(self::readVelocity);
+        }
+
+        public static Command SetRegressionAuto() {
+            return Command.create(self::setRegressionAuto);
+        }
+
+        public static Command SetRegressionTeleop() {
+            return Command.create(self::setRegressionTeleop);
+        }
+
+        public static Command IncreaseRegressionDTeleop() {
+            return Command.create(self::increaseRegressionDTeleop);
+        }
+
+        // This is just to make all commands look the same to the 'outside' user:
+        // You just call LauncherCommands.AutoVelocity() instead of needing to differentiate
+        // between simple Command.create's and more complex "class" commands.
+        public static Command AutoVelocity() {
+            return new AutoVelocityImplementation();
+        }
+
+        // This class is protected to ensure that elsewhere, you can't ever use
+        //   button.whenPressed(new AutoVelocityImplementation());
+        // but instead you have to use
+        //   button.whenPressed(LaunchCommand.AutoVelocity());
+        protected static class AutoVelocityImplementation implements Command {
+
+            public AutoVelocityImplementation() {}
+
+            @Override
+            public boolean isFinished() {
+                //return !robot.follower.isBusy();
+                return false;
+            }
+
+            @Override
+            public void execute() {
+                LauncherSubsystem.self.Launch();
+            }
+        }
     }
 
     @Log.Number(name = "Target Velocity")
@@ -110,110 +174,98 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     private static PIDFController launcherPID;
     public static double lastAutoVelocity = 0;
 
-    boolean hasHardware;
-    public Robot robot;
-    public PIDFCoefficients launcherPIDF = new PIDFCoefficients(0, 0.0, 0.0, 0);
-    public PIDFController launcherPIDFController;
-    public static double FEEDFORWARD_COEFFICIENT = 0.0;
-
-    public static double MINIMUM_VELOCITY = 1140;
-    public static double RPM_PER_FOOT = 62.3;
-
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
 
     public double launcherPow;
     // not tested just placeholder but should be used
+
+    // External components this requires:
     EncodedMotor<DcMotorEx> launcher1;
     EncodedMotor<DcMotorEx> launcher2;
-    LimelightSubsystem ls;
+
+    TargetAcquisition targetAcquisition;
+    DoubleSupplier voltage;
 
     //    @Log(name = "Flywheel at Velocity")
     //    public static boolean ready;
 
-    public LauncherSubsystem(Hardware h) {
-        hasHardware = Setup.Connected.LAUNCHERSUBSYSTEM;
-        // Do stuff in here
-        if (hasHardware) {
-            launcher1 = h.launcher1;
-            launcher2 = h.launcher2;
-            launcher1.setDirection(DcMotorSimple.Direction.REVERSE);
-            launcher2.setDirection(DcMotorSimple.Direction.FORWARD);
-            launcher1.coast();
-            launcher2.coast();
-            launcher1.setPIDFCoefficients(launcherPIDF);
-            launcher2.setPIDFCoefficients(launcherPIDF);
-            //ready = false;
-            ls = new LimelightSubsystem(h);
-            double ADDITION = (Config.PEAK_VOLTAGE - h.voltage());
-            if (ADDITION == 0) {
-                Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + 0.001;
-            } else {
-                Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + (ADDITION * Config.DIFFERENCE);
-            }
-            launcherPID = new PIDFController(Config.launcherPI, target ->
-                target == 0
-                    ? 0
-                    : (Config.SPIN_F_SCALE * target) +
-                      (Config.SPIN_VOLT_COMP * Math.min(Config.PEAK_VOLTAGE, h.voltage()))
+    public LauncherSubsystem(
+        EncodedMotor<DcMotorEx> primary,
+        EncodedMotor<DcMotorEx> secondary,
+        TargetAcquisition targetSubsystem,
+        DoubleSupplier voltageSup
+    ) {
+        self = this;
+        launcher1 = primary;
+        if (launcher1 != null) {
+            launcher1.setDirection(
+                Config.PrimaryReversed
+                    ? DcMotorSimple.Direction.REVERSE
+                    : DcMotorSimple.Direction.FORWARD
             );
-            //            top.setPIDFCoefficients(launcherP);
-            setTargetSpeed(0);
-        } else {
-            launcher1 = null;
-            launcher2 = null;
+            launcher1.coast();
         }
+        launcher2 = secondary;
+        if (launcher2 != null) {
+            launcher2.setDirection(
+                Config.SecondaryReversed
+                    ? DcMotorSimple.Direction.REVERSE
+                    : DcMotorSimple.Direction.FORWARD
+            );
+            launcher2.coast();
+        }
+        // ready = false;
+        targetAcquisition = targetSubsystem;
+        voltage = voltageSup;
+        double ADDITION = (Config.PEAK_VOLTAGE - voltage.getAsDouble());
+        if (ADDITION == 0) {
+            Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + 0.001;
+        } else {
+            Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + (ADDITION * Config.DIFFERENCE);
+        }
+        launcherPID = new PIDFController(Config.launcherPI, target ->
+            target == 0
+                ? 0
+                : (Config.SPIN_F_SCALE * target) +
+                  (Config.SPIN_VOLT_COMP * Math.min(Config.PEAK_VOLTAGE, voltage.getAsDouble()))
+        );
+        setTargetSpeed(0);
         CommandScheduler.register(this);
+    }
+
+    public LauncherSubsystem() {
+        this(null, null, null, () -> 0);
     }
 
     public void Launch() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            setTargetSpeed(autoVelocity()); //change to auto aim velocity
-            //            launcher1.setVelocity(TargetLaunchVelocity);
-            //            launcher2.setVelocity(TargetLaunchVelocity);
-        }
+        setTargetSpeed(autoVelocity()); //change to auto aim velocity
     }
 
     public void CloseShoot() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            targetLaunchVelocity = Config.closetargetLaunchVelocity;
-        }
+        targetLaunchVelocity = Config.CloseTargetLaunchVelocity;
     }
 
     public void FarShoot() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            targetLaunchVelocity = Config.fartargetLaunchVelocity;
-        }
+        targetLaunchVelocity = Config.FarTargetLaunchVelocity;
     }
 
     public void AutoLaunch1() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            setTargetSpeed(Config.targetLaunchVelocityforAuto1); //change to auto aim velocity
-            //launcher1.setVelocity(targetLaunchVelocityforAuto1);
-            //launcher2.setVelocity(targetLaunchVelocityforAuto1);
-        }
+        setTargetSpeed(Config.TargetLaunchVelocityForAuto1); //change to auto aim velocity
     }
 
     public void AutoLaunch2() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            setTargetSpeed(Config.targetLaunchVelocityforAuto2); //change to auto aim velocity
-            //            launcher1.setVelocity(TargetLaunchVelocity);
-            //            launcher2.setVelocity(TargetLaunchVelocity);
-        }
+        setTargetSpeed(Config.TargetLaunchVelocityForAuto2); //change to auto aim velocity
     }
 
     public void FarAutoLaunch() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            setTargetSpeed(Config.fartargetLaunchVelocityforAuto); //change to auto aim velocity
-            //            launcher1.setVelocity(TargetLaunchVelocity);
-            //            launcher2.setVelocity(TargetLaunchVelocity);
-        }
+        setTargetSpeed(Config.FarTargetLaunchVelocityForAuto); //change to auto aim velocity
     }
 
     public double readVelocity() {
@@ -222,7 +274,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // } else {
         //     return ready = false;
         // }
-        return launcher1.getVelocity();
+        return launcher1 != null ? launcher1.getVelocity() : Double.NaN; // Nan = "Not a Number"
 
         // 12.25 stationary voltage - had to decrease velocity by 150 (trial one: true, trial two: true)
         // 11.84 stationary voltage - had to decrease velocity by 100? (trial one:
@@ -241,8 +293,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     private void setMotorPower(double pow) {
         double power = Math.clamp(pow, -1, 1);
         targetPower = power;
-        if (launcher1 != null && launcher2 != null) {
+        if (launcher1 != null) {
             launcher1.setPower(power);
+        }
+        if (launcher2 != null) {
             launcher2.setPower(power);
         }
     }
@@ -269,58 +323,45 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     }
 
     public void Stop() {
-        if (hasHardware) {
-            //            launcher1.setVelocity(0);
-            //            launcher2.setVelocity(0);
-            //launcher1.setPower(0);
-            //launcher2.setPower(0);
-            launcherPID.setTarget(0);
-        }
+        launcherPID.setTarget(0);
     }
 
     public void IncreaseMotorVelocity() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            additionAmount += additionDelta;
-        }
+        additionAmount += additionDelta;
     }
 
     public void DecreaseMotorVelocity() {
         // Spin the motors pid goes here
-        if (hasHardware) {
-            additionAmount -= additionDelta;
-        }
+        additionAmount -= additionDelta;
     }
-
-    public void setMotorVelocityTest() {
-        launcher1.setVelocity(targetLaunchVelocity);
-    }
-
-    //    public void setMotorPowerTest() {
-    //        launcher1.setPower(MOTOR_POWER);
-    //        CurrentLaunchVelocity = getMotor1Velocity();
-    //    }
 
     public double getMotor1Velocity() {
-        return launcher1.getVelocity();
+        return launcher1 != null ? launcher1.getVelocity() : Double.NaN; // Not a Number
     }
 
     public double getMotor2Velocity() {
-        return launcher2.getVelocity();
+        return launcher2 != null ? launcher2.getVelocity() : Double.NaN; // Not a Number
     }
 
+    // This is wrong (and, as it turns out, unused), so I just commented it out
+    // TODO: We should discuss how to accomplish what this is attempting to do
+    /*
     public void VelocityShoot() {
         if (
             getMotor1Velocity() == targetLaunchVelocity &&
             getMotor2Velocity() == targetLaunchVelocity
         ) {
+            // This doesn't do anything. It *creates* a command, but the command is never
+            // scheduled, so it won't ever actually do anything.
             TeleCommands.GateDown(robot);
         }
     }
+    */
 
     public double autoVelocity() {
         // x = distance in feet
-        double x = ls.getDistance();
+        double x = getTargetDistance();
 
         if (x < 100 && x > 0) {
             //launcherPI.p = 0.0015;
@@ -341,7 +382,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public double autoVelocityForAuto() {
         // x = distance in feet
-        double x = ls.getDistance();
+        double x = getTargetDistance();
 
         if (x < 100 && x > 0) {
             //launcherPI.p = 0.0015;
@@ -360,29 +401,28 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
     }
 
-    public void setRegressionCAuto() {
+    public void setRegressionAuto() {
         // Spin the motors pid goes here
         Config.REGRESSION_C = Config.REGRESSION_C_AUTO;
-    }
-
-    public void setRegressionDAuto() {
-        // Spin the motors pid goes here
         Config.REGRESSION_D = Config.REGRESSION_D_AUTO;
     }
 
-    public void setRegressionCTeleop() {
+    public void setRegressionTeleop() {
         // Spin the motors pid goes here
         Config.REGRESSION_C = Config.REGRESSION_C_TELEOP;
-    }
-
-    public void setRegressionDTeleop() {
-        // Spin the motors pid goes here
         Config.REGRESSION_D = Config.REGRESSION_D_TELEOP;
     }
 
     public void increaseRegressionDTeleop() {
         // Spin the motors pid goes here
         Config.REGRESSION_D += 15;
+    }
+
+    // This lets the 'no hardware' or 'subsystem disabled' thing still work without a functional
+    // target acquisition subsystem
+    private double getTargetDistance() {
+        if (targetAcquisition != null) return targetAcquisition.getDistance();
+        return -1;
     }
 
     @Override
@@ -399,8 +439,35 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
         err = launcherPID.getLastError();
         motorVelocity = getMotorSpeed();
-        power = launcher1.getPower();
+        if (launcher1 != null) {
+            power = launcher1.getPower();
+        } else {
+            power = -1;
+        }
         launcher1Current = getMotor1Current();
         launcher2Current = getMotor2Current();
+    }
+
+    // This should be used by a test opmode to check that the basics are working.
+    public String hardwareValidation(double power1, double power2) {
+        String res = "";
+        if (launcher1 != null) {
+            launcher1.setPower(power1);
+        } else {
+            res += "(no launcher1)";
+        }
+        if (launcher2 != null) {
+            launcher2.setPower(power2);
+        } else {
+            res += "(no launcher2)";
+        }
+        res += String.format(
+            Locale.ENGLISH,
+            "Launcher Speed: %.2f, Current1: %.2f, Current2: %.2f",
+            getMotorSpeed(),
+            getMotor1Current(),
+            getMotor2Current()
+        );
+        return res;
     }
 }

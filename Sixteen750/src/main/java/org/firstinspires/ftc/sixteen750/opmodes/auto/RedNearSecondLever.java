@@ -13,7 +13,6 @@ import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
@@ -21,6 +20,7 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem.LauncherCommand;
 
 @Autonomous(name = "RedNearLever2️⃣", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
@@ -40,7 +40,7 @@ public class RedNearSecondLever extends CommandOpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE;
         robot.follower.setStartingPose(p.getRSegmentedCurveStart());
         CommandScheduler.scheduleForState(
-            new AltAutoVelocity(robot).alongWith(
+            LauncherCommand.AutoVelocity().alongWith(
                 new SequentialCommandGroup(
                     //TeleCommands.AutoLaunch1(robot),
                     TeleCommands.GateUp(robot),
@@ -102,9 +102,6 @@ public class RedNearSecondLever extends CommandOpMode {
              * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
              */
             limelight.start();
-        }
-        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
-            CommandScheduler.register(robot.launcherSubsystem);
         }
     }
 

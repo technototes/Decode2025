@@ -3,31 +3,22 @@ package org.firstinspires.ftc.sixteen750.opmodes;
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.AprilTag_Pipeline;
 
 import com.bylazar.telemetry.PanelsTelemetry;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-import java.util.Arrays;
-import java.util.List;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem.LauncherCommand;
 
 @TeleOp(name = "Dual Control")
 @SuppressWarnings("unused")
@@ -56,8 +47,7 @@ public class DualTeleOp extends CommandOpMode {
                 new SequentialCommandGroup(
                     HeadingHelper.RestorePreviousPosition(robot.follower),
                     DrivingCommands.ResetGyro(controlsDriver.pedroDriver),
-                    TeleCommands.SetRegressionCTeleop(robot),
-                    TeleCommands.SetRegressionDTeleop(robot)
+                    LauncherCommand.SetRegressionTeleop()
                 ),
                 OpModeState.INIT
             );
@@ -79,9 +69,6 @@ public class DualTeleOp extends CommandOpMode {
              * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
              */
             limelight.start();
-        }
-        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
-            CommandScheduler.register(robot.launcherSubsystem);
         }
     }
 
