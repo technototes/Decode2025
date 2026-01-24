@@ -9,12 +9,12 @@ import com.technototes.library.util.Alliance;
 import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
-import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem.LauncherCommand;
 
 @Autonomous(name = "BlueNearLever1️⃣NoThird", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
@@ -31,7 +31,7 @@ public class BlueNearLeverNoThird extends CommandOpMode {
         Paths p = new Paths(robot.follower);
         robot.follower.setStartingPose(p.getBSegmentedCurveStart());
         CommandScheduler.scheduleForState(
-            new AltAutoVelocity(robot).alongWith(
+            LauncherCommand.AutoVelocity().alongWith(
                 new SequentialCommandGroup(
                     //TeleCommands.AutoLaunch1(robot),
                     TeleCommands.GateUp(robot),

@@ -6,9 +6,6 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -17,7 +14,7 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Setup;
 
 @Configurable
-public class LimelightSubsystem implements Loggable, Subsystem {
+public class LimelightSubsystem implements Loggable, Subsystem, TargetAcquisition {
 
     boolean hasHardware;
 
@@ -101,8 +98,13 @@ public class LimelightSubsystem implements Loggable, Subsystem {
         // if it start turning away from the apriltag
     }
 
-    public double getTX() {
+    // Don't know if the signs for these two things are correct or not...
+    public double getHorizontalPosition() {
         return Xangle;
+    }
+
+    public double getVerticalPosition() {
+        return Yangle;
     }
 
     public void LimelightStartup() {

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem.LauncherCommand;
 
 @Autonomous(name = "Blue9BallFarNew", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
@@ -33,12 +34,11 @@ public class Blue9BallFarNew extends CommandOpMode {
         CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                TeleCommands.SetRegressionCAuto(robot),
-                TeleCommands.SetRegressionDAuto(robot),
+                LauncherCommand.SetRegressionAuto(),
                 new LLSetup(robot),
                 TeleCommands.GateUp(robot),
-                TeleCommands.SetFarShoot(robot),
-                TeleCommands.FarAutoLaunch(robot),
+                LauncherCommand.SetFarShoot(),
+                LauncherCommand.FarAutoLaunch(),
                 TeleCommands.HoldIntake(robot),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.StartFartolaunchfar),
@@ -73,7 +73,7 @@ public class Blue9BallFarNew extends CommandOpMode {
                     TeleCommands.Intake(robot)
                 ),
                 new WaitCommand(1),
-                TeleCommands.StopLaunch(robot),
+                LauncherCommand.StopLaunch(),
                 TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode
             ),

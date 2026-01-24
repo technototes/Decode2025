@@ -13,12 +13,12 @@ import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
 @TeleOp(name = "Dual Control")
 @SuppressWarnings("unused")
@@ -47,8 +47,7 @@ public class DualTeleOp extends CommandOpMode {
                 new SequentialCommandGroup(
                     HeadingHelper.RestorePreviousPosition(robot.follower),
                     DrivingCommands.ResetGyro(controlsDriver.pedroDriver),
-                    TeleCommands.SetRegressionCTeleop(robot),
-                    TeleCommands.SetRegressionDTeleop(robot)
+                    LauncherSubsystem.LauncherCommand.SetRegressionTeleop()
                 ),
                 OpModeState.INIT
             );
@@ -70,9 +69,6 @@ public class DualTeleOp extends CommandOpMode {
              * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
              */
             limelight.start();
-        }
-        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
-            CommandScheduler.register(robot.launcherSubsystem);
         }
     }
 

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem.LauncherCommand;
 
 @Autonomous(name = "Red9BallFar", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
@@ -35,8 +36,8 @@ public class Red9BallFar extends CommandOpMode {
             new SequentialCommandGroup(
                 new LLSetup(robot),
                 TeleCommands.GateUp(robot),
-                TeleCommands.SetFarShoot(robot),
-                TeleCommands.Launch(robot),
+                LauncherCommand.SetFarShoot(),
+                LauncherCommand.Launch(),
                 TeleCommands.Intake(robot),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
@@ -57,7 +58,7 @@ public class Red9BallFar extends CommandOpMode {
                 Paths.AutoLaunching3Balls(robot),
                 new PedroPathCommand(robot.follower, p.Rlaunchfartopark),
                 new WaitCommand(1),
-                TeleCommands.StopLaunch(robot),
+                LauncherCommand.StopLaunch(),
                 TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode
             ),
