@@ -4,6 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
@@ -19,16 +20,71 @@ import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 @Configurable
 public class LauncherSubsystem implements Loggable, Subsystem {
 
-    //    @Log.Number(name = "Motor Power")
-    //    public static double MOTOR_POWER = 0.65; // 0.5 1.0
+    public class Commands {
+
+        public Command Launch(LauncherSubsystem l) {
+            return Command.create(l::Launch);
+        }
+
+        public Command SetFarShoot(LauncherSubsystem l) {
+            return Command.create(l::FarShoot);
+        }
+
+        public static Command SetCloseShoot(LauncherSubsystem l) {
+            return Command.create(l::CloseShoot);
+        }
+
+        public static Command AutoLaunch1(LauncherSubsystem l) {
+            return Command.create(l::AutoLaunch1);
+        }
+
+        public static Command AutoLaunch2(LauncherSubsystem l) {
+            return Command.create(l::AutoLaunch2);
+        }
+
+        public static Command FarAutoLaunch(LauncherSubsystem l) {
+            return Command.create(l::FarAutoLaunch);
+        }
+
+        public static Command StopLaunch(LauncherSubsystem l) {
+            return Command.create(l::Stop);
+        }
+    }
+
+    public static class Config {
+
+        //    @Log.Number(name = "Motor Power")
+        //    public static double MOTOR_POWER = 0.65; // 0.5 1.0
+        public static double closetargetLaunchVelocity = 1400;
+        public static double fartargetLaunchVelocity = 1850;
+        public static double fartargetLaunchVelocityforAuto = 2300;
+        public static double targetLaunchVelocityforAuto1 = 1950;
+        public static double targetLaunchVelocityforAuto2 = 1850;
+
+        public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
+        public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
+            0.0015,
+            0.0000,
+            0.0,
+            0
+        ); //p = 0.004, i = 0.00020
+        public static double SPIN_F_SCALE = 0.00021;
+        public static double SPIN_VOLT_COMP = 0.0216;
+        public static double DIFFERENCE = 0.0046;
+        public static double PEAK_VOLTAGE = 13;
+
+        public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
+        public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
+        public static double REGRESSION_C = 20; // multiplier for x for far zone launch speed formula
+        public static double REGRESSION_D = 320; // minimum velocity for far zone launch speed formula - 130, 255
+        public static double REGRESSION_C_TELEOP = 20; // multiplier for x for far zone launch speed formula
+        public static double REGRESSION_D_TELEOP = 130; // minimum velocity for far zone launch speed formula
+        public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
+        public static double REGRESSION_D_AUTO = 115; // minimum velocity for far zone launch speed formula
+    }
+
     @Log.Number(name = "Target Velocity")
     public static double targetLaunchVelocity = 1150;
-
-    public static double closetargetLaunchVelocity = 1400;
-    public static double fartargetLaunchVelocity = 1850;
-    public static double fartargetLaunchVelocityforAuto = 2300;
-    public static double targetLaunchVelocityforAuto1 = 1950;
-    public static double targetLaunchVelocityforAuto2 = 1850;
 
     @Log.Number(name = "Current Motor Velocity")
     public static double currentLaunchVelocity = 0.0;
@@ -51,17 +107,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
-    public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
-        0.0015,
-        0.0000,
-        0.0,
-        0
-    ); //p = 0.004, i = 0.00020
-    public static double SPIN_F_SCALE = 0.00021;
-    public static double SPIN_VOLT_COMP = 0.0216;
-    public static double DIFFERENCE = 0.0046;
-    public static double PEAK_VOLTAGE = 13;
     private static PIDFController launcherPID;
     public static double lastAutoVelocity = 0;
 
@@ -73,14 +118,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
-    public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
-    public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
-    public static double REGRESSION_C = 20; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 320; // minimum velocity for far zone launch speed formula - 130, 255
-    public static double REGRESSION_C_TELEOP = 20; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D_TELEOP = 130; // minimum velocity for far zone launch speed formula
-    public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D_AUTO = 115; // minimum velocity for far zone launch speed formula
 
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
@@ -108,17 +145,17 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             launcher2.setPIDFCoefficients(launcherPIDF);
             //ready = false;
             ls = new LimelightSubsystem(h);
-            double ADDITION = (PEAK_VOLTAGE - h.voltage());
+            double ADDITION = (Config.PEAK_VOLTAGE - h.voltage());
             if (ADDITION == 0) {
-                SPIN_VOLT_COMP = SPIN_VOLT_COMP + 0.001;
+                Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + 0.001;
             } else {
-                SPIN_VOLT_COMP = SPIN_VOLT_COMP + (ADDITION * DIFFERENCE);
+                Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + (ADDITION * Config.DIFFERENCE);
             }
-            launcherPID = new PIDFController(launcherPI, target ->
+            launcherPID = new PIDFController(Config.launcherPI, target ->
                 target == 0
                     ? 0
-                    : (SPIN_F_SCALE * target) +
-                      (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()))
+                    : (Config.SPIN_F_SCALE * target) +
+                      (Config.SPIN_VOLT_COMP * Math.min(Config.PEAK_VOLTAGE, h.voltage()))
             );
             //            top.setPIDFCoefficients(launcherP);
             setTargetSpeed(0);
@@ -141,21 +178,21 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void CloseShoot() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            targetLaunchVelocity = closetargetLaunchVelocity;
+            targetLaunchVelocity = Config.closetargetLaunchVelocity;
         }
     }
 
     public void FarShoot() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            targetLaunchVelocity = fartargetLaunchVelocity;
+            targetLaunchVelocity = Config.fartargetLaunchVelocity;
         }
     }
 
     public void AutoLaunch1() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            setTargetSpeed(targetLaunchVelocityforAuto1); //change to auto aim velocity
+            setTargetSpeed(Config.targetLaunchVelocityforAuto1); //change to auto aim velocity
             //launcher1.setVelocity(targetLaunchVelocityforAuto1);
             //launcher2.setVelocity(targetLaunchVelocityforAuto1);
         }
@@ -164,7 +201,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void AutoLaunch2() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            setTargetSpeed(targetLaunchVelocityforAuto2); //change to auto aim velocity
+            setTargetSpeed(Config.targetLaunchVelocityforAuto2); //change to auto aim velocity
             //            launcher1.setVelocity(TargetLaunchVelocity);
             //            launcher2.setVelocity(TargetLaunchVelocity);
         }
@@ -173,7 +210,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void FarAutoLaunch() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            setTargetSpeed(fartargetLaunchVelocityforAuto); //change to auto aim velocity
+            setTargetSpeed(Config.fartargetLaunchVelocityforAuto); //change to auto aim velocity
             //            launcher1.setVelocity(TargetLaunchVelocity);
             //            launcher2.setVelocity(TargetLaunchVelocity);
         }
@@ -288,15 +325,15 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         if (x < 100 && x > 0) {
             //launcherPI.p = 0.0015;
             //launcherPI.i = 0;
-            lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
+            lastAutoVelocity = Config.REGRESSION_A * x + Config.REGRESSION_B;
             return lastAutoVelocity;
         }
         if (x < 0) {
             return lastAutoVelocity;
         } else {
-            launcherPI.p = 0.004;
-            launcherPI.i = 0.0002;
-            return REGRESSION_C * x + REGRESSION_D;
+            Config.launcherPI.p = 0.004;
+            Config.launcherPI.i = 0.0002;
+            return Config.REGRESSION_C * x + Config.REGRESSION_D;
         }
 
         //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
@@ -309,15 +346,15 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         if (x < 100 && x > 0) {
             //launcherPI.p = 0.0015;
             //launcherPI.i = 0;
-            lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
+            lastAutoVelocity = Config.REGRESSION_A * x + Config.REGRESSION_B;
             return lastAutoVelocity;
         }
         if (x < 0) {
             return lastAutoVelocity;
         } else {
-            launcherPI.p = 0.004;
-            launcherPI.i = 0.0002;
-            return REGRESSION_C_AUTO * x + REGRESSION_D_AUTO;
+            Config.launcherPI.p = 0.004;
+            Config.launcherPI.i = 0.0002;
+            return Config.REGRESSION_C_AUTO * x + Config.REGRESSION_D_AUTO;
         }
 
         //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
@@ -325,27 +362,27 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public void setRegressionCAuto() {
         // Spin the motors pid goes here
-        REGRESSION_C = REGRESSION_C_AUTO;
+        Config.REGRESSION_C = Config.REGRESSION_C_AUTO;
     }
 
     public void setRegressionDAuto() {
         // Spin the motors pid goes here
-        REGRESSION_D = REGRESSION_D_AUTO;
+        Config.REGRESSION_D = Config.REGRESSION_D_AUTO;
     }
 
     public void setRegressionCTeleop() {
         // Spin the motors pid goes here
-        REGRESSION_C = REGRESSION_C_TELEOP;
+        Config.REGRESSION_C = Config.REGRESSION_C_TELEOP;
     }
 
     public void setRegressionDTeleop() {
         // Spin the motors pid goes here
-        REGRESSION_D = REGRESSION_D_TELEOP;
+        Config.REGRESSION_D = Config.REGRESSION_D_TELEOP;
     }
 
     public void increaseRegressionDTeleop() {
         // Spin the motors pid goes here
-        REGRESSION_D += 15;
+        Config.REGRESSION_D += 15;
     }
 
     @Override
