@@ -14,9 +14,9 @@ import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
+import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem.LauncherCommand;
 
 @Autonomous(name = "FarZoneDriveForward", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
