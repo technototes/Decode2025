@@ -14,34 +14,6 @@ public class TeleCommands {
         ); //pose might need to be current pose?
     }
 
-    public static Command Launch(Robot r) {
-        return Command.create(r.launcherSubsystem::Launch);
-    }
-
-    public static Command SetFarShoot(Robot r) {
-        return Command.create(r.launcherSubsystem::FarShoot);
-    }
-
-    public static Command SetCloseShoot(Robot r) {
-        return Command.create(r.launcherSubsystem::CloseShoot);
-    }
-
-    public static Command AutoLaunch1(Robot r) {
-        return Command.create(r.launcherSubsystem::AutoLaunch1);
-    }
-
-    public static Command AutoLaunch2(Robot r) {
-        return Command.create(r.launcherSubsystem::AutoLaunch2);
-    }
-
-    public static Command FarAutoLaunch(Robot r) {
-        return Command.create(r.launcherSubsystem::FarAutoLaunch);
-    }
-
-    public static Command StopLaunch(Robot r) {
-        return Command.create(r.launcherSubsystem::Stop);
-    }
-
     public static Command Rumble(Robot r) {
         return Command.create(r.intakeSubsystem::setRumble);
     }
