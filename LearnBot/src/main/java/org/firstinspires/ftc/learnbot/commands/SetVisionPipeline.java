@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.learnbot.commands;
 
 import com.technototes.library.command.Command;
-import org.firstinspires.ftc.learnbot.subsystems.VisionSubsystem;
+import org.firstinspires.ftc.learnbot.subsystems.TargetSubsystem;
 
 public class SetVisionPipeline implements Command {
 
-    public VisionSubsystem viz;
-    public VisionSubsystem.Pipeline pipeline;
+    public TargetSubsystem viz;
+    public TargetSubsystem.Pipeline pipeline;
 
-    public SetVisionPipeline(VisionSubsystem v, VisionSubsystem.Pipeline p) {
+    public SetVisionPipeline(TargetSubsystem v, TargetSubsystem.Pipeline p) {
         viz = v;
         pipeline = p;
     }
