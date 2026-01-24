@@ -11,7 +11,6 @@ import com.technototes.library.logger.Log;
 import com.technototes.library.util.PIDFController;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 @Configurable

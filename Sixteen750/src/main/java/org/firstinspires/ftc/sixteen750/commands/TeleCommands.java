@@ -22,14 +22,6 @@ public class TeleCommands {
         return Command.create(r.intakeSubsystem::setRumbleOff);
     }
 
-    public static Command IncreaseMotor(Robot r) {
-        return Command.create(r.launcherSubsystem::IncreaseMotorVelocity);
-    }
-
-    public static Command DecreaseMotor(Robot r) {
-        return Command.create(r.launcherSubsystem::DecreaseMotorVelocity);
-    }
-
     public static Command Intake(Robot r) {
         return Command.create(r.intakeSubsystem::Intake);
     }
@@ -88,29 +80,5 @@ public class TeleCommands {
 
     public static Command MotorVelocityTest(Robot r) {
         return Command.create(r.testSubsystem::setMotorVelocityTest);
-    }
-
-    public static Command ReadVelocity(Robot r) {
-        return Command.create(r.launcherSubsystem::readVelocity);
-    }
-
-    public static Command SetRegressionCAuto(Robot r) {
-        return Command.create(r.launcherSubsystem::setRegressionCAuto);
-    }
-
-    public static Command SetRegressionDAuto(Robot r) {
-        return Command.create(r.launcherSubsystem::setRegressionDAuto);
-    }
-
-    public static Command SetRegressionCTeleop(Robot r) {
-        return Command.create(r.launcherSubsystem::setRegressionCTeleop);
-    }
-
-    public static Command SetRegressionDTeleop(Robot r) {
-        return Command.create(r.launcherSubsystem::setRegressionDTeleop);
-    }
-
-    public static Command IncreaseRegressionDTeleop(Robot r) {
-        return Command.create(r.launcherSubsystem::increaseRegressionDTeleop);
     }
 }
