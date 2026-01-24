@@ -214,19 +214,38 @@ public class LauncherComponent implements Loggable, Subsystem {
             );
             launcher2.coast();
         }
-        // ready = false;
         targetAcquisition = targetSubsystem;
-        voltage = voltageSup;
+        voltage = voltageSup != null ? voltageSup : () -> Config.PEAK_VOLTAGE;
+        // All the Feedfwd stuff below seems...confused.
+        // Notes: Addition will *increase* as voltage decreases (I think this is expected)
+        // but it likely won't ever be zero, and it could (with a new battery) be *negative*
+        // I've tried to model it here: https://www.desmos.com/calculator/gmzlhkyz5a
+
+        // (I is the initial voltage delta (ADDITION), and V is the voltage as the bot  is runs.
+        //  Don't animate I, just V, and you'll see that as voltage decreases, so does the output
+        //  power. Drag I around to change the initial voltage delta)
+
+        // The thing that saves us is I, which does what I believe we're expecting: It increase
+        // power as initial voltage is lower. But then the FF function drops it.
+
+        // My suggestion: rip out all the 'initial' stuff and make the core F function return higher
+        // values as voltage *decreases*, which is I think what we're really looking for anyway.
+
         double ADDITION = (Config.PEAK_VOLTAGE - voltage.getAsDouble());
         if (ADDITION == 0) {
+            // I'd be stunned if this code runs...ever. Not sure what's supposed to happen here.
             Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + 0.001;
         } else {
+            // This seems like a sensible thing: We're adding some amount of voltage delta to
+            // compensate for a lower initial voltage
             Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + (ADDITION * Config.DIFFERENCE);
         }
         launcherPID = new PIDFController(Config.launcherPI, target ->
             target == 0
                 ? 0
                 : (Config.SPIN_F_SCALE * target) +
+                  // This is weird: We're going to *reduce* the output power slightly as voltage
+                  // decreases over time. I don't think this is what we're trying to accomplish.
                   (Config.SPIN_VOLT_COMP * Math.min(Config.PEAK_VOLTAGE, voltage.getAsDouble()))
         );
         setTargetSpeed(0);
@@ -438,7 +457,7 @@ public class LauncherComponent implements Loggable, Subsystem {
         if (hasLaunch1()) {
             power = launcher1.getPower();
         } else {
-            power = -1;
+            power = Double.NaN;
         }
         launcher1Current = getMotor1Current();
         launcher2Current = getMotor2Current();
