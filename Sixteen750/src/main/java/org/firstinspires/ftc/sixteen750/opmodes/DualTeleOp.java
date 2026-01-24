@@ -15,6 +15,7 @@ import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
+import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
@@ -84,20 +85,20 @@ public class DualTeleOp extends CommandOpMode {
             .getTelemetry()
             .addData(
                 "currentLaunchVelocity",
-                String.valueOf(LauncherSubsystem.currentLaunchVelocity)
+                String.valueOf(LauncherComponent.currentLaunchVelocity)
             );
         panelsTelemetry
             .getTelemetry()
-            .addData("launcherError", String.valueOf(LauncherSubsystem.err));
+            .addData("launcherError", String.valueOf(LauncherComponent.err));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
+            .addData("launcherTargetVelocity", String.valueOf(LauncherComponent.targetSpeed));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
+            .addData("launcher1Current", String.valueOf(LauncherComponent.launcher1Current));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
+            .addData("launcher2Current", String.valueOf(LauncherComponent.launcher2Current));
         panelsTelemetry.getTelemetry().update(telemetry);
     }
     */

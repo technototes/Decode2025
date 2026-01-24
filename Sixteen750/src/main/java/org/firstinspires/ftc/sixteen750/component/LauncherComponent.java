@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.sixteen750.subsystems;
+package org.firstinspires.ftc.sixteen750.component;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -14,17 +14,18 @@ import com.technototes.library.util.PIDFController;
 import java.util.Locale;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.sixteen750.subsystems.TargetAcquisition;
 
 @Configurable
-public class LauncherSubsystem implements Loggable, Subsystem {
+public class LauncherComponent implements Loggable, Subsystem {
 
     // This is a little strange: It's a place to tuck away a reference to the Launcher Subsystem,
     // so that all the commands can get to it there.
     // It let's us do this:
-    //    button.whenPressed(LauncherSubsystem.Commands.IncreaseMotor());
+    //    button.whenPressed(LauncherComponent.Commands.IncreaseMotor());
     // Instead of this:
-    //    button.whenPressed(LauncherSubsystem.Commands.IncreaseMotor(r.launcherSubsystem));
-    private static LauncherSubsystem self = null;
+    //    button.whenPressed(LauncherComponent.Commands.IncreaseMotor(r.launcherComponent));
+    private static LauncherComponent self = null;
 
     // *ALL* the configuration should go in here. I moved some things that had been constants up
     // to here, as they are "bot build configuration": are the motors reversed.
@@ -46,6 +47,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
         // TODO: Document this better
         public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
+        public static double Near_P = 0.004;
+        public static double Near_I = 0.0002;
+        public static double Far_P = 0.004;
+        public static double Far_I = 0.0002;
         public static double SPIN_F_SCALE = 0.00021;
         public static double SPIN_VOLT_COMP = 0.0216;
         public static double DIFFERENCE = 0.0046;
@@ -64,7 +69,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     }
 
     // *All* commands for the subsystem belong in here. It's easy for the simple "call a method"
-    // commands, but for more comlicated commands, scroll down to see AutoVelocity
+    // commands, but for more complicated commands, scroll down to see AutoVelocity/AutoVelocityImpl
     public static class LauncherCommand {
 
         public static Command Launch() {
@@ -123,26 +128,27 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // You just call LauncherCommands.AutoVelocity() instead of needing to differentiate
         // between simple Command.create's and more complex "class" commands.
         public static Command AutoVelocity() {
-            return new AutoVelocityImplementation();
+            return new AutoVelocityImpl();
         }
 
         // This class is protected to ensure that elsewhere, you can't ever use
-        //   button.whenPressed(new AutoVelocityImplementation());
+        //   button.whenPressed(new AutoVelocityImpl());
         // but instead you have to use
         //   button.whenPressed(LaunchCommand.AutoVelocity());
-        protected static class AutoVelocityImplementation implements Command {
+        protected static class AutoVelocityImpl implements Command {
 
-            public AutoVelocityImplementation() {}
+            public AutoVelocityImpl() {}
 
+            // This command is designed to *never* finish.
+            // It should be run in a parallel command group/alongWith/raceWith group.
             @Override
             public boolean isFinished() {
-                //return !robot.follower.isBusy();
                 return false;
             }
 
             @Override
             public void execute() {
-                LauncherSubsystem.self.Launch();
+                LauncherComponent.self.Launch();
             }
         }
     }
@@ -177,20 +183,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
 
-    public double launcherPow;
-    // not tested just placeholder but should be used
-
-    // External components this requires:
+    // External dependencies this component requires:
     EncodedMotor<DcMotorEx> launcher1;
     EncodedMotor<DcMotorEx> launcher2;
-
     TargetAcquisition targetAcquisition;
     DoubleSupplier voltage;
 
-    //    @Log(name = "Flywheel at Velocity")
-    //    public static boolean ready;
-
-    public LauncherSubsystem(
+    public LauncherComponent(
         EncodedMotor<DcMotorEx> primary,
         EncodedMotor<DcMotorEx> secondary,
         TargetAcquisition targetSubsystem,
@@ -198,7 +197,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     ) {
         self = this;
         launcher1 = primary;
-        if (launcher1 != null) {
+        if (hasLaunch1()) {
             launcher1.setDirection(
                 Config.PrimaryReversed
                     ? DcMotorSimple.Direction.REVERSE
@@ -207,7 +206,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             launcher1.coast();
         }
         launcher2 = secondary;
-        if (launcher2 != null) {
+        if (hasLaunch2()) {
             launcher2.setDirection(
                 Config.SecondaryReversed
                     ? DcMotorSimple.Direction.REVERSE
@@ -234,8 +233,16 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         CommandScheduler.register(this);
     }
 
-    public LauncherSubsystem() {
+    public LauncherComponent() {
         this(null, null, null, () -> 0);
+    }
+
+    public LauncherComponent(
+        EncodedMotor<DcMotorEx> primary,
+        TargetAcquisition targetSubsystem,
+        DoubleSupplier voltageSup
+    ) {
+        this(primary, null, targetSubsystem, voltageSup);
     }
 
     public void Launch() {
@@ -269,20 +276,15 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     }
 
     public double readVelocity() {
-        // if(launcher1.getVelocity() == TARGET_LAUNCH_VELOCITY && launcher2.getVelocity() == TARGET_LAUNCH_VELOCITY) {
-        //     return ready = true;
-        // } else {
-        //     return ready = false;
-        // }
-        return launcher1 != null ? launcher1.getVelocity() : Double.NaN; // Nan = "Not a Number"
-
-        // 12.25 stationary voltage - had to decrease velocity by 150 (trial one: true, trial two: true)
-        // 11.84 stationary voltage - had to decrease velocity by 100? (trial one:
+        if (hasLaunch1()) {
+            return launcher1.getVelocity();
+        } else {
+            return Double.NaN; // Nan = "Not a Number"
+        }
     }
 
     public void setTargetSpeed(double speed) {
         targetSpeed = speed;
-        //        top.setVelocity(speed);
         launcherPID.setTarget(speed);
     }
 
@@ -293,30 +295,30 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     private void setMotorPower(double pow) {
         double power = Math.clamp(pow, -1, 1);
         targetPower = power;
-        if (launcher1 != null) {
+        if (hasLaunch1()) {
             launcher1.setPower(power);
         }
-        if (launcher2 != null) {
+        if (hasLaunch2()) {
             launcher2.setPower(power);
         }
     }
 
     public double getMotorSpeed() {
-        if (launcher1 != null) {
+        if (hasLaunch1()) {
             return launcher1.getVelocity();
         }
         return -1;
     }
 
     public double getMotor1Current() {
-        if (launcher1 != null) {
+        if (hasLaunch1()) {
             return launcher1.getAmperage(CurrentUnit.AMPS);
         }
         return -1;
     }
 
     public double getMotor2Current() {
-        if (launcher2 != null) {
+        if (hasLaunch2()) {
             return launcher2.getAmperage(CurrentUnit.AMPS);
         }
         return -1;
@@ -337,11 +339,19 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     }
 
     public double getMotor1Velocity() {
-        return launcher1 != null ? launcher1.getVelocity() : Double.NaN; // Not a Number
+        if (hasLaunch1()) {
+            return launcher1.getVelocity();
+        } else {
+            return Double.NaN; // Not a Number
+        }
     }
 
     public double getMotor2Velocity() {
-        return launcher2 != null ? launcher2.getVelocity() : Double.NaN; // Not a Number
+        if (hasLaunch2()) {
+            return launcher2.getVelocity();
+        } else {
+            return Double.NaN; // Not a Number
+        }
     }
 
     // This is wrong (and, as it turns out, unused), so I just commented it out
@@ -359,43 +369,27 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     }
     */
 
+    // TOOD: Turn this into a quadratic equation instead, since that's what it's mimicking.
     public double autoVelocity() {
-        // x = distance in feet
+        // x = distance in inches
         double x = getTargetDistance();
 
-        if (x < 100 && x > 0) {
-            //launcherPI.p = 0.0015;
-            //launcherPI.i = 0;
-            lastAutoVelocity = Config.REGRESSION_A * x + Config.REGRESSION_B;
-            return lastAutoVelocity;
-        }
         if (x < 0) {
             return lastAutoVelocity;
+        } else if (x < 100) {
+            // launcherPI.p = 0.0015;
+            // launcherPI.i = 0;
+            lastAutoVelocity = Config.REGRESSION_A * x + Config.REGRESSION_B;
+            return lastAutoVelocity;
         } else {
-            Config.launcherPI.p = 0.004;
-            Config.launcherPI.i = 0.0002;
+            // NOTE: These two lines don't appear to do anything, because we're not using the
+            // Near_P and Near_I values anywhere (they were commented out above)
+            // TODO: Assigning values to something in Config is 'bad form'. Instead, we should
+            // have the coefficients copied into the Launcher itself in the constructor, and change
+            // that here.
+            Config.launcherPI.p = Config.Far_P;
+            Config.launcherPI.i = Config.Far_I;
             return Config.REGRESSION_C * x + Config.REGRESSION_D;
-        }
-
-        //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
-    }
-
-    public double autoVelocityForAuto() {
-        // x = distance in feet
-        double x = getTargetDistance();
-
-        if (x < 100 && x > 0) {
-            //launcherPI.p = 0.0015;
-            //launcherPI.i = 0;
-            lastAutoVelocity = Config.REGRESSION_A * x + Config.REGRESSION_B;
-            return lastAutoVelocity;
-        }
-        if (x < 0) {
-            return lastAutoVelocity;
-        } else {
-            Config.launcherPI.p = 0.004;
-            Config.launcherPI.i = 0.0002;
-            return Config.REGRESSION_C_AUTO * x + Config.REGRESSION_D_AUTO;
         }
 
         //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
@@ -421,7 +415,9 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     // This lets the 'no hardware' or 'subsystem disabled' thing still work without a functional
     // target acquisition subsystem
     private double getTargetDistance() {
-        if (targetAcquisition != null) return targetAcquisition.getDistance();
+        if (targetAcquisition != null) {
+            return targetAcquisition.getDistance();
+        }
         return -1;
     }
 
@@ -439,7 +435,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
         err = launcherPID.getLastError();
         motorVelocity = getMotorSpeed();
-        if (launcher1 != null) {
+        if (hasLaunch1()) {
             power = launcher1.getPower();
         } else {
             power = -1;
@@ -451,12 +447,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     // This should be used by a test opmode to check that the basics are working.
     public String hardwareValidation(double power1, double power2) {
         String res = "";
-        if (launcher1 != null) {
+        if (hasLaunch1()) {
             launcher1.setPower(power1);
         } else {
             res += "(no launcher1)";
         }
-        if (launcher2 != null) {
+        if (hasLaunch2()) {
             launcher2.setPower(power2);
         } else {
             res += "(no launcher2)";
@@ -469,5 +465,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             getMotor2Current()
         );
         return res;
+    }
+
+    private boolean hasLaunch1() {
+        return launcher1 != null;
+    }
+
+    private boolean hasLaunch2() {
+        return launcher2 != null;
     }
 }

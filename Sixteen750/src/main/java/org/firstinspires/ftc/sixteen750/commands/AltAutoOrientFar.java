@@ -69,7 +69,7 @@ public class AltAutoOrientFar implements Command {
         //                    Math.toRadians(robot.limelightSubsystem.getTX()) //.getTX .getLimelightRotation()
         //            );
         //            robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
-        //            LauncherSubsystem.targetPower = 1;
+        //            LauncherComponent.targetPower = 1;
         //            firsttime = false;
         //}
         currentPose = robot.follower.getPose();

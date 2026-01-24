@@ -11,7 +11,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem.LauncherCommand;
+import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
 
 public class DriverController {
 
@@ -58,7 +58,7 @@ public class DriverController {
         if (Setup.Connected.DRIVEBASE) {
             bindDriveControls();
         }
-        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
+        if (Setup.Connected.LAUNCHERCOMPONENT) {
             bindLaunchControls();
         }
         if (Setup.Connected.INTAKESUBSYSTEM) {
