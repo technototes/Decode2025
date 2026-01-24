@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.sixteen750.controls;
+package org.firstinspires.ftc.blackbird.controls;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.command.Command;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
-import org.firstinspires.ftc.sixteen750.Robot;
-import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.blackbird.Robot;
+import org.firstinspires.ftc.blackbird.Setup;
+import org.firstinspires.ftc.blackbird.commands.TeleCommands;
 
 public class TestingController {
 
@@ -16,6 +16,7 @@ public class TestingController {
     public CommandButton motorPowerButton;
     public CommandButton motorVelocityButton;
     public CommandButton TurretMoveToPose;
+    public CommandButton TurretMoveToPose90;
 
     public TestingController(CommandGamepad g, Robot r) {
         robot = r;
@@ -28,10 +29,14 @@ public class TestingController {
         // motorPowerButton = gamepad.ps_circle;
         // motorVelocityButton = gamepad.ps_triangle;
         TurretMoveToPose = gamepad.ps_cross;
+        TurretMoveToPose90 = gamepad.ps_square;
     }
 
     private void bindButtonControls() {
-        motorPowerButton.whenPressed(TeleCommands.MotorPowerTest(robot));
-        motorVelocityButton.whenPressed(TeleCommands.MotorVelocityTest(robot));
+        // motorPowerButton.whenPressed(TeleCommands.MotorPowerTest(robot));
+        // motorPowerButton.whenReleased(TeleCommands.)
+        // motorVelocityButton.whenPressed(TeleCommands.MotorVelocityTest(robot));
+        TurretMoveToPose.whenPressed(Command.create(robot.turretSubsystem::turretGoToZero));
+        TurretMoveToPose90.whenPressed(Command.create(robot.turretSubsystem::turretGoTo90));
     }
 }

@@ -15,6 +15,10 @@ buildscript {
     }
 }
 
+plugins {
+  id 'idea'
+}
+
 // This is now required because aapt2 has to be downloaded from the
 // google() repository beginning with version 3.2 of the Android Gradle Plugin
 allprojects {
@@ -32,6 +36,15 @@ repositories {
 task justAssembleDebug(type: GradleBuild) {
     tasks = [
         ':Twenty403:assembleDebug',
-        ':Sixteen750:assembleDebug'
+        ':Sixteen750:assembleDebug',
+        ':Blackbird:assembleDebug'
     ]
+}
+
+idea {
+  module {
+    // Add relative paths to folders you want to exclude from indexing
+    excludeDirs += file('node_modules')
+    excludeDirs += file('pedroviz/node_modules')
+  }
 }

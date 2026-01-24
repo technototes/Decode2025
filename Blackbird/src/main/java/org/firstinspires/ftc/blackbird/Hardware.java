@@ -1,10 +1,9 @@
-package org.firstinspires.ftc.sixteen750;
+package org.firstinspires.ftc.blackbird;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.technototes.library.hardware.motor.CRServo;
@@ -28,29 +27,50 @@ public class Hardware implements Loggable {
     public DcMotorEx intake;
     public EncodedMotor launcher1;
     public EncodedMotor launcher2;
-    public Servo brake;
     public Servo hood;
     public Servo lever;
     public MotorEncoder odoRL, odoFB;
-    public SparkFunOTOS odo;
     public CRServo testCRServo;
     public Servo testServo;
     public Limelight3A limelight;
     public HardwareMap map;
+    public EncodedMotor<DcMotorEx> turretMotor;
 
     /* Put other hardware here! */
 
     public Hardware(HardwareMap hwmap) {
         map = hwmap;
         hubs = hwmap.getAll(LynxModule.class);
-        if (Setup.Connected.EXTERNAL_IMU) {
-            imu = new AdafruitIMU(Setup.HardwareNames.EXTERNAL_IMU, AdafruitIMU.Orientation.Pitch);
+        if (Setup.Connected.BLACKBIRD) {
+            // For Blackbird:
+            if (Setup.Connected.EXTERNAL_IMU) {
+                // TODO: Is this Yaw, Pitch, or Roll?
+                imu = new AdafruitIMU(
+                    Setup.HardwareNames.EXTERNAL_IMU,
+                    AdafruitIMU.Orientation.Pitch
+                );
+            } else {
+                // The ControlHub is on the other side for Blackbird (cuz mech gonna mech)
+                imu = new IMU(
+                    Setup.HardwareNames.IMU,
+                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                    RevHubOrientationOnRobot.UsbFacingDirection.UP
+                );
+            }
         } else {
-            imu = new IMU(
-                Setup.HardwareNames.IMU,
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP
-            );
+            // For Cardinal:
+            if (Setup.Connected.EXTERNAL_IMU) {
+                imu = new AdafruitIMU(
+                    Setup.HardwareNames.EXTERNAL_IMU,
+                    AdafruitIMU.Orientation.Pitch
+                );
+            } else {
+                imu = new IMU(
+                    Setup.HardwareNames.IMU,
+                    RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                    RevHubOrientationOnRobot.UsbFacingDirection.UP
+                );
+            }
         }
         if (Setup.Connected.DRIVEBASE) {
             fl = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.FL_DRIVE_MOTOR);
@@ -59,11 +79,8 @@ public class Hardware implements Loggable {
             rr = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.RR_DRIVE_MOTOR);
         }
         if (Setup.Connected.ODOSUBSYSTEM) {
-            odoFB = new MotorEncoder(Setup.HardwareNames.ODOFB);
-            odoRL = new MotorEncoder(Setup.HardwareNames.ODORL);
-        }
-        if (Setup.Connected.OTOS) {
-            odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+            odoFB = new MotorEncoder(Setup.HardwareNames.ODO_FWDBACK);
+            odoRL = new MotorEncoder(Setup.HardwareNames.ODO_STRAFE);
         }
         if (Setup.Connected.INTAKESUBSYSTEM) {
             intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
@@ -76,9 +93,6 @@ public class Hardware implements Loggable {
             hood = new Servo(Setup.HardwareNames.HOOD_SERVO);
             lever = new Servo(Setup.HardwareNames.LEVER_SERVO);
         }
-        if (Setup.Connected.BRAKESUBSYSTEM) {
-            brake = new Servo(Setup.HardwareNames.BRAKE_SERVO);
-        }
         if (Setup.Connected.TESTSUBSYSTEM) {
             testMotor = new EncodedMotor<>(Setup.HardwareNames.TESTMOTOR);
             testCRServo = new CRServo(Setup.HardwareNames.TESTCRSERVO);
@@ -86,6 +100,9 @@ public class Hardware implements Loggable {
         }
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
+        }
+        if (Setup.Connected.TURRETSUBSYSTEM) {
+            turretMotor = new EncodedMotor<>(Setup.HardwareNames.TURRET);
         }
     }
 

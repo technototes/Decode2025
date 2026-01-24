@@ -4,6 +4,7 @@ include ':FtcRobotController'
 include 'RobotLibrary'                                                   // FLIP: TechnoLibLocal
 project(':RobotLibrary').projectDir = new File('TechnoLib/RobotLibrary') // FLIP: TechnoLibLocal
 
+include ':Blackbird'
 include ':Sixteen750'
 include ':Twenty403'
 

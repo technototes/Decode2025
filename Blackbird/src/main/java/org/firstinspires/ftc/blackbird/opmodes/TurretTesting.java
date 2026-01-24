@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.sixteen750.opmodes;
+package org.firstinspires.ftc.blackbird.opmodes;
 
-import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.AprilTag_Pipeline;
+import static org.firstinspires.ftc.blackbird.Setup.HardwareNames.AprilTag_Pipeline;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -15,19 +15,19 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import java.util.Arrays;
 import java.util.List;
+import org.firstinspires.ftc.blackbird.Hardware;
+import org.firstinspires.ftc.blackbird.Robot;
+import org.firstinspires.ftc.blackbird.Setup;
+import org.firstinspires.ftc.blackbird.commands.auto.Paths;
+import org.firstinspires.ftc.blackbird.commands.driving.DrivingCommands;
+import org.firstinspires.ftc.blackbird.controls.DriverController;
+import org.firstinspires.ftc.blackbird.controls.OperatorController;
+import org.firstinspires.ftc.blackbird.controls.TestingController;
+import org.firstinspires.ftc.blackbird.helpers.HeadingHelper;
+import org.firstinspires.ftc.blackbird.helpers.StartingPosition;
+import org.firstinspires.ftc.blackbird.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.blackbird.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.sixteen750.Hardware;
-import org.firstinspires.ftc.sixteen750.Robot;
-import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
-import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.controls.DriverController;
-import org.firstinspires.ftc.sixteen750.controls.OperatorController;
-import org.firstinspires.ftc.sixteen750.controls.TestingController;
-import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
-import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 @TeleOp(name = "TurretTesting")
 @SuppressWarnings("unused")
@@ -54,10 +54,10 @@ public class TurretTesting extends CommandOpMode {
 
     @Override
     public void runLoop() {
-        robot.turretSubsystem.setTurretPos(robot.turretSubsystem.turretPIDF.update(robot.turretSubsystem.getTurretPos()));
-        robot.turretSubsystem.turretAngle = robot.turretSubsystem.getEncoderAngleInDegrees();
-        robot.turretSubsystem.turretPow = robot.turretSubsystem.getTurretPow();
-        robot.turretSubsystem.turretTicks = robot.turretSubsystem.getTurretPos();
+        // robot.turretSubsystem.setTurretPos(robot.turretSubsystem.turretPIDF.update(robot.turretSubsystem.getTurretPos()));
+        // robot.turretSubsystem.turretAngle = robot.turretSubsystem.getEncoderAngleInDegrees();
+        // robot.turretSubsystem.turretPow = robot.turretSubsystem.getTurretPow();
+        // robot.turretSubsystem.turretTicks = robot.turretSubsystem.getTurretPos();
         telemetry.addData("Turret", robot.turretSubsystem.TurretSubsytemInfoToDS);
         panelsTelemetry.getTelemetry().addData("TurretPos", robot.turretSubsystem.turretTicks);
         panelsTelemetry.getTelemetry().update(telemetry);
@@ -169,7 +169,5 @@ public class TurretTesting extends CommandOpMode {
     */
 
     @Override
-    public void end() {
-
-    }
+    public void end() {}
 }

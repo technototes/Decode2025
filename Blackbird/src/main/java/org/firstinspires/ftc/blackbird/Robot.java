@@ -1,16 +1,16 @@
-package org.firstinspires.ftc.sixteen750;
+package org.firstinspires.ftc.blackbird;
 
 import com.pedropathing.follower.Follower;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
-import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
-import org.firstinspires.ftc.sixteen750.subsystems.AimingSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.BrakeSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.SafetySubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.TestSubsystem;
+import org.firstinspires.ftc.blackbird.helpers.StartingPosition;
+import org.firstinspires.ftc.blackbird.subsystems.AimingSubsystem;
+import org.firstinspires.ftc.blackbird.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.blackbird.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.blackbird.subsystems.LimelightSubsystem;
+import org.firstinspires.ftc.blackbird.subsystems.SafetySubsystem;
+import org.firstinspires.ftc.blackbird.subsystems.TestSubsystem;
+import org.firstinspires.ftc.blackbird.subsystems.TurretSubsystem;
 
 public class Robot implements Loggable {
 
@@ -22,10 +22,10 @@ public class Robot implements Loggable {
     public SafetySubsystem safetySubsystem;
     public LauncherSubsystem launcherSubsystem;
     public IntakeSubsystem intakeSubsystem;
-    public BrakeSubsystem brakeSubsystem;
     public AimingSubsystem aimingSubsystem;
     public LimelightSubsystem limelightSubsystem;
     public TestSubsystem testSubsystem;
+    public TurretSubsystem turretSubsystem;
     public Follower follower;
     private Hardware hardware;
 
@@ -44,9 +44,6 @@ public class Robot implements Loggable {
         if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             this.launcherSubsystem = new LauncherSubsystem(hw);
         }
-        if (Setup.Connected.BRAKESUBSYSTEM) {
-            this.brakeSubsystem = new BrakeSubsystem(hw);
-        }
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             this.limelightSubsystem = new LimelightSubsystem(hw);
         }
@@ -58,6 +55,11 @@ public class Robot implements Loggable {
         }
         if (Setup.Connected.DRIVEBASE) {
             follower = AutoConstants.createFollower(hw.map);
+        }
+        if (Setup.Connected.TURRETSUBSYSTEM) {
+            this.turretSubsystem = new TurretSubsystem(hw);
+        } else {
+            this.turretSubsystem = new TurretSubsystem();
         }
     }
 

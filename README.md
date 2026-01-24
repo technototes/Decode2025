@@ -1,15 +1,21 @@
 # TODO's for V2:
 
 - [ ] Basic drivebase validation
-- [ ] PedroPath Tuner
+- [ ] ODO configuration
+  - [ ] Pod location
+  - [ ] ODO Pedro Tuning
+- [ ] PedroPath Motion Tuner
 - [ ] Turret work
-  - [ ] PID for Turret
-  - [ ] Unwind for Turret
+  - [x] PID for Turret
+  - [x] Positioning for Turret
   - [ ] Auto-orient for vision
-- [ ] PID tuning for launcher
+- [ ] Re-implement launcher (including PID tuning)
+  - [ ] Stop using SetVelocity, as we only have 1 encoder
+  - [ ] Read velocity, but use custom PID (for both motors)
 - [ ] Hood servo settings
 - [ ] Tweaking intake
 - [ ] Pose/odometry during tele/auto ("Targetting Subsystem")
+- [ ] Shooting while moving
 
 ## NOTICE
 
