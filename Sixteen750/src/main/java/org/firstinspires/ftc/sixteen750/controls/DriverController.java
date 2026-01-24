@@ -13,6 +13,7 @@ import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 public class DriverController {
@@ -129,8 +130,8 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-        launchButton.whilePressed(TeleCommands.Launch(robot));
-        launchButton.whenReleased(TeleCommands.StopLaunch(robot));
+        launchButton.whilePressed(LauncherSubsystem.Commands.Launch(robot.launcherSubsystem));
+        launchButton.whenReleased(LauncherSubsystem.Commands.StopLaunch(robot.launcherSubsystem));
         //        CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
         //        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
         MotorIncrease.whenPressed(robot.launcherSubsystem::IncreaseMotorVelocity);
