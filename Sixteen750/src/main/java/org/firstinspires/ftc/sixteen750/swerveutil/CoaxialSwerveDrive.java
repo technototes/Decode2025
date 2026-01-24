@@ -133,10 +133,10 @@ public class CoaxialSwerveDrive extends Drivetrain {
         // Initialize module positions (relative to robot center)
         // These represent the physical location of each module on the robot
         modulePositions = new Vector[4];
-        modulePositions[0] = new Vector(constants.trackWidth / 2, constants.wheelBase / 2);   // Front Left
-        modulePositions[1] = new Vector(constants.trackWidth / 2, -constants.wheelBase / 2);  // Front Right
-        modulePositions[2] = new Vector(-constants.trackWidth / 2, constants.wheelBase / 2);  // Back Left
-        modulePositions[3] = new Vector(-constants.trackWidth / 2, -constants.wheelBase / 2); // Back Right
+        modulePositions[0] = new Vector(-constants.trackWidth / 2, constants.wheelBase / 2);   // Front Left
+        modulePositions[1] = new Vector(constants.trackWidth / 2, constants.wheelBase / 2);    // Front Right
+        modulePositions[2] = new Vector(-constants.trackWidth / 2, -constants.wheelBase / 2);  // Back Left
+        modulePositions[3] = new Vector(constants.trackWidth / 2, -constants.wheelBase / 2);   // Back Right
 
         // Set motor modes
         for (DcMotorEx motor : driveMotors) {
@@ -327,10 +327,10 @@ public class CoaxialSwerveDrive extends Drivetrain {
     @Override
     public void updateConstants() {
         // Update module positions if constants changed
-        modulePositions[0] = new Vector(constants.trackWidth / 2, constants.wheelBase / 2);
-        modulePositions[1] = new Vector(constants.trackWidth / 2, -constants.wheelBase / 2);
-        modulePositions[2] = new Vector(-constants.trackWidth / 2, constants.wheelBase / 2);
-        modulePositions[3] = new Vector(-constants.trackWidth / 2, -constants.wheelBase / 2);
+        modulePositions[0] = new Vector(-constants.trackWidth / 2, constants.wheelBase / 2);  // Front Left
+        modulePositions[1] = new Vector(constants.trackWidth / 2, constants.wheelBase / 2);   // Front Right
+        modulePositions[2] = new Vector(-constants.trackWidth / 2, -constants.wheelBase / 2); // Back Left
+        modulePositions[3] = new Vector(constants.trackWidth / 2, -constants.wheelBase / 2);  // Back Right
     }
 
     @Override
