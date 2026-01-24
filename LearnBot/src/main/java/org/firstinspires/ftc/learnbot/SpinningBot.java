@@ -4,9 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
-import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
 import org.firstinspires.ftc.learnbot.subsystems.SpinningSubsystem;
-import org.firstinspires.ftc.learnbot.subsystems.VisionSubsystem;
 
 @Configurable
 public class SpinningBot implements Loggable {

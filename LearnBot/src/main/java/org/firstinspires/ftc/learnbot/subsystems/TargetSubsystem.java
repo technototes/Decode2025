@@ -11,7 +11,13 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 
 @Configurable
-public class VisionSubsystem implements Subsystem, Loggable {
+public class TargetSubsystem implements Subsystem, Loggable {
+
+    public static class Config {
+
+        public static CameraOrientation Camera_Orientation = CameraOrientation.USB_UP;
+        public static double Camera_Tilt_Degrees = 14.0;
+    }
 
     public enum CameraOrientation {
         USB_BOT_LEFT, // This is 'normal'
@@ -26,9 +32,6 @@ public class VisionSubsystem implements Subsystem, Loggable {
         PURPLE_COLOR,
         UNKNOWN,
     }
-
-    public static CameraOrientation Camera_Orientation = CameraOrientation.USB_UP;
-    public static double Camera_Tilt_Degrees = 14.0;
 
     @Log(name = "Viz")
     public static String status = "";
@@ -48,22 +51,22 @@ public class VisionSubsystem implements Subsystem, Loggable {
 
         private void setXY(double obsX, double obsY) {
             // Translate based on Camera Orientation
-            switch (VisionSubsystem.Camera_Orientation) {
+            switch (Config.Camera_Orientation) {
                 case USB_BOT_LEFT:
                     this.x = obsX;
-                    this.y = obsY - Camera_Tilt_Degrees;
+                    this.y = obsY - Config.Camera_Tilt_Degrees;
                     break;
                 case USB_UP:
                     this.x = -obsY;
-                    this.y = obsX - Camera_Tilt_Degrees;
+                    this.y = obsX - Config.Camera_Tilt_Degrees;
                     break;
                 case USB_BOT_RIGHT:
                     this.x = -obsX;
-                    this.y = -obsY + Camera_Tilt_Degrees;
+                    this.y = -obsY + Config.Camera_Tilt_Degrees;
                     break;
                 case USB_DOWN:
                     this.x = obsY;
-                    this.y = -obsX + Camera_Tilt_Degrees;
+                    this.y = -obsX + Config.Camera_Tilt_Degrees;
                     break;
             }
         }
@@ -79,7 +82,7 @@ public class VisionSubsystem implements Subsystem, Loggable {
         }
     }
 
-    public VisionSubsystem(Limelight3A ll) {
+    public TargetSubsystem(Limelight3A ll) {
         limelight = ll;
         limelight.start();
         // I just start it with the AprilTag pipeline, I guess...
