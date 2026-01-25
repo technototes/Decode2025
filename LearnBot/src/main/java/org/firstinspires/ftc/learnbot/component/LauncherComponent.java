@@ -505,19 +505,11 @@ public class LauncherComponent implements Loggable, Subsystem {
         return res;
     }
 
-    // TODO: Code that measures kStaticFriction and kVelocityConstant for a FeedFwd function
+    // Code that measures kStaticFriction and kVelocityConstant for the FeedFwd function
     public void feedFwdHelper(Telemetry tel, Gamepad gamepad, BooleanSupplier opModeIsActive) {
         // Wait until a button's been pressed, then first identify kStaticFriction, by watching to
         // see when the motor just barely starts moving (then back off by a couple percent)
         motorHelperPower(0);
-        while (!anyButtonsPressed(gamepad) && opModeIsActive.getAsBoolean()) {
-            tel.addLine("Please press a button on the gamepad to begin test");
-            tel.update();
-        }
-        while (anyButtonsPressed(gamepad) && opModeIsActive.getAsBoolean()) {
-            tel.addLine("Release the button to begin the test");
-            tel.update();
-        }
         // Okay, slowly raise the power applied to launcher1 until w
         double staticFriction = 0.001;
         double staticFrictionStep = 0.001;
@@ -525,20 +517,21 @@ public class LauncherComponent implements Loggable, Subsystem {
         while (opModeIsActive.getAsBoolean()) {
             double v = voltage.getAsDouble();
             motorHelperPower(staticFriction / v);
-            tel.addLine("Press a button to abort");
+            tel.addLine("Press a button to abort (and just be patient)");
             tel.addData("kStaticFriction", staticFriction);
             tel.addData("Voltage", v);
+            tel.addData("Power", staticFriction / v);
             tel.update();
-            if (anyButtonsPressed(gamepad)) {
+            if (anyButtonsReleased(gamepad)) {
                 motorHelperPower(0);
                 return;
             }
-            if (lastUpdate.milliseconds() >= 50) {
-                // We update every 25 milliseconds, just to give it time to trigger
+            if (lastUpdate.milliseconds() >= 75) {
+                lastUpdate.reset();
+                // We update every 75 milliseconds, just to give it time to trigger
                 if (getMotor1Velocity() != 0) {
                     break;
                 }
-                lastUpdate.reset();
                 staticFriction += staticFrictionStep;
             }
         }
@@ -547,37 +540,28 @@ public class LauncherComponent implements Loggable, Subsystem {
         staticFriction -= staticFrictionStep;
         motorHelperPower(0);
         // Display the kStaticFriction value we got:
-        while (!anyButtonsPressed(gamepad) && opModeIsActive.getAsBoolean()) {
-            tel.addData("kStaticFriction-->>", staticFriction);
-            tel.addLine("Press a button to start the velocity measurement");
-            tel.update();
-        }
         // Next up: Velocity!
-        while (anyButtonsPressed(gamepad) && opModeIsActive.getAsBoolean()) {
-            tel.addData("kStaticFriction!", staticFriction);
-            tel.addLine("Release the button to start the velocity measurement");
+        while (!anyButtonsReleased(gamepad) && opModeIsActive.getAsBoolean()) {
+            tel.addData("kStaticFriction-->>", staticFriction);
+            tel.addLine("Hit a button to start the velocity measurement");
             tel.update();
         }
         lastUpdate.reset();
         double velocityConstant = 0;
         MovingStatistics velocityConstantStats = new MovingStatistics(50);
-        while (!anyButtonsPressed(gamepad) && opModeIsActive.getAsBoolean()) {
+        double vel = 0;
+        double vol = 0;
+        while (!anyButtonsReleased(gamepad) && opModeIsActive.getAsBoolean()) {
             motorHelperPower(1);
             if (lastUpdate.milliseconds() >= 50) {
-                double vel = getMotor1Velocity();
-                double vol = voltage.getAsDouble();
+                vel = getMotor1Velocity();
+                vol = voltage.getAsDouble();
                 if (vel != 0) {
-                    // power = (kStaticFriction + kVelocity * RPM) / v
+                    // power = (kStaticFriction + kVelocityConstant * RPM) / v
                     // So
                     //   1 = (kSF + kV * RPM) / v;
-                    // Multiply both sides by v
-                    //   v = kSF + kV * RPM
-                    // move kStaticFriction over:
-                    //   v - KSF = kV * RPM
-                    // swap sides
-                    //   kv * RPM = v - kSF
-                    // and divide both sides by RPM
-                    // kv = (v - kSF) / RPM
+                    // solve for kV:
+                    //   kV = (v - kSF) / RPM
                     velocityConstant = (vol - staticFriction) / vel;
                     velocityConstantStats.add(velocityConstant);
                 }
@@ -586,26 +570,53 @@ public class LauncherComponent implements Loggable, Subsystem {
             tel.addLine("Press a button to stop velocity measurement");
             tel.addData("kVelocityConstant", velocityConstant);
             tel.addData("Average kV", velocityConstantStats.getMean());
+            tel.addData("Velocity", vel);
+            tel.addData("Voltage", vol);
             tel.update();
+        }
+        MovingStatistics error = new MovingStatistics(1000);
+        velocityConstant = velocityConstantStats.getMean();
+        error.add(0);
+        double targetVelocity = vel * 0.5;
+        lastUpdate.reset();
+        vel = 0;
+        while (!anyButtonsReleased(gamepad) && opModeIsActive.getAsBoolean()) {
+            tel.addData("Measured kStaticFriction", staticFriction);
+            tel.addData("Measured kVelocityConstant", velocityConstant);
+            tel.addLine("Press a button to stop, dpad left/right to change target");
+            tel.addData("target", targetVelocity);
+            tel.addData("measured", vel);
+            tel.addData("Average Error", error.getMean());
+            tel.addData("stddev", error.getStandardDeviation());
+            tel.update();
+            double pow =
+                (Math.copySign(staticFriction, targetVelocity) +
+                    velocityConstant * targetVelocity) /
+                voltage.getAsDouble();
+            motorHelperPower(targetVelocity == 0 ? 0 : pow);
+            if (lastUpdate.milliseconds() > 250) {
+                vel = getMotor1Velocity();
+                error.add(targetVelocity - vel);
+                lastUpdate.reset();
+            }
+            if (gamepad.dpadLeftWasPressed()) {
+                targetVelocity -= 100;
+                lastUpdate.reset();
+            } else if (gamepad.dpadRightWasPressed()) {
+                targetVelocity += 100;
+                lastUpdate.reset();
+            } else if (gamepad.dpadUpWasPressed()) {
+                targetVelocity += 10;
+                lastUpdate.reset();
+            } else if (gamepad.dpadDownWasPressed()) {
+                targetVelocity -= 10;
+                lastUpdate.reset();
+            }
         }
     }
 
-    private static boolean anyButtonsPressed(Gamepad g) {
-        return (
-            g.a ||
-            g.b ||
-            g.x ||
-            g.y ||
-            g.dpad_down ||
-            g.dpad_up ||
-            g.dpad_left ||
-            g.dpad_right ||
-            g.options ||
-            g.share ||
-            g.left_bumper ||
-            g.right_bumper ||
-            g.start
-        );
+    private static boolean anyButtonsReleased(Gamepad g) {
+        return g.aWasReleased() || g.bWasReleased() || g.xWasReleased() || g.yWasReleased();
     }
 
     private void motorHelperPower(double p) {
