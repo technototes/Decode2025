@@ -30,7 +30,7 @@ public class LauncherValidator extends LinearOpMode {
             }
             return volt / count;
         });
-        telemetry.addLine("Press dpad for validation, buttons for feedwd");
+        telemetry.addLine("Press dpad for feedfwd, buttons for validation");
         telemetry.update();
         waitForStart();
         while (true) {
