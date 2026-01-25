@@ -2,7 +2,7 @@ package org.firstinspires.ftc.learnbot.component;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -42,24 +42,18 @@ public class LauncherComponent implements Loggable, Subsystem {
         // Is the secondary intake motor reversed?
         public static boolean SecondaryReversed = false;
 
-        //    @Log.Number(name = "Motor Power")
-        //    public static double MOTOR_POWER = 0.65; // 0.5 1.0
         public static double CloseTargetLaunchVelocity = 1400;
         public static double FarTargetLaunchVelocity = 1850;
         public static double FarTargetLaunchVelocityForAuto = 2300;
         public static double TargetLaunchVelocityForAuto1 = 1950;
         public static double TargetLaunchVelocityForAuto2 = 1850;
+        public static double additionDelta = 10;
 
         // TODO: Document this better
-        public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
-        public static double Near_P = 0.004;
-        public static double Near_I = 0.0002;
-        public static double Far_P = 0.004;
-        public static double Far_I = 0.0002;
-        public static double SPIN_F_SCALE = 0.00021;
-        public static double SPIN_VOLT_COMP = 0.0216;
-        public static double DIFFERENCE = 0.0046;
-        public static double PEAK_VOLTAGE = 13;
+        public static PIDFCoefficients launchPID = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
+        public static double kStaticFriction = 0.415;
+        public static double kVelocityConstant = 0.00044;
+        public static double PeakVoltage = 13.6;
 
         // TODO: Make this more configurable. Maybe just turn it into a little helper function that
         // lives in this class?
@@ -166,13 +160,7 @@ public class LauncherComponent implements Loggable, Subsystem {
 
     public static double motorVelocity;
     public static double additionAmount;
-    public static double additionDelta = 5;
 
-    //@Log(name = "Launcher Power: ")
-    public static double power;
-
-    //@Log(name = "Error")
-    public static double err;
     public static double launcher1Current;
     public static double launcher2Current;
 
@@ -203,57 +191,20 @@ public class LauncherComponent implements Loggable, Subsystem {
         self = this;
         launcher1 = primary;
         if (hasLaunch1()) {
-            launcher1.setDirection(
-                Config.PrimaryReversed
-                    ? DcMotorSimple.Direction.REVERSE
-                    : DcMotorSimple.Direction.FORWARD
-            );
+            launcher1.setDirection(Config.PrimaryReversed ? Direction.REVERSE : Direction.FORWARD);
             launcher1.coast();
         }
         launcher2 = secondary;
         if (hasLaunch2()) {
             launcher2.setDirection(
-                Config.SecondaryReversed
-                    ? DcMotorSimple.Direction.REVERSE
-                    : DcMotorSimple.Direction.FORWARD
+                Config.SecondaryReversed ? Direction.REVERSE : Direction.FORWARD
             );
             launcher2.coast();
         }
         targetAcquisition = targetSubsystem;
-        voltage = voltageSup != null ? voltageSup : () -> Config.PEAK_VOLTAGE;
-        // All the Feedfwd stuff below seems...confused.
-        // Notes: Addition will *increase* as voltage decreases (I think this is expected)
-        // but it likely won't ever be zero, and it could (with a new battery) be *negative*
-        // I've tried to model it here: https://www.desmos.com/calculator/gmzlhkyz5a
+        voltage = voltageSup != null ? voltageSup : () -> Config.PeakVoltage;
 
-        // (I is the initial voltage delta (ADDITION), and V is the voltage as the bot  is runs.
-        //  Don't animate I, just V, and you'll see that as voltage decreases, so does the output
-        //  power. Drag I around to change the initial voltage delta)
-
-        // The thing that saves us is I, which does what I believe we're expecting: It increase
-        // power as initial voltage is lower. But then the FF function drops it.
-
-        // My suggestion: rip out all the 'initial' stuff and make the core F function return higher
-        // values as voltage *decreases*, which is I think what we're really looking for anyway.
-
-        double ADDITION = (Config.PEAK_VOLTAGE - voltage.getAsDouble());
-        if (ADDITION == 0) {
-            // I'd be stunned if this code runs...ever. Not sure what's supposed to happen here.
-            Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + 0.001;
-        } else {
-            // This seems like a sensible thing: We're adding some amount of voltage delta to
-            // compensate for a lower initial voltage
-            Config.SPIN_VOLT_COMP = Config.SPIN_VOLT_COMP + (ADDITION * Config.DIFFERENCE);
-        }
-        launcherPID = new PIDFController(Config.launcherPI, target ->
-            target == 0
-                ? 0
-                : (Config.SPIN_F_SCALE * target) +
-                  // This is weird: We're going to *reduce* the output power slightly as voltage
-                  // decreases over time. I don't think this is what we're trying to accomplish.
-                  (Config.SPIN_VOLT_COMP * Math.min(Config.PEAK_VOLTAGE, voltage.getAsDouble()))
-        );
-        // A quick wander around google comes up with something like this:
+        // A quick wander around google comes up with something like this for motor feedfwd:
 
         // launcherMyPID = new PIDFController(Config.launcherPID, target ->
         //    (Config.kStaticFriction + Config.kVelocityConstant * target) / voltage.getAsDouble());
@@ -264,8 +215,13 @@ public class LauncherComponent implements Loggable, Subsystem {
         // To get solve that formula, get a fresh battery, run it at full power and measure the RPM.
         // (Well, and figure out kStaticFriction, too: The lowest value that will still get the
         // launcher barely moving)
-
-        // These capabilities should probably go in the "validation" function at the bottom :D
+        launcherPID = new PIDFController(Config.launchPID, target ->
+            target == 0
+                ? 0
+                : (Math.copySign(Config.kStaticFriction, target) +
+                      Config.kVelocityConstant * target) /
+                  voltage.getAsDouble()
+        );
 
         setTargetSpeed(0);
         CommandScheduler.register(this);
@@ -368,12 +324,12 @@ public class LauncherComponent implements Loggable, Subsystem {
 
     public void IncreaseMotorVelocity() {
         // Spin the motors pid goes here
-        additionAmount += additionDelta;
+        additionAmount += Config.additionDelta;
     }
 
     public void DecreaseMotorVelocity() {
         // Spin the motors pid goes here
-        additionAmount -= additionDelta;
+        additionAmount -= Config.additionDelta;
     }
 
     public double getMotor1Velocity() {
@@ -412,25 +368,15 @@ public class LauncherComponent implements Loggable, Subsystem {
         // x = distance in inches
         double x = getTargetDistance();
 
+        // TODO: Clean this up, make it a formula
         if (x < 0) {
             return lastAutoVelocity;
         } else if (x < 100) {
-            // launcherPI.p = 0.0015;
-            // launcherPI.i = 0;
             lastAutoVelocity = Config.REGRESSION_A * x + Config.REGRESSION_B;
             return lastAutoVelocity;
         } else {
-            // NOTE: These two lines don't appear to do anything, because we're not using the
-            // Near_P and Near_I values anywhere (they were commented out above)
-            // TODO: Assigning values to something in Config is 'bad form'. Instead, we should
-            // have the coefficients copied into the Launcher itself in the constructor, and change
-            // that here.
-            Config.launcherPI.p = Config.Far_P;
-            Config.launcherPI.i = Config.Far_I;
             return Config.REGRESSION_C * x + Config.REGRESSION_D;
         }
-
-        //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
     }
 
     public void setRegressionAuto() {
@@ -463,20 +409,14 @@ public class LauncherComponent implements Loggable, Subsystem {
     public void periodic() {
         autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
+        motorVelocity = getMotorSpeed();
         if (launcherPID.getTarget() != 0) {
-            setMotorPower(launcherPID.update(getMotorSpeed()));
+            setMotorPower(launcherPID.update(motorVelocity) + additionAmount);
         } else {
             setMotorPower(0);
-            launcherPID.update(getMotorSpeed());
+            // When we want to stop, reset the PID controller
+            launcherPID.update(motorVelocity);
             launcherPID.reset();
-        }
-
-        err = launcherPID.getLastError();
-        motorVelocity = getMotorSpeed();
-        if (hasLaunch1()) {
-            power = launcher1.getPower();
-        } else {
-            power = Double.NaN;
         }
         launcher1Current = getMotor1Current();
         launcher2Current = getMotor2Current();
