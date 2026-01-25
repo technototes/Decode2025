@@ -54,6 +54,11 @@ public class LauncherComponent implements Loggable, Subsystem {
         public static double kStaticFriction = 0.415;
         public static double kVelocityConstant = 0.00044;
         public static double PeakVoltage = 13.6;
+        // GoBilda says stall current of 9.2A at 12V, so V = I * R, R = 12 / 9.2 (about 1.3)
+        // As the motor heats up, resistance also increase, so we could increase this a little bit
+        // or maybe increase it over time to counteract that, but this is probably good enough for
+        // now
+        public static double MotorResistance = 9.2 / 12;
 
         // TODO: Make this more configurable. Maybe just turn it into a little helper function that
         // lives in this class?
@@ -219,7 +224,8 @@ public class LauncherComponent implements Loggable, Subsystem {
             target == 0
                 ? 0
                 : (Math.copySign(Config.kStaticFriction, target) +
-                      Config.kVelocityConstant * target) /
+                      Config.kVelocityConstant * target +
+                      getMotor1Current() * Config.MotorResistance) /
                   voltage.getAsDouble()
         );
 
@@ -428,16 +434,16 @@ public class LauncherComponent implements Loggable, Subsystem {
         if (hasLaunch1()) {
             launcher1.setPower(power1);
         } else {
-            res += "(no launcher1)";
+            res += "(no launcher1) ";
         }
         if (hasLaunch2()) {
             launcher2.setPower(power2);
         } else {
-            res += "(no launcher2)";
+            res += "(no launcher2) ";
         }
         res += String.format(
             Locale.ENGLISH,
-            "Launcher Speed: %.2f, Current1: %.2f, Current2: %.2f",
+            "Speed: %.2f, Current1: %.2f, Current2: %.2f",
             getMotorSpeed(),
             getMotor1Current(),
             getMotor2Current()
@@ -456,19 +462,21 @@ public class LauncherComponent implements Loggable, Subsystem {
         ElapsedTime lastUpdate = new ElapsedTime();
         while (opModeIsActive.getAsBoolean()) {
             double v = voltage.getAsDouble();
-            motorHelperPower(staticFriction / v);
+            double amps = getMotor1Current();
+            double power = (staticFriction + amps * Config.MotorResistance) / v;
+            motorHelperPower(power);
             tel.addLine("Press a button to abort (and just be patient)");
             tel.addData("kStaticFriction", staticFriction);
             tel.addData("Voltage", v);
-            tel.addData("Power", staticFriction / v);
+            tel.addData("Power", power);
             tel.update();
             if (anyButtonsReleased(gamepad)) {
                 motorHelperPower(0);
                 return;
             }
-            if (lastUpdate.milliseconds() >= 75) {
+            if (lastUpdate.milliseconds() >= 100) {
                 lastUpdate.reset();
-                // We update every 75 milliseconds, just to give it time to trigger
+                // We update every 100 milliseconds, just to give it time to trigger the encoder
                 if (getMotor1Velocity() != 0) {
                     break;
                 }
@@ -491,18 +499,21 @@ public class LauncherComponent implements Loggable, Subsystem {
         MovingStatistics velocityConstantStats = new MovingStatistics(50);
         double vel = 0;
         double vol = 0;
+        double amps = 0;
         while (!anyButtonsReleased(gamepad) && opModeIsActive.getAsBoolean()) {
             motorHelperPower(1);
             if (lastUpdate.milliseconds() >= 50) {
+                lastUpdate.reset();
                 vel = getMotor1Velocity();
                 vol = voltage.getAsDouble();
+                amps = getMotor1Current();
                 if (vel != 0) {
                     // power = (kStaticFriction + kVelocityConstant * RPM) / v
                     // So
-                    //   1 = (kSF + kV * RPM) / v;
+                    //   1 = (kSF + kV * RPM + motorAmperage * motorResistance) / v;
                     // solve for kV:
-                    //   kV = (v - kSF) / RPM
-                    velocityConstant = (vol - staticFriction) / vel;
+                    //   kV = (v - kSF - motorAmperage * motorResistance) / RPM
+                    velocityConstant = (vol - staticFriction - amps * Config.MotorResistance) / vel;
                     velocityConstantStats.add(velocityConstant);
                 }
             }
@@ -535,22 +546,22 @@ public class LauncherComponent implements Loggable, Subsystem {
                 voltage.getAsDouble();
             motorHelperPower(targetVelocity == 0 ? 0 : pow);
             if (lastUpdate.milliseconds() > 250) {
+                lastUpdate.reset();
                 vel = getMotor1Velocity();
                 error.add(targetVelocity - vel);
-                lastUpdate.reset();
             }
             if (gamepad.dpadLeftWasPressed()) {
+                lastUpdate.reset();
                 targetVelocity -= 100;
-                lastUpdate.reset();
             } else if (gamepad.dpadRightWasPressed()) {
+                lastUpdate.reset();
                 targetVelocity += 100;
-                lastUpdate.reset();
             } else if (gamepad.dpadUpWasPressed()) {
+                lastUpdate.reset();
                 targetVelocity += 10;
-                lastUpdate.reset();
             } else if (gamepad.dpadDownWasPressed()) {
-                targetVelocity -= 10;
                 lastUpdate.reset();
+                targetVelocity -= 10;
             }
         }
     }

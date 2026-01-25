@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.learnbot.component.LauncherComponent;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 
@@ -17,48 +18,56 @@ public class LauncherValidator extends LinearOpMode {
 
     public static String MotorName = "rr";
 
+    public boolean anyDpad() {
+        return (
+            gamepad1.dpadUpWasReleased() ||
+            gamepad1.dpadDownWasReleased() ||
+            gamepad1.dpadLeftWasReleased() ||
+            gamepad1.dpadRightWasReleased()
+        );
+    }
+
+    public boolean anyButtons() {
+        return (
+            gamepad1.aWasReleased() ||
+            gamepad1.bWasReleased() ||
+            gamepad1.xWasReleased() ||
+            gamepad1.yWasReleased()
+        );
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
-        DcMotorEx m = this.hardwareMap.get(DcMotorEx.class, MotorName);
+        // We need to get the voltage for
         List<LynxModule> hubs = hardwareMap.getAll(LynxModule.class);
-        LauncherComponent lc = new LauncherComponent(new EncodedMotor<>(m, MotorName), null, () -> {
-            double volt = 0;
-            double count = 0;
+        DoubleSupplier getVoltage = () -> {
+            double volts = 0;
             for (LynxModule lm : hubs) {
-                count += 1;
-                volt += lm.getInputVoltage(VoltageUnit.VOLTS);
+                volts += lm.getInputVoltage(VoltageUnit.VOLTS);
             }
-            return volt / count;
-        });
-        telemetry.addLine("Press dpad for feedfwd, buttons for validation");
-        telemetry.update();
+            return volts / hubs.size();
+        };
+        EncodedMotor<DcMotorEx> m = new EncodedMotor<>(
+            hardwareMap.get(DcMotorEx.class, MotorName),
+            MotorName
+        );
+        LauncherComponent lc = new LauncherComponent(m, null, getVoltage);
         waitForStart();
-        while (true) {
-            if (
-                gamepad1.dpadUpWasReleased() ||
-                gamepad1.dpadDownWasReleased() ||
-                gamepad1.dpadLeftWasReleased() ||
-                gamepad1.dpadRightWasReleased()
-            ) {
+        telemetry.addLine(">>> Press the dpad for feedfwd <<<");
+        telemetry.addLine(">>> Press any button for validation <<<");
+        telemetry.update();
+        while (opModeIsActive()) {
+            if (anyDpad()) {
                 lc.feedFwdHelper(telemetry, gamepad1, this::opModeIsActive);
                 break;
-            } else if (
-                gamepad1.aWasReleased() ||
-                gamepad1.bWasReleased() ||
-                gamepad1.xWasReleased() ||
-                gamepad1.yWasReleased()
-            ) {
-                while (true) {
+            } else if (anyButtons()) {
+                while (opModeIsActive() && !anyDpad()) {
+                    telemetry.addLine(">>> Press left trigger for Launcher1 control");
+                    telemetry.addLine(">>> Press right trigger for Launcher2 control");
+                    telemetry.addLine(">>> Hit the dpad to stop");
                     telemetry.addLine(
-                        "Press left trigger for Launcher1, right trigger for Launcher2, dpad (any) to stop"
+                        lc.hardwareValidation(gamepad1.left_trigger, gamepad1.right_trigger)
                     );
-                    if (gamepad1.dpad_up || gamepad1.dpad_down) {
-                        break;
-                    } else {
-                        telemetry.addLine(
-                            lc.hardwareValidation(gamepad1.left_trigger, gamepad1.right_trigger)
-                        );
-                    }
                     telemetry.update();
                 }
             }
