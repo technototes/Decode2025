@@ -11,11 +11,14 @@ import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.DriveEncoderConstants;
 import com.pedropathing.ftc.localization.constants.OTOSConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
+import com.pedropathing.ftc.localization.constants.TwoWheelConstants;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import kotlin.internal.ContractsDsl;
 import org.firstinspires.ftc.learnbot.Setup.HardwareNames;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -131,13 +134,32 @@ public class DrivingConstants {
             GoBildaPinpointDriver.EncoderDirection.REVERSED;
     }
 
+    @Configurable
+    public static class TwoWheelConfig {
+
+        public static String ForwardPodName = "odofb";
+        public static String StrafePodName = "odostrafe";
+        public static String IMUName = "imu";
+        public static RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(
+            RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
+            RevHubOrientationOnRobot.UsbFacingDirection.UP
+        );
+        public static double ForwardPodDirection = Encoder.FORWARD;
+        public static double StrafePodDirection = Encoder.REVERSE;
+        public static double ForwardPodTicksToInches = 2000 / ((Math.PI * 32) / 25.4);
+        public static double StrafePodTicksToInches = 2000 / ((Math.PI * 32) / 25.4);
+        public static double ForwardPodY = -2.5;
+        public static double StrafePodX = 0.25;
+    }
+
     public enum LocalizerSelection {
         USE_MOTORS,
         USE_OTOS,
         USE_PINPOINT,
+        USE_TWO_WHEEL,
     }
 
-    public static LocalizerSelection WhichLocalizer = LocalizerSelection.USE_OTOS;
+    public static LocalizerSelection WhichLocalizer = LocalizerSelection.USE_TWO_WHEEL;
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
@@ -221,6 +243,25 @@ public class DrivingConstants {
             .strafeEncoderDirection(PinpointConfig.StrafeDirection);
     }
 
+    public static TwoWheelConstants getTwoWheelConstants() {
+        TwoWheelConstants twc = new TwoWheelConstants()
+            .forwardEncoder_HardwareMapName(TwoWheelConfig.ForwardPodName)
+            .forwardEncoderDirection(TwoWheelConfig.ForwardPodDirection)
+            .forwardTicksToInches(TwoWheelConfig.ForwardPodTicksToInches)
+            .forwardPodY(TwoWheelConfig.ForwardPodY)
+            .strafeEncoder_HardwareMapName(TwoWheelConfig.StrafePodName)
+            .strafeEncoderDirection(TwoWheelConfig.StrafePodDirection)
+            .strafeTicksToInches(TwoWheelConfig.StrafePodTicksToInches)
+            .strafePodX(TwoWheelConfig.StrafePodX);
+        // TODO: Add support for a custom IMU:
+        // if (UseCustomIMU) {
+        //    return getTwoWheelConstants().customIMU(...);
+        // }
+        return twc
+            .IMU_HardwareMapName(TwoWheelConfig.IMUName)
+            .IMU_Orientation(TwoWheelConfig.orientation);
+    }
+
     public static Follower createFollower(HardwareMap hardwareMap) {
         FollowerBuilder fb = new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
@@ -238,6 +279,9 @@ public class DrivingConstants {
                 if (Setup.Connected.PINPOINT) {
                     fb = fb.pinpointLocalizer(getPinpointConstants());
                 }
+                break;
+            case USE_TWO_WHEEL:
+                fb = fb.twoWheelLocalizer(getTwoWheelConstants());
                 break;
         }
         Follower f = fb.build();
