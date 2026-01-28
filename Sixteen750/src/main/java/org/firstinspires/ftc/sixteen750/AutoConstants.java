@@ -21,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.sixteen750.Setup.HardwareNames;
 import org.firstinspires.ftc.sixteen750.helpers.CustomAdafruitIMU;
+import org.firstinspires.ftc.sixteen750.swerveutil.CoaxialSwerveConstants;
+import org.firstinspires.ftc.sixteen750.swerveutil.CoaxialSwerveDrive;
 
 @Configurable
 public class AutoConstants {
