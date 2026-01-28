@@ -3,31 +3,22 @@ package org.firstinspires.ftc.sixteen750.opmodes;
 import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.AprilTag_Pipeline;
 
 import com.bylazar.telemetry.PanelsTelemetry;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-import java.util.Arrays;
-import java.util.List;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
-import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
+import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
-import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
-import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 @TeleOp(name = "Dual Control")
 @SuppressWarnings("unused")
@@ -56,8 +47,7 @@ public class DualTeleOp extends CommandOpMode {
                 new SequentialCommandGroup(
                     HeadingHelper.RestorePreviousPosition(robot.follower),
                     DrivingCommands.ResetGyro(controlsDriver.pedroDriver),
-                    TeleCommands.SetRegressionCTeleop(robot),
-                    TeleCommands.SetRegressionDTeleop(robot)
+                    LauncherCommand.SetRegressionTeleop()
                 ),
                 OpModeState.INIT
             );
@@ -80,9 +70,6 @@ public class DualTeleOp extends CommandOpMode {
              */
             limelight.start();
         }
-        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
-            CommandScheduler.register(robot.launcherSubsystem);
-        }
     }
 
     @Override
@@ -97,20 +84,20 @@ public class DualTeleOp extends CommandOpMode {
             .getTelemetry()
             .addData(
                 "currentLaunchVelocity",
-                String.valueOf(LauncherSubsystem.currentLaunchVelocity)
+                String.valueOf(LauncherComponent.currentLaunchVelocity)
             );
         panelsTelemetry
             .getTelemetry()
-            .addData("launcherError", String.valueOf(LauncherSubsystem.err));
+            .addData("launcherError", String.valueOf(LauncherComponent.err));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
+            .addData("launcherTargetVelocity", String.valueOf(LauncherComponent.targetSpeed));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
+            .addData("launcher1Current", String.valueOf(LauncherComponent.launcher1Current));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
+            .addData("launcher2Current", String.valueOf(LauncherComponent.launcher2Current));
         panelsTelemetry.getTelemetry().update(telemetry);
     }
     */

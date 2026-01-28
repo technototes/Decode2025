@@ -13,6 +13,7 @@ import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
+import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
@@ -38,12 +39,12 @@ public class FarZoneDriveForward extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 new LLSetup(robot),
-                TeleCommands.SetFarShoot(robot),
-                TeleCommands.Launch(robot),
+                LauncherCommand.SetFarShoot(),
+                LauncherCommand.Launch(),
                 TeleCommands.HoodUp(robot),
                 new WaitCommand(2),
                 Paths.AutoLaunching3Balls(robot),
-                TeleCommands.StopLaunch(robot),
+                LauncherCommand.StopLaunch(),
                 TeleCommands.IntakeStop(robot),
                 new WaitCommand(18),
                 new DriveAutoCommand(robot.follower, 0.5),

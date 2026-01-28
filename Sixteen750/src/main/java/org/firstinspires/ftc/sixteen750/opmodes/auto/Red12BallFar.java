@@ -9,11 +9,11 @@ import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
-import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
 import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
+import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
@@ -39,13 +39,12 @@ public class Red12BallFar extends CommandOpMode {
             //new AltAutoVelocity(robot).alongWith(
             new SequentialCommandGroup(
                 new LLSetup(robot),
-                TeleCommands.SetRegressionCAuto(robot),
-                TeleCommands.SetRegressionDAuto(robot),
+                LauncherCommand.SetRegressionAuto(),
                 TeleCommands.GateUp(robot),
                 TeleCommands.Intake(robot),
-                TeleCommands.SetFarShoot(robot),
+                LauncherCommand.SetFarShoot(),
                 TeleCommands.HoldIntake(robot),
-                TeleCommands.FarAutoLaunch(robot),
+                LauncherCommand.FarAutoLaunch(),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
                 new WaitCommand(0.5),
