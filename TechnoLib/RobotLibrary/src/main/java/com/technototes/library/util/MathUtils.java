@@ -200,4 +200,18 @@ public class MathUtils {
     public static double halfCircle(AngleUnit angleUnit) {
         return angleUnit == AngleUnit.RADIANS ? Math.PI : 180;
     }
+
+    // Helper to make dead zones on sticks still allow good scaling
+    public static double deadZoneScale(double val, double deadZone) {
+        // Okay, we want a small dead zone in the middle of the stick, but that also means that
+        // you can't have a value any smaller than that value, so instead, we're going to scale
+        // the value after compensating for the dead zone
+
+        // If the value is inside the dead zone, just make it zero
+        if (Math.abs(val) <= deadZone) {
+            return 0.0;
+        }
+        // If the value is outside the dead zone, scale it
+        return ((val - Math.copySign(deadZone, val)) / (1.0 - deadZone));
+    }
 }
