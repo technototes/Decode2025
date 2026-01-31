@@ -42,10 +42,10 @@ public class LimelightSubsystem implements Loggable, Subsystem {
 
     public static double SIGN = 1.0;
     public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 17.2;
-    public static double CAMERA_TO_CENTER_OF_ROBOT = 7.2;
+    public static double CAMERA_TO_CENTER_OF_ROBOT = 2.08;
     public static double EXTRA_OFFSET = -3;
     // TODO: Measure this more accurately
-    public static double LIMELIGHT_ANGLE = 14;
+    public static double LIMELIGHT_ANGLE = 15;
     public static Limelight3A limelight;
     LLResult result;
 
