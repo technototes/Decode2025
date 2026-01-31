@@ -26,6 +26,7 @@
     "- // c ": "These scripts are for formatting code/scripts/markdown stuff:",
     "- // c+": "",
     "format": "tools format bun",
+    "foramt": "tools format bun",
     "force-format": "prettier -w \"Twenty403/**/*.java\" \"Sixteen750/**/*.java\" \"Blackbird/**/*.java\" \"scripts/**/*.ts*\"",
     "- // d-": "",
     "- // d ": "This will toggle using TechnoLib locally or from Maven",

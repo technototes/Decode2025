@@ -96,7 +96,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
     // The PedroPath follower, to let us actually make the bot move:
     public Follower follower;
     // The vision subsystem, for vision-based driving stuff
-    public VisionSubsystem vision;
+    public TargetSubsystem vision;
 
     // The direction of the 3 axes for manual control: Should be updated by a joystick command
     public double strafe, forward, rotation;
@@ -172,7 +172,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         return driveStyle.perspective == DrivingPerspective.FieldCentric ? headingOffsetRadians : 0;
     }
 
-    public PedroDrivebaseSubsystem(Follower f, VisionSubsystem viz, Alliance all) {
+    public PedroDrivebaseSubsystem(Follower f, TargetSubsystem viz, Alliance all) {
         started = false;
         follower = f;
         vision = viz;
@@ -198,7 +198,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
         this(f, null, all);
     }
 
-    public PedroDrivebaseSubsystem(Follower f, VisionSubsystem viz) {
+    public PedroDrivebaseSubsystem(Follower f, TargetSubsystem viz) {
         this(f, viz, Alliance.NONE);
     }
 
@@ -410,7 +410,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
             // target. The 'a' part of the result is the percentage of the total image that the
             // target is filling, so the closer you are, the larger the area of the image. It's
             // kinda dopey, but works just fine...
-            VisionSubsystem.TargetInfo curTarget = vision.getCurResult();
+            TargetSubsystem.TargetInfo curTarget = vision.getCurResult();
             if (curTarget != null) {
                 forward =
                     (DrivingConstants.Control.VISION_TARGET_SIZE - curTarget.a) *
@@ -480,7 +480,7 @@ public class PedroDrivebaseSubsystem implements Subsystem, Loggable {
                 }
                 break;
             case Vision: // Use Vision to find the target & aim toward it
-                VisionSubsystem.TargetInfo visResult = vision == null
+                TargetSubsystem.TargetInfo visResult = vision == null
                     ? null
                     : vision.getCurResult();
                 if (visResult != null) {
