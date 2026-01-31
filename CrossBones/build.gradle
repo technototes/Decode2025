@@ -16,7 +16,7 @@ apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 
 android {
-    namespace = 'org.firstinspires.ftc.twenty403'
+    namespace = 'org.firstinspires.ftc.crossbones'
     compileSdkVersion 35
     packagingOptions {
         jniLibs {
