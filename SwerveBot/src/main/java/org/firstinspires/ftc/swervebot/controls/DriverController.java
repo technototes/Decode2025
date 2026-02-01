@@ -66,12 +66,6 @@ public class DriverController {
         if (Setup.Connected.INTAKESUBSYSTEM) {
             bindIntakeControls();
         }
-        if (Setup.Connected.BRAKESUBSYSTEM) {
-            bindBrakeControls();
-        }
-        if (Setup.Connected.AIMINGSUBSYSTEM) {
-            bindAimControls();
-        }
     }
 
     private void AssignNamedControllerButton() {
@@ -144,31 +138,5 @@ public class DriverController {
         intakeTrigger.whenPressed(TeleCommands.Intake(robot));
         intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot));
         RumbleToggle.toggle(TeleCommands.Rumble(robot), TeleCommands.RumbleOff(robot));
-    }
-
-    // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));
-    // spitTrigger.whileReleased(TeleCommands.Intake(robot.intakeSubsystem));
-
-    public void bindBrakeControls() {
-        brakeButton.whilePressed(TeleCommands.EngageBrake(robot));
-        brakeButton.whenReleased(TeleCommands.DisengageBrake(robot));
-    }
-
-    public void bindAimControls() {
-        // if(yippee) {
-        //     leverButton.whenPressed(
-        //     TeleCommands.LeverStop(robot.aimingSubsystem));
-        //     yippee = false;
-        // } else {
-        //     leverButton.whenPressed(
-        //     TeleCommands.LeverGo(robot.aimingSubsystem));
-        //     yippee = true;
-        // }
-        gateButton.whenPressed(TeleCommands.GateDown(robot));
-        gateButton.whenReleased(TeleCommands.GateUp(robot));
-
-        //
-        holdButton.whilePressed(TeleCommands.HoldIntake(robot));
-        holdButton.whenReleased(TeleCommands.IntakeStop(robot));
     }
 }

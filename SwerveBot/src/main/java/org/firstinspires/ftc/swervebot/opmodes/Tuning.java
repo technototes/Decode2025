@@ -137,12 +137,7 @@ public class Tuning extends BetterSelectableOpMode {
 class LocalizationTest extends OpMode {
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /** This initializes the PoseUpdater, the mecanum drive motors, and the Panels telemetry. */
     @Override
@@ -205,10 +200,6 @@ class ForwardTuner extends OpMode {
 
     @Override
     public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
         follower.update();
         drawOnlyCurrent();
     }
@@ -270,10 +261,6 @@ class LateralTuner extends OpMode {
 
     @Override
     public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
         follower.update();
         drawOnlyCurrent();
     }
@@ -335,10 +322,6 @@ class TurnTuner extends OpMode {
 
     @Override
     public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
         follower.update();
         drawOnlyCurrent();
     }
@@ -406,12 +389,7 @@ class ForwardVelocityTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /** This initializes the drive motors as well as the cache of velocities and the Panels telemetry. */
     @Override
@@ -532,12 +510,7 @@ class LateralVelocityTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /**
      * This initializes the drive motors as well as the cache of velocities and the Panels
@@ -650,12 +623,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /** This initializes the drive motors as well as the Panels telemetryM. */
     @Override
@@ -767,12 +735,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /** This initializes the drive motors as well as the Panels telemetry. */
     @Override
@@ -878,12 +841,7 @@ class TranslationalTuner extends OpMode {
     private Path backwards;
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /** This initializes the Follower and creates the forward and backward Paths. */
     @Override
@@ -952,10 +910,6 @@ class HeadingTuner extends OpMode {
 
     @Override
     public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
         panelsTelemetry = PanelsTelemetry.INSTANCE;
     }
 
@@ -1032,12 +986,7 @@ class DriveTuner extends OpMode {
     private PathChain backwards;
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /**
      * This initializes the Follower and creates the forward and backward Paths. Additionally, this
@@ -1120,12 +1069,7 @@ class Line extends OpMode {
     private Path backwards;
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /** This initializes the Follower and creates the forward and backward Paths. */
     @Override
@@ -1193,12 +1137,7 @@ class CentripetalTuner extends OpMode {
     private Path backwards;
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /**
      * This initializes the Follower and creates the forward and backward Paths.
@@ -1296,12 +1235,7 @@ class Triangle extends OpMode {
     }
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     @Override
     public void init_loop() {
@@ -1399,12 +1333,7 @@ class Circle extends OpMode {
     }
 
     @Override
-    public void init() {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
-    }
+    public void init() {}
 
     /**
      * This runs the OpMode, updating the Follower as well as printing out the debug statements to

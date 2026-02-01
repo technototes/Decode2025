@@ -272,15 +272,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         return launcher2.getVelocity();
     }
 
-    public void VelocityShoot() {
-        if (
-            getMotor1Velocity() == targetLaunchVelocity &&
-            getMotor2Velocity() == targetLaunchVelocity
-        ) {
-            TeleCommands.GateDown(robot);
-        }
-    }
-
     public double autoVelocity() {
         // x = distance in feet
         double x = ls.getDistance();
