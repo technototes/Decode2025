@@ -21,17 +21,11 @@ public class TestingController {
         robot = r;
         gamepad = g;
         AssignNamedControllerButton();
-        bindButtonControls();
     }
 
     private void AssignNamedControllerButton() {
         // motorPowerButton = gamepad.ps_circle;
         // motorVelocityButton = gamepad.ps_triangle;
         TurretMoveToPose = gamepad.ps_cross;
-    }
-
-    private void bindButtonControls() {
-        motorPowerButton.whenPressed(TeleCommands.MotorPowerTest(robot));
-        motorVelocityButton.whenPressed(TeleCommands.MotorVelocityTest(robot));
     }
 }

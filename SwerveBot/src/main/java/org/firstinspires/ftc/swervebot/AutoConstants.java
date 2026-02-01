@@ -206,10 +206,6 @@ public class AutoConstants {
     */
 
     public static Follower createFollower(HardwareMap hardwareMap) {
-        if (Setup.Connected.OTOS) {
-            SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, HardwareNames.OTOS);
-            otos.calibrateImu();
-        }
         Follower fol = new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
             //.driveEncoderLocalizer(getEncoderConstants())

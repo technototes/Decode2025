@@ -70,52 +70,8 @@ public class TeleCommands {
         return Command.create(r.intakeSubsystem::Spit);
     }
 
-    public static Command EngageBrake(Robot r) {
-        return Command.create(r.brakeSubsystem::Engage);
-    }
-
     public static Command HoldIntake(Robot r) {
         return Command.create(r.intakeSubsystem::Hold);
-    }
-
-    public static Command DisengageBrake(Robot r) {
-        return Command.create(r.brakeSubsystem::Disengage);
-    }
-
-    public static Command Aim(Robot r) {
-        return Command.create(r.aimingSubsystem::Aim);
-    }
-
-    public static Command HoodUp(Robot r) {
-        return Command.create(r.aimingSubsystem::testHoodUp);
-    }
-
-    public static Command HoodUpAutoOnly(Robot r) {
-        return Command.create(r.aimingSubsystem::testHoodUpAutoOnly);
-    }
-
-    public static Command HoodUpAutoOnly2(Robot r) {
-        return Command.create(r.aimingSubsystem::testHoodUpAutoOnly2);
-    }
-
-    public static Command HoodDown(Robot r) {
-        return Command.create(r.aimingSubsystem::testHoodDown);
-    }
-
-    public static Command GateUp(Robot r) {
-        return Command.create(r.aimingSubsystem::StopBall);
-    }
-
-    public static Command GateDown(Robot r) {
-        return Command.create(r.aimingSubsystem::GoBall);
-    }
-
-    public static Command MotorPowerTest(Robot r) {
-        return Command.create(r.testSubsystem::setMotorPowerTest);
-    }
-
-    public static Command MotorVelocityTest(Robot r) {
-        return Command.create(r.testSubsystem::setMotorVelocityTest);
     }
 
     public static Command ReadVelocity(Robot r) {

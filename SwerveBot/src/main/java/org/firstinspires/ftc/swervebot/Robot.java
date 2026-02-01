@@ -4,13 +4,9 @@ import com.pedropathing.follower.Follower;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.swervebot.helpers.StartingPosition;
-import org.firstinspires.ftc.swervebot.subsystems.AimingSubsystem;
-import org.firstinspires.ftc.swervebot.subsystems.BrakeSubsystem;
 import org.firstinspires.ftc.swervebot.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.swervebot.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.swervebot.subsystems.LimelightSubsystem;
-import org.firstinspires.ftc.swervebot.subsystems.SafetySubsystem;
-import org.firstinspires.ftc.swervebot.subsystems.TestSubsystem;
 
 public class Robot implements Loggable {
 
@@ -19,13 +15,9 @@ public class Robot implements Loggable {
 
     public double initialVoltage;
 
-    public SafetySubsystem safetySubsystem;
     public LauncherSubsystem launcherSubsystem;
     public IntakeSubsystem intakeSubsystem;
-    public BrakeSubsystem brakeSubsystem;
-    public AimingSubsystem aimingSubsystem;
     public LimelightSubsystem limelightSubsystem;
-    public TestSubsystem testSubsystem;
     public Follower follower;
     private Hardware hardware;
 
@@ -35,26 +27,14 @@ public class Robot implements Loggable {
         this.hardware = hw;
         this.initialVoltage = hw.voltage();
 
-        if (Setup.Connected.SAFETYSUBSYSTEM) {
-            this.safetySubsystem = new SafetySubsystem(hw);
-        }
         if (Setup.Connected.INTAKESUBSYSTEM) {
             this.intakeSubsystem = new IntakeSubsystem(hw);
         }
         if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             this.launcherSubsystem = new LauncherSubsystem(hw);
         }
-        if (Setup.Connected.BRAKESUBSYSTEM) {
-            this.brakeSubsystem = new BrakeSubsystem(hw);
-        }
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             this.limelightSubsystem = new LimelightSubsystem(hw);
-        }
-        if (Setup.Connected.AIMINGSUBSYSTEM) {
-            this.aimingSubsystem = new AimingSubsystem(hw, limelightSubsystem);
-        }
-        if (Setup.Connected.TESTSUBSYSTEM) {
-            this.testSubsystem = new TestSubsystem(hw);
         }
         if (Setup.Connected.DRIVEBASE) {
             follower = AutoConstants.createFollower(hw.map);

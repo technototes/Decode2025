@@ -62,27 +62,12 @@ public class Hardware implements Loggable {
             odoFB = new MotorEncoder(Setup.HardwareNames.ODOFB);
             odoRL = new MotorEncoder(Setup.HardwareNames.ODORL);
         }
-        if (Setup.Connected.OTOS) {
-            odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        }
         if (Setup.Connected.INTAKESUBSYSTEM) {
             intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
         }
         if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             launcher1 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR1);
             launcher2 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR2);
-        }
-        if (Setup.Connected.AIMINGSUBSYSTEM) {
-            hood = new Servo(Setup.HardwareNames.HOOD_SERVO);
-            lever = new Servo(Setup.HardwareNames.LEVER_SERVO);
-        }
-        if (Setup.Connected.BRAKESUBSYSTEM) {
-            brake = new Servo(Setup.HardwareNames.BRAKE_SERVO);
-        }
-        if (Setup.Connected.TESTSUBSYSTEM) {
-            testMotor = new EncodedMotor<>(Setup.HardwareNames.TESTMOTOR);
-            testCRServo = new CRServo(Setup.HardwareNames.TESTCRSERVO);
-            testServo = new Servo(Setup.HardwareNames.TESTSERVO);
         }
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             limelight = hwmap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
