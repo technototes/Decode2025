@@ -3,7 +3,7 @@ package org.firstinspires.ftc.sixteen750;
 import com.pedropathing.follower.Follower;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
-import org.firstinspires.ftc.sixteen750.component.LauncherComponent;
+import org.firstinspires.ftc.sixteen750.components.LauncherComponent;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.AimingSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.BrakeSubsystem;

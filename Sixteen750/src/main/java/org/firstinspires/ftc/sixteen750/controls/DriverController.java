@@ -11,7 +11,7 @@ import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
+import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
 
 public class DriverController {
 

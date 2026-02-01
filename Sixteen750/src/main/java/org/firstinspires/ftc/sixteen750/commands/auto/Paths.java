@@ -15,7 +15,7 @@ import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoOrientFar;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
-import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
+import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
 
 @Configurable
 public class Paths {

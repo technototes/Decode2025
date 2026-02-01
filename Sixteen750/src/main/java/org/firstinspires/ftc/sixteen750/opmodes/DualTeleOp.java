@@ -15,7 +15,7 @@ import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.component.LauncherComponent.LauncherCommand;
+import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;

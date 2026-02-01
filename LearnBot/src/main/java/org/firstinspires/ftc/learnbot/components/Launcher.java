@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.learnbot.component;
+package org.firstinspires.ftc.learnbot.components;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
