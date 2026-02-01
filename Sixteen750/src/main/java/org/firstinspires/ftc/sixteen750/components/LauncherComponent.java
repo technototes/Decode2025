@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.sixteen750.component;
+package org.firstinspires.ftc.sixteen750.components;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
