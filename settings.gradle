@@ -6,6 +6,7 @@ project(':RobotLibrary').projectDir = new File('TechnoLib/RobotLibrary') // FLIP
 
 include ':Blackbird'
 include ':Sixteen750'
+include ':SwerveBot'
 include ':Twenty403'
 
 // These are other 'bots' that we should build until we're at competitions
