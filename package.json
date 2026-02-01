@@ -67,7 +67,14 @@
     "- // z ": "Type check the scripts (BUG: It's typechecking node_modules too!)",
     "types": "tsc --noEmit -p tsconfig.json",
     "- //": "This is just a shortcut helper script for now to launch the pedropath visualizer",
-    "pv": "bun run open http://localhost:3000 && cd pedroviz && bun install && bun pvdev"
+    "pv": "bun run open http://localhost:3000 && cd pedroviz && bun install && bun pvdev",
+    "- // docs-": "",
+    "- // docs ": "This generates class graphs for the various codebases. Paste it into https://mermaid.live to visualize",
+    "graphlib": "java -jar scripts/java2umltext/build/libs/java2umltext-0.1.0.jar MERMAID TechnoLib/RobotLibrary > tl-classgraph.mmd",
+    "graph16": "java -jar scripts/java2umltext/build/libs/java2umltext-0.1.0.jar MERMAID Sixteen750 > 16750-classgraph.mmd",
+    "graph20": "java -jar scripts/java2umltext/build/libs/java2umltext-0.1.0.jar MERMAID Twenty403 > 20403-classgraph.mmd",
+    "graphlb": "java -jar scripts/java2umltext/build/libs/java2umltext-0.1.0.jar MERMAID LearnBot > learnbot-classgraph.mmd",
+    "graph": "bun run graphlib && bun run graph16 && bun run graph20 && bun run graphlb"
   },
   "dependencies": {
     "@freik/containers": "^0.4.4",

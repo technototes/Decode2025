@@ -12,6 +12,10 @@ include ':Twenty403'
 // These are other 'bots' that we should build until we're at competitions
 include ':LearnBot'                                                      // FLIP: BUILD ALL BOTS
 
+// This is a thing that will generate diagrams for our code:
+include ':java2umltext'
+project(':java2umltext').projectDir = new File('scripts/java2umltext')
+
 // Stuff for road-runner, I think, is all dead:
 // include ':RRQuickStart'
 // include ':MeepMeepTesting'
