@@ -10,7 +10,7 @@ import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.TestPaths;
-import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
+import org.firstinspires.ftc.learnbot.components.PedroDrivebase;
 import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
@@ -33,10 +33,10 @@ public class TestPedroAuto extends CommandOpMode {
         );
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                robot.drivebase.MakePathCommand(p.Path1),
-                robot.drivebase.MakePathCommand(p.Path2),
-                robot.drivebase.MakePathCommand(p.Path3),
-                robot.drivebase.MakePathCommand(p.Path4),
+                PedroDrivebase.Commands.FollowPath(p.Path1),
+                PedroDrivebase.Commands.FollowPath(p.Path2),
+                PedroDrivebase.Commands.FollowPath(p.Path3),
+                PedroDrivebase.Commands.FollowPath(p.Path4),
                 new WaitCommand(1),
                 HeadingHelper.SaveCurrentPosition(robot.drivebase.follower),
                 CommandScheduler::terminateOpMode
