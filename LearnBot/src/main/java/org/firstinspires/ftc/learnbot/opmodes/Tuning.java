@@ -15,7 +15,6 @@ import com.bylazar.field.PanelsField;
 import com.bylazar.field.Style;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.ErrorCalculator;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.*;
 import com.pedropathing.math.*;
@@ -26,7 +25,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.structure.BetterSelectableOpMode;
 import java.util.ArrayList;
 import java.util.List;
-import org.firstinspires.ftc.learnbot.DrivingConstants;
+import org.firstinspires.ftc.learnbot.components.Pedro;
 
 /**
  * This is the Tuning class. It contains a selection menu for various tuning OpModes.
@@ -89,7 +88,7 @@ public class Tuning extends BetterSelectableOpMode {
         if (follower == null) {
             PanelsConfigurables.INSTANCE.refreshClass(this);
         }
-        follower = DrivingConstants.createFollower(hardwareMap);
+        follower = Pedro.createFollower(hardwareMap);
 
         follower.setStartingPose(new Pose());
 

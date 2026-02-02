@@ -9,14 +9,18 @@ import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
+import com.technototes.library.subsystem.TargetAcquisition;
+import java.util.Locale;
 
 @Configurable
-public class TargetSubsystem implements Subsystem, Loggable {
+public class TargetSubsystem implements Subsystem, Loggable, TargetAcquisition {
 
     public static class Config {
 
         public static CameraOrientation Camera_Orientation = CameraOrientation.USB_UP;
         public static double Camera_Tilt_Degrees = 14.0;
+        public static double VISION_TARGET_SIZE = 10;
+        public static double VISION_FORWARD_GAIN = .1;
     }
 
     public enum CameraOrientation {
@@ -128,6 +132,28 @@ public class TargetSubsystem implements Subsystem, Loggable {
         return rotatedResult;
     }
 
+    @Override
+    public double getDistance() {
+        TargetInfo ti = getCurResult();
+        if (ti == null) return -1;
+        // TODO: This isn't right, but it's what was there before
+        return (Config.VISION_TARGET_SIZE - ti.a) * Config.VISION_FORWARD_GAIN;
+    }
+
+    @Override
+    public double getHorizontalPosition() {
+        TargetInfo ti = getCurResult();
+        if (ti == null) return Double.NaN;
+        return ti.x;
+    }
+
+    @Override
+    public double getVerticalPosition() {
+        TargetInfo ti = getCurResult();
+        if (ti == null) return Double.NaN;
+        return ti.y;
+    }
+
     // TODO: Could add some sort of diagnostics to the periodic function
     @Override
     public void periodic() {
@@ -140,6 +166,7 @@ public class TargetSubsystem implements Subsystem, Loggable {
 
     private String resString() {
         return String.format(
+            Locale.ENGLISH,
             "X: %.2f(%.2f), Y: %.2f(%.2f), A: %.2f",
             rotatedResult.x,
             result.getTx(),
@@ -152,6 +179,7 @@ public class TargetSubsystem implements Subsystem, Loggable {
     private String statString() {
         LLStatus lls = limelight.getStatus();
         return String.format(
+            Locale.ENGLISH,
             "Y: %.2f, N: %s, C: %d, I: %d, T: %s",
             lls.getFinalYaw(),
             lls.getName(),

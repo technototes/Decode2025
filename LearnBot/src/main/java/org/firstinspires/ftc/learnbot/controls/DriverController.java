@@ -10,7 +10,7 @@ import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup.Connected;
 import org.firstinspires.ftc.learnbot.components.Launcher;
-import org.firstinspires.ftc.learnbot.components.PedroDrivebase;
+import org.firstinspires.ftc.learnbot.components.Pedro;
 
 public class DriverController implements Loggable {
 
@@ -66,7 +66,7 @@ public class DriverController implements Loggable {
     }
 
     public void bindDriveControls() {
-        stickDriver = PedroDrivebase.Commands.JoystickDrive(driveLeftStick, driveRightStick);
+        stickDriver = Pedro.Commands.JoystickDrive(driveLeftStick, driveRightStick);
 
         turboButton.whenPressed(robot.drivebase::SetTurboSpeed);
         normalButton.whenPressed(robot.drivebase::SetNormalSpeed);
