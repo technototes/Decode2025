@@ -3,8 +3,8 @@ package org.firstinspires.ftc.learnbot;
 import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
+import org.firstinspires.ftc.learnbot.components.PedroDrivebase;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
-import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
 import org.firstinspires.ftc.learnbot.subsystems.TargetSubsystem;
 
 @Configurable
@@ -16,7 +16,7 @@ public class Robot implements Loggable {
     public double initialVoltage;
     // Subsystems:
     // (Currently, Mouse only has a single subsystem: The drivebase)
-    public PedroDrivebaseSubsystem drivebase;
+    public PedroDrivebase.Component drivebase;
     public TargetSubsystem vision;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
@@ -30,7 +30,7 @@ public class Robot implements Loggable {
         }
         if (Setup.Connected.DRIVEBASE) {
             // Note that vision may be null, but the drivebase is okay with this.
-            this.drivebase = new PedroDrivebaseSubsystem(hw.follower, vision, team);
+            this.drivebase = new PedroDrivebase.Component(hw.follower, vision, team);
         }
     }
 
