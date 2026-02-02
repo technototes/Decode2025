@@ -17,7 +17,6 @@ import com.technototes.library.control.CommandAxis;
 import com.technototes.library.control.CommandButton;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-// import org.firstinspires.ftc.learnbot.Setup.*;
 import org.firstinspires.ftc.learnbot.subsystems.AllianceDetection;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;

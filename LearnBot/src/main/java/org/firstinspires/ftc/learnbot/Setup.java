@@ -17,13 +17,7 @@ public class Setup {
     @Configurable
     public static class HardwareNames {
 
-        public static String FLMOTOR = "fl";
-        public static String FRMOTOR = "fr";
-        public static String RLMOTOR = "rl";
-        public static String RRMOTOR = "rr";
         public static String IMU = "imu";
-        public static String OTOS = "otos";
-        public static String PINPOINT = "pinpoint";
         public static String LIMELIGHT = "limelight";
         public static String ALLIANCE_SWITCH_RED = "asr";
         public static String ALLIANCE_SWITCH_BLUE = "asb";

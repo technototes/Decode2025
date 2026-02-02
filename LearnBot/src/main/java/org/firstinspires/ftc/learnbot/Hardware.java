@@ -17,6 +17,7 @@ import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Loggable;
 import java.util.List;
 import org.firstinspires.ftc.learnbot.Setup.HardwareNames;
+import org.firstinspires.ftc.learnbot.components.Pedro;
 import org.firstinspires.ftc.learnbot.subsystems.AllianceDetection;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 
@@ -48,14 +49,14 @@ public class Hardware implements Loggable {
             RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
         );
         if (Setup.Connected.DRIVEBASE) {
-            fl = new EncodedMotor<>(HardwareNames.FLMOTOR);
-            fr = new EncodedMotor<>(HardwareNames.FRMOTOR);
-            rl = new EncodedMotor<>(HardwareNames.RLMOTOR);
-            rr = new EncodedMotor<>(HardwareNames.RRMOTOR);
-            follower = DrivingConstants.createFollower(hwmap);
+            fl = new EncodedMotor<>(Pedro.Config.FLMOTOR);
+            fr = new EncodedMotor<>(Pedro.Config.FRMOTOR);
+            rl = new EncodedMotor<>(Pedro.Config.RLMOTOR);
+            rr = new EncodedMotor<>(Pedro.Config.RRMOTOR);
+            follower = Pedro.createFollower(hwmap);
         }
         if (Setup.Connected.OTOS) {
-            odo = hwmap.get(SparkFunOTOS.class, HardwareNames.OTOS);
+            odo = hwmap.get(SparkFunOTOS.class, Pedro.Config.Localizer.OTOSConfig.hardwareName);
         }
         //        if (Setup.Connected.OCTOQUAD) {
         //            octoquad = hwmap.get(OctoQuad.class, Setup.HardwareNames.OCTOQUAD);

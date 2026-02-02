@@ -37,10 +37,16 @@ import org.firstinspires.ftc.learnbot.Setup;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class PedroDrivebase {
+public class Pedro {
 
     @Configurable
     public static class Config {
+
+        // Names of motors:
+        public static String FLMOTOR = "fl";
+        public static String FRMOTOR = "fr";
+        public static String RLMOTOR = "rl";
+        public static String RRMOTOR = "rr";
 
         // Max power scaling for translational driving:
         public static double SNAIL_SPEED = 0.40;
@@ -141,10 +147,10 @@ public class PedroDrivebase {
         public static MecanumConstants getDriveConstants() {
             return new MecanumConstants()
                 .maxPower(1)
-                .leftFrontMotorName(Setup.HardwareNames.FLMOTOR)
-                .leftRearMotorName(Setup.HardwareNames.RLMOTOR)
-                .rightFrontMotorName(Setup.HardwareNames.FRMOTOR)
-                .rightRearMotorName(Setup.HardwareNames.RRMOTOR)
+                .leftFrontMotorName(Config.FLMOTOR)
+                .leftRearMotorName(Config.RLMOTOR)
+                .rightFrontMotorName(Config.FRMOTOR)
+                .rightRearMotorName(Config.RRMOTOR)
                 .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
                 .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
                 .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
@@ -157,6 +163,8 @@ public class PedroDrivebase {
 
             @Configurable
             public static class OTOSConfig {
+
+                public static String hardwareName = "otos";
 
                 public static double linearScalar = 1.0;
                 public static double angularScalar = 1.0;
@@ -177,6 +185,8 @@ public class PedroDrivebase {
 
             @Configurable
             public static class PinpointConfig {
+
+                public static String hardwareName = "pinpoint";
 
                 public static double ForwardPodY = -2.5;
                 public static double StrafePodX = 0.25;
@@ -215,7 +225,7 @@ public class PedroDrivebase {
 
             public static OTOSConstants getOtosLocalizerConstants() {
                 return new OTOSConstants()
-                    .hardwareMapName(Setup.HardwareNames.OTOS)
+                    .hardwareMapName(OTOSConfig.hardwareName)
                     .linearUnit(DistanceUnit.INCH)
                     .angleUnit(AngleUnit.RADIANS)
                     .linearScalar(OTOSConfig.linearScalar)
@@ -226,10 +236,10 @@ public class PedroDrivebase {
 
             public static DriveEncoderConstants getDriveEncoderConstants() {
                 return new DriveEncoderConstants()
-                    .leftFrontMotorName(Setup.HardwareNames.FLMOTOR)
-                    .leftRearMotorName(Setup.HardwareNames.RLMOTOR)
-                    .rightFrontMotorName(Setup.HardwareNames.FRMOTOR)
-                    .rightRearMotorName(Setup.HardwareNames.RRMOTOR)
+                    .leftFrontMotorName(Config.FLMOTOR)
+                    .leftRearMotorName(Config.RLMOTOR)
+                    .rightFrontMotorName(Config.FRMOTOR)
+                    .rightRearMotorName(Config.RRMOTOR)
                     .leftFrontEncoderDirection(Encoder.FORWARD)
                     .leftRearEncoderDirection(Encoder.FORWARD)
                     .rightFrontEncoderDirection(Encoder.FORWARD)
@@ -243,7 +253,7 @@ public class PedroDrivebase {
 
             public static PinpointConstants getPinpointConstants() {
                 return new PinpointConstants()
-                    .hardwareMapName(Setup.HardwareNames.PINPOINT)
+                    .hardwareMapName(PinpointConfig.hardwareName)
                     .distanceUnit(DistanceUnit.INCH)
                     .forwardPodY(PinpointConfig.ForwardPodY)
                     .strafePodX(PinpointConfig.StrafePodX)
