@@ -108,6 +108,11 @@ public class MotorEncoder extends Sensor<DcMotorEx> implements Encoder {
         this.direction = direction;
     }
 
+    @Override
+    public void setDirection(boolean reversed) {
+        setDirection(reversed ? Direction.REVERSE : Direction.FORWARD);
+    }
+
     public MotorEncoder invert() {
         setDirection(getDirection() == Direction.FORWARD ? Direction.REVERSE : Direction.FORWARD);
         return this;

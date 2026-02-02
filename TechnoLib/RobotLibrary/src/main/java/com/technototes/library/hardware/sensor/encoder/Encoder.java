@@ -14,4 +14,7 @@ public interface Encoder extends Sensored {
     default double getPosition() {
         return getSensorValue();
     }
+
+    void setDirection(boolean reversed);
+    //   double getVelocity();
 }
