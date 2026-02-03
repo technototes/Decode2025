@@ -26,9 +26,9 @@ public class TestPedroAuto extends CommandOpMode {
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
-        TestPaths p = new TestPaths(robot.drivebase.follower);
+        TestPaths p = new TestPaths(Pedro.getFollower());
         CommandScheduler.scheduleOnceForState(
-            () -> robot.drivebase.follower.setStartingPose(p.getStart()),
+            () -> Pedro.getFollower().setStartingPose(p.getStart()),
             OpModeState.INIT
         );
         CommandScheduler.scheduleForState(
@@ -38,7 +38,7 @@ public class TestPedroAuto extends CommandOpMode {
                 Pedro.Commands.FollowPath(p.Path3),
                 Pedro.Commands.FollowPath(p.Path4),
                 new WaitCommand(1),
-                HeadingHelper.SaveCurrentPosition(robot.drivebase.follower),
+                HeadingHelper.SaveCurrentPosition(Pedro.getFollower()),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN
@@ -50,6 +50,6 @@ public class TestPedroAuto extends CommandOpMode {
     }
 
     public void end() {
-        HeadingHelper.SaveCurrentPosition(robot.drivebase.follower);
+        HeadingHelper.SaveCurrentPosition(Pedro.getFollower());
     }
 }

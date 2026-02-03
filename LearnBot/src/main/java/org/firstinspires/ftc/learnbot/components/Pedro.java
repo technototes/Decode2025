@@ -347,7 +347,7 @@ public class Pedro {
             return self::SetVisionRotation;
         }
 
-        public protected static static class DrivePowerImpl implements Command {
+        protected static class DrivePowerImpl implements Command {
 
             double[] p;
 
@@ -361,7 +361,7 @@ public class Pedro {
 
             @Override
             public void execute() {
-                self.follower.drivetrain.runDrive(p);
+                getFollower().drivetrain.runDrive(p);
             }
         }
 
@@ -431,19 +431,19 @@ public class Pedro {
             @Override
             public void initialize() {
                 if (currentPose) {
-                    self.follower.setStartingPose(begin == null ? self.follower.getPose() : begin);
+                    getFollower().setStartingPose(begin == null ? getFollower().getPose() : begin);
                 }
-                self.follower.followPath(pathChain);
+                getFollower().followPath(pathChain);
             }
 
             @Override
             public boolean isFinished() {
-                return !self.follower.isBusy();
+                return !getFollower().isBusy();
             }
 
             @Override
             public void execute() {
-                self.follower.update();
+                getFollower().update();
             }
         }
     }
@@ -473,6 +473,14 @@ public class Pedro {
         Follower f = fb.build();
         f.setMaxPowerScaling(Config.AUTO_SPEED);
         return f;
+    }
+
+    // The PedroPath follower, to let us actually make the bot move:
+    protected static Follower follower;
+
+    public static Follower getFollower() {
+        // TODO: Can make this an on-demand creation if we'd like :)
+        return follower;
     }
 
     /* Recall, the Pedro Path coordinate system:
@@ -552,8 +560,6 @@ public class Pedro {
             FieldCentric,
         }
 
-        // The PedroPath follower, to let us actually make the bot move:
-        public Follower follower;
         // The vision subsystem, for vision-based driving stuff
         public TargetAcquisition targetAcquisition;
 
