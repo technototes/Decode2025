@@ -12,6 +12,7 @@ public class Setup {
         public static boolean LIMELIGHT = false;
         public static boolean OTOS = true;
         public static boolean PINPOINT = false;
+        public static boolean GIMBAL = true;
     }
 
     @Configurable

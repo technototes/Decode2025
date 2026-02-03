@@ -4,10 +4,14 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.PwmControl;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.Servo.Direction;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.MovingStatistics;
 import com.qualcomm.robotcore.util.Range;
+import com.technototes.library.hardware.servo.Servo;
+import com.technototes.library.logger.Loggable;
+import com.technototes.library.subsystem.Subsystem;
+import com.technototes.library.subsystem.TargetAcquisition;
 import com.technototes.library.util.MathUtils;
 
 // TODO: This "component" doesn't yet have a subsystem implementation. Fix that.
@@ -25,8 +29,8 @@ public class Gimbal {
         public static double PITCH_INIT = 0.2;
         public static double PITCH_LOW = 0.0;
         public static double PITCH_HIGH = 0.8;
-        public static Servo.Direction PITCH_DIR = Servo.Direction.REVERSE;
-        public static Servo.Direction YAW_DIR = Servo.Direction.FORWARD;
+        public static Direction PITCH_DIR = Direction.REVERSE;
+        public static Direction YAW_DIR = Direction.FORWARD;
 
         // OpMode testing configuration:
         public static double CHANGE = 0.025;
@@ -34,11 +38,52 @@ public class Gimbal {
         public static int ANALOG_SMOOTHING_LEVEL = 25;
     }
 
+    public static class Component implements Subsystem, Loggable, TargetAcquisition {
+
+        private final Servo yaw, pitch;
+        private final TargetAcquisition camera;
+
+        // Things I want the gimbal to do:
+        // Track a target when it's visible (as it moves, follow it, unless you can't
+        // Scan when it can't find a target (what 'scan' means is still an implementation question)
+        // Scan in the direction where it thinks a target might be? This one is iffy.
+        // Indicate where a target is currently located, offset from the Vision subsystem/component
+        public Component(Servo yawServo, Servo pitchServo, TargetAcquisition vision) {
+            yaw = yawServo;
+            pitch = pitchServo;
+            if (yaw != null) {
+                yaw.setInverted(Config.YAW_DIR == Direction.REVERSE);
+            }
+            if (pitch != null) {
+                pitch.setInverted(Config.PITCH_DIR == Direction.REVERSE);
+            }
+            camera = vision;
+        }
+
+        @Override
+        public double getDistance() {
+            // TODO: Make this use the gimbal position and the h/v position from the camera.
+            return camera.getDistance();
+        }
+
+        @Override
+        public double getHorizontalPosition() {
+            // TODO: Make this consider gimbal position
+            return camera.getHorizontalPosition();
+        }
+
+        @Override
+        public double getVerticalPosition() {
+            // TODO: Make this consider gimbal position
+            return camera.getVerticalPosition();
+        }
+    }
+
     @TeleOp(name = "Gimbal Testing")
     public static class Testing extends OpMode {
 
         // Hardware
-        Servo yaw, pitch;
+        com.qualcomm.robotcore.hardware.Servo yaw, pitch;
 
         // State
         double yawPos = Config.YAW_INIT;
@@ -50,8 +95,11 @@ public class Gimbal {
 
         @Override
         public void init() {
-            yaw = hardwareMap.get(Servo.class, Config.YAW_SERVO);
-            pitch = hardwareMap.get(Servo.class, Config.PITCH_SERVO);
+            yaw = hardwareMap.get(com.qualcomm.robotcore.hardware.Servo.class, Config.YAW_SERVO);
+            pitch = hardwareMap.get(
+                com.qualcomm.robotcore.hardware.Servo.class,
+                Config.PITCH_SERVO
+            );
             if (yaw instanceof ServoImplEx) {
                 ((ServoImplEx) yaw).setPwmRange(new PwmControl.PwmRange(500, 2500));
             }
