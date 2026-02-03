@@ -68,9 +68,9 @@ public class DriverController implements Loggable {
     public void bindDriveControls() {
         stickDriver = Pedro.Commands.JoystickDrive(driveLeftStick, driveRightStick);
 
-        turboButton.whenPressed(robot.drivebase::SetTurboSpeed);
-        normalButton.whenPressed(robot.drivebase::SetNormalSpeed);
-        snailButton.whenPressed(robot.drivebase::SetSnailSpeed);
+        turboButton.whenPressed(Pedro.Commands.TurboSpeed());
+        normalButton.whenPressed(Pedro.Commands.NormalSpeed());
+        snailButton.whenPressed(Pedro.Commands.SnailSpeed());
 
         if (Connected.LIMELIGHT) {
             visionButton.whenPressedReleased(
