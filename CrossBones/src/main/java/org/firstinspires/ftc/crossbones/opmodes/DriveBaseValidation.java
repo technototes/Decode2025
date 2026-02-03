@@ -10,7 +10,7 @@ import org.firstinspires.ftc.crossbones.Setup;
 import org.firstinspires.ftc.crossbones.subsystems.TestSubsystem;
 
 @Configurable
-@TeleOp(name = "Drivebase Testbed")
+@TeleOp(name = "CrossOp Validation")
 public class DriveBaseValidation extends LinearOpMode {
 
     public static double motorPower = 0.2;
