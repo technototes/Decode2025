@@ -311,7 +311,43 @@ public class Pedro {
             return new FollowPathImpl(p, readCurPose);
         }
 
-        protected static class DrivePowerImpl implements Command {
+        public static Command TurboSpeed() {
+            return self::SetTurboSpeed;
+        }
+
+        public static Command SnailSpeed() {
+            return self::SetSnailSpeed;
+        }
+
+        public static Command NormalSpeed() {
+            return self::SetNormalSpeed;
+        }
+
+        public static Command VisionDriving() {
+            return self::SetVisionDriving;
+        }
+
+        public static Command ResumeDriving() {
+            return self::ResumeDriving;
+        }
+
+        public static Command HoldRotation() {
+            return self::SetHoldRotation;
+        }
+
+        public static Command TangentRotation() {
+            return self::SetTangentRotation;
+        }
+
+        public static Command SetBidirectionalRotation() {
+            return self::SetBidirectionalRotation;
+        }
+
+        public static Command SetVisionRotation() {
+            return self::SetVisionRotation;
+        }
+
+        public protected static static class DrivePowerImpl implements Command {
 
             double[] p;
 
