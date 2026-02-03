@@ -109,7 +109,7 @@ public class DriverController implements Loggable {
                 robot.drivebase::SetFieldCentricMode
             )
         );
-        launch1Button.whenPressed(Launcher.Commands.AutoLaunch1());
-        launch2Button.whenPressed(Launcher.Commands.AutoLaunch2());
+        launch1Button.whilePressed(Launcher.Commands.Launch());
+        launch2Button.whenReleased(Launcher.Commands.StopLaunch());
     }
 }
