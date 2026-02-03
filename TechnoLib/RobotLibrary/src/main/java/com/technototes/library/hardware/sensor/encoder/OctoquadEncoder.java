@@ -2,7 +2,7 @@ package com.technototes.library.hardware.sensor.encoder;
 
 import com.qualcomm.hardware.digitalchickenlabs.OctoQuad;
 
-public class OctoquadEncoder implements Encoder {
+public class OctoquadEncoder implements VelocityEncoder {
 
     protected OctoQuad octoQuad;
     protected int portNumber;
@@ -32,6 +32,7 @@ public class OctoquadEncoder implements Encoder {
         return octoQuad.readSinglePosition_Caching(portNumber) - zero;
     }
 
+    @Override
     public double getVelocity() {
         return octoQuad.readSingleVelocity_Caching(portNumber);
     }

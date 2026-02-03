@@ -5,19 +5,14 @@ import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.learnbot.Hardware;
-import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.SpinningBot;
-import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.controls.SpinController;
-import org.firstinspires.ftc.learnbot.helpers.HeadingHelper;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
 @Configurable

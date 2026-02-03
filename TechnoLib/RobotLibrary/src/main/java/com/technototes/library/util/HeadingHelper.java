@@ -1,14 +1,12 @@
-package org.firstinspires.ftc.learnbot.helpers;
+package com.technototes.library.util;
 
-import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.technototes.library.command.Command;
-import org.firstinspires.ftc.learnbot.subsystems.PedroDrivebaseSubsystem;
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 
-@Configurable
 public class HeadingHelper {
+
+    public static HeadingHelper SavedBetweenRuns = null;
 
     public double headingUpdateTime;
     public double lastHeading;
@@ -23,18 +21,18 @@ public class HeadingHelper {
     }
 
     public static void saveHeading(double x, double y, double h) {
-        FtcRobotControllerActivity.SaveBetweenRuns = new HeadingHelper(x, y, h);
+        SavedBetweenRuns = new HeadingHelper(x, y, h);
     }
 
-    public static Command SaveCurrentPosition(PedroDrivebaseSubsystem db) {
-        return Command.create(() -> savePose(db.follower.getPose()));
+    public static Command SaveCurrentPosition(Follower f) {
+        return Command.create(() -> savePose(f.getPose()));
     }
 
-    public static Command RestorePreviousPosition(PedroDrivebaseSubsystem db) {
+    public static Command RestorePreviousPosition(Follower f) {
         return Command.create(() -> {
             Pose p = getSavedPose();
             if (p != null) {
-                db.follower.setPose(p);
+                f.setPose(p);
             }
         });
     }
@@ -44,7 +42,7 @@ public class HeadingHelper {
     }
 
     public static Pose getSavedPose() {
-        HeadingHelper hh = (HeadingHelper) FtcRobotControllerActivity.SaveBetweenRuns;
+        HeadingHelper hh = HeadingHelper.SavedBetweenRuns;
         if (hh != null) {
             return new Pose(hh.lastXPosition, hh.lastYPosition, hh.lastHeading);
         }
@@ -52,11 +50,11 @@ public class HeadingHelper {
     }
 
     public static void clearSavedInfo() {
-        FtcRobotControllerActivity.SaveBetweenRuns = null;
+        HeadingHelper.SavedBetweenRuns = null;
     }
 
     public static boolean validHeading() {
-        HeadingHelper hh = (HeadingHelper) FtcRobotControllerActivity.SaveBetweenRuns;
+        HeadingHelper hh = HeadingHelper.SavedBetweenRuns;
         if (hh == null) {
             return false;
         }
@@ -65,7 +63,7 @@ public class HeadingHelper {
     }
 
     public static double getSavedHeading() {
-        HeadingHelper hh = (HeadingHelper) FtcRobotControllerActivity.SaveBetweenRuns;
+        HeadingHelper hh = HeadingHelper.SavedBetweenRuns;
         if (hh != null) {
             return hh.lastHeading;
         }
@@ -73,7 +71,7 @@ public class HeadingHelper {
     }
 
     public static double getSavedX() {
-        HeadingHelper hh = (HeadingHelper) FtcRobotControllerActivity.SaveBetweenRuns;
+        HeadingHelper hh = HeadingHelper.SavedBetweenRuns;
         if (hh != null) {
             return hh.lastXPosition;
         }
@@ -81,7 +79,7 @@ public class HeadingHelper {
     }
 
     public static double getSavedY() {
-        HeadingHelper hh = (HeadingHelper) FtcRobotControllerActivity.SaveBetweenRuns;
+        HeadingHelper hh = HeadingHelper.SavedBetweenRuns;
         if (hh != null) {
             return hh.lastYPosition;
         }
