@@ -499,11 +499,10 @@ public class Launcher {
         @Override
         public void loop() {
             super.loop();
-            telemetry.addLine(">>> Press left trigger for Launcher1 control");
-            telemetry.addLine(">>> Press right trigger for Launcher2 control");
-            telemetry.addLine(">>> Hit the dpad to stop");
-            telemetry.addLine(lc.hardwareValidation(gamepad1.left_trigger, gamepad1.right_trigger));
-            telemetry.update();
+            addLine(">>> Press left trigger for Launcher1 control");
+            addLine(">>> Press right trigger for Launcher2 control");
+            addLine(">>> Hit the dpad to stop");
+            addLine(lc.hardwareValidation(gamepad1.left_trigger, gamepad1.right_trigger));
             if (anyDpadReleased()) {
                 terminateOpModeNow();
             }
@@ -524,11 +523,9 @@ public class Launcher {
 
         Launcher.Component lc = null;
         State state = State.MeasureStaticFriction;
-        TelemetryManager panelsTelemetry = null;
 
         @Override
         public void init() {
-            panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
             super.init();
             EncodedMotor<DcMotorEx> m = new EncodedMotor<>(
                 hardwareMap.get(DcMotorEx.class, Config.getMotorName()),
@@ -642,12 +639,11 @@ public class Launcher {
         }
 
         private State Testing() {
-            double pow =
-                targetVelocity == 0
-                    ? 0
-                    : ((Math.copySign(staticFriction, targetVelocity) +
-                              velocityConstant * targetVelocity) /
-                          getVoltage());
+            double pow = targetVelocity == 0
+                ? 0
+                : ((Math.copySign(staticFriction, targetVelocity) +
+                          velocityConstant * targetVelocity) /
+                      getVoltage());
             lc.setMotorPower(pow);
             if (lastUpdate.milliseconds() > 250) {
                 lastUpdate.reset();
@@ -704,25 +700,6 @@ public class Launcher {
             }
 
             super.loop();
-            panelsTelemetry.update();
-        }
-
-        @Override
-        public void addData(String caption, String data) {
-            super.addData(caption, data);
-            panelsTelemetry.addData(caption, data);
-        }
-
-        @Override
-        public void addData(String caption, double d) {
-            super.addData(caption, d);
-            panelsTelemetry.addData(caption, d);
-        }
-
-        @Override
-        public void addLine(String line) {
-            super.addLine(line);
-            panelsTelemetry.addLine(line);
         }
     }
 }
