@@ -13,13 +13,14 @@ repositories {
 dependencies {
     implementation 'org.firstinspires.ftc:Inspection:11.1.0'
     implementation 'org.firstinspires.ftc:Blocks:11.1.0'
+    //noinspection Aligned16KB
     implementation 'org.firstinspires.ftc:RobotCore:11.1.0'
     implementation 'org.firstinspires.ftc:RobotServer:11.1.0'
     implementation 'org.firstinspires.ftc:OnBotJava:11.1.0'
     implementation 'org.firstinspires.ftc:Hardware:11.1.0'
     implementation 'org.firstinspires.ftc:FtcCommon:11.1.0'
     implementation 'org.firstinspires.ftc:Vision:11.1.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
 
     // Freik: 16750/20403 external dependencies:
     // TechnoLib: This should be commented out to use a local source copy
@@ -27,7 +28,7 @@ dependencies {
     // implementation 'com.github.technototes:technolib:2.3.0' // FLIP: TechnoLibLocal
 
     // Adding support for Pedro Pathing
-    implementation 'com.pedropathing:ftc:2.0.4'
+    implementation 'com.pedropathing:ftc:2.0.6'
     implementation 'com.pedropathing:telemetry:1.0.0'
     implementation 'com.bylazar:fullpanels:1.0.12'
 

@@ -22,17 +22,19 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation('org.ejml:ejml-simple:0.39') {
+    implementation('org.ejml:ejml-simple:0.44.0') {
         exclude group: 'org.ejml', module: 'ejml-all'
     }
-/*
+    implementation 'com.pedropathing:ftc:2.0.6'
+    implementation 'com.pedropathing:telemetry:1.0.0'
+    /*
     testImplementation(platform('org.junit:junit-bom:5.7.0'))
     testImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.7.0')
     testImplementation('org.mockito:mockito-core:3.5.11')
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.0"
-*/
+    */
 }
 
 /*

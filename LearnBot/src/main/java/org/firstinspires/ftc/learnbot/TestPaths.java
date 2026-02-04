@@ -9,7 +9,7 @@ import com.pedropathing.paths.PathChain;
 
 /**** DO NOT EDIT ****
  These paths are specifically for testing the visualizer. If you want to make some
- changes to the 'real" paths, just create a different file...
+ changes to the 'real' paths, just create a different file...
  **** DO NOT EDIT ****/
 
 @Configurable

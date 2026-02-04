@@ -10,7 +10,7 @@ import com.technototes.library.hardware.sensor.Sensor;
  * Wraps a motor instance to provide corrected velocity counts and allow reversing independently of the corresponding
  * slot's motor direction
  */
-public class MotorEncoder extends Sensor<DcMotorEx> implements Encoder {
+public class MotorEncoder extends Sensor<DcMotorEx> implements VelocityEncoder {
 
     private static final int CPS_STEP = 0x10000;
     public int offset = 0;
@@ -108,6 +108,11 @@ public class MotorEncoder extends Sensor<DcMotorEx> implements Encoder {
         this.direction = direction;
     }
 
+    @Override
+    public void setDirection(boolean reversed) {
+        setDirection(reversed ? Direction.REVERSE : Direction.FORWARD);
+    }
+
     public MotorEncoder invert() {
         setDirection(getDirection() == Direction.FORWARD ? Direction.REVERSE : Direction.FORWARD);
         return this;
@@ -137,5 +142,10 @@ public class MotorEncoder extends Sensor<DcMotorEx> implements Encoder {
     public double getCorrectedVelocity() {
         corVel = inverseOverflow(getRawVelocity(), velocityEstimate);
         return corVel;
+    }
+
+    @Override
+    public double getVelocity() {
+        return getCorrectedVelocity();
     }
 }

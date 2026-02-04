@@ -12,11 +12,11 @@ import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.hardware.sensor.IMU;
+import com.technototes.library.hardware.sensor.encoder.Encoder;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Loggable;
 import java.util.List;
 import org.firstinspires.ftc.learnbot.Setup.HardwareNames;
-import org.firstinspires.ftc.learnbot.helpers.IEncoder;
 import org.firstinspires.ftc.learnbot.subsystems.AllianceDetection;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 
@@ -27,7 +27,7 @@ public class Hardware implements Loggable {
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, top, testMotor;
     public AllianceDetection allianceDetection;
-    public IEncoder odoF, odoR;
+    public Encoder odoF, odoR;
     private OctoQuad octoquad;
     public CRServo bottomLeft, bottomRight;
     public Limelight3A limelight;
