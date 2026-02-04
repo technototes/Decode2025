@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
+import com.technototes.library.hardware.sensor.encoder.MotorEncoder;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import java.util.Arrays;
@@ -36,12 +37,16 @@ public class TurretTesting extends CommandOpMode {
     public Robot robot;
     public TestingController controlsDriver;
     public Hardware hardware;
+    private MotorEncoder odoFwd;
+    private MotorEncoder odoStf;
     private PanelsTelemetry panelsTelemetry;
 
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
+        odoFwd = new MotorEncoder(Setup.HardwareNames.ODO_FWDBACK);
+        odoStf = new MotorEncoder(Setup.HardwareNames.ODO_STRAFE);
         controlsDriver = new TestingController(driverGamepad, robot);
         CommandScheduler.register(robot.turretSubsystem);
         panelsTelemetry = PanelsTelemetry.INSTANCE;
@@ -59,6 +64,8 @@ public class TurretTesting extends CommandOpMode {
         // robot.turretSubsystem.turretPow = robot.turretSubsystem.getTurretPow();
         // robot.turretSubsystem.turretTicks = robot.turretSubsystem.getTurretPos();
         telemetry.addData("Turret", robot.turretSubsystem.TurretSubsytemInfoToDS);
+        telemetry.addData("Odo Fwd", odoFwd.getSensorValue());
+        telemetry.addData("Odo Stf", odoStf.getSensorValue());
         panelsTelemetry.getTelemetry().addData("TurretPos", robot.turretSubsystem.turretTicks);
         panelsTelemetry.getTelemetry().update(telemetry);
         telemetry.update();

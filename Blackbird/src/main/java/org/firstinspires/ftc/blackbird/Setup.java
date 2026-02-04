@@ -31,12 +31,12 @@ public class Setup {
         public static String RR_DRIVE_MOTOR = "rr";
         public static String IMU = "imu";
         public static String EXTERNAL_IMU = "adafruit-imu";
-        public static String INTAKE_MOTOR = "intake";
+        public static String INTAKE_MOTOR = "intake-odo2";
         public static String LAUNCHER_MOTOR1 = "launcher1";
-        public static String LAUNCHER_MOTOR2 = "launcher2";
+        public static String LAUNCHER_MOTOR2 = "launcher2-odo1";
         public static String HOOD_SERVO = "hood";
-        public static String ODO_STRAFE = "odostrafe";
-        public static String ODO_FWDBACK = "odofb";
+        public static String ODO_STRAFE = "launcher2-odo1";
+        public static String ODO_FWDBACK = "intake-odo2";
         public static String LEVER_SERVO = "lever";
         public static String PINPOINT = "pinpoint";
         public static String TESTSERVO = "testservo";
@@ -44,11 +44,7 @@ public class Setup {
         public static String TESTCRSERVO = "testcrservo";
         public static String LIMELIGHT = "limelight";
         public static String TURRET = "turret";
-        public static int Green_Color_Pipeline = 0;
-        // public static int Classifier_Pipeline = 2;
-        // public static int Object_Detection_Pipeline = 3;
-        public static int AprilTag_Pipeline = 1;
-        public static int Purple_Color_Pipeline = 2;
+        public static int AprilTag_Pipeline = 0;
         public static String[] Motif = { "1", "2", "3" };
     }
 

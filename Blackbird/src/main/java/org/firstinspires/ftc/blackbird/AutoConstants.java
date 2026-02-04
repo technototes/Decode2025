@@ -103,10 +103,11 @@ public class AutoConstants {
 
         public static String forwardName = HardwareNames.ODO_FWDBACK;
         public static String strafeName = HardwareNames.ODO_STRAFE;
-        public static double forwardTicksToInches = ((17.5 / 25.4) * 2 * Math.PI) / 8192; // 5.42, 5.47, 5.49
-        public static double strafeTicksToInches = ((17.5 / 25.4) * 2 * Math.PI) / 8192; // 5.37, 5.39, 5.38
-        public static double forwardPodYOffset = -3.9; // From Colin's CAD 10/31
-        public static double strafePodXOffset = -4.124; // From Colin's CAD 10/31
+        //could be / 1000
+        public static double forwardTicksToInches = (32 * Math.PI) / 2000; // 5.42, 5.47, 5.49
+        public static double strafeTicksToInches = (32 * Math.PI) / 2000; // 5.37, 5.39, 5.38
+        public static double forwardPodYOffset = 1.75; // 2/3/2026
+        public static double strafePodXOffset = -3; // 2/3/2026
         public static boolean forwardReversed = true;
         public static boolean strafeReversed = false;
         public static RevHubOrientationOnRobot.LogoFacingDirection logoDir =
@@ -203,7 +204,7 @@ public class AutoConstants {
         Follower fol = new FollowerBuilder(getFollowerConstants(), hardwareMap)
             .pathConstraints(getPathConstraints())
             .mecanumDrivetrain(getDriveConstants())
-            .pinpointLocalizer(PinpointLocalizer.get())
+            .twoWheelLocalizer(TwoWheelLocalizer.get())
             .build();
         //        fol.setMaxPowerScaling(0.5);
         return fol;
