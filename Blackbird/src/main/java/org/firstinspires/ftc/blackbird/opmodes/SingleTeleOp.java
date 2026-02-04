@@ -7,11 +7,11 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
 import java.util.Arrays;
 import java.util.List;
 import org.firstinspires.ftc.blackbird.Hardware;
@@ -19,7 +19,6 @@ import org.firstinspires.ftc.blackbird.Robot;
 import org.firstinspires.ftc.blackbird.Setup;
 import org.firstinspires.ftc.blackbird.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.blackbird.controls.SingleController;
-import org.firstinspires.ftc.blackbird.helpers.HeadingHelper;
 import org.firstinspires.ftc.blackbird.helpers.StartingPosition;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
@@ -127,30 +126,30 @@ public class SingleTeleOp extends CommandOpMode {
                         for (LLResultTypes.FiducialResult fr : fiducialResults) {
                             if (
                                 fr.getFiducialId() == 23 &&
-                                    Arrays.equals(
-                                        Setup.HardwareNames.Motif,
-                                        new String[]{"1", "2", "3"}
-                                    )
+                                Arrays.equals(
+                                    Setup.HardwareNames.Motif,
+                                    new String[] { "1", "2", "3" }
+                                )
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE2";
                             } else if (
                                 fr.getFiducialId() == 22 &&
-                                    Arrays.equals(
-                                        Setup.HardwareNames.Motif,
-                                        new String[]{"1", "2", "3"}
-                                    )
+                                Arrays.equals(
+                                    Setup.HardwareNames.Motif,
+                                    new String[] { "1", "2", "3" }
+                                )
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE3";
                             } else if (
                                 fr.getFiducialId() == 21 &&
-                                    Arrays.equals(
-                                        Setup.HardwareNames.Motif,
-                                        new String[]{"1", "2", "3"}
-                                    )
+                                Arrays.equals(
+                                    Setup.HardwareNames.Motif,
+                                    new String[] { "1", "2", "3" }
+                                )
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";

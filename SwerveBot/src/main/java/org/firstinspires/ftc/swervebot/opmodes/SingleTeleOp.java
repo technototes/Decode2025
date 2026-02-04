@@ -7,11 +7,11 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
 import java.util.Arrays;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -20,7 +20,6 @@ import org.firstinspires.ftc.swervebot.Robot;
 import org.firstinspires.ftc.swervebot.Setup;
 import org.firstinspires.ftc.swervebot.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.swervebot.controls.SingleController;
-import org.firstinspires.ftc.swervebot.helpers.HeadingHelper;
 import org.firstinspires.ftc.swervebot.helpers.StartingPosition;
 
 @TeleOp(name = "Single Control")

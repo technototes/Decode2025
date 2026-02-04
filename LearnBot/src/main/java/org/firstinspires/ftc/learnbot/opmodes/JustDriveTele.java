@@ -36,7 +36,9 @@ public class JustDriveTele extends CommandOpMode implements Loggable {
         hardware.follower.update();
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
-        CommandScheduler.scheduleInit(HeadingHelper.RestorePreviousPosition(robot.drivebase));
+        CommandScheduler.scheduleInit(
+            HeadingHelper.RestorePreviousPosition(robot.drivebase.follower)
+        );
         CommandScheduler.scheduleJoystick(controls.stickDriver);
     }
 
