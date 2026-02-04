@@ -10,12 +10,12 @@ import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
 import com.technototes.library.util.MathUtils;
 import com.technototes.library.util.PIDFController;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.Setup.OtherSettings;
-import org.firstinspires.ftc.sixteen750.helpers.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 /* Recall, the Pedro Path coordinate system:

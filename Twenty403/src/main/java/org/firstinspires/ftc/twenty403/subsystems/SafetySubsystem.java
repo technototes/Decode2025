@@ -23,10 +23,10 @@ public class SafetySubsystem implements Subsystem, Loggable {
 
     public Hardware myHw;
 
-    public int previousOdoFPosition = 0;
+    public double previousOdoFPosition = 0;
 
     @Log(name = "prevOdoR")
-    public int previousOdoRPosition = 0;
+    public double previousOdoRPosition = 0;
 
     @Log(name = "prevFLPos")
     public double previousFLPosition = 0;
@@ -51,7 +51,7 @@ public class SafetySubsystem implements Subsystem, Loggable {
     @Log
     public String stopAutoReason = "not stopping";
 
-    public boolean isOdoFailing(int currentOdoPosition, int previousOdoPosition) {
+    public boolean isOdoFailing(double currentOdoPosition, double previousOdoPosition) {
         if (Math.abs(previousOdoPosition - currentOdoPosition) < SafetySubsystem.OdoTickDiff) {
             return true;
         }
@@ -71,7 +71,7 @@ public class SafetySubsystem implements Subsystem, Loggable {
         }
     }
 
-    private int getOdoFPosition() {
+    private double getOdoFPosition() {
         if (failedPart == FailedPart.ODOF) {
             return 0;
         } else {
@@ -79,7 +79,7 @@ public class SafetySubsystem implements Subsystem, Loggable {
         }
     }
 
-    private int getOdoRPosition() {
+    private double getOdoRPosition() {
         if (failedPart == FailedPart.ODOR) {
             return 0;
         } else {
@@ -136,10 +136,10 @@ public class SafetySubsystem implements Subsystem, Loggable {
         }
         stopAutoReason = "Monitoring checking";
         timer.reset();
-        int odoFCurrentPosition = getOdoFPosition();
-        int odoRCurrentPosition = getOdoRPosition();
+        double odoFCurrentPosition = getOdoFPosition();
+        double odoRCurrentPosition = getOdoRPosition();
 
-        stopAutoReason = String.format("CheckingR: %d ", odoRCurrentPosition);
+        stopAutoReason = String.format("CheckingR: %f ", odoRCurrentPosition);
         double wheelflCurrentPosition = getwheelflPosition();
         double wheelfrCurrentPosition = getwheelfrPosition();
         double wheelrlCurrentPosition = getwheelrlPosition();

@@ -9,13 +9,13 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.twenty403.AutoConstants;
 import org.firstinspires.ftc.twenty403.Hardware;
 import org.firstinspires.ftc.twenty403.Robot;
 import org.firstinspires.ftc.twenty403.Setup;
 import org.firstinspires.ftc.twenty403.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.twenty403.controls.DriverController;
-import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
 @Configurable

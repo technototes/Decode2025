@@ -5,12 +5,12 @@ import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.swervebot.Hardware;
 import org.firstinspires.ftc.swervebot.Robot;
 import org.firstinspires.ftc.swervebot.commands.PedroPathCommand;
 import org.firstinspires.ftc.swervebot.commands.auto.TestPaths;
 import org.firstinspires.ftc.swervebot.controls.DriverController;
-import org.firstinspires.ftc.swervebot.helpers.HeadingHelper;
 import org.firstinspires.ftc.swervebot.helpers.StartingPosition;
 
 @Autonomous(name = "TestPedro", preselectTeleOp = "OneDriver")

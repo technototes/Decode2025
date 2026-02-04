@@ -10,16 +10,14 @@ import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.swervebot.Hardware;
 import org.firstinspires.ftc.swervebot.Robot;
 import org.firstinspires.ftc.swervebot.Setup;
 import org.firstinspires.ftc.swervebot.commands.AltAutoOrient;
-import org.firstinspires.ftc.swervebot.commands.LLSetup;
-import org.firstinspires.ftc.swervebot.commands.PedroPathCommand;
 import org.firstinspires.ftc.swervebot.commands.TeleCommands;
 import org.firstinspires.ftc.swervebot.commands.auto.Paths;
 import org.firstinspires.ftc.swervebot.controls.DriverController;
-import org.firstinspires.ftc.swervebot.helpers.HeadingHelper;
 import org.firstinspires.ftc.swervebot.helpers.StartingPosition;
 import org.firstinspires.ftc.swervebot.subsystems.LimelightSubsystem;
 

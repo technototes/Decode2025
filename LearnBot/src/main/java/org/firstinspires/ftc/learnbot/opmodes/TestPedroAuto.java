@@ -38,7 +38,7 @@ public class TestPedroAuto extends CommandOpMode {
                 robot.drivebase.MakePathCommand(p.Path3),
                 robot.drivebase.MakePathCommand(p.Path4),
                 new WaitCommand(1),
-                HeadingHelper.SaveCurrentPosition(robot.drivebase),
+                HeadingHelper.SaveCurrentPosition(robot.drivebase.follower),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN
@@ -50,6 +50,6 @@ public class TestPedroAuto extends CommandOpMode {
     }
 
     public void end() {
-        HeadingHelper.SaveCurrentPosition(robot.drivebase);
+        HeadingHelper.SaveCurrentPosition(robot.drivebase.follower);
     }
 }

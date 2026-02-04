@@ -3,19 +3,13 @@ package org.firstinspires.ftc.swervebot.opmodes;
 import static org.firstinspires.ftc.swervebot.Setup.HardwareNames.AprilTag_Pipeline;
 
 import com.bylazar.telemetry.PanelsTelemetry;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
-import java.util.Arrays;
-import java.util.List;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.swervebot.Hardware;
 import org.firstinspires.ftc.swervebot.Robot;
 import org.firstinspires.ftc.swervebot.Setup;
@@ -24,10 +18,7 @@ import org.firstinspires.ftc.swervebot.commands.auto.Paths;
 import org.firstinspires.ftc.swervebot.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.swervebot.controls.DriverController;
 import org.firstinspires.ftc.swervebot.controls.OperatorController;
-import org.firstinspires.ftc.swervebot.helpers.HeadingHelper;
 import org.firstinspires.ftc.swervebot.helpers.StartingPosition;
-import org.firstinspires.ftc.swervebot.subsystems.LauncherSubsystem;
-import org.firstinspires.ftc.swervebot.subsystems.LimelightSubsystem;
 
 @TeleOp(name = "Dual Control")
 @SuppressWarnings("unused")

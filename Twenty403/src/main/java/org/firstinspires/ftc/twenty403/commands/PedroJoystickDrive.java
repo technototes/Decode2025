@@ -9,9 +9,9 @@ import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.twenty403.Setup;
-import org.firstinspires.ftc.twenty403.helpers.HeadingHelper;
 
 /* Recall, the Pedro Path coordinate system:
                  [Refs/score table]

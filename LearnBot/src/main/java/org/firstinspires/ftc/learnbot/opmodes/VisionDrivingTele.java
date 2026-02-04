@@ -39,7 +39,9 @@ public class VisionDrivingTele extends CommandOpMode implements Loggable {
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         controls = new DriverController(driverGamepad, robot);
         CommandScheduler.register(robot.vision);
-        CommandScheduler.scheduleInit(HeadingHelper.RestorePreviousPosition(robot.drivebase));
+        CommandScheduler.scheduleInit(
+            HeadingHelper.RestorePreviousPosition(robot.drivebase.follower)
+        );
         CommandScheduler.scheduleInit(
             new SetVisionPipeline(robot.vision, TargetSubsystem.Pipeline.APRIL_TAG)
         );
