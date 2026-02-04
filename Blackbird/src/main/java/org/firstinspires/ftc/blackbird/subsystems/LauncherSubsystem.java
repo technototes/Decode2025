@@ -23,6 +23,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     //    public static double MOTOR_POWER = 0.65; // 0.5 1.0
     @Log.Number(name = "Target Velocity")
     public static double targetLaunchVelocity = 1150;
+    public static double testingLaunchVelocity = 1400;
 
     public static double closetargetLaunchVelocity = 1400;
     public static double fartargetLaunchVelocity = 1775;
@@ -132,7 +133,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void Launch() {
         // Spin the motors pid goes here
         if (hasHardware) {
-            setTargetSpeed(autoVelocity()); //change to auto aim velocity
+//            setTargetSpeed(autoVelocity()); //change to auto aim velocity
+            setTargetSpeed(testingLaunchVelocity);
             //            launcher1.setVelocity(TargetLaunchVelocity);
             //            launcher2.setVelocity(TargetLaunchVelocity);
         }
@@ -324,7 +326,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     @Override
     public void periodic() {
-        autoVelocity = autoVelocity();
+//        autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
         if (launcherPID.getTarget() != 0) {
             setMotorPower(launcherPID.update(getMotorSpeed()));

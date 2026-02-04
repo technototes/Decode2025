@@ -41,11 +41,11 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     public boolean startup_done;
 
     public static double SIGN = 1.0;
-    public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 17.2;
+    public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 17.32;
     public static double CAMERA_TO_CENTER_OF_ROBOT = 2.08;
     public static double EXTRA_OFFSET = -3;
     // TODO: Measure this more accurately
-    public static double LIMELIGHT_ANGLE = 15;
+    public static double LIMELIGHT_ANGLE = 12;
     public static Limelight3A limelight;
     LLResult result;
 
@@ -55,7 +55,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
         if (hasHardware) {
             limelight = h.limelight;
             limelight.start();
-            setPipeline(1);
+            setPipeline(0);
         } else {
             limelight = null;
         }
@@ -145,10 +145,10 @@ public class LimelightSubsystem implements Loggable, Subsystem {
                 EXTRA_OFFSET;
             return distance;
         }
-        return -1;
+        return 0;
         // measurements:
-        // center of camera lens to floor - 12.3 inches
-        // camera to center of robot(front-back) - 7.2 inches
+        // center of camera lens to floor - 17.32 inches
+        // camera to center of robot(front-back) - 2.08 inches
         // apriltag height from floor- 29.5 inches
     }
 

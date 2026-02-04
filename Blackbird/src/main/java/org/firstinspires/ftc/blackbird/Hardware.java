@@ -83,7 +83,8 @@ public class Hardware implements Loggable {
             odoRL = new MotorEncoder(Setup.HardwareNames.ODO_STRAFE);
         }
         if (Setup.Connected.INTAKESUBSYSTEM) {
-            intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
+            intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.
+                      INTAKE_MOTOR);
         }
         if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             launcher1 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR1);

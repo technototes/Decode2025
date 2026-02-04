@@ -127,30 +127,30 @@ public class SingleTeleOp extends CommandOpMode {
                         for (LLResultTypes.FiducialResult fr : fiducialResults) {
                             if (
                                 fr.getFiducialId() == 23 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
+                                    Arrays.equals(
+                                        Setup.HardwareNames.Motif,
+                                        new String[]{"1", "2", "3"}
+                                    )
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE2";
                             } else if (
                                 fr.getFiducialId() == 22 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
+                                    Arrays.equals(
+                                        Setup.HardwareNames.Motif,
+                                        new String[]{"1", "2", "3"}
+                                    )
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE3";
                             } else if (
                                 fr.getFiducialId() == 21 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
+                                    Arrays.equals(
+                                        Setup.HardwareNames.Motif,
+                                        new String[]{"1", "2", "3"}
+                                    )
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
@@ -164,22 +164,6 @@ public class SingleTeleOp extends CommandOpMode {
                             double distance = Math.sqrt(tx * tx + ty * ty + tz * tz);
                             telemetry.addData("Distance to AprilTag", String.valueOf(distance));
                         }
-                    } else if (
-                        result.getPipelineIndex() == Setup.HardwareNames.Green_Color_Pipeline
-                    ) {
-                        // Access color results
-                        List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                        // for (LLResultTypes.ColorResult cr : colorResults) {
-                        //
-                        // }
-                    } else if (
-                        result.getPipelineIndex() == Setup.HardwareNames.Purple_Color_Pipeline
-                    ) {
-                        // Access color results
-                        List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                        // for (LLResultTypes.ColorResult cr : colorResults) {
-                        //
-                        // }
                     }
                 }
             } else {
