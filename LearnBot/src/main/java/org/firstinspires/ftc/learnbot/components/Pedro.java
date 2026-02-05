@@ -93,7 +93,7 @@ public class Pedro {
         // Tristan says Kalman Filtering is for curve prediction, so...it helps predict ac/deceleration?
         public static FilteredPIDFCoefficients drivePID = new FilteredPIDFCoefficients(
             0.005,
-            00.00001,
+            0.00001,
             0.0004,
             0.6, // Kalman filter: 60% of D will come from the *previous* derivative
             0.02
@@ -187,7 +187,6 @@ public class Pedro {
             public static class PinpointConfig {
 
                 public static String hardwareName = "pinpoint";
-
                 public static double ForwardPodY = -2.5;
                 public static double StrafePodX = 0.25;
                 public static GoBildaPinpointDriver.EncoderDirection ForwardDirection =

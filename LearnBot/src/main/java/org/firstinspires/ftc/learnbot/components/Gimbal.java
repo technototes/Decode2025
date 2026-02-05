@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo.Direction;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.MovingStatistics;
 import com.qualcomm.robotcore.util.Range;
+import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -26,11 +27,19 @@ public class Gimbal {
         public static double YAW_INIT = 0.45;
         public static double YAW_LOW = 0.1;
         public static double YAW_HIGH = 0.9;
+        // This is how many degrees the servo turns from YAW_LOW to YAW_HIGH
+        public static double YAW_DEGREE_SPAN = 80.0;
         public static double PITCH_INIT = 0.2;
         public static double PITCH_LOW = 0.0;
         public static double PITCH_HIGH = 0.8;
+        // This is how many degrees the servo turns from PITCH_LOW to PITCH_HIGH
+        public static double PITCH_DEGREE_SPAN = 70.0;
         public static Direction PITCH_DIR = Direction.REVERSE;
         public static Direction YAW_DIR = Direction.FORWARD;
+
+        // Stuff for TargetAcquisition
+        public static double TARGET_HEIGHT = 23.5; // Inches: This is a blind guess
+        public static double CAMERA_HEIGHT = 5; // I could go look at the CAD...
 
         // OpMode testing configuration:
         public static double CHANGE = 0.025;
@@ -63,19 +72,31 @@ public class Gimbal {
         @Override
         public double getDistance() {
             // TODO: Make this use the gimbal position and the h/v position from the camera.
-            return camera.getDistance();
+            // In Decode (2025) we use the fixed target height and camera height to calculate the
+            // distance pretty accurately. To do that with a gimbal, you have to get the *accurate*
+            // angle, because the camera itself doesn't know the gimbal angle.
+            double angle = getVerticalPosition();
+            // tan(angle) = height / distance
+            return (Config.TARGET_HEIGHT - Config.CAMERA_HEIGHT) / Math.tan(angle);
         }
 
         @Override
         public double getHorizontalPosition() {
-            // TODO: Make this consider gimbal position
-            return camera.getHorizontalPosition();
+            double fromCamera = camera.getHorizontalPosition();
+            double gimbalPosition = yaw.getPosition();
+            double servoTicksFromCenter = gimbalPosition - Config.YAW_INIT;
+            double ticksToDegrees = Config.YAW_DEGREE_SPAN / (Config.YAW_HIGH - Config.YAW_LOW);
+            return fromCamera - servoTicksFromCenter * ticksToDegrees;
         }
 
         @Override
         public double getVerticalPosition() {
-            // TODO: Make this consider gimbal position
-            return camera.getVerticalPosition();
+            double fromCamera = camera.getVerticalPosition();
+            double gimbalPosition = pitch.getPosition();
+            double servoTicksFromCenter = gimbalPosition - Config.PITCH_INIT;
+            double ticksToDegrees =
+                Config.PITCH_DEGREE_SPAN / (Config.PITCH_HIGH - Config.PITCH_LOW);
+            return fromCamera - servoTicksFromCenter * ticksToDegrees;
         }
     }
 
