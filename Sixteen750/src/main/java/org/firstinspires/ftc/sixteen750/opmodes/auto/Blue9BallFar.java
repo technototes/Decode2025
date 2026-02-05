@@ -12,7 +12,6 @@ import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
-import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
@@ -33,8 +32,8 @@ public class Blue9BallFar extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
                 TeleCommands.GateUp(robot),
-                LauncherCommand.SetFarShoot(),
-                LauncherCommand.Launch(),
+                TeleCommands.SetFarShoot(robot),
+                TeleCommands.Launch(robot),
                 TeleCommands.Intake(robot),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.StartFartolaunchfar),
@@ -56,7 +55,7 @@ public class Blue9BallFar extends CommandOpMode {
                 Paths.AutoLaunching3Balls(robot),
                 new PedroPathCommand(robot.follower, p.launchfartopark),
                 new WaitCommand(1),
-                LauncherCommand.StopLaunch(),
+                TeleCommands.StopLaunch(robot),
                 TeleCommands.IntakeStop(robot),
                 CommandScheduler::terminateOpMode
             ),

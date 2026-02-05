@@ -68,7 +68,7 @@ public class Hardware implements Loggable {
         if (Setup.Connected.INTAKESUBSYSTEM) {
             intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
         }
-        if (Setup.Connected.LAUNCHERCOMPONENT) {
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             launcher1 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR1);
             launcher2 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR2);
         }

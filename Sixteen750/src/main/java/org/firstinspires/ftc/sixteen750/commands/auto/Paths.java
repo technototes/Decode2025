@@ -15,7 +15,6 @@ import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoOrientFar;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
-import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
 
 @Configurable
 public class Paths {
@@ -27,7 +26,7 @@ public class Paths {
             new ParallelCommandGroup(
                 TeleCommands.Intake(r),
                 TeleCommands.GateUp(r),
-                LauncherCommand.AutoLaunch1()
+                TeleCommands.AutoLaunch1(r)
             ),
             new WaitCommand(3),
             TeleCommands.GateDown(r),

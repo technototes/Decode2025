@@ -11,6 +11,7 @@ import com.technototes.library.logger.Log;
 import com.technototes.library.util.PIDFController;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 @Configurable
@@ -72,7 +73,7 @@ public class AltAutoOrient implements Command {
         //                    Math.toRadians(robot.limelightSubsystem.getTX()) //.getTX .getLimelightRotation()
         //            );
         //            robot.follower.holdPoint(new BezierPoint(wantedPose), wantedPose.getHeading(), false);
-        //            LauncherComponent.targetPower = 1;
+        //            LauncherSubsystem.targetPower = 1;
         //            firsttime = false;
         //}
         currentPose = robot.follower.getPose();

@@ -13,9 +13,9 @@ import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
@@ -47,7 +47,8 @@ public class DualTeleOp extends CommandOpMode {
                 new SequentialCommandGroup(
                     HeadingHelper.RestorePreviousPosition(robot.follower),
                     DrivingCommands.ResetGyro(controlsDriver.pedroDriver),
-                    LauncherCommand.SetRegressionTeleop()
+                    TeleCommands.SetRegressionCTeleop(robot),
+                    TeleCommands.SetRegressionDTeleop(robot)
                 ),
                 OpModeState.INIT
             );
@@ -70,6 +71,9 @@ public class DualTeleOp extends CommandOpMode {
              */
             limelight.start();
         }
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
+            CommandScheduler.register(robot.launcherSubsystem);
+        }
     }
 
     @Override
@@ -84,20 +88,20 @@ public class DualTeleOp extends CommandOpMode {
             .getTelemetry()
             .addData(
                 "currentLaunchVelocity",
-                String.valueOf(LauncherComponent.currentLaunchVelocity)
+                String.valueOf(LauncherSubsystem.currentLaunchVelocity)
             );
         panelsTelemetry
             .getTelemetry()
-            .addData("launcherError", String.valueOf(LauncherComponent.err));
+            .addData("launcherError", String.valueOf(LauncherSubsystem.err));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcherTargetVelocity", String.valueOf(LauncherComponent.targetSpeed));
+            .addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcher1Current", String.valueOf(LauncherComponent.launcher1Current));
+            .addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcher2Current", String.valueOf(LauncherComponent.launcher2Current));
+            .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
         panelsTelemetry.getTelemetry().update(telemetry);
     }
     */

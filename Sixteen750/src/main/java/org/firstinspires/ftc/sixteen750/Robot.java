@@ -3,11 +3,11 @@ package org.firstinspires.ftc.sixteen750;
 import com.pedropathing.follower.Follower;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
-import org.firstinspires.ftc.sixteen750.components.LauncherComponent;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.AimingSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.BrakeSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.SafetySubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.TestSubsystem;
@@ -20,7 +20,7 @@ public class Robot implements Loggable {
     public double initialVoltage;
 
     public SafetySubsystem safetySubsystem;
-    public LauncherComponent launcherComponent;
+    public LauncherSubsystem launcherSubsystem;
     public IntakeSubsystem intakeSubsystem;
     public BrakeSubsystem brakeSubsystem;
     public AimingSubsystem aimingSubsystem;
@@ -41,23 +41,8 @@ public class Robot implements Loggable {
         if (Setup.Connected.INTAKESUBSYSTEM) {
             this.intakeSubsystem = new IntakeSubsystem(hw);
         }
-        if (Setup.Connected.LAUNCHERCOMPONENT) {
-            // For Review:
-            // The limelightSubsystem now implements the "TargetAcquisition" interface. This let's
-            // us completely decouple the LauncherComponent from the LimelightSubsystem, and instead
-            // just requires that we provide *anything* that will tell us the distance to target.
-            // We could build out a little thing that only uses Odometry to decide where the target
-            // is, instead, and wouldn't need to change anything in the LauncherComponent.
-            this.launcherComponent = new LauncherComponent(
-                hw.launcher1,
-                hw.launcher2,
-                limelightSubsystem,
-                hw::voltage
-            );
-        } else {
-            // This should let us run code (scheduled commands, for instance...) without any
-            // hardware in the launcher subsystem
-            this.launcherComponent = new LauncherComponent();
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
+            this.launcherSubsystem = new LauncherSubsystem(hw);
         }
         if (Setup.Connected.BRAKESUBSYSTEM) {
             this.brakeSubsystem = new BrakeSubsystem(hw);

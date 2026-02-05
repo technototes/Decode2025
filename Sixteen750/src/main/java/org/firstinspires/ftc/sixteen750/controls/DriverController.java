@@ -8,10 +8,12 @@ import com.technototes.library.control.Stick;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
-import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
+import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 public class DriverController {
 
@@ -58,7 +60,7 @@ public class DriverController {
         if (Setup.Connected.DRIVEBASE) {
             bindDriveControls();
         }
-        if (Setup.Connected.LAUNCHERCOMPONENT) {
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             bindLaunchControls();
         }
         if (Setup.Connected.INTAKESUBSYSTEM) {
@@ -127,13 +129,13 @@ public class DriverController {
     }
 
     public void bindLaunchControls() {
-        launchButton.whilePressed(LauncherCommand.Launch());
-        launchButton.whenReleased(LauncherCommand.StopLaunch());
-        // CloseShoot.whenPressed(LauncherCommand.SetCloseShoot());
-        // FarShoot.whenPressed(LauncherCommand.SetFarShoot());
-        MotorIncrease.whenPressed(LauncherCommand.IncreaseMotor());
-        MotorDecrease.whenPressed(LauncherCommand.DecreaseMotor());
-        increaseD.whenPressed(LauncherCommand.IncreaseRegressionDTeleop());
+        launchButton.whilePressed(TeleCommands.Launch(robot));
+        launchButton.whenReleased(TeleCommands.StopLaunch(robot));
+        //        CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
+        //        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
+        MotorIncrease.whenPressed(robot.launcherSubsystem::IncreaseMotorVelocity);
+        MotorDecrease.whenPressed(robot.launcherSubsystem::DecreaseMotorVelocity);
+        increaseD.whenPressed(robot.launcherSubsystem::increaseRegressionDTeleop);
     }
 
     public void bindIntakeControls() {

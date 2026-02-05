@@ -14,12 +14,48 @@ public class TeleCommands {
         ); //pose might need to be current pose?
     }
 
+    public static Command Launch(Robot r) {
+        return Command.create(r.launcherSubsystem::Launch);
+    }
+
+    public static Command SetFarShoot(Robot r) {
+        return Command.create(r.launcherSubsystem::FarShoot);
+    }
+
+    public static Command SetCloseShoot(Robot r) {
+        return Command.create(r.launcherSubsystem::CloseShoot);
+    }
+
+    public static Command AutoLaunch1(Robot r) {
+        return Command.create(r.launcherSubsystem::AutoLaunch1);
+    }
+
+    public static Command AutoLaunch2(Robot r) {
+        return Command.create(r.launcherSubsystem::AutoLaunch2);
+    }
+
+    public static Command FarAutoLaunch(Robot r) {
+        return Command.create(r.launcherSubsystem::FarAutoLaunch);
+    }
+
+    public static Command StopLaunch(Robot r) {
+        return Command.create(r.launcherSubsystem::Stop);
+    }
+
     public static Command Rumble(Robot r) {
         return Command.create(r.intakeSubsystem::setRumble);
     }
 
     public static Command RumbleOff(Robot r) {
         return Command.create(r.intakeSubsystem::setRumbleOff);
+    }
+
+    public static Command IncreaseMotor(Robot r) {
+        return Command.create(r.launcherSubsystem::IncreaseMotorVelocity);
+    }
+
+    public static Command DecreaseMotor(Robot r) {
+        return Command.create(r.launcherSubsystem::DecreaseMotorVelocity);
     }
 
     public static Command Intake(Robot r) {
@@ -80,5 +116,29 @@ public class TeleCommands {
 
     public static Command MotorVelocityTest(Robot r) {
         return Command.create(r.testSubsystem::setMotorVelocityTest);
+    }
+
+    public static Command ReadVelocity(Robot r) {
+        return Command.create(r.launcherSubsystem::readVelocity);
+    }
+
+    public static Command SetRegressionCAuto(Robot r) {
+        return Command.create(r.launcherSubsystem::setRegressionCAuto);
+    }
+
+    public static Command SetRegressionDAuto(Robot r) {
+        return Command.create(r.launcherSubsystem::setRegressionDAuto);
+    }
+
+    public static Command SetRegressionCTeleop(Robot r) {
+        return Command.create(r.launcherSubsystem::setRegressionCTeleop);
+    }
+
+    public static Command SetRegressionDTeleop(Robot r) {
+        return Command.create(r.launcherSubsystem::setRegressionDTeleop);
+    }
+
+    public static Command IncreaseRegressionDTeleop(Robot r) {
+        return Command.create(r.launcherSubsystem::increaseRegressionDTeleop);
     }
 }

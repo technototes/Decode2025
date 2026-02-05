@@ -16,7 +16,7 @@ public class Setup {
         public static boolean EXTERNAL_IMU = true;
         public static boolean OTOS = false;
         public static boolean INTAKESUBSYSTEM = true;
-        public static boolean LAUNCHERCOMPONENT = true;
+        public static boolean LAUNCHERSUBSYSTEM = true;
         public static boolean AIMINGSUBSYSTEM = true;
         public static boolean BRAKESUBSYSTEM = true;
     }

@@ -14,7 +14,6 @@ import org.firstinspires.ftc.sixteen750.commands.LLSetup;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
-import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
@@ -39,12 +38,13 @@ public class Red12BallFar extends CommandOpMode {
             //new AltAutoVelocity(robot).alongWith(
             new SequentialCommandGroup(
                 new LLSetup(robot),
-                LauncherCommand.SetRegressionAuto(),
+                TeleCommands.SetRegressionCAuto(robot),
+                TeleCommands.SetRegressionDAuto(robot),
                 TeleCommands.GateUp(robot),
                 TeleCommands.Intake(robot),
-                LauncherCommand.SetFarShoot(),
+                TeleCommands.SetFarShoot(robot),
                 TeleCommands.HoldIntake(robot),
-                LauncherCommand.FarAutoLaunch(),
+                TeleCommands.FarAutoLaunch(robot),
                 TeleCommands.HoodUp(robot),
                 new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
                 new WaitCommand(0.5),

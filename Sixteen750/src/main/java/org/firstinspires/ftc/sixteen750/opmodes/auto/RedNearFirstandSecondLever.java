@@ -14,13 +14,13 @@ import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
-import org.firstinspires.ftc.sixteen750.components.LauncherComponent;
-import org.firstinspires.ftc.sixteen750.components.LauncherComponent.LauncherCommand;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
 @Autonomous(name = "RedNearLever1️⃣2️⃣", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
@@ -40,7 +40,7 @@ public class RedNearFirstandSecondLever extends CommandOpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE;
         robot.follower.setStartingPose(p.getRSegmentedCurveStart());
         CommandScheduler.scheduleForState(
-            LauncherCommand.AutoVelocity().alongWith(
+            new AltAutoVelocity(robot).alongWith(
                 new SequentialCommandGroup(
                     //TeleCommands.AutoLaunch1(robot),
                     TeleCommands.GateUp(robot),
@@ -106,6 +106,9 @@ public class RedNearFirstandSecondLever extends CommandOpMode {
              */
             limelight.start();
         }
+        if (Setup.Connected.LAUNCHERSUBSYSTEM) {
+            CommandScheduler.register(robot.launcherSubsystem);
+        }
     }
 
     public void uponStart() {
@@ -117,20 +120,20 @@ public class RedNearFirstandSecondLever extends CommandOpMode {
             .getTelemetry()
             .addData(
                 "currentLaunchVelocity",
-                String.valueOf(LauncherComponent.currentLaunchVelocity)
+                String.valueOf(LauncherSubsystem.currentLaunchVelocity)
             );
         panelsTelemetry
             .getTelemetry()
-            .addData("launcherError", String.valueOf(LauncherComponent.err));
+            .addData("launcherError", String.valueOf(LauncherSubsystem.err));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcherTargetVelocity", String.valueOf(LauncherComponent.targetSpeed));
+            .addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcher1Current", String.valueOf(LauncherComponent.launcher1Current));
+            .addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
         panelsTelemetry
             .getTelemetry()
-            .addData("launcher2Current", String.valueOf(LauncherComponent.launcher2Current));
+            .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
         panelsTelemetry.getTelemetry().update(telemetry);
     }
 
