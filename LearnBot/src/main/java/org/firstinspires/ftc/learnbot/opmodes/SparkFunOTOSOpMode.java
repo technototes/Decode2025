@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.learnbot.Setup;
+import org.firstinspires.ftc.learnbot.components.Pedro;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -27,7 +28,10 @@ public class SparkFunOTOSOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Get a reference to the sensor
-        myOtos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+        myOtos = hardwareMap.get(
+            SparkFunOTOS.class,
+            Pedro.Config.Localizer.OTOSConfig.hardwareName
+        );
 
         // All the configuration for the OTOS is done in this helper method, check it out!
         configureOtos();

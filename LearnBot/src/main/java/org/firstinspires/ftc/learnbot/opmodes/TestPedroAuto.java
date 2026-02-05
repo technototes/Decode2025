@@ -10,7 +10,7 @@ import com.technototes.library.util.HeadingHelper;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.TestPaths;
-import org.firstinspires.ftc.learnbot.commands.PedroPathCommand;
+import org.firstinspires.ftc.learnbot.components.Pedro;
 import org.firstinspires.ftc.learnbot.controls.DriverController;
 import org.firstinspires.ftc.learnbot.helpers.StartingPosition;
 
@@ -26,19 +26,19 @@ public class TestPedroAuto extends CommandOpMode {
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
-        TestPaths p = new TestPaths(robot.drivebase.follower);
+        TestPaths p = new TestPaths(Pedro.getFollower());
         CommandScheduler.scheduleOnceForState(
-            () -> robot.drivebase.follower.setStartingPose(p.getStart()),
+            () -> Pedro.getFollower().setStartingPose(p.getStart()),
             OpModeState.INIT
         );
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                robot.drivebase.MakePathCommand(p.Path1),
-                robot.drivebase.MakePathCommand(p.Path2),
-                robot.drivebase.MakePathCommand(p.Path3),
-                robot.drivebase.MakePathCommand(p.Path4),
+                Pedro.Commands.FollowPath(p.Path1),
+                Pedro.Commands.FollowPath(p.Path2),
+                Pedro.Commands.FollowPath(p.Path3),
+                Pedro.Commands.FollowPath(p.Path4),
                 new WaitCommand(1),
-                HeadingHelper.SaveCurrentPosition(robot.drivebase.follower),
+                HeadingHelper.SaveCurrentPosition(Pedro.getFollower()),
                 CommandScheduler::terminateOpMode
             ),
             OpModeState.RUN
@@ -50,6 +50,6 @@ public class TestPedroAuto extends CommandOpMode {
     }
 
     public void end() {
-        HeadingHelper.SaveCurrentPosition(robot.drivebase.follower);
+        HeadingHelper.SaveCurrentPosition(Pedro.getFollower());
     }
 }

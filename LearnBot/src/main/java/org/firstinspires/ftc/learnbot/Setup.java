@@ -12,18 +12,13 @@ public class Setup {
         public static boolean LIMELIGHT = false;
         public static boolean OTOS = true;
         public static boolean PINPOINT = false;
+        public static boolean GIMBAL = true;
     }
 
     @Configurable
     public static class HardwareNames {
 
-        public static String FLMOTOR = "fl";
-        public static String FRMOTOR = "fr";
-        public static String RLMOTOR = "rl";
-        public static String RRMOTOR = "rr";
         public static String IMU = "imu";
-        public static String OTOS = "otos";
-        public static String PINPOINT = "pinpoint";
         public static String LIMELIGHT = "limelight";
         public static String ALLIANCE_SWITCH_RED = "asr";
         public static String ALLIANCE_SWITCH_BLUE = "asb";

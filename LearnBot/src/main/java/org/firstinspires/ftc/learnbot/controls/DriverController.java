@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.learnbot.controls;
 
+import com.technototes.library.command.Command;
 import com.technototes.library.command.CycleCommandGroup;
 import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
@@ -8,7 +9,8 @@ import com.technototes.library.logger.Loggable;
 import org.firstinspires.ftc.learnbot.Hardware;
 import org.firstinspires.ftc.learnbot.Robot;
 import org.firstinspires.ftc.learnbot.Setup.Connected;
-import org.firstinspires.ftc.learnbot.commands.JoystickDrive;
+import org.firstinspires.ftc.learnbot.components.Launcher;
+import org.firstinspires.ftc.learnbot.components.Pedro;
 
 public class DriverController implements Loggable {
 
@@ -27,8 +29,10 @@ public class DriverController implements Loggable {
     public CommandButton driveModeButton;
     public CommandButton holdPosButton;
     public CommandButton snapRotButton;
-    public JoystickDrive stickDriver;
+    public Command stickDriver;
     public CycleCommandGroup rotationCommand;
+    public CommandButton launch1Button;
+    public CommandButton launch2Button;
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
@@ -57,14 +61,16 @@ public class DriverController implements Loggable {
         snapRotButton = gamepad.ps_triangle;
 
         visionButton = gamepad.ps_circle;
+        launch1Button = gamepad.ps_square;
+        launch2Button = gamepad.ps_cross;
     }
 
     public void bindDriveControls() {
-        stickDriver = new JoystickDrive(robot.drivebase, driveLeftStick, driveRightStick);
+        stickDriver = Pedro.Commands.JoystickDrive(driveLeftStick, driveRightStick);
 
-        turboButton.whenPressed(robot.drivebase::SetTurboSpeed);
-        normalButton.whenPressed(robot.drivebase::SetNormalSpeed);
-        snailButton.whenPressed(robot.drivebase::SetSnailSpeed);
+        turboButton.whenPressed(Pedro.Commands.TurboSpeed());
+        normalButton.whenPressed(Pedro.Commands.NormalSpeed());
+        snailButton.whenPressed(Pedro.Commands.SnailSpeed());
 
         if (Connected.LIMELIGHT) {
             visionButton.whenPressedReleased(
@@ -103,5 +109,7 @@ public class DriverController implements Loggable {
                 robot.drivebase::SetFieldCentricMode
             )
         );
+        launch1Button.whilePressed(Launcher.Commands.Launch());
+        launch2Button.whenReleased(Launcher.Commands.StopLaunch());
     }
 }
