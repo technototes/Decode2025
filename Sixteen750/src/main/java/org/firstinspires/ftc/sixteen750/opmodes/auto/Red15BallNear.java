@@ -46,17 +46,19 @@ public class Red15BallNear extends CommandOpMode {
                     TeleCommands.GateUp(robot),
                     TeleCommands.Intake(robot),
                     TeleCommands.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.RStarttoLaunch, p.power2),
+                    new PedroPathCommand(robot.follower, p.RStarttoLaunch, p.power9),
                     Paths.AutoLaunching3Balls(robot),
                     // new WaitCommand(0.5),
                     new PedroPathCommand(robot.follower, p.RLaunchtoIntake2),
                     // new WaitCommand(1),
-                    new PedroPathCommand(robot.follower, p.RIntake2toIntake2end, p.power).alongWith(
-                        TeleCommands.Intake(robot)
-                    ),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.RIntake2toIntake2end,
+                        p.power9
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new WaitCommand(0.05),
                     //   TeleCommands.AutoLaunch2(robot),
-                    new PedroPathCommand(robot.follower, p.RIntake2endtoLever2, p.power2),
+                    new PedroPathCommand(robot.follower, p.RIntake2endtoLever2, p.power9),
                     new WaitCommand(0.5),
                     new PedroPathCommand(robot.follower, p.RLever2toLaunch).alongWith(
                         TeleCommands.IntakeStop(robot)
@@ -68,47 +70,53 @@ public class Red15BallNear extends CommandOpMode {
                     new WaitCommand(0.05),
                     //TeleCommands.AutoLaunch2(robot),
 
-                    new PedroPathCommand(robot.follower, p.RIntakeGatetoIntakeGateDown).alongWith(
-                        TeleCommands.Intake(robot)
-                    ),
-                    new WaitCommand(0.5),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.RIntakeGatetoIntakeGateDown,
+                        p.power9
+                    ).alongWith(TeleCommands.Intake(robot)),
+                    new WaitCommand(1.2),
                     new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),
-                    new WaitCommand(0.05),
-                    Paths.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.RLaunchtoIntakeGate).alongWith(
-                        TeleCommands.IntakeStop(robot)
-                    ),
-                    new WaitCommand(0.05),
-                    //TeleCommands.AutoLaunch2(robot),
-
-                    new PedroPathCommand(robot.follower, p.RIntakeGatetoIntakeGateDown).alongWith(
-                        TeleCommands.Intake(robot)
-                    ),
                     new WaitCommand(0.5),
-                    new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch).alongWith(
-                        TeleCommands.IntakeStop(robot)
-                    ),
-                    new WaitCommand(0.05),
                     Paths.AutoLaunching3Balls(robot),
+                    //                    new PedroPathCommand(robot.follower, p.RLaunchtoIntakeGate).alongWith(
+                    //                        TeleCommands.IntakeStop(robot)
+                    //                    ),
+                    //                    new WaitCommand(0.05),
+                    //                    //TeleCommands.AutoLaunch2(robot),
+                    //
+                    //                    new PedroPathCommand(robot.follower, p.RIntakeGatetoIntakeGateDown, p.power2).alongWith(
+                    //                        TeleCommands.Intake(robot)
+                    //                    ),
+                    //                    new WaitCommand(0.2),
+                    //                    new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch).alongWith(
+                    //                        TeleCommands.IntakeStop(robot)
+                    //                    ),
+                    //                    new WaitCommand(0.05),
+                    //                    Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RLaunchtoIntake1),
-                    new PedroPathCommand(robot.follower, p.RIntake1toIntake1end).alongWith(
-                        TeleCommands.Intake(robot)
-                    ),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.RIntake1toIntake1end,
+                        p.power9
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.RIntake1endtoLaunch),
                     new WaitCommand(0.05),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),
-                    new PedroPathCommand(robot.follower, p.RIntake3toIntake3end, p.power).alongWith(
-                        TeleCommands.Intake(robot)
-                    ),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.RIntake3toIntake3end,
+                        p.power9
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new WaitCommand(0.1),
                     new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),
                     Paths.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.RLaunchtoEnd, p.power2),
+                    new PedroPathCommand(robot.follower, p.RLaunchtoEnd),
                     TeleCommands.IntakeStop(robot),
                     CommandScheduler::terminateOpMode
                 )
