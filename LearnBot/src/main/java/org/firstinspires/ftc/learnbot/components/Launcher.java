@@ -230,7 +230,7 @@ public class Launcher {
             setTargetVelocity(calculateVelocity()); //change to auto aim velocity
         }
 
-        protected void setVelocity(double pow) {
+        protected void setPower(double pow) {
             double power = Math.clamp(pow, -1, 1);
             targetPower = power;
             if (hasLaunch1()) {
@@ -300,9 +300,9 @@ public class Launcher {
             if (launcherPID.getTarget() != 0) {
                 double power = launcherPID.update(motorVelocity);
                 power += Math.copySign(additionalAmount, power);
-                setVelocity(power);
+                setPower(power);
             } else {
-                setVelocity(0);
+                setPower(0);
                 // When we want to stop, reset the PID controller, too
                 launcherPID.update(motorVelocity);
                 launcherPID.reset();
@@ -400,7 +400,7 @@ public class Launcher {
             );
             lc = new Launcher.Component(m, null, this::getVoltage);
             state = State.MeasureStaticFriction;
-            lc.setVelocity(0);
+            lc.setPower(0);
         }
 
         double staticFriction = 0.001;
@@ -418,7 +418,7 @@ public class Launcher {
             double v = getVoltage();
             double amps = lc.getMotor1Current();
             double power = (staticFriction + amps * Config.MotorResistance) / v;
-            lc.setVelocity(power);
+            lc.setPower(power);
             addLine("Press a button to abort (and just be patient)");
             addData("kStaticFriction", staticFriction);
             addData("Voltage", v);
@@ -427,14 +427,14 @@ public class Launcher {
                 lastUpdate.reset();
                 // We update every 100 milliseconds, just to give it time to trigger the encoder
                 if (lc.getActualVelocity() != 0) {
-                    lc.setVelocity(0);
+                    lc.setPower(0);
                     staticFriction -= staticFrictionStep;
                     return State.DoneWithFriction;
                 }
                 staticFriction += staticFrictionStep;
             }
             if (anyButtonsReleased()) {
-                lc.setVelocity(0);
+                lc.setPower(0);
                 return State.Abort;
             }
             return State.MeasureStaticFriction;
@@ -459,10 +459,10 @@ public class Launcher {
             double amps;
             if (anyButtonsReleased()) {
                 velocityConstant = velocityConstantStats.getMean();
-                lc.setVelocity(0);
+                lc.setPower(0);
                 return State.DoneWithVelocity;
             }
-            lc.setVelocity(1);
+            lc.setPower(1);
             if (lastUpdate.milliseconds() >= 50) {
                 lastUpdate.reset();
                 vel = lc.getActualVelocity();
@@ -472,7 +472,7 @@ public class Launcher {
                 }
                 amps = lc.getMotor1Current();
                 if (vel != 0) {
-                    // power = (kStaticFriction + kVelocityConstant * RPM) / v
+                    // power = (kStaticFriction + kVelocityConstant * RPM + motorAmperage * motorResistance) / v
                     // So
                     //   1 = (kSF + kV * RPM + motorAmperage * motorResistance) / v;
                     // solve for kV:
@@ -506,12 +506,17 @@ public class Launcher {
         }
 
         private State Testing() {
+            double voltage = getVoltage();
             double pow = targetVelocity == 0
                 ? 0
                 : ((Math.copySign(staticFriction, targetVelocity) +
-                          velocityConstant * targetVelocity) /
-                      getVoltage());
-            lc.setVelocity(pow);
+                          velocityConstant * targetVelocity +
+                          Math.copySign(
+                              lc.getMotor1Current() * Config.MotorResistance,
+                              targetVelocity
+                          )) /
+                      voltage);
+            lc.setPower(pow);
             if (lastUpdate.milliseconds() > 250) {
                 lastUpdate.reset();
                 vel = lc.getActualVelocity();
