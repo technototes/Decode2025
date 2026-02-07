@@ -51,7 +51,7 @@ public class Paths {
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
-            new WaitCommand(1),
+            new WaitCommand(0.8),
             TeleCommands.GateUp(r),
             TeleCommands.IntakeStop(r)
 
@@ -186,10 +186,12 @@ public class Paths {
     public static double power = 0.38;
     public static double powerforintake4 = 0.5;
     public static double power2 = 0.75;
+    public static double power9 = 0.9;
 
     //Red poses reconfigure these
     public static Pose RStart = new Pose(113.5, 135.152);
     public static Pose RLaunch = new Pose(90, 93, 0);
+    public static Pose RLaunch2 = new Pose(84, 87);
     public static Pose RLaunchStart = new Pose(85, 88);
     public static Pose RGoal = new Pose(144, 144);
     public static Pose RLaunchend = new Pose(90, 90);
@@ -201,10 +203,10 @@ public class Paths {
     public static Pose RIntake2end = new Pose(128, 62);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
     public static Pose RIntake3 = new Pose(95, 41);
-    public static Pose RIntakeGate = new Pose(131.868, 60.458);
-    public static Pose RIntakeGateControlPoint = new Pose(73.222, 67.549);
-    public static Pose RIntakeGateDown = new Pose(134.328, 45.393);
-    public static Pose RIntakeGateDownControlPoint = new Pose(64.993, 70.179);
+    public static Pose RIntakeGate = new Pose(131.868, 70);
+    public static Pose RIntakeGateControlPoint = new Pose(90, 67.549);
+    public static Pose RIntakeGateDown = new Pose(134.328, 56);
+    public static Pose RIntakeGateDownControlPoint = new Pose(70, 70.179);
     public static Pose IntakeGate = new Pose(13, 60);
     public static Pose IntakeGateControlPoint = new Pose(71, 67);
     public static Pose IntakeGateDown = new Pose(10, 45);
@@ -213,7 +215,8 @@ public class Paths {
     public static Pose RIntake3end = new Pose(128, 41);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(125, 79);
-    public static Pose Rlever2 = new Pose(125, 67);
+    public static Pose Rlever2 = new Pose(125, 70);
+    public static Pose RLever2controlpoint = new Pose(60, 76);
     public static Pose RleverControlPoint = new Pose(118, 76);
     public static Pose RleverControlPoint2 = new Pose(110, 68); //x = 112, y=73 - old point, new to test
     public static Pose REnd = new Pose(95, 84);
@@ -727,7 +730,7 @@ public class Paths {
             .build();
         RLever2toLaunch = follower
             .pathBuilder()
-            .addPath(new BezierLine(Rlever2, RLaunch))
+            .addPath(new BezierCurve(Rlever2, RLever2controlpoint, RLaunch))
             .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading1))
             .build();
         Lever2toLaunch = follower
