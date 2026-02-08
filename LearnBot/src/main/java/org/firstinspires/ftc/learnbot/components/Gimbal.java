@@ -5,7 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo.Direction;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.MovingStatistics;
+import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.structure.ValidationOpMode;
@@ -94,6 +96,7 @@ public class Gimbal {
                 pitch.setInverted(Config.Pitch.flip);
             }
             camera = vision;
+            CommandScheduler.register(this);
         }
 
         @Override
@@ -120,10 +123,56 @@ public class Gimbal {
             return Config.Pitch.Adjust(fromCamera, gimbalPosition);
         }
 
+        private enum State {
+            Unknown,
+            Following,
+            Scanning,
+            Scanning_Start,
+        }
+
+        State curState = State.Unknown;
+        ElapsedTime stateTimer = new ElapsedTime();
+
         // TODO: Implement either target tracking when a target is visible
         //   OR
         //  target *scanning* when a target isn't visible
+        @Override
+        public void periodic() {
+            double vert = camera.getVerticalPosition();
+            double horiz = camera.getHorizontalPosition();
+            if (Double.isNaN(vert) || Double.isNaN(horiz)) {
+                if (curState == State.Unknown || curState == State.Following) {
+                    curState = State.Scanning_Start;
+                    stateTimer.reset();
+                }
+            } else {
+                if (curState != State.Following) {
+                    curState = State.Following;
+                    stateTimer.reset();
+                }
+            }
+            switch (curState) {
+                case Following:
+                    // Move the gimbal to try to center the target
+                    break;
+                case Scanning_Start:
+                    // Initialize our scan positions (from where we are currently)
+                    setPos(0, 0);
+                    break;
+                case Scanning:
+                    // I want the stall detector, so I can see when the camera has hit it's edge
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void setPos(double X, double Y) {}
     }
+
+    // TODO: Make an opmode to *calculate* the angle spread of the gimbal
+    //  This would entail watching a target and moving the gimbal to measure how far
+    //  each movement changes the position of the target.
 
     @TeleOp(name = "Gimbal Testing")
     public static class TestingOpMode extends ValidationOpMode {
