@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.technototes.library.util.MathUtils;
 import com.technototes.library.util.PIDFController;
 
 /**
@@ -98,29 +98,25 @@ public class CoaxialSwerveDrive extends Drivetrain {
             hardwareMap.get(AnalogInput.class, constants.frontLeftEncoderName)
         )
             .zero(constants.frontLeftEncoderOffset)
-            .setInverted(constants.isFrontLeftEncoderInverted)
-            .setSmoothing(constants.frontLeftSmoothing);
+            .setInverted(constants.isFrontLeftEncoderInverted);
 
         steeringEncoders[1] = new AbsoluteAnalogEncoder(
             hardwareMap.get(AnalogInput.class, constants.frontRightEncoderName)
         )
             .zero(constants.frontRightEncoderOffset)
-            .setInverted(constants.isFrontRightEncoderInverted)
-            .setSmoothing(constants.frontRightSmoothing);
+            .setInverted(constants.isFrontRightEncoderInverted);
 
         steeringEncoders[2] = new AbsoluteAnalogEncoder(
             hardwareMap.get(AnalogInput.class, constants.rearLeftEncoderName)
         )
             .zero(constants.rearLeftEncoderOffset)
-            .setInverted(constants.isRearLeftEncoderInverted)
-            .setSmoothing(constants.rearLeftSmoothing);
+            .setInverted(constants.isRearLeftEncoderInverted);
 
         steeringEncoders[3] = new AbsoluteAnalogEncoder(
             hardwareMap.get(AnalogInput.class, constants.rearRightEncoderName)
         )
             .zero(constants.rearRightEncoderOffset)
-            .setInverted(constants.isRearRightEncoderInverted)
-            .setSmoothing(constants.rearRightSmoothing);
+            .setInverted(constants.isRearRightEncoderInverted);
 
         // Set motor directions
         driveMotors[0].setDirection(constants.frontLeftDriveMotorDirection);
@@ -217,7 +213,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
 
             // Optimize the module angle to avoid rotating more than 90 degrees
             // If the module needs to rotate >90°, we can reverse the drive direction instead
-            double angleDifference = Angle.normDelta(moduleAngles[i] - currentAngles[i]);
+            double angleDifference = MathUtils.normalizeDeltaRadians(moduleAngles[i] - currentAngles[i]);
 
             // If we need to turn more than 90 degrees, flip the angle and reverse speed
             if (Math.abs(angleDifference) > Math.PI / 2) {
@@ -225,7 +221,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
                 moduleSpeeds[i] *= -1;
 
                 // Normalize the angle [-pi, pi]
-                moduleAngles[i] = Angle.normDelta(moduleAngles[i]);
+                moduleAngles[i] = MathUtils.normalizeDeltaRadians(moduleAngles[i]);
             }
 
             // Store the target angle for this module
@@ -255,7 +251,7 @@ public class CoaxialSwerveDrive extends Drivetrain {
         double[] steeringPowers = new double[4];
         for (int i = 0; i < 4; i++) {
             // Get actual current angle from absolute encoder and normalize
-            currentAngles[i] = Angle.normDelta(steeringEncoders[i].getCurrentPosition());
+            currentAngles[i] = MathUtils.normalizeDeltaRadians(steeringEncoders[i].getCurrentPosition());
 
             // Set the target for the controller (already normalized in loop above)
             steeringControllers[i].setTarget(targetAngles[i]);
