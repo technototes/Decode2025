@@ -23,10 +23,10 @@ import org.firstinspires.ftc.swervebot.swerveutil.AbsoluteAnalogEncoder;
 public class SwerveCalibrationOpMode extends LinearOpMode {
 
     // Change these to match your robot configuration
-    private static final String FL_ENCODER = "frontLeftEncoder";
-    private static final String FR_ENCODER = "frontRightEncoder";
-    private static final String BL_ENCODER = "backLeftEncoder";
-    private static final String BR_ENCODER = "backRightEncoder";
+    private static final String FL_ENCODER = "servoenc";
+//    private static final String FR_ENCODER = "frontRightEncoder";
+//    private static final String BL_ENCODER = "backLeftEncoder";
+//    private static final String BR_ENCODER = "backRightEncoder";
 
     @Override
     public void runOpMode() {
@@ -34,15 +34,15 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
         AbsoluteAnalogEncoder flEncoder = new AbsoluteAnalogEncoder(
             hardwareMap.get(AnalogInput.class, FL_ENCODER)
         );
-        AbsoluteAnalogEncoder frEncoder = new AbsoluteAnalogEncoder(
-            hardwareMap.get(AnalogInput.class, FR_ENCODER)
-        );
-        AbsoluteAnalogEncoder blEncoder = new AbsoluteAnalogEncoder(
-            hardwareMap.get(AnalogInput.class, BL_ENCODER)
-        );
-        AbsoluteAnalogEncoder brEncoder = new AbsoluteAnalogEncoder(
-            hardwareMap.get(AnalogInput.class, BR_ENCODER)
-        );
+//        AbsoluteAnalogEncoder frEncoder = new AbsoluteAnalogEncoder(
+//            hardwareMap.get(AnalogInput.class, FR_ENCODER)
+//        );
+//        AbsoluteAnalogEncoder blEncoder = new AbsoluteAnalogEncoder(
+//            hardwareMap.get(AnalogInput.class, BL_ENCODER)
+//        );
+//        AbsoluteAnalogEncoder brEncoder = new AbsoluteAnalogEncoder(
+//            hardwareMap.get(AnalogInput.class, BR_ENCODER)
+//        );
 
         telemetry.addLine("========================================");
         telemetry.addLine("SWERVE ENCODER CALIBRATION");
@@ -60,25 +60,25 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
 
         while (opModeIsActive()) {
             // Read current positions
-            double flPos = flEncoder.getRawAngle();
-            double frPos = frEncoder.getRawAngle();
-            double blPos = blEncoder.getRawAngle();
-            double brPos = brEncoder.getRawAngle();
+            double flPos = flEncoder.getCurrentPosition() ;
+//            double frPos = frEncoder.getRawAngle();
+//            double blPos = blEncoder.getRawAngle();
+//            double brPos = brEncoder.getRawAngle();
 
             // Read raw voltages for debugging
             double flVolt = flEncoder.getVoltage();
-            double frVolt = frEncoder.getVoltage();
-            double blVolt = blEncoder.getVoltage();
-            double brVolt = brEncoder.getVoltage();
+//            double frVolt = frEncoder.getVoltage();
+//            double blVolt = blEncoder.getVoltage();
+//            double brVolt = brEncoder.getVoltage();
 
             // Display information
             telemetry.addLine("========================================");
             telemetry.addLine("ENCODER POSITIONS (radians)");
             telemetry.addLine("========================================");
             telemetry.addData("Front Left", "%.4f rad (%.1f°)", flPos, Math.toDegrees(flPos));
-            telemetry.addData("Front Right", "%.4f rad (%.1f°)", frPos, Math.toDegrees(frPos));
-            telemetry.addData("Back Left", "%.4f rad (%.1f°)", blPos, Math.toDegrees(blPos));
-            telemetry.addData("Back Right", "%.4f rad (%.1f°)", brPos, Math.toDegrees(brPos));
+//            telemetry.addData("Front Right", "%.4f rad (%.1f°)", frPos, Math.toDegrees(frPos));
+//            telemetry.addData("Back Left", "%.4f rad (%.1f°)", blPos, Math.toDegrees(blPos));
+//            telemetry.addData("Back Right", "%.4f rad (%.1f°)", brPos, Math.toDegrees(brPos));
 
             telemetry.addLine();
             telemetry.addLine("========================================");
@@ -86,11 +86,11 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
             telemetry.addLine("========================================");
             telemetry.addLine(
                 String.format(
-                    ".withEncoderOffsets(%.4f, %.4f, %.4f, %.4f)",
-                    flPos,
-                    frPos,
-                    blPos,
-                    brPos
+                    ".withEncoderOffsets(%.4f)",
+                    flPos
+//                    frPos,
+//                    blPos,
+//                    brPos
                 )
             );
 
@@ -99,9 +99,9 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
             telemetry.addLine("RAW VOLTAGES (for debugging)");
             telemetry.addLine("========================================");
             telemetry.addData("Front Left", "%.3fV", flVolt);
-            telemetry.addData("Front Right", "%.3fV", frVolt);
-            telemetry.addData("Back Left", "%.3fV", blVolt);
-            telemetry.addData("Back Right", "%.3fV", brVolt);
+//            telemetry.addData("Front Right", "%.3fV", frVolt);
+//            telemetry.addData("Back Left", "%.3fV", blVolt);
+//            telemetry.addData("Back Right", "%.3fV", brVolt);
 
             telemetry.addLine();
             telemetry.addLine("========================================");
