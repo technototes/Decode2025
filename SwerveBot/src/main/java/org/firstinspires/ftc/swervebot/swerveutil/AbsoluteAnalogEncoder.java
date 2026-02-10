@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.swervebot.swerveutil;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.ftc.localization.Encoder;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.technototes.library.util.MathUtils;
 
 @Configurable
 public class AbsoluteAnalogEncoder {
 
     public static double DEFAULT_RANGE = 3.3;
+    public static boolean VALUE_REJECTION = false;
 
     private final AnalogInput encoder;
     private double offset;
@@ -65,41 +68,10 @@ public class AbsoluteAnalogEncoder {
      * @return position in radians
      */
     public double getCurrentPosition() {
-        double rawVoltage = getVoltage();
-
-        // Initialize filter on first read
-        if (!filterInitialized) {
-            filteredVoltage = rawVoltage;
-            filterInitialized = true;
-        }
-
-        // Apply low-pass filter to reduce jitter
-        filteredVoltage = (alpha * rawVoltage) + ((1 - alpha) * filteredVoltage);
-
-        // Convert voltage to ratio [0, 1]
-        double ratio = filteredVoltage / analogRange;
-        if (!inverted) {
-            ratio = 1 - ratio;
-        }
-
-        // Convert to radians [0, 2π] and apply offset
-        double pos = Angle.norm((ratio * Math.PI * 2) - offset);
-
-        return pos;
+        return  MathUtils.normalizeRadians(
+            (!inverted ? 1 - getVoltage() / analogRange : getVoltage() / analogRange) * (Math.PI*2) - offset);
     }
 
-    /**
-     * Get the raw angle without offset or filtering
-     * Useful for calibration
-     * @return raw angle in radians [0, 2π]
-     */
-    public double getRawAngle() {
-        double ratio = getVoltage() / analogRange;
-        if (!inverted) {
-            ratio = 1 - ratio;
-        }
-        return ratio * Math.PI * 2;
-    }
 
     /**
      * Get the raw voltage from the encoder
