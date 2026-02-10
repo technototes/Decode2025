@@ -1,6 +1,5 @@
 package com.technototes.library.util;
 
-import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /**
@@ -178,6 +177,30 @@ public class MathUtils {
 
     public static double normalizeDegrees(double degrees) {
         return normalizeAngle(degrees, AngleUnit.DEGREES);
+    }
+
+    /**
+     * Returns angleDelta clamped to [-pi, pi].
+     *
+     * @param angleDelta angle delta in radians
+     */
+    public static double normalizeDeltaRadians(double angleDelta) {
+        double modifiedAngleDelta = normalizeRadians(angleDelta);
+
+        if (modifiedAngleDelta > Math.PI) {
+            modifiedAngleDelta -= Math.PI * 2;
+        }
+
+        return modifiedAngleDelta;
+    }
+
+    /**
+     * Returns angleDelta clamped to [-pi, pi].
+     *
+     * @param angleDelta angle delta in radians
+     */
+    public static double normalizeDeltaDegrees(double angleDelta) {
+        return Math.toDegrees(normalizeDeltaRadians(Math.toRadians(angleDelta)));
     }
 
     public static double posNegAngle(double angle, AngleUnit angleUnit) {
