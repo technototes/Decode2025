@@ -26,7 +26,7 @@ import org.firstinspires.ftc.swervebot.swerveutil.CoaxialSwerveDrive;
 
 @Configurable
 public class AutoConstants {
-
+    /** EVERYTHING IN THIS CLASS NEEDS TO BE TUNED **/
     // note these need to be measured:
     public static double botWeightKg = 10.1;
     public static double robotLength = 17.5;
@@ -38,6 +38,9 @@ public class AutoConstants {
     public static double fwdDeceleration = -42.8;
     public static double latDeceleration = -71.1;
     public static double centripetalScaling = 0.0005;
+    public static double steeringMaxPower = Math.PI;
+    public static double steeringMinPower = -0.05;
+
 
     // These are hand tuned to work how we want
     public static double brakingStrength = 1;
@@ -45,6 +48,7 @@ public class AutoConstants {
     public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.5, 0, 0.03, 0.03); //11-7 tuning i = 0.00055
     public static PIDFCoefficients second_headingPIDF = new PIDFCoefficients(0.5, 0.05, 0.03, 0);
     public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.07, 0, 0.009, 0.02); //11-7 tuning i = 0.00015
+    public static com.qualcomm.robotcore.hardware.PIDFCoefficients swervoPIDF = new com.qualcomm.robotcore.hardware.PIDFCoefficients(0,0,0, 0);
 
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
@@ -177,6 +181,16 @@ public class AutoConstants {
             .yVelocity(yvelocity);
     }
 
+    public static CoaxialSwerveConstants getSwerveConstants() {
+        return new CoaxialSwerveConstants()
+            .withMotorNames(HardwareNames.FL_DRIVE_MOTOR, HardwareNames.FR_DRIVE_MOTOR, HardwareNames.RL_DRIVE_MOTOR, HardwareNames.RR_DRIVE_MOTOR)
+            .withServoNames(HardwareNames.FL_SWERVO, HardwareNames.FR_SWERVO, HardwareNames.RL_SWERVO, HardwareNames.RR_SWERVO)
+            .withEncoderNames(HardwareNames.FL_SWERVO_ENCODER, HardwareNames.FR_SWERVO_ENCODER, HardwareNames.RL_SWERVO_ENCODER, HardwareNames.RR_SWERVO_ENCODER)
+            .withSteeringParams(swervoPIDF, steeringMaxPower, steeringMinPower)
+            .withDimensions(robotWidth, robotLength)
+            .withSteeringDeadband(Math.toRadians(18));
+    }
+
     /*
     public static DriveEncoderConstants getEncoderConstants() {
         return new DriveEncoderConstants()
@@ -210,10 +224,11 @@ public class AutoConstants {
             .pathConstraints(getPathConstraints())
             //.driveEncoderLocalizer(getEncoderConstants())
             //.OTOSLocalizer(getOTOSConstants())
-            .mecanumDrivetrain(getDriveConstants())
+//            .mecanumDrivetrain(getDriveConstants())
+            .setDrivetrain(new CoaxialSwerveDrive(hardwareMap,getSwerveConstants()))
             .twoWheelLocalizer(getTwoWheelLocalizerConstants())
             .build();
-        //        fol.setMaxPowerScaling(0.5);
+//                fol.setMaxPowerScaling(0.5);
         return fol;
     }
 
