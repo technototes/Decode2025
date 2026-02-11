@@ -34,12 +34,22 @@ public class Setup {
         public static String HOOD_SERVO = "hood";
         public static String LEVER_SERVO = "lever";
         public static String LIMELIGHT = "limelight";
+        public static final String FL_SWERVO_ENCODER = "servoenc0";
+        public static final String FR_SWERVO_ENCODER = "servoenc1";
+        public static final String RL_SWERVO_ENCODER = "servoenc2";
+        public static final String RR_SWERVO_ENCODER = "servoenc3";
+        public static final String FL_SWERVO = "flsteer";
+        public static final String FR_SWERVO = "frsteer";
+        public static final String RL_SWERVO= "rlsteer";
+        public static final String RR_SWERVO = "rrsteer";
         public static int Green_Color_Pipeline = 0;
         // public static int Classifier_Pipeline = 2;
         // public static int Object_Detection_Pipeline = 3;
         public static int AprilTag_Pipeline = 1;
         public static int Purple_Color_Pipeline = 2;
         public static String[] Motif = { "1", "2", "3" };
+
+
     }
 
     @Configurable
