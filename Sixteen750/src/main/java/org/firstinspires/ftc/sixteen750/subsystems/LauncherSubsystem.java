@@ -19,6 +19,10 @@ import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 @Configurable
 public class LauncherSubsystem implements Loggable, Subsystem {
 
+    public static double kStaticFriction = 0.65; // Measured by the Launcher FF thing in learnbot
+    public static double kVelocityConstant = 0.00039; // Ditto
+    public static double kMotorResistance = 12 / 9.2; // From goBilda
+
     //    @Log.Number(name = "Motor Power")
     //    public static double MOTOR_POWER = 0.65; // 0.5 1.0
     @Log.Number(name = "Target Velocity")
@@ -117,8 +121,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             launcherPID = new PIDFController(launcherPI, target ->
                 target == 0
                     ? 0
-                    : (SPIN_F_SCALE * target) +
-                      (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()))
+                    : ((Math.copySign(kStaticFriction, target) +
+                              kVelocityConstant * target +
+                              Math.copySign(getMotor1Current() * kMotorResistance, target)) /
+                          h.voltage())
             );
             //            top.setPIDFCoefficients(launcherP);
             setTargetSpeed(0);
