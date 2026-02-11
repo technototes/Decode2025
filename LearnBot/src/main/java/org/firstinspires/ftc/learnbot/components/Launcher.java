@@ -28,8 +28,12 @@ public class Launcher {
     public static class Config {
 
         // You can (should...) pull this from a Setup.* location:
-        public static String getMotorName() {
-            return "rr"; // return Setup.HardwareNames.MyLauncherMotor; for example
+        public static String getMotorName1() {
+            return "launcher1"; // return Setup.HardwareNames.MyLauncherMotor; for example
+        }
+
+        public static String getMotorName2() {
+            return "launcher2";
         }
 
         // Is the primary intake motor reversed?
@@ -356,11 +360,15 @@ public class Launcher {
         @Override
         public void init() {
             super.init();
-            EncodedMotor<DcMotorEx> m = new EncodedMotor<>(
-                hardwareMap.get(DcMotorEx.class, Config.getMotorName()),
-                Config.getMotorName()
+            EncodedMotor<DcMotorEx> m1 = new EncodedMotor<>(
+                hardwareMap.get(DcMotorEx.class, Config.getMotorName1()),
+                Config.getMotorName1()
             );
-            lc = new Launcher.Component(m, null, this::getVoltage);
+            EncodedMotor<DcMotorEx> m2 = new EncodedMotor<>(
+                hardwareMap.get(DcMotorEx.class, Config.getMotorName2()),
+                Config.getMotorName2()
+            );
+            lc = new Launcher.Component(m1, m2, null, this::getVoltage);
         }
 
         @Override
@@ -394,11 +402,15 @@ public class Launcher {
         @Override
         public void init() {
             super.init();
-            EncodedMotor<DcMotorEx> m = new EncodedMotor<>(
-                hardwareMap.get(DcMotorEx.class, Config.getMotorName()),
-                Config.getMotorName()
+            EncodedMotor<DcMotorEx> m1 = new EncodedMotor<>(
+                hardwareMap.get(DcMotorEx.class, Config.getMotorName1()),
+                Config.getMotorName1()
             );
-            lc = new Launcher.Component(m, null, this::getVoltage);
+            EncodedMotor<DcMotorEx> m2 = new EncodedMotor<>(
+                hardwareMap.get(DcMotorEx.class, Config.getMotorName2()),
+                Config.getMotorName2()
+            );
+            lc = new Launcher.Component(m1, m2, null, this::getVoltage);
             state = State.MeasureStaticFriction;
             lc.setPower(0);
         }
@@ -507,15 +519,16 @@ public class Launcher {
 
         private State Testing() {
             double voltage = getVoltage();
-            double pow = targetVelocity == 0
-                ? 0
-                : ((Math.copySign(staticFriction, targetVelocity) +
-                          velocityConstant * targetVelocity +
-                          Math.copySign(
-                              lc.getMotor1Current() * Config.MotorResistance,
-                              targetVelocity
-                          )) /
-                      voltage);
+            double pow =
+                targetVelocity == 0
+                    ? 0
+                    : ((Math.copySign(staticFriction, targetVelocity) +
+                              velocityConstant * targetVelocity +
+                              Math.copySign(
+                                  lc.getMotor1Current() * Config.MotorResistance,
+                                  targetVelocity
+                              )) /
+                          voltage);
             lc.setPower(pow);
             if (lastUpdate.milliseconds() > 250) {
                 lastUpdate.reset();
