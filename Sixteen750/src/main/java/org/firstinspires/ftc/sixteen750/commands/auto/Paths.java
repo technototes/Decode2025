@@ -45,13 +45,13 @@ public class Paths {
 
     public static Command AutoLaunching3Balls(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.IntakeStop(r),
+            //TeleCommands.IntakeStop(r),
             TeleCommands.GateUp(r),
             TeleCommands.Intake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
-            new WaitCommand(0.8),
+            new WaitCommand(0.75),
             TeleCommands.GateUp(r),
             TeleCommands.IntakeStop(r)
 
@@ -187,6 +187,7 @@ public class Paths {
     public static double powerforintake4 = 0.5;
     public static double power2 = 0.75;
     public static double power9 = 0.9;
+    public static double power85 = 0.85;
 
     //Red poses reconfigure these
     public static Pose RStart = new Pose(113.5, 135.152);
@@ -203,7 +204,7 @@ public class Paths {
     public static Pose RIntake2end = new Pose(128, 62);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
     public static Pose RIntake3 = new Pose(95, 41);
-    public static Pose RIntakeGate = new Pose(131.868, 70);
+    public static Pose RIntakeGate = new Pose(133.868, 70);
     public static Pose RIntakeGateControlPoint = new Pose(90, 67.549);
     public static Pose RIntakeGateDown = new Pose(134.328, 56);
     public static Pose RIntakeGateDownControlPoint = new Pose(70, 70.179);
@@ -212,14 +213,14 @@ public class Paths {
     public static Pose IntakeGateDown = new Pose(10, 45);
     public static Pose IntakeGateDownControlPoint = new Pose(80, 70);
     public static Pose RIntake3ControlPoint = new Pose(70, 41.585);
-    public static Pose RIntake3end = new Pose(128, 41);
+    public static Pose RIntake3end = new Pose(129, 41);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(125, 79);
     public static Pose Rlever2 = new Pose(125, 70);
     public static Pose RLever2controlpoint = new Pose(60, 76);
     public static Pose RleverControlPoint = new Pose(118, 76);
     public static Pose RleverControlPoint2 = new Pose(110, 68); //x = 112, y=73 - old point, new to test
-    public static Pose REnd = new Pose(95, 84);
+    public static Pose REnd = new Pose(85, 99); //95, 84
     public static Pose RfarStart = new Pose(90.000, 9.000);
     public static Pose RfarLaunch = new Pose(87.000, 17);
     public static Pose RfarLaunch2 = new Pose(87.000, 19);
@@ -355,6 +356,10 @@ public class Paths {
     public PathChain LaunchtoIntakeGate;
     public PathChain IntakeGatetoIntakeGateDown;
     public PathChain IntakeGateDowntoLaunch;
+    public PathChain RLaunch2toIntake1;
+    public PathChain RIntake3endtoLaunch2;
+    public PathChain RLaunch2toEnd;
+    public PathChain RIntakeGateDowntoLaunch2;
 
     public static Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
@@ -657,6 +662,12 @@ public class Paths {
             .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
             .build();
 
+        RLaunch2toIntake1 = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(RLaunch2, RIntake1ControlPoint, RIntake1))
+            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
+            .build();
+
         RIntake1toIntake1end = follower
             .pathBuilder()
             .addPath(new BezierLine(RIntake1, RIntake1end))
@@ -694,16 +705,21 @@ public class Paths {
         RLaunchtoIntakeGate = follower
             .pathBuilder()
             .addPath(new BezierCurve(RLaunch, RIntakeGateControlPoint, RIntakeGate))
-            .setConstantHeadingInterpolation(Math.toRadians(45))
+            .setConstantHeadingInterpolation(Math.toRadians(30))
             .build();
         RIntakeGatetoIntakeGateDown = follower
             .pathBuilder()
             .addPath(new BezierLine(RIntakeGate, RIntakeGateDown))
-            .setConstantHeadingInterpolation(Math.toRadians(45))
+            .setConstantHeadingInterpolation(Math.toRadians(65))
             .build();
         RIntakeGateDowntoLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(RIntakeGateDown, RIntakeGateDownControlPoint, RLaunch))
+            .setConstantHeadingInterpolation(Math.toRadians(45))
+            .build();
+        RIntakeGateDowntoLaunch2 = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(RIntakeGateDown, RIntakeGateDownControlPoint, RLaunch2))
             .setConstantHeadingInterpolation(Math.toRadians(45))
             .build();
 
@@ -767,9 +783,19 @@ public class Paths {
             .addPath(new BezierCurve(RIntake3end, RIntake3endControlPoint, RLaunchend))
             .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading4))
             .build();
+        RIntake3endtoLaunch2 = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(RIntake3end, RIntake3endControlPoint, RLaunch2))
+            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading4))
+            .build();
         RLaunchtoEnd = follower
             .pathBuilder()
             .addPath(new BezierLine(RLaunch, REnd))
+            .setLinearHeadingInterpolation(Math.toRadians(RlaunchHeading4), Math.toRadians(0))
+            .build();
+        RLaunch2toEnd = follower
+            .pathBuilder()
+            .addPath(new BezierLine(RLaunch2, REnd))
             .setLinearHeadingInterpolation(Math.toRadians(RlaunchHeading4), Math.toRadians(0))
             .build();
 
