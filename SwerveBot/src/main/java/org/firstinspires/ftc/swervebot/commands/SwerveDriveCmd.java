@@ -19,8 +19,8 @@ public class SwerveDriveCmd implements Command, Loggable {
         addRequirements(sub);
         subsystem = sub;
         x = xyStick.getXSupplier();
-        x = xyStick.getYSupplier();
-        x = rStick.getXSupplier();
+        y = xyStick.getYSupplier();
+        r = rStick.getXSupplier();
     }
 
     // This will make the bot snap to an angle, if the 'straighten' button is pressed
