@@ -8,12 +8,13 @@ public class Setup {
     @Configurable
     public static class Connected {
 
-        public static boolean LIMELIGHTSUBSYSTEM = true;
-        public static boolean DRIVEBASE = true;
-        public static boolean ODOSUBSYSTEM = true;
-        public static boolean EXTERNAL_IMU = true;
-        public static boolean INTAKESUBSYSTEM = true;
-        public static boolean LAUNCHERSUBSYSTEM = true;
+        public static boolean LIMELIGHTSUBSYSTEM = false;
+        public static boolean DRIVEBASE = false;
+        public static boolean ODOSUBSYSTEM = false;
+        public static boolean EXTERNAL_IMU = false;
+        public static boolean INTAKESUBSYSTEM = false;
+        public static boolean LAUNCHERSUBSYSTEM = false;
+        public static boolean SWERVESUBSYSTEM = true;
     }
 
     @Configurable
@@ -42,6 +43,10 @@ public class Setup {
         public static final String FR_SWERVO = "frsteer";
         public static final String RL_SWERVO= "rlsteer";
         public static final String RR_SWERVO = "rrsteer";
+        public static final String FL_SWERVEDRIVE = "fldrive";
+        public static final String FR_SWERVEDRIVE = "frdrive";
+        public static final String RL_SWERVEDRIVE = "rldrive";
+        public static final String RR_SWERVEDRIVE = "rrdrive";
         public static int Green_Color_Pipeline = 0;
         // public static int Classifier_Pipeline = 2;
         // public static int Object_Detection_Pipeline = 3;
