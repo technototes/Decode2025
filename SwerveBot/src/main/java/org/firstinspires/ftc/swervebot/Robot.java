@@ -7,6 +7,7 @@ import org.firstinspires.ftc.swervebot.helpers.StartingPosition;
 import org.firstinspires.ftc.swervebot.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.swervebot.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.swervebot.subsystems.LimelightSubsystem;
+import org.firstinspires.ftc.swervebot.swerveutil.SimpleCoaxSwerveDriveSubsystem;
 
 public class Robot implements Loggable {
 
@@ -18,6 +19,7 @@ public class Robot implements Loggable {
     public LauncherSubsystem launcherSubsystem;
     public IntakeSubsystem intakeSubsystem;
     public LimelightSubsystem limelightSubsystem;
+    public SimpleCoaxSwerveDriveSubsystem swerveDriveSubsystem;
     public Follower follower;
     private Hardware hardware;
 
@@ -38,6 +40,9 @@ public class Robot implements Loggable {
         }
         if (Setup.Connected.DRIVEBASE) {
             follower = AutoConstants.createFollower(hw.map);
+        }
+        if (Setup.Connected.SWERVESUBSYSTEM) {
+            this.swerveDriveSubsystem = new SimpleCoaxSwerveDriveSubsystem(hw);
         }
     }
 
