@@ -51,8 +51,8 @@ public class Hardware implements Loggable {
         } else {
             imu = new IMU(
                 Setup.HardwareNames.IMU,
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
             );
         }
         if (Setup.Connected.DRIVEBASE) {
