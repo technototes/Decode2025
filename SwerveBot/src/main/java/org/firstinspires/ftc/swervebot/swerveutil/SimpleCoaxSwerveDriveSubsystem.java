@@ -17,6 +17,7 @@ import org.firstinspires.ftc.swervebot.Setup;
 
 import java.util.Arrays;
 import java.util.OptionalDouble;
+import java.util.function.DoubleSupplier;
 
 @Configurable
 public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
@@ -120,8 +121,8 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     public void updateValues(double x, double y, double r) {
         if (hasHardware) {
             robotHeading = -imu.getHeadingInRadians();
-            forwardInput = x * Math.cos(robotHeading) + y * Math.sin(robotHeading);
-            strafeInput = -x * Math.sin(robotHeading) + y * Math.cos(robotHeading);
+            forwardInput = DeadZoneScale(x) * Math.cos(robotHeading) + DeadZoneScale(y) * Math.sin(robotHeading);
+            strafeInput = DeadZoneScale(-x) * Math.sin(robotHeading) + DeadZoneScale(y) * Math.cos(robotHeading);
             rotationInput = r;
             A = strafeInput - rotationInput * (driveLength / R);
             B = strafeInput + rotationInput * (driveLength / R);
@@ -157,6 +158,21 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
                 setSwervoPow(swervo[i], swervoPIDF[i].update(swervopos[i]));
             }
         }
+    }
+    private double DeadZoneScale(double d) {
+        // Okay, we want a small dead zone in the middle of the stick, but that also means that
+        // you can't have a value any smaller than that value, so instead, we're going to scale
+        // the value after compensating for the dead zone
+            // If the value is inside the dead zone, just make it zero
+            if (Math.abs(d) <= Setup.OtherSettings.STICK_DEAD_ZONE) {
+                return 0.0;
+            }
+            // If the value is outside the dead zone, scale it
+            return (
+                    (d - Math.copySign(Setup.OtherSettings.STICK_DEAD_ZONE, d)) /
+                            (1.0 - Setup.OtherSettings.STICK_DEAD_ZONE)
+            );
+
     }
 
 }
