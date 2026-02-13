@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.swervebot.swerveutil;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.motor.CRServo;
+import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.MathUtils;
@@ -48,6 +50,8 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     double[] wheelPowers = new double[4];
     double[] wheelAngles = new double[4];
     double[] angleDifferences = new double[4];
+    IGyro imu;
+    double robotHeading;
 
 
     public SimpleCoaxSwerveDriveSubsystem(Hardware hw) {
@@ -67,71 +71,91 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
             swervo[2] = hw.rlswervo;
             swervo[3] = hw.rrswervo;
             CommandScheduler.register(this);
-            for (PIDFController swervoPIDF : swervoPIDF) {
-                swervoPIDF = new PIDFController(swervoPID);
+            for (int i = 0; i < 4; i++) {
+                swervoPIDF[i] = new PIDFController(swervoPID);
+                swervoPIDF[i].setInputBounds(-Math.PI, Math.PI);
+                drive[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                drive[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
+            imu = hw.imu;
         } else {
             drive = null;
             swervo = null;
             swervoencs = null;
+            imu = null;
+            hasHardware = false;
         }
     }
 
     @Override
     public void periodic() {
-        for (int i = 0; i < 4; i++) {
-            if ( 0 <= Math.abs(swervoPIDF[i].getLastError()) &&  Math.abs(swervoPIDF[i].getLastError()) < Math.toRadians(1)) {
-
+        if (hasHardware) {
+            for (int i = 0; i < 4; i++) {
+                if (0 <= Math.abs(swervoPIDF[i].getLastError()) && Math.abs(swervoPIDF[i].getLastError()) < Math.toRadians(1)) {
+                    //commenting out is helpful for just tuning swervo pid
+//                drive[i].setPower(wheelPowers[i]);
+                }
             }
         }
     }
 
     private void setSwervoPow(CRServo crServo, double power) {
-        crServo.setPower(power);
+        if (hasHardware) {
+            crServo.setPower(power);
+        }
     }
     private void setSwervoPos(PIDFController swervoPIDF, double pos) {
-        swervoPIDF.setTarget(pos);
+        if (hasHardware) {
+            swervoPIDF.setTarget(pos);
+        }
     }
 
     private double getSwervoPow(CRServo crServo) {
-        return crServo.getPower();
+        if (hasHardware) {
+            return crServo.getPower();
+        }
+        return 0;
     }
 
     public void updateValues(double x, double y, double r) {
-        forwardInput = x;
-        strafeInput = y;
-        rotationInput = r;
-        A = (strafeInput - rotationInput) * (driveLength / R);
-        B = (strafeInput + rotationInput) * (driveLength / R);
-        C = (forwardInput - rotationInput) * (trackWidth / R);
-        D = (forwardInput + rotationInput) * (trackWidth / R);
-        unfilteredWheelPowers[0] = Math.sqrt((B * B) + (C * C));
-        unfilteredWheelPowers[1] = Math.sqrt((B * B) + (D * D));
-        unfilteredWheelPowers[2] = Math.sqrt((A * A) + (D * D));
-        unfilteredWheelPowers[3] = Math.sqrt((A * A) + (C * C));
-        maxPower = Arrays.stream(unfilteredWheelPowers).max();
-        wheelPowers[0] = unfilteredWheelPowers[0] > 1 ? unfilteredWheelPowers[0] / maxPower.getAsDouble() : unfilteredWheelPowers[0];
-        wheelPowers[1] = unfilteredWheelPowers[1] > 1 ? unfilteredWheelPowers[1] / maxPower.getAsDouble() : unfilteredWheelPowers[1];
-        wheelPowers[2] = unfilteredWheelPowers[2] > 1 ? unfilteredWheelPowers[2] / maxPower.getAsDouble() : unfilteredWheelPowers[2];
-        wheelPowers[3] = unfilteredWheelPowers[3] > 1 ? unfilteredWheelPowers[3] / maxPower.getAsDouble() : unfilteredWheelPowers[3];
-        wheelAngles[0] = C == 0 && B == 0  ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(C, B));
-        wheelAngles[1] = D == 0 && B == 0  ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(D, B));
-        wheelAngles[2] = D == 0 && A == 0  ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(D, A));
-        wheelAngles[3] = C == 0 && A == 0  ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(C, A));
-        for (int i = 0; i < 4; i++) {
-            angleDifferences[i] = MathUtils.normalizeDeltaRadians(wheelAngles[i] - swervopos[i]);
-            if (Math.abs(angleDifferences[i]) > Math.PI / 2) {
-                wheelAngles[i] += Math.PI;
-                wheelPowers[i] *= -1;
-
-                // Normalize the angle [-pi, pi]
-                wheelAngles[i] = MathUtils.normalizeDeltaRadians(wheelAngles[i]);
+        if (hasHardware) {
+            robotHeading = -imu.getHeadingInRadians();
+            forwardInput = x * Math.cos(robotHeading) + y * Math.sin(robotHeading);
+            strafeInput = -x * Math.sin(robotHeading) + y * Math.cos(robotHeading);
+            rotationInput = r;
+            A = strafeInput - rotationInput * (driveLength / R);
+            B = strafeInput + rotationInput * (driveLength / R);
+            C = forwardInput - rotationInput * (trackWidth / R);
+            D = forwardInput + rotationInput * (trackWidth / R);
+            unfilteredWheelPowers[0] = Math.sqrt((B * B) + (C * C));
+            unfilteredWheelPowers[1] = Math.sqrt((B * B) + (D * D));
+            unfilteredWheelPowers[2] = Math.sqrt((A * A) + (D * D));
+            unfilteredWheelPowers[3] = Math.sqrt((A * A) + (C * C));
+            maxPower = Arrays.stream(unfilteredWheelPowers).max();
+            if (maxPower.getAsDouble() > 1) {
+                for (int i = 0; i < 4; i++) {
+                    wheelPowers[i] = unfilteredWheelPowers[i] / maxPower.getAsDouble();
+                }
             }
-        }
-        for (int i = 0; i < 4; i++) {
-            swervoPIDF[i].setTarget(wheelAngles[i]);
-            swervopos[i] = swervoencs[i].getCurrentPosition();
-            setSwervoPow(swervo[i], swervoPIDF[i].update(swervopos[i]));
+            wheelAngles[0] = C == 0 && B == 0 ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(C, B));
+            wheelAngles[1] = D == 0 && B == 0 ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(D, B));
+            wheelAngles[2] = D == 0 && A == 0 ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(D, A));
+            wheelAngles[3] = C == 0 && A == 0 ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(C, A));
+            for (int i = 0; i < 4; i++) {
+                swervopos[i] = swervoencs[i].getCurrentPosition();
+                angleDifferences[i] = MathUtils.normalizeDeltaRadians(wheelAngles[i] - swervopos[i]);
+                if (Math.abs(angleDifferences[i]) > Math.PI / 2) {
+                    wheelAngles[i] += Math.PI;
+                    wheelPowers[i] *= -1;
+
+                    // Normalize the angle [-pi, pi]
+                    wheelAngles[i] = MathUtils.normalizeDeltaRadians(wheelAngles[i]);
+                }
+            }
+            for (int i = 0; i < 4; i++) {
+                swervoPIDF[i].setTarget(wheelAngles[i]);
+                setSwervoPow(swervo[i], swervoPIDF[i].update(swervopos[i]));
+            }
         }
     }
 
