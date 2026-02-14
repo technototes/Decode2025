@@ -116,30 +116,30 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
             telemetry.addData("Front Right", "%.3fV", frVolt);
             telemetry.addData("Back Left", "%.3fV", rlVolt);
             telemetry.addData("Back Right", "%.3fV", rrVolt);
-            if (gamepad1.crossWasPressed() && flsteer != null){
-                flsteer.setPower(0.5);
+            if (gamepad1.cross && flsteer != null){
+                flsteer.setPower(1);
             }
-            if (gamepad1.crossWasReleased() && flsteer != null){
-                flsteer.setPower(0);
-            }
-            if (gamepad1.squareWasPressed() && frsteer != null){
-                frsteer.setPower(0.5);
-            }
-            if (gamepad1.squareWasReleased() && frsteer != null){
-                flsteer.setPower(0);
-            }
-            if (gamepad1.circleWasPressed() && rlsteer != null){
-                rlsteer.setPower(0.5);
-            }
-            if (gamepad1.circleWasReleased() && rlsteer != null){
-                flsteer.setPower(0);
-            }
-            if (gamepad1.triangleWasPressed() && rrsteer != null){
-                rrsteer.setPower(0.5);
-            }
-            if (gamepad1.triangleWasReleased() && rrsteer != null){
-                flsteer.setPower(0);
-            }
+//            if (gamepad1.cross && flsteer != null){
+//                flsteer.setPower(0);
+//            }
+//            if (gamepad1.squareWasPressed() && frsteer != null){
+//                frsteer.setPower(1);
+//            }
+//            if (gamepad1.squareWasReleased() && frsteer != null){
+//                flsteer.setPower(0);
+//            }
+//            if (gamepad1.circleWasPressed() && rlsteer != null){
+//                rlsteer.setPower(1);
+//            }
+//            if (gamepad1.circleWasReleased() && rlsteer != null){
+//                flsteer.setPower(0);
+//            }
+//            if (gamepad1.triangleWasPressed() && rrsteer != null){
+//                rrsteer.setPower(1);
+//            }
+//            if (gamepad1.triangleWasReleased() && rrsteer != null){
+//                flsteer.setPower(0);
+//            }
 
             telemetry.addLine();
             telemetry.addLine("========================================");

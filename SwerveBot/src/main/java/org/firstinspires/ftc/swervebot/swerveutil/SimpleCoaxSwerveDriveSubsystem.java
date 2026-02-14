@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.sensor.IGyro;
+import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.MathUtils;
@@ -27,7 +28,7 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     CRServo[] swervo = new CRServo[4];
     //fr,fl,rl,rr
     AbsoluteAnalogEncoder[] swervoencs = new AbsoluteAnalogEncoder[4];
-    PIDFCoefficients swervoPID = new PIDFCoefficients(1,0,0,0);
+    public static PIDFCoefficients swervoPID = new PIDFCoefficients(0,0,0,0);
     PIDFController[] swervoPIDF = new PIDFController[4];
 
     boolean hasHardware;
@@ -35,16 +36,24 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     double[] swervopos = new double[4];
 
     // module to module needs to be measured
-    double trackWidth = 17;
-    double driveLength = 16;
+    double trackWidth = 8;
+    double driveLength = 8.2;
     double R = Math.sqrt((trackWidth * trackWidth) + (driveLength * driveLength));
+    @Log
     double forwardInput = 0;
+    @Log
     double strafeInput = 0;
+    @Log
     double rotationInput = 0;
+    @Log
     double A = 0;
+    @Log
     double B = 0;
+    @Log
     double C = 0;
+    @Log
     double D = 0;
+    @Log
     double[] unfilteredWheelPowers = new double[4];
 
     OptionalDouble maxPower = OptionalDouble.of(0.0);
@@ -105,6 +114,20 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
             crServo.setPower(power);
         }
     }
+    public void setSwervosPow() {
+        if (hasHardware) {
+            for (int i = 0; i < 4; i++) {
+                swervo[i].setPower(0.5);
+            }
+        }
+    }
+    public void setSwervosPowZero() {
+        if (hasHardware) {
+            for (int i = 0; i < 4; i++) {
+                swervo[i].setPower(0.5);
+            }
+        }
+    }
     private void setSwervoPos(PIDFController swervoPIDF, double pos) {
         if (hasHardware) {
             swervoPIDF.setTarget(pos);
@@ -121,8 +144,8 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     public void updateValues(double x, double y, double r) {
         if (hasHardware) {
             robotHeading = -imu.getHeadingInRadians();
-            forwardInput = DeadZoneScale(x) * Math.cos(robotHeading) + DeadZoneScale(y) * Math.sin(robotHeading);
-            strafeInput = DeadZoneScale(-x) * Math.sin(robotHeading) + DeadZoneScale(y) * Math.cos(robotHeading);
+            forwardInput = x * Math.cos(robotHeading) + y * Math.sin(robotHeading);
+            strafeInput = -x * Math.sin(robotHeading) + y * Math.cos(robotHeading);
             rotationInput = r;
             A = strafeInput - rotationInput * (driveLength / R);
             B = strafeInput + rotationInput * (driveLength / R);
