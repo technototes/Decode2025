@@ -26,7 +26,7 @@ public class SwerveTeleOp extends CommandOpMode {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
         // limelight = hardwareMap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
-        if (Setup.Connected.DRIVEBASE) {
+        if (Setup.Connected.SWERVESUBSYSTEM) {
             controls = new DriverController(driverGamepad, robot);
 
         }
