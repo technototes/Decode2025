@@ -743,7 +743,7 @@ public class Pedro {
             snapRadians = new double[degrees.length + 1];
             double lowest = TwoPi;
             for (int i = 0; i < degrees.length; i++) {
-                snapRadians[i] = MathUtils.posNegRadians(Math.toRadians(degrees[i]));
+                snapRadians[i] = MathUtils.normalizeDeltaRadians(Math.toRadians(degrees[i]));
                 if (snapRadians[i] < lowest) {
                     lowest = snapRadians[i];
                 }
@@ -891,7 +891,9 @@ public class Pedro {
         double getRotation() {
             // Negative, because pushing left is negative, but that is a positive change in Pedro's
             // coordinate system.
-            curHeading = MathUtils.posNegRadians(follower.getHeading() - getHeadingOffsetRadians());
+            curHeading = MathUtils.normalizeDeltaRadians(
+                follower.getHeading() - getHeadingOffsetRadians()
+            );
             switch (driveStyle.rotation) {
                 case Target_NYI:
                 // The controller is used to specify a desired heading: NYI
@@ -910,7 +912,7 @@ public class Pedro {
                 case Hold:
                     // Hold the current heading
                     if (driveStyle.translation != TranslationMode.Hold && holdPose != null) {
-                        targetHeading = MathUtils.posNegRadians(
+                        targetHeading = MathUtils.normalizeDeltaRadians(
                             holdPose.getHeading() - getHeadingOffsetRadians()
                         );
                     } else {
@@ -925,7 +927,9 @@ public class Pedro {
                     // eliminate "actual" strafing: The robot should be oriented to drive forward in the
                     // direction of the stick
                     if (Math.abs(strafe) > 0 || Math.abs(forward) > 0) {
-                        targetHeading = MathUtils.posNegRadians(Math.atan2(strafe, forward));
+                        targetHeading = MathUtils.normalizeDeltaRadians(
+                            Math.atan2(strafe, forward)
+                        );
                     } else {
                         return 0;
                     }
@@ -935,12 +939,17 @@ public class Pedro {
                     // the direction of the stick, but with a twist: If you flip the direction you're
                     // driving, the bot will drive in reverse, rather than fully rotate.
                     if (Math.abs(strafe) > 0 || Math.abs(forward) > 0) {
-                        targetHeading = MathUtils.posNegRadians(Math.atan2(strafe, forward));
+                        targetHeading = MathUtils.normalizeDeltaRadians(
+                            Math.atan2(strafe, forward)
+                        );
                         // targetHeading should be within 90 degrees of curHeading, if it's not, flip it
                         if (
-                            Math.abs(MathUtils.posNegRadians(targetHeading - curHeading)) > HalfPi
+                            Math.abs(MathUtils.normalizeDeltaRadians(targetHeading - curHeading)) >
+                            HalfPi
                         ) {
-                            targetHeading = MathUtils.posNegRadians(targetHeading + Math.PI);
+                            targetHeading = MathUtils.normalizeDeltaRadians(
+                                targetHeading + Math.PI
+                            );
                         }
                     } else {
                         return 0;
@@ -951,7 +960,9 @@ public class Pedro {
                         ? Double.NaN
                         : targetAcquisition.getHorizontalPosition();
                     if (!Double.isNaN((x))) {
-                        targetHeading = MathUtils.posNegRadians(curHeading + Math.toRadians(x));
+                        targetHeading = MathUtils.normalizeDeltaRadians(
+                            curHeading + Math.toRadians(x)
+                        );
                     } else {
                         return rotationTransform(rotation);
                     }
@@ -964,7 +975,10 @@ public class Pedro {
                 turningPIDF.reset();
                 turnPidStarted = true;
             }
-            if (Math.abs(MathUtils.posNegRadians(targetHeading - curHeading)) > WIND_UP_LIMIT) {
+            if (
+                Math.abs(MathUtils.normalizeDeltaRadians(targetHeading - curHeading)) >
+                WIND_UP_LIMIT
+            ) {
                 // The goal is to prevent *massive* early error from making the I value useless.
                 turningPIDF.reset();
             }
@@ -1066,7 +1080,7 @@ public class Pedro {
                 strafe,
                 rot,
                 Math.toDegrees(curHeading),
-                Math.toDegrees(MathUtils.posNegRadians(offset))
+                Math.toDegrees(MathUtils.normalizeDeltaRadians(offset))
             );
         }
     }

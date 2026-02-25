@@ -180,18 +180,13 @@ public class MathUtils {
     }
 
     /**
-     * Returns angleDelta clamped to [-pi, pi].
+     * Returns angleDelta clamped to [-pi/-180, pi/180].
      *
      * @param angleDelta angle delta in radians
      */
-    public static double normalizeDeltaRadians(double angleDelta) {
-        double modifiedAngleDelta = normalizeRadians(angleDelta);
-
-        if (modifiedAngleDelta > Math.PI) {
-            modifiedAngleDelta -= Math.PI * 2;
-        }
-
-        return modifiedAngleDelta;
+    public static double normalizeDeltaAngle(double angleDelta, AngleUnit angleUnit) {
+        double half = halfCircle(angleUnit);
+        return normalizeAngle(angleDelta + half, angleUnit) - half;
     }
 
     /**
@@ -199,21 +194,17 @@ public class MathUtils {
      *
      * @param angleDelta angle delta in radians
      */
+    public static double normalizeDeltaRadians(double angleDelta) {
+        return normalizeDeltaAngle(angleDelta, AngleUnit.RADIANS);
+    }
+
+    /**
+     * Returns angleDelta clamped to [-180, 180].
+     *
+     * @param angleDelta angle delta in degrees
+     */
     public static double normalizeDeltaDegrees(double angleDelta) {
-        return Math.toDegrees(normalizeDeltaRadians(Math.toRadians(angleDelta)));
-    }
-
-    public static double posNegAngle(double angle, AngleUnit angleUnit) {
-        double half = halfCircle(angleUnit);
-        return normalizeAngle(angle + half, angleUnit) - half;
-    }
-
-    public static double posNegRadians(double radians) {
-        return posNegAngle(radians, AngleUnit.RADIANS);
-    }
-
-    public static double posNegDegrees(double randians) {
-        return posNegAngle(randians, AngleUnit.DEGREES);
+        return normalizeDeltaAngle(angleDelta, AngleUnit.DEGREES);
     }
 
     public static double fullCircle(AngleUnit angleUnit) {
