@@ -4,7 +4,9 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.logger.Log;
@@ -18,7 +20,6 @@ import org.firstinspires.ftc.swervebot.Setup;
 
 import java.util.Arrays;
 import java.util.OptionalDouble;
-import java.util.function.DoubleSupplier;
 
 @Configurable
 public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
@@ -28,7 +29,7 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     CRServo[] swervo = new CRServo[4];
     //fr,fl,rl,rr
     AbsoluteAnalogEncoder[] swervoencs = new AbsoluteAnalogEncoder[4];
-    public static PIDFCoefficients swervoPID = new PIDFCoefficients(0,0,0,0);
+    public static PIDFCoefficients swervoPID = new PIDFCoefficients(0.2,0,0,0);
     PIDFController[] swervoPIDF = new PIDFController[4];
 
     boolean hasHardware;
@@ -39,21 +40,20 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     double trackWidth = 8;
     double driveLength = 8.2;
     double R = Math.sqrt((trackWidth * trackWidth) + (driveLength * driveLength));
-    @Log
-    double forwardInput = 0;
-    @Log
-    double strafeInput = 0;
-    @Log
-    double rotationInput = 0;
-    @Log
-    double A = 0;
-    @Log
-    double B = 0;
-    @Log
-    double C = 0;
-    @Log
-    double D = 0;
-    @Log
+    @Log.Number(name = "X: ")
+    public static double forwardInput = 0;
+    @Log.Number(name = "Y: ")
+    public static double strafeInput = 0;
+    @Log.Number(name = "R: ")
+    public static double rotationInput = 0;
+    @Log.Number(name = "A: ")
+    public static double A = 0;
+    @Log.Number(name = "B: ")
+    public static double B = 0;
+    @Log.Number(name = "C: ")
+    public static double C = 0;
+    @Log.Number(name = "D: ")
+    public static double D = 0;
     double[] unfilteredWheelPowers = new double[4];
 
     OptionalDouble maxPower = OptionalDouble.of(0.0);
@@ -88,6 +88,7 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
                 drive[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
             imu = hw.imu;
+            zeroEncoders();
         } else {
             drive = null;
             swervo = null;
@@ -116,8 +117,37 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     }
     public void setSwervosPow() {
         if (hasHardware) {
+            swervo[0].setPower(1);
+            swervo[1].setPower(1);
+            swervo[2].setPower(1);
+            swervo[3].setPower(1);
+
+        }
+    }
+    public Command setSwervosCmd() {
+        if (hasHardware) {
+            return () -> new ParallelCommandGroup(() -> swervo[0].setPower(1),
+                () -> swervo[1].setPower(1),
+                () -> swervo[2].setPower(1),
+                () -> swervo[3].setPower(1));
+
+        }
+        return null;
+    }
+    public Command stopSwervosCmd() {
+        if (hasHardware) {
+            return () -> new ParallelCommandGroup(() -> swervo[0].setPower(0),
+                () -> swervo[1].setPower(0),
+                () -> swervo[2].setPower(0),
+                () -> swervo[3].setPower(0));
+
+        }
+        return null;
+    }
+    private void zeroEncoders() {
+        if (hasHardware) {
             for (int i = 0; i < 4; i++) {
-                swervo[i].setPower(0.5);
+                swervoencs[i].zero(swervoencs[i].getCurrentPosition());
             }
         }
     }

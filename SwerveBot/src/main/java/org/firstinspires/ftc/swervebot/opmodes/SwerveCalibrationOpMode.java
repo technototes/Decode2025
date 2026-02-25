@@ -34,27 +34,9 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Initialize encoders
-        AbsoluteAnalogEncoder flEncoder = new AbsoluteAnalogEncoder(
-            hardwareMap.get(AnalogInput.class, Setup.HardwareNames.FL_SWERVO_ENCODER)
-        );
-        AbsoluteAnalogEncoder frEncoder = new AbsoluteAnalogEncoder(
-            hardwareMap.get(AnalogInput.class, Setup.HardwareNames.FR_SWERVO_ENCODER)
-        );
-        AbsoluteAnalogEncoder blEncoder = new AbsoluteAnalogEncoder(
-            hardwareMap.get(AnalogInput.class, Setup.HardwareNames.RL_SWERVO_ENCODER)
-        );
-        AbsoluteAnalogEncoder brEncoder = new AbsoluteAnalogEncoder(
-            hardwareMap.get(AnalogInput.class, Setup.HardwareNames.RR_SWERVO_ENCODER)
-        );
-        if (hardwareMap.crservo.contains(Setup.HardwareNames.FR_SWERVO)) {
-            frsteer = new CRServo(hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.FR_SWERVO), Setup.HardwareNames.FR_SWERVO);
-        } if (hardwareMap.crservo.contains(Setup.HardwareNames.FL_SWERVO)) {
-            flsteer = new CRServo(hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.FL_SWERVO), Setup.HardwareNames.FL_SWERVO);
-        } if (hardwareMap.crservo.contains(Setup.HardwareNames.RL_SWERVO)) {
-            rlsteer = new CRServo(hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.RL_SWERVO), Setup.HardwareNames.RL_SWERVO);
-        } if (hardwareMap.crservo.contains(Setup.HardwareNames.RR_SWERVO)) {
-            rrsteer = new CRServo(hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.RR_SWERVO), Setup.HardwareNames.RR_SWERVO);
-        }
+
+
+
 
 
 
@@ -71,9 +53,26 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
+        flsteer = new CRServo(hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.FL_SWERVO) , Setup.HardwareNames.FL_SWERVO);
+        frsteer = new CRServo(hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.FR_SWERVO), Setup.HardwareNames.FR_SWERVO);
 
+        rlsteer = new CRServo(hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.RL_SWERVO), Setup.HardwareNames.RL_SWERVO);
+
+        rrsteer = new CRServo(hardwareMap.get(com.qualcomm.robotcore.hardware.CRServo.class, Setup.HardwareNames.RR_SWERVO), Setup.HardwareNames.RR_SWERVO);
+        AbsoluteAnalogEncoder flEncoder = new AbsoluteAnalogEncoder(
+            hardwareMap.get(AnalogInput.class, Setup.HardwareNames.FL_SWERVO_ENCODER)
+        );
+        AbsoluteAnalogEncoder frEncoder = new AbsoluteAnalogEncoder(
+            hardwareMap.get(AnalogInput.class, Setup.HardwareNames.FR_SWERVO_ENCODER)
+        );
+        AbsoluteAnalogEncoder blEncoder = new AbsoluteAnalogEncoder(
+            hardwareMap.get(AnalogInput.class, Setup.HardwareNames.RL_SWERVO_ENCODER)
+        );
+        AbsoluteAnalogEncoder brEncoder = new AbsoluteAnalogEncoder(
+            hardwareMap.get(AnalogInput.class, Setup.HardwareNames.RR_SWERVO_ENCODER)
+        );
         while (opModeIsActive()) {
-            // Read current positions
+//             Read current positions
             double flPos = flEncoder.getCurrentPosition() ;
             double frPos = frEncoder.getCurrentPosition();
             double rlPos = blEncoder.getCurrentPosition();
@@ -116,30 +115,26 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
             telemetry.addData("Front Right", "%.3fV", frVolt);
             telemetry.addData("Back Left", "%.3fV", rlVolt);
             telemetry.addData("Back Right", "%.3fV", rrVolt);
-            if (gamepad1.cross && flsteer != null){
+            if (gamepad1.crossWasPressed() && flsteer != null){
                 flsteer.setPower(1);
+            } else if (gamepad1.crossWasReleased() && flsteer != null){
+                flsteer.setPower(0);
             }
-//            if (gamepad1.cross && flsteer != null){
-//                flsteer.setPower(0);
-//            }
-//            if (gamepad1.squareWasPressed() && frsteer != null){
-//                frsteer.setPower(1);
-//            }
-//            if (gamepad1.squareWasReleased() && frsteer != null){
-//                flsteer.setPower(0);
-//            }
-//            if (gamepad1.circleWasPressed() && rlsteer != null){
-//                rlsteer.setPower(1);
-//            }
-//            if (gamepad1.circleWasReleased() && rlsteer != null){
-//                flsteer.setPower(0);
-//            }
-//            if (gamepad1.triangleWasPressed() && rrsteer != null){
-//                rrsteer.setPower(1);
-//            }
-//            if (gamepad1.triangleWasReleased() && rrsteer != null){
-//                flsteer.setPower(0);
-//            }
+            if (gamepad1.squareWasPressed() && frsteer != null) {
+                frsteer.setPower(1);
+            } else if (gamepad1.squareWasReleased() && frsteer != null){
+                flsteer.setPower(0);
+            }
+            if (gamepad1.circleWasPressed() && rlsteer != null){
+                rlsteer.setPower(1);
+            } else if (gamepad1.circleWasReleased() && rlsteer != null){
+                flsteer.setPower(0);
+            }
+            if (gamepad1.triangleWasPressed() && rrsteer != null){
+                rrsteer.setPower(1);
+            } else   if (gamepad1.triangleWasReleased() && rrsteer != null){
+                flsteer.setPower(0);
+            }
 
             telemetry.addLine();
             telemetry.addLine("========================================");

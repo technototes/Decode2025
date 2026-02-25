@@ -41,7 +41,8 @@ public class DriverController {
     public void bindDriveControls() {
        SwerveDriveCmd = new SwerveDriveCmd(robot.swerveDriveSubsystem, driveLeftStick, driveRightStick);
         CommandScheduler.scheduleJoystick(SwerveDriveCmd);
-        spinallswervos.whenPressedReleased(Command.create(robot.swerveDriveSubsystem::setSwervosPow), Command.create(robot.swerveDriveSubsystem::setSwervosPowZero));
+        spinallswervos.whenPressed(robot.swerveDriveSubsystem.setSwervosCmd());
+        spinallswervos.whenReleased(robot.swerveDriveSubsystem.stopSwervosCmd());
 
     }
 
