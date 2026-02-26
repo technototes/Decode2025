@@ -74,9 +74,9 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
     public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
-    public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
+    public static double REGRESSION_B = 1485; // minimum velocity for close zone launch speed formula 1560
     public static double REGRESSION_C = 20; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 320; // minimum velocity for far zone launch speed formula - 130, 255
+    public static double REGRESSION_D = 270; // minimum velocity for far zone launch speed formula - 130, 255
     public static double REGRESSION_C_TELEOP = 20; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D_TELEOP = 130; // minimum velocity for far zone launch speed formula
     public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
@@ -282,25 +282,20 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     }
 
     public double autoVelocity() {
-        // x = distance in feet
+        // x = distance in inches
         double x = ls.getDistance();
-
         if (x < 100 && x > 0) {
-            //launcherPI.p = 0.0015;
-            //launcherPI.i = 0;
             lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
-            return lastAutoVelocity;
-        }
-        if (x < 0) {
-            return lastAutoVelocity;
-        } else {
+        } else if (x > 0) {
             launcherPI.p = 0.004;
             launcherPI.i = 0.0002;
-            return REGRESSION_C * x + REGRESSION_D;
+            lastAutoVelocity = REGRESSION_C * x + REGRESSION_D;
         }
-
-        //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
+        return lastAutoVelocity;
     }
+
+
+    //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
 
     public double autoVelocityForAuto() {
         // x = distance in feet

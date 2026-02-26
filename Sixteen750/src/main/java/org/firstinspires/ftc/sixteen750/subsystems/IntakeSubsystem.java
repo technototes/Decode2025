@@ -20,7 +20,7 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     public static double two_threshold = 3;
     public static double theree_threshold = 4.5;
     public static double MOTOR_VELOCITY = 1; // 0.5 1.0
-    public static double SLOW_MOTOR_VELOCITY = 0.8; // 0.5 1.0
+    public static double SLOW_MOTOR_VELOCITY = 0.67; // 0.5 1.0
     public static int duration = 80;
     boolean hasHardware;
     int currentIndex = 0;
