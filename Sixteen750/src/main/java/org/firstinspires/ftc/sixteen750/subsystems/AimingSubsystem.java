@@ -14,11 +14,12 @@ import org.firstinspires.ftc.sixteen750.Setup;
 public class AimingSubsystem implements Loggable, Subsystem {
 
     public static double HOOD_POS = 0.5; // 0.5 1.0
+    public static double HOOD_POS_MIDDLE = 0.72;
     public static double HOOD_POS_UP = 1; // 0.5 1.0
     public static double HOD_POS_UP_AUTO_ONLY = 0.90;
     public static double HOD_POS_UP_AUTO_ONLY2 = 0.80;
 
-    public static double HOOD_POS_DOWN = 0.4; // 0.5 1.0
+    public static double HOOD_POS_DOWN = 0.45; // 0.5 1.0
 
     public static double LEVER_POS = 0.7; //.65
     public static double LEVER_POS_GO = 0.4; //0.2
@@ -96,7 +97,11 @@ public class AimingSubsystem implements Loggable, Subsystem {
         if (ls.getDistance() > -1 && ls.getDistance() < 35) {
             setHoodPos(HOOD_POS_DOWN);
         } else {
-            setHoodPos(HOOD_POS_UP);
+            if (ls.getDistance() > 35 && ls.getDistance() < 105) {
+            setHoodPos(HOOD_POS_MIDDLE);
+        }
+         else
+             setHoodPos(HOOD_POS_UP);
         }
     }
 
