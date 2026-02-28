@@ -33,8 +33,8 @@ public class Blue12BallFar extends CommandOpMode {
         CommandScheduler.register(robot.limelightSubsystem);
         CommandScheduler.scheduleForState(
             new SequentialCommandGroup(
-                TeleCommands.SetRegressionCAuto(robot),
-                TeleCommands.SetRegressionDAuto(robot),
+//                TeleCommands.SetRegressionCAuto(robot),
+//                TeleCommands.SetRegressionDAuto(robot),
                 new LLSetup(robot),
                 TeleCommands.GateUp(robot),
                 TeleCommands.SetFarShoot(robot),
