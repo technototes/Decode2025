@@ -38,8 +38,8 @@ public class Red12BallFar extends CommandOpMode {
             //new AltAutoVelocity(robot).alongWith(
             new SequentialCommandGroup(
                 new LLSetup(robot),
-                TeleCommands.SetRegressionCAuto(robot),
-                TeleCommands.SetRegressionDAuto(robot),
+//                TeleCommands.SetRegressionCAuto(robot),
+//                TeleCommands.SetRegressionDAuto(robot),
                 TeleCommands.GateUp(robot),
                 TeleCommands.Intake(robot),
                 TeleCommands.SetFarShoot(robot),
