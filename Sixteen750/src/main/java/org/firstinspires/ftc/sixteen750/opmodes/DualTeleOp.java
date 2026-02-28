@@ -47,9 +47,9 @@ public class DualTeleOp extends CommandOpMode {
             CommandScheduler.scheduleForState(
                 new SequentialCommandGroup(
                     HeadingHelper.RestorePreviousPosition(robot.follower),
-                    DrivingCommands.ResetGyro(controlsDriver.pedroDriver),
-                    TeleCommands.SetRegressionCTeleop(robot),
-                    TeleCommands.SetRegressionDTeleop(robot)
+                    DrivingCommands.ResetGyro(controlsDriver.pedroDriver)
+//                    TeleCommands.SetRegressionCTeleop(robot),
+//                    TeleCommands.SetRegressionDTeleop(robot)
                 ),
                 OpModeState.INIT
             );

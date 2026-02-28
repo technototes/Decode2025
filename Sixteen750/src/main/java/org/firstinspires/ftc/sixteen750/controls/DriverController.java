@@ -135,7 +135,7 @@ public class DriverController {
         //        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
         MotorIncrease.whenPressed(robot.launcherSubsystem::IncreaseMotorVelocity);
         MotorDecrease.whenPressed(robot.launcherSubsystem::DecreaseMotorVelocity);
-        increaseD.whenPressed(robot.launcherSubsystem::increaseRegressionDTeleop);
+        //increaseD.whenPressed(robot.launcherSubsystem::increaseRegressionDTeleop);
     }
 
     public void bindIntakeControls() {

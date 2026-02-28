@@ -20,7 +20,7 @@ import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double kStaticFriction = 0.65; // Measured by the Launcher FF thing in learnbot
-    public static double kVelocityConstant = 0.00039; // Ditto
+    public static double kVelocityConstant = 0.0039; // Ditto
     public static double kMotorResistance = 12 / 9.2; // From goBilda
 
     //    @Log.Number(name = "Motor Power")
@@ -55,13 +55,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
-    public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
-        0.0015,
-        0.0000,
-        0.0,
-        0
-    ); //p = 0.004, i = 0.00020
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.0003, 0.00001, 0.0, 0);
+//    public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
+//        0.0015,
+//        0.0000,
+//        0.0,
+//        0
+//    ); //p = 0.004, i = 0.00020
     public static double SPIN_F_SCALE = 0.00021;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
@@ -81,10 +81,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double REGRESSION_B = 1485; // minimum velocity for close zone launch speed formula 1560
     public static double REGRESSION_C = 20; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D = 270; // minimum velocity for far zone launch speed formula - 130, 255
-    public static double REGRESSION_C_TELEOP = 20; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D_TELEOP = 130; // minimum velocity for far zone launch speed formula
-    public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D_AUTO = 115; // minimum velocity for far zone launch speed formula
+//    public static double REGRESSION_C_TELEOP = 20; // multiplier for x for far zone launch speed formula
+//    public static double REGRESSION_D_TELEOP = 130; // minimum velocity for far zone launch speed formula
+//    public static double REGRESSION_C_AUTO = 17; // multiplier for x for far zone launch speed formula
+//    public static double REGRESSION_D_AUTO = 115; // minimum velocity for far zone launch speed formula
 
     @Log.Number(name = "AutoAim Velocity")
     public static double autoVelocity;
@@ -293,8 +293,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         if (x < 100 && x > 0) {
             lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
         } else if (x > 0) {
-            launcherPI.p = 0.004;
-            launcherPI.i = 0.0002;
+//            launcherPI.p = 0.004;
+//            launcherPI.i = 0.0002;
             lastAutoVelocity = REGRESSION_C * x + REGRESSION_D;
         }
         return lastAutoVelocity;
@@ -303,51 +303,51 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
 
-    public double autoVelocityForAuto() {
-        // x = distance in feet
-        double x = ls.getDistance();
+//    public double autoVelocityForAuto() {
+//        // x = distance in feet
+//        double x = ls.getDistance();
+//
+//        if (x < 100 && x > 0) {
+//            //launcherPI.p = 0.0015;
+//            //launcherPI.i = 0;
+//            lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
+//            return lastAutoVelocity;
+//        }
+//        if (x < 0) {
+//            return lastAutoVelocity;
+//        } else {
+//            launcherPI.p = 0.004;
+//            launcherPI.i = 0.0002;
+//            return REGRESSION_C_AUTO * x + REGRESSION_D_AUTO;
+//        }
+//
+//        //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
+//    }
 
-        if (x < 100 && x > 0) {
-            //launcherPI.p = 0.0015;
-            //launcherPI.i = 0;
-            lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
-            return lastAutoVelocity;
-        }
-        if (x < 0) {
-            return lastAutoVelocity;
-        } else {
-            launcherPI.p = 0.004;
-            launcherPI.i = 0.0002;
-            return REGRESSION_C_AUTO * x + REGRESSION_D_AUTO;
-        }
-
-        //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
-    }
-
-    public void setRegressionCAuto() {
-        // Spin the motors pid goes here
-        REGRESSION_C = REGRESSION_C_AUTO;
-    }
-
-    public void setRegressionDAuto() {
-        // Spin the motors pid goes here
-        REGRESSION_D = REGRESSION_D_AUTO;
-    }
-
-    public void setRegressionCTeleop() {
-        // Spin the motors pid goes here
-        REGRESSION_C = REGRESSION_C_TELEOP;
-    }
-
-    public void setRegressionDTeleop() {
-        // Spin the motors pid goes here
-        REGRESSION_D = REGRESSION_D_TELEOP;
-    }
-
-    public void increaseRegressionDTeleop() {
-        // Spin the motors pid goes here
-        REGRESSION_D += 15;
-    }
+//    public void setRegressionCAuto() {
+//        // Spin the motors pid goes here
+//        REGRESSION_C = REGRESSION_C_AUTO;
+//    }
+//
+//    public void setRegressionDAuto() {
+//        // Spin the motors pid goes here
+//        REGRESSION_D = REGRESSION_D_AUTO;
+//    }
+//
+//    public void setRegressionCTeleop() {
+//        // Spin the motors pid goes here
+//        REGRESSION_C = REGRESSION_C_TELEOP;
+//    }
+//
+//    public void setRegressionDTeleop() {
+//        // Spin the motors pid goes here
+//        REGRESSION_D = REGRESSION_D_TELEOP;
+//    }
+//
+//    public void increaseRegressionDTeleop() {
+//        // Spin the motors pid goes here
+//        REGRESSION_D += 15;
+//    }
 
     @Override
     public void periodic() {
