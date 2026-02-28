@@ -14,12 +14,13 @@ import org.firstinspires.ftc.twenty403.Setup;
 @Configurable
 public class LauncherSubsystem implements Loggable, Subsystem {
 
-    public static double TARGET_MOTOR_VELOCITY = 1375; //.58; // 0.5 // /1.0
+    public static double TARGET_MOTOR_VELOCITY = 1530      ; //.58; // 0.5 // /1.0
 
     boolean hasHardware;
     public static EncodedMotor<DcMotorEx> top;
-    public static PIDFCoefficients launcherP = new PIDFCoefficients(0.002, 0.0, 0.0, 0);
-    public static double SPIN_F_SCALE = 1.0 / 6000;
+    // this doesn't really matter as much since f calculation is just overriding it :(
+    public static PIDFCoefficients launcherP = new PIDFCoefficients(0.006, 0.0, 0.0, 0);
+    public static double SPIN_F_SCALE = 0.00016;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
     public static double PEAK_VOLTAGE = 13;
@@ -69,11 +70,9 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // Spin the motors
         // TODO: make the motors spit the thing at the right angle
         if (hasHardware) {
-            if (Hardware.voltage() < 13.0 && Hardware.voltage() > 12.8) {
-                setTargetSpeed(1475);
-            } else {
+
                 setTargetSpeed(TARGET_MOTOR_VELOCITY);
-            }
+
         }
         launching = true;
     }

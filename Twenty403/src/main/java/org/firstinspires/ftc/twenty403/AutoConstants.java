@@ -62,7 +62,7 @@ public class AutoConstants {
         1E-4
     );
 
-    public static boolean USE_OTOS = false;
+    public static boolean USE_OTOS = true;
 
     public static FollowerConstants getFollowerConstants() {
         return new FollowerConstants()
