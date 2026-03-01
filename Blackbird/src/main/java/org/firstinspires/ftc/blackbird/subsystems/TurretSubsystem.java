@@ -39,15 +39,15 @@ public class TurretSubsystem implements Subsystem, Loggable {
     public String TurretSubsytemInfoToDS;
 
     public static PIDFCoefficients turretPID = new PIDFCoefficients(0.005, 0, 0, 0.0001);
-    public static PIDFCoefficients dtopPID = new PIDFCoefficients(
-        positionToDegrees(0.005),
-        0,
-        0,
-        positionToDegrees(0.0001)
-    );
-    public PIDFController turretPIDF = new PIDFController(turretPID);
-    public PIDFController degreesToPowerPIDF = new PIDFController(dtopPID);
-    boolean hasHardware;
+    //    public static PIDFCoefficients dtopPID = new PIDFCoefficients(
+    //        positionToDegrees(0.005),
+    //        0,
+    //        0,
+    //        positionToDegrees(0.0001)
+    //    );
+    public static PIDFController turretPIDF = new PIDFController(turretPID);
+    //    public PIDFController degreesToPowerPIDF = new PIDFController(dtopPID);
+    static boolean hasHardware;
 
     public TurretSubsystem(Hardware h) {
         hasHardware = Setup.Connected.TURRETSUBSYSTEM;
@@ -84,7 +84,7 @@ public class TurretSubsystem implements Subsystem, Loggable {
         if (hasHardware) {
             //            turretOffsetDegrees += robot.follower.getHeading() * (180 / Math.PI);
             turretPIDF.setTarget(degreesToPosition(deg - turretOffsetDegrees));
-            degreesToPowerPIDF.setTarget(deg - turretOffsetDegrees);
+            //            degreesToPowerPIDF.setTarget(deg - turretOffsetDegrees);
         }
     }
 
@@ -98,19 +98,19 @@ public class TurretSubsystem implements Subsystem, Loggable {
                         turretOffsetDegrees
                 )
             );
-            degreesToPowerPIDF.setTarget(
-                degreesToPowerPIDF.getTarget() + LimelightSubsystem.Xangle + turretOffsetDegrees
-            );
+            //            degreesToPowerPIDF.setTarget(
+            //                degreesToPowerPIDF.getTarget() + LimelightSubsystem.Xangle + turretOffsetDegrees
+            //            );
         }
     }
 
-    public void setTurretPosTXWithPos(double pos) {
+    public static void setTurretPosTXWithPos(double pos) {
         if (hasHardware) {
             //            turretOffsetDegrees = robot.follower.getHeading() * (180 / Math.PI);
             turretPIDF.setTarget(
                 degreesToPosition(pos + LimelightSubsystem.Xangle + turretOffsetDegrees)
             );
-            degreesToPowerPIDF.setTarget(pos + LimelightSubsystem.Xangle + turretOffsetDegrees);
+            //            degreesToPowerPIDF.setTarget(pos + LimelightSubsystem.Xangle + turretOffsetDegrees);
         }
     }
 
@@ -159,15 +159,15 @@ public class TurretSubsystem implements Subsystem, Loggable {
     @Override
     public void periodic() {
         turretPow = turretPIDF.update(getTurretPos());
-        double degreesBaseDPower = degreesToPowerPIDF.update(positionToDegrees(getTurretPos()));
+        //        double degreesBaseDPower = degreesToPowerPIDF.update(positionToDegrees(getTurretPos()));
         String extra = "";
         if (Math.abs(turretPow) < BRAKE_THRESHOLD && turretPow != 0) {
             turretPow = 0.0;
             extra = "[BRK]";
         }
-        if (Math.abs(degreesBaseDPower - turretPow) > 0.0001) {
-            extra = "[bug]";
-        }
+        //        if (Math.abs(degreesBaseDPower - turretPow) > 0.0001) {
+        //            extra = "[bug]";
+        //        }
         setTurretPower(turretPow);
         turretAngle = getEncoderAngleInDegrees();
         turretTicks = getTurretPos();

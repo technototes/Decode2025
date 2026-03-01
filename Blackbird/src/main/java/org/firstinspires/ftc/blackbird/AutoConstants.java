@@ -26,9 +26,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class AutoConstants {
 
     // note these need to be measured:
-    public static double botWeightKg = 10.1;
-    public static double robotLength = 17.5;
-    public static double robotWidth = 11.5;
+    public static double botWeightKg = 10.3;
+    public static double robotLength = 17;
+    public static double robotWidth = 12.5;
 
     // These come from Tuners:
     public static double xvelocity = 67.3;
