@@ -23,6 +23,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     //    public static double MOTOR_POWER = 0.65; // 0.5 1.0
     @Log.Number(name = "Target Velocity")
     public static double targetLaunchVelocity = 1150;
+
     public static double testingLaunchVelocity = 1400;
 
     public static double closetargetLaunchVelocity = 1400;
@@ -53,27 +54,21 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double targetPower;
 
     public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
-    public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
-        0.0015,
-        0.0000,
-        0.0,
-        0
-    ); //p = 0.004, i = 0.00020
-    public static double SPIN_F_SCALE = 0.00021;
-    public static double SPIN_VOLT_COMP = 0.0216;
-    public static double DIFFERENCE = 0.0046;
-    public static double PEAK_VOLTAGE = 13;
+    public static double kStaticFriction = 0.19; // Measured by the Launcher FF helper
+    public static double kVelocityConstant = 0.0043; // Measured by the Launcher FF helper
+    public static double kMotorResistance = 12 / 9.2; // From goBilda motor spec sheet
+
+    public static double VELOCITY_RANGE = 50;
+
     private static PIDFController launcherPID;
     public static double lastAutoVelocity = 0;
 
     boolean hasHardware;
     public Robot robot;
-    public PIDFCoefficients launcherPIDF = new PIDFCoefficients(0, 0.0, 0.0, 0);
-    public PIDFController launcherPIDFController;
-    public static double FEEDFORWARD_COEFFICIENT = 0.0;
+    public PIDFCoefficients launcherPIDF = new PIDFCoefficients(0.0001, 0.0001, 0.0, 0);
 
     public static double MINIMUM_VELOCITY = 1140;
-    public static double RPM_PER_FOOT = 62.3;
+    public static double RPM_PER_INCH = 5.2;
     public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
     public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
     public static double REGRESSION_C = 20; // multiplier for x for far zone launch speed formula
@@ -107,21 +102,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             launcher2.coast();
             launcher1.setPIDFCoefficients(launcherPIDF);
             launcher2.setPIDFCoefficients(launcherPIDF);
-            //ready = false;
             ls = new LimelightSubsystem(h);
-            double ADDITION = (PEAK_VOLTAGE - h.voltage());
-            if (ADDITION == 0) {
-                SPIN_VOLT_COMP = SPIN_VOLT_COMP + 0.001;
-            } else {
-                SPIN_VOLT_COMP = SPIN_VOLT_COMP + (ADDITION * DIFFERENCE);
-            }
             launcherPID = new PIDFController(launcherPI, target ->
-                target == 0
-                    ? 0
-                    : (SPIN_F_SCALE * target) +
-                      (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()))
+                ((Math.signum(target) * (kStaticFriction + getMotor1Current() * kMotorResistance) +
+                        kVelocityConstant * target) /
+                    h.voltage())
             );
-            //            top.setPIDFCoefficients(launcherP);
             setTargetSpeed(0);
         } else {
             launcher1 = null;
@@ -133,10 +119,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void Launch() {
         // Spin the motors pid goes here
         if (hasHardware) {
-//            setTargetSpeed(autoVelocity()); //change to auto aim velocity
             setTargetSpeed(testingLaunchVelocity);
-            //            launcher1.setVelocity(TargetLaunchVelocity);
-            //            launcher2.setVelocity(TargetLaunchVelocity);
         }
     }
 
@@ -158,8 +141,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // Spin the motors pid goes here
         if (hasHardware) {
             setTargetSpeed(targetLaunchVelocityforAuto1); //change to auto aim velocity
-            //launcher1.setVelocity(targetLaunchVelocityforAuto1);
-            //launcher2.setVelocity(targetLaunchVelocityforAuto1);
         }
     }
 
@@ -167,8 +148,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // Spin the motors pid goes here
         if (hasHardware) {
             setTargetSpeed(targetLaunchVelocityforAuto2); //change to auto aim velocity
-            //            launcher1.setVelocity(TargetLaunchVelocity);
-            //            launcher2.setVelocity(TargetLaunchVelocity);
         }
     }
 
@@ -176,26 +155,15 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         // Spin the motors pid goes here
         if (hasHardware) {
             setTargetSpeed(fartargetLaunchVelocityforAuto); //change to auto aim velocity
-            //            launcher1.setVelocity(TargetLaunchVelocity);
-            //            launcher2.setVelocity(TargetLaunchVelocity);
         }
     }
 
     public double readVelocity() {
-        // if(launcher1.getVelocity() == TARGET_LAUNCH_VELOCITY && launcher2.getVelocity() == TARGET_LAUNCH_VELOCITY) {
-        //     return ready = true;
-        // } else {
-        //     return ready = false;
-        // }
-        return launcher1.getVelocity();
-
-        // 12.25 stationary voltage - had to decrease velocity by 150 (trial one: true, trial two: true)
-        // 11.84 stationary voltage - had to decrease velocity by 100? (trial one:
+        return getMotorSpeed();
     }
 
     public void setTargetSpeed(double speed) {
         targetSpeed = speed;
-        //        top.setVelocity(speed);
         launcherPID.setTarget(speed);
     }
 
@@ -214,7 +182,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public double getMotorSpeed() {
         if (launcher1 != null) {
-            return launcher1.getVelocity();
+            // The motor spins backward so flip the sing on velocity
+            return -launcher1.getVelocity();
         }
         return -1;
     }
@@ -235,10 +204,6 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public void Stop() {
         if (hasHardware) {
-            //            launcher1.setVelocity(0);
-            //            launcher2.setVelocity(0);
-            //launcher1.setPower(0);
-            //launcher2.setPower(0);
             launcherPID.setTarget(0);
         }
     }
@@ -257,28 +222,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         }
     }
 
-    public void setMotorVelocityTest() {
-        launcher1.setVelocity(targetLaunchVelocity);
-    }
-
-    //    public void setMotorPowerTest() {
-    //        launcher1.setPower(MOTOR_POWER);
-    //        CurrentLaunchVelocity = getMotor1Velocity();
-    //    }
-
     public double getMotor1Velocity() {
-        return launcher1.getVelocity();
-    }
-
-    public double getMotor2Velocity() {
-        return launcher2.getVelocity();
+        return getMotorSpeed();
     }
 
     public void VelocityShoot() {
-        if (
-            getMotor1Velocity() == targetLaunchVelocity &&
-            getMotor2Velocity() == targetLaunchVelocity
-        ) {
+        if (Math.abs(getMotor1Velocity() - targetLaunchVelocity) < VELOCITY_RANGE) {
             TeleCommands.GateDown(robot);
         }
     }
@@ -326,7 +275,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     @Override
     public void periodic() {
-//        autoVelocity = autoVelocity();
+        // autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
         if (launcherPID.getTarget() != 0) {
             setMotorPower(launcherPID.update(getMotorSpeed()));
