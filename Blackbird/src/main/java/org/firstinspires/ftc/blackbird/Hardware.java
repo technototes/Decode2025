@@ -25,8 +25,8 @@ public class Hardware implements Loggable {
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, testMotor;
     public DcMotorEx intake;
-    public EncodedMotor launcher1;
-    public EncodedMotor launcher2;
+    public EncodedMotor<DcMotorEx> launcher1;
+    public EncodedMotor<DcMotorEx> launcher2;
     public Servo hood;
     public Servo lever;
     public MotorEncoder odoRL, odoFB;
@@ -83,12 +83,11 @@ public class Hardware implements Loggable {
             odoRL = new MotorEncoder(Setup.HardwareNames.ODO_STRAFE);
         }
         if (Setup.Connected.INTAKESUBSYSTEM) {
-            intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.
-                      INTAKE_MOTOR);
+            intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
         }
         if (Setup.Connected.LAUNCHERSUBSYSTEM) {
-            launcher1 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR1);
-            launcher2 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR2);
+            launcher1 = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.LAUNCHER_MOTOR1);
+            launcher2 = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.LAUNCHER_MOTOR2);
         }
         if (Setup.Connected.AIMINGSUBSYSTEM) {
             hood = new Servo(Setup.HardwareNames.HOOD_SERVO);

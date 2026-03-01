@@ -29,11 +29,19 @@ public class Launcher {
 
         // You can (should...) pull this from a Setup.* location:
         public static String getMotorName() {
-            return "rr"; // return Setup.HardwareNames.MyLauncherMotor; for example
+            return "launcher1"; // return Setup.HardwareNames.MyLauncherMotor; for example
+        }
+
+        public static String getMotorName2() {
+            return "launcher2-odo1";
         }
 
         // Is the primary intake motor reversed?
         public static boolean PrimaryReversed = true;
+        // This should probably track the PrimaryReversed value
+        // but if you're using the encoder from the secondary, it might now
+        // TODO: The FeedFwd helper should tell you the correct value.
+        public static boolean ReverseEncoder = true;
         // Is the secondary intake motor reversed?
         public static boolean SecondaryReversed = false;
 
@@ -48,10 +56,13 @@ public class Launcher {
         // now
         public static double MotorResistance = 12 / 9.2;
 
-        // This is how much to add (or substract) when increase/decrease velocity is invoked
-        public static double additionDelta = 10;
-        public static double REGRESSION_M = 6.261; // multiplier for x for close zone launch speed formula
-        public static double REGRESSION_B = 1550; // minimum velocity for close zone launch speed formula
+        // This is how much to add (or subtract) to *power* when inc/dec velocity is invoked
+        public static double additionDelta = 0.025;
+
+        // multiplier for x for launch speed formula
+        public static double REGRESSION_M = 6.261;
+        // minimum velocity for launch speed formula
+        public static double REGRESSION_B = 1250;
 
         public static double CalcVelocity(double distInInches) {
             return REGRESSION_M * distInInches + REGRESSION_B;
@@ -64,7 +75,7 @@ public class Launcher {
 
         // This is a little strange: It's a place to tuck away a reference to the Launcher Subsystem,
         // so that all the commands can get to it there.
-        // It let's us do this:
+        // It lets us do this:
         //    button.whenPressed(Launcher.Commands.IncreaseMotor());
         // Instead of this:
         //    button.whenPressed(Launcher.Commands.IncreaseMotor(r.launcherComponent));
@@ -122,29 +133,25 @@ public class Launcher {
     @Configurable
     public static class Component implements Loggable, Subsystem {
 
-        @Log.Number(name = "Target Velocity")
-        public static double targetLaunchVelocity = 1150;
+        @Log.Number(name = "Target Velocity: ")
+        public static double targetVelocity = 0.0;
 
         @Log.Number(name = "Current Motor Velocity")
-        public static double currentLaunchVelocity = 0.0;
-
         public static double motorVelocity;
+
+        @Log.Number(name = "Target Power: ")
+        public static double targetPower;
+
+        @Log.Number(name = "Manual extra power")
         public static double additionalAmount;
+
+        @Log.Number(name = "AutoAim Velocity")
+        public static double autoVelocity;
 
         public static double launcher1Current;
         public static double launcher2Current;
 
-        @Log(name = "Target Speed: ")
-        public static double targetSpeed;
-
-        @Log(name = "Target Power: ")
-        public static double targetPower;
-
         private static PIDFController launcherPID;
-        public static double lastAutoVelocity = 0;
-
-        @Log.Number(name = "AutoAim Velocity")
-        public static double autoVelocity;
 
         // External dependencies this component requires:
         EncodedMotor<DcMotorEx> launcher1;
@@ -185,9 +192,11 @@ public class Launcher {
             // The point is that motor RPM scales linearly with voltage, so to compensate, you should
             // divide by voltage: Don't try to scale something by a delta from peak. Just divide.
 
-            // To get solve that formula, get a fresh battery, run it at full power and measure the RPM.
+            // To solve that formula, get a fresh battery, run it at full power and measure the RPM.
             // (Well, and figure out kStaticFriction, too: The lowest value that will still get the
             // launcher barely moving)
+
+            // NOTE The FeedForward Helper opmode calculates these numbers for you automatically!
             launcherPID = new PIDFController(Config.launchPID, target -> {
                 if (target == 0) return 0.0;
                 return (
@@ -216,13 +225,20 @@ public class Launcher {
             this(primary, null, targetSubsystem, voltageSup);
         }
 
+        public Component(
+            EncodedMotor<DcMotorEx> primary,
+            EncodedMotor<DcMotorEx> secondary,
+            DoubleSupplier voltageSup
+        ) {
+            this(primary, secondary, null, voltageSup);
+        }
+
         public void setTargetVelocity(double speed) {
-            targetSpeed = speed;
             launcherPID.setTarget(speed);
         }
 
         public double getTargetVelocity() {
-            return targetSpeed;
+            return launcherPID.getTarget();
         }
 
         public void setAutoVelocity() {
@@ -243,28 +259,22 @@ public class Launcher {
 
         public double getActualVelocity() {
             if (hasLaunch1()) {
-                return launcher1.getVelocity();
+                return launcher1.getVelocity() * (Config.ReverseEncoder ? -1 : 1);
             } else {
                 return Double.NaN; // Not a Number
             }
         }
 
         public double getMotor1Current() {
-            if (hasLaunch1()) {
-                return launcher1.getAmperage(CurrentUnit.AMPS);
-            }
-            return -1;
+            return hasLaunch1() ? launcher1.getAmperage(CurrentUnit.AMPS) : -1;
         }
 
         public double getMotor2Current() {
-            if (hasLaunch2()) {
-                return launcher2.getAmperage(CurrentUnit.AMPS);
-            }
-            return -1;
+            return hasLaunch2() ? launcher2.getAmperage(CurrentUnit.AMPS) : -1;
         }
 
         public void Stop() {
-            launcherPID.setTarget(0);
+            setTargetVelocity(0);
         }
 
         public void IncreaseVelocity() {
@@ -295,7 +305,7 @@ public class Launcher {
         @Override
         public void periodic() {
             autoVelocity = calculateVelocity();
-            currentLaunchVelocity = getTargetVelocity();
+            targetVelocity = getTargetVelocity();
             motorVelocity = getActualVelocity();
             if (launcherPID.getTarget() != 0) {
                 double power = launcherPID.update(motorVelocity);
@@ -343,9 +353,6 @@ public class Launcher {
         }
     }
 
-    /*************************************************************************
-     * Op modes: Can they be internal classes? I don't know! Let's find out! *
-     *************************************************************************/
     @Configurable
     @SuppressWarnings("unused")
     @TeleOp(name = "Launcher Validation", group = "Launcher")
@@ -356,11 +363,9 @@ public class Launcher {
         @Override
         public void init() {
             super.init();
-            EncodedMotor<DcMotorEx> m = new EncodedMotor<>(
-                hardwareMap.get(DcMotorEx.class, Config.getMotorName()),
-                Config.getMotorName()
-            );
-            lc = new Launcher.Component(m, null, this::getVoltage);
+            EncodedMotor<DcMotorEx> m = new EncodedMotor<>(Config.getMotorName());
+            EncodedMotor<DcMotorEx> m2 = new EncodedMotor<>(Config.getMotorName2());
+            lc = new Launcher.Component(m, m2, null, this::getVoltage);
         }
 
         @Override
@@ -390,15 +395,16 @@ public class Launcher {
 
         Launcher.Component lc = null;
         State state = State.MeasureStaticFriction;
+        String extra = "";
 
         @Override
         public void init() {
             super.init();
-            EncodedMotor<DcMotorEx> m = new EncodedMotor<>(
-                hardwareMap.get(DcMotorEx.class, Config.getMotorName()),
-                Config.getMotorName()
+            lc = new Launcher.Component(
+                new EncodedMotor<>(Config.getMotorName()),
+                new EncodedMotor<>(Config.getMotorName2()),
+                this::getVoltage
             );
-            lc = new Launcher.Component(m, null, this::getVoltage);
             state = State.MeasureStaticFriction;
             lc.setPower(0);
         }
@@ -426,9 +432,14 @@ public class Launcher {
             if (lastUpdate.milliseconds() >= 100) {
                 lastUpdate.reset();
                 // We update every 100 milliseconds, just to give it time to trigger the encoder
-                if (lc.getActualVelocity() != 0) {
+                double measuredVelocity = lc.getActualVelocity();
+                if (measuredVelocity != 0) {
                     lc.setPower(0);
                     staticFriction -= staticFrictionStep;
+                    if (measuredVelocity < 0) {
+                        extra = "Make sure to set Reverse the encoder!";
+                        Config.ReverseEncoder = true;
+                    }
                     return State.DoneWithFriction;
                 }
                 staticFriction += staticFrictionStep;
@@ -443,6 +454,7 @@ public class Launcher {
         private State DoneWithFriction() {
             // Display results of Static Friction calculator & wait for user
             addData("kStaticFriction-->>", staticFriction);
+            addLine(extra);
             addLine("Hit a button to start the velocity measurement");
             lastUpdate.reset();
             return (anyButtonsReleased() || anyDpadReleased())
@@ -507,15 +519,16 @@ public class Launcher {
 
         private State Testing() {
             double voltage = getVoltage();
-            double pow = targetVelocity == 0
-                ? 0
-                : ((Math.copySign(staticFriction, targetVelocity) +
-                          velocityConstant * targetVelocity +
-                          Math.copySign(
-                              lc.getMotor1Current() * Config.MotorResistance,
-                              targetVelocity
-                          )) /
-                      voltage);
+            double pow =
+                targetVelocity == 0
+                    ? 0
+                    : ((Math.copySign(staticFriction, targetVelocity) +
+                              velocityConstant * targetVelocity +
+                              Math.copySign(
+                                  lc.getMotor1Current() * Config.MotorResistance,
+                                  targetVelocity
+                              )) /
+                          voltage);
             lc.setPower(pow);
             if (lastUpdate.milliseconds() > 250) {
                 lastUpdate.reset();
@@ -531,6 +544,7 @@ public class Launcher {
             addData("Avg Err (after 0.25s)", error.getMean());
             addData("stddev", error.getStandardDeviation());
             addData("Power", pow);
+            addLine(extra);
             if (gamepad1.dpadLeftWasPressed()) {
                 lastUpdate.reset();
                 targetVelocity -= 100;
