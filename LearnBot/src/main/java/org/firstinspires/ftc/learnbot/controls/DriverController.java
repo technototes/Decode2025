@@ -66,50 +66,57 @@ public class DriverController implements Loggable {
     }
 
     public void bindDriveControls() {
-        stickDriver = Pedro.Commands.JoystickDrive(driveLeftStick, driveRightStick);
+        if (Connected.DRIVEBASE) {
+            stickDriver = Pedro.Commands.JoystickDrive(driveLeftStick, driveRightStick);
 
-        turboButton.whenPressed(Pedro.Commands.TurboSpeed());
-        normalButton.whenPressed(Pedro.Commands.NormalSpeed());
-        snailButton.whenPressed(Pedro.Commands.SnailSpeed());
+            turboButton.whenPressed(Pedro.Commands.TurboSpeed());
+            normalButton.whenPressed(Pedro.Commands.NormalSpeed());
+            snailButton.whenPressed(Pedro.Commands.SnailSpeed());
 
-        if (Connected.LIMELIGHT) {
-            visionButton.whenPressedReleased(
-                robot.drivebase::SetVisionDriving,
+            if (Connected.LIMELIGHT) {
+                visionButton.whenPressedReleased(
+                    robot.drivebase::SetVisionDriving,
+                    robot.drivebase::ResumeDriving
+                );
+            }
+
+            rotationCommand = new CycleCommandGroup(
+                robot.drivebase::SetHoldRotation,
+                robot.drivebase::SetTangentRotation,
+                robot.drivebase::SetBidirectionalRotation,
+                robot.drivebase::SetVisionRotation,
+                // robot.drivebase::SetTargetBasedRotation,
+                robot.drivebase::SetFreeRotation
+            );
+
+            rotateModeButton.whenPressed(rotationCommand);
+            driveModeButton.whenPressed(
+                new CycleCommandGroup(
+                    robot.drivebase::SetSquareMotion,
+                    // robot.drivebase::SetTargetBasedMotion,
+                    robot.drivebase::SetFreeMotion
+                )
+            );
+            holdPosButton.whenPressedReleased(
+                robot.drivebase::StayPut,
                 robot.drivebase::ResumeDriving
             );
+            snapRotButton.whenPressedReleased(robot.drivebase::SetSnapRotation, () -> {
+                robot.drivebase.SetFreeRotation();
+                rotationCommand.reset();
+            });
+            resetGyroButton.whenPressed(robot.drivebase::ResetGyro);
+            // This is a nifty feature students built last year: We can *cycle* through commands!
+            botFieldToggleButton.whenReleased(
+                new CycleCommandGroup(
+                    robot.drivebase::SetRobotCentricMode,
+                    robot.drivebase::SetFieldCentricMode
+                )
+            );
         }
-
-        rotationCommand = new CycleCommandGroup(
-            robot.drivebase::SetHoldRotation,
-            robot.drivebase::SetTangentRotation,
-            robot.drivebase::SetBidirectionalRotation,
-            robot.drivebase::SetVisionRotation,
-            // robot.drivebase::SetTargetBasedRotation,
-            robot.drivebase::SetFreeRotation
-        );
-
-        rotateModeButton.whenPressed(rotationCommand);
-        driveModeButton.whenPressed(
-            new CycleCommandGroup(
-                robot.drivebase::SetSquareMotion,
-                // robot.drivebase::SetTargetBasedMotion,
-                robot.drivebase::SetFreeMotion
-            )
-        );
-        holdPosButton.whenPressedReleased(robot.drivebase::StayPut, robot.drivebase::ResumeDriving);
-        snapRotButton.whenPressedReleased(robot.drivebase::SetSnapRotation, () -> {
-            robot.drivebase.SetFreeRotation();
-            rotationCommand.reset();
-        });
-        resetGyroButton.whenPressed(robot.drivebase::ResetGyro);
-        // This is a nifty feature students built last year: We can *cycle* through commands!
-        botFieldToggleButton.whenReleased(
-            new CycleCommandGroup(
-                robot.drivebase::SetRobotCentricMode,
-                robot.drivebase::SetFieldCentricMode
-            )
-        );
-        launch1Button.whilePressed(Launcher.Commands.Launch());
-        launch2Button.whenReleased(Launcher.Commands.StopLaunch());
+        if (Connected.LAUNCHER) {
+            launch1Button.whilePressed(Launcher.Commands.Launch());
+            launch2Button.whenReleased(Launcher.Commands.StopLaunch());
+        }
     }
 }

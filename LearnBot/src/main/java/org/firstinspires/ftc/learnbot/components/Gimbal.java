@@ -61,9 +61,9 @@ public class Gimbal {
 
         // Hardware Configuration:
         public static String YAW_SERVO = "yaw";
-        public static ServoInfo Yaw = new ServoInfo(0.1, 0.9, 0.45, 80.0, false);
+        public static ServoInfo Yaw = new ServoInfo(0.0, 0.95, 0.475, 100.0, false);
         public static String PITCH_SERVO = "pitch";
-        public static ServoInfo Pitch = new ServoInfo(0.0, 0.8, 0.2, 70.0, true);
+        public static ServoInfo Pitch = new ServoInfo(0.05, 1.0, 0.15, 80.0, true);
 
         // Stuff for TargetAcquisition
         public static double TARGET_HEIGHT = 23.5; // Inches: This is a blind guess

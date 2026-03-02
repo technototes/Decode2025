@@ -9,10 +9,11 @@ public class Setup {
 
         public static boolean DRIVEBASE = true;
         public static boolean TESTSUBSYSTEM = false;
-        public static boolean LIMELIGHT = false;
-        public static boolean OTOS = true;
-        public static boolean PINPOINT = false;
+        public static boolean LIMELIGHT = true;
+        public static boolean OTOS = false;
+        public static boolean PINPOINT = true;
         public static boolean GIMBAL = true;
+        public static boolean LAUNCHER = false;
     }
 
     @Configurable
