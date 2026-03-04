@@ -206,21 +206,21 @@ public class Paths {
     public static Pose RIntake3 = new Pose(95, 41);
     public static Pose RIntakeGate = new Pose(131, 70);
     public static Pose RIntakeGateControlPoint = new Pose(90, 67.549);
-    public static Pose RIntakeGateDown = new Pose(135, 55);//136, 60
+    public static Pose RIntakeGateDown = new Pose(133, 55);//136, 60
     public static Pose RIntakeGateDownControlPoint = new Pose(70, 70.179);
     public static Pose IntakeGate = new Pose(13, 60); // 13, 60
     public static Pose IntakeGateControlPoint = new Pose(71, 67);
     public static Pose IntakeGateDown = new Pose(10, 45);
     public static Pose IntakeGateDownControlPoint = new Pose(80, 70);
     public static Pose RIntake3ControlPoint = new Pose(70, 41.585);
-    public static Pose RIntake3end = new Pose(128, 41);
+    public static Pose RIntake3end = new Pose(127, 41);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(125, 79);
     public static Pose Rlever2 = new Pose(125, 70);
     public static Pose RLever2controlpoint = new Pose(60, 76);
     public static Pose RleverControlPoint = new Pose(118, 76);
     public static Pose RleverControlPoint2 = new Pose(110, 68); //x = 112, y=73 - old point, new to test
-    public static Pose REnd = new Pose(85, 99); //95, 84
+    public static Pose REnd = new Pose(85, 110); //95, 84
     public static Pose RfarStart = new Pose(90.000, 9.000);
     public static Pose RfarLaunch = new Pose(87.000, 17);
     public static Pose RfarLaunch2 = new Pose(87.000, 19);
@@ -710,7 +710,7 @@ public class Paths {
             .build();
         RLaunchtoIntakeGateInOne = follower
             .pathBuilder()
-            .addPath(new BezierCurve(RLaunch, new Pose(138,53), new Pose(143, 72), RIntakeGateDown))
+            .addPath(new BezierCurve(RLaunch, new Pose(108,38), new Pose(140, 83), RIntakeGateDown))
             .setConstantHeadingInterpolation(Math.toRadians(30))
             .build();
         RIntakeGatetoIntakeGateDown = follower
