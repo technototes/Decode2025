@@ -74,11 +74,11 @@ public class Red15BallNear extends CommandOpMode {
 //                        p.power9
 //                    ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.RLaunchtoIntakeGateInOne, p.power9).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(1),
+                    new WaitCommand(2),
                     new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch2).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),
-                    new WaitCommand(0.5),
+                    new WaitCommand(0.1),
                     Paths.AutoLaunching3Balls(robot),
                     //                    new PedroPathCommand(robot.follower, p.RLaunchtoIntakeGate).alongWith(
                     //                        TeleCommands.IntakeStop(robot)
