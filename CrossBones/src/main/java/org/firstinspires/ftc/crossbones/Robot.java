@@ -6,6 +6,7 @@ import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.crossbones.helpers.StartingPosition;
+import org.firstinspires.ftc.crossbones.subsystems.CrossBase;
 import org.firstinspires.ftc.crossbones.subsystems.FeedingSubsystem;
 import org.firstinspires.ftc.crossbones.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.crossbones.subsystems.SafetySubsystem;
@@ -35,7 +36,7 @@ public class Robot implements Loggable {
     public SafetySubsystem safetySubsystem;
     public LauncherSubsystem launcherSubsystem;
     public FeedingSubsystem feedingSubsystem;
-    public Follower follower;
+    public CrossBase crossbase;
 
     public Robot(Hardware hw, Alliance team, StartingPosition pos) {
         this.position = pos;
@@ -50,11 +51,10 @@ public class Robot implements Loggable {
         if (Setup.Connected.SAFETYSUBSYSTEM) {
             this.safetySubsystem = new SafetySubsystem(hw);
         }
+        if (Setup.Connected.DRIVEBASE) {
+            this.crossbase = new CrossBase(hw.imu::getHeading, hw.fl, hw.fr, hw.rl, hw.rr);
+        }
     }
 
     public void atStart() {}
-
-    public Follower getFollower() {
-        return follower;
-    }
 }

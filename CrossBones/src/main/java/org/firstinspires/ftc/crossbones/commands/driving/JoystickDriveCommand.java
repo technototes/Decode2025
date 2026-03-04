@@ -10,10 +10,11 @@ import com.technototes.library.util.MathUtils;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.crossbones.Setup;
+import org.firstinspires.ftc.crossbones.subsystems.CrossBase;
 
 public class JoystickDriveCommand implements Command, Loggable {
 
-    public Follower follower;
+    public CrossBase crossBase;
     public DoubleSupplier x, y, r;
     public BooleanSupplier watchTrigger;
     public DoubleSupplier driveStraighten;
@@ -24,13 +25,13 @@ public class JoystickDriveCommand implements Command, Loggable {
     public static boolean faceTagMode = false;
 
     public JoystickDriveCommand(
-        Follower follower,
+        CrossBase crossBase,
         Stick xyStick,
         Stick rotStick,
         DoubleSupplier strtDrive,
         DoubleSupplier angleDrive
     ) {
-        this.follower = follower;
+        this.crossBase = crossBase;
         x = xyStick.getXSupplier();
         y = xyStick.getYSupplier();
         r = rotStick.getXSupplier();
@@ -41,8 +42,8 @@ public class JoystickDriveCommand implements Command, Loggable {
     }
 
     // Use this constructor if you don't want auto-straightening
-    public JoystickDriveCommand(Follower follower, Stick xyStick, Stick rotStick) {
-        this(follower, xyStick, rotStick, null, null);
+    public JoystickDriveCommand(CrossBase crossBase, Stick xyStick, Stick rotStick) {
+        this(crossBase, xyStick, rotStick, null, null);
     }
 
     // This will make the bot snap to an angle, if the 'straighten' button is pressed
@@ -138,23 +139,8 @@ public class JoystickDriveCommand implements Command, Loggable {
 
     @Override
     public void execute() {
-        // If subsystem is busy it is running a trajectory.
-        if (!follower.isBusy()) {
-            double curHeading = -follower.getHeading();
-
-            // The math & signs looks wonky, because this makes things field-relative
-            // (Remember that "3 O'Clock" is zero degrees)
-            double yvalue = -y.getAsDouble();
-            double xvalue = -x.getAsDouble();
-            if (driveStraighten != null) {
-                if (driveStraighten.getAsDouble() > 0.7) {
-                    if (Math.abs(yvalue) > Math.abs(xvalue)) xvalue = 0;
-                    else yvalue = 0;
-                }
-            }
-            // Vector2d input = new Vector2d(yvalue, xvalue).rotated(curHeading);
-        }
-        follower.update();
+        // crossBase.joystickDriveWithGyro(x.getAsDouble(), y.getAsDouble(), r.getAsDouble(), crossBase.getGyro());
+        crossBase.joystickDrive(x.getAsDouble(), y.getAsDouble(), r.getAsDouble());
     }
 
     @Override

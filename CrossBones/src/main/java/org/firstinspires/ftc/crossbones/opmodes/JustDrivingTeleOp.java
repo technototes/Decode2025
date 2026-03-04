@@ -70,12 +70,10 @@ public class JustDrivingTeleOp extends CommandOpMode {
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
-        robot.follower = AutoConstants.createFollower(hardwareMap);
-        robot.follower.setStartingPose(robot.follower.getPose());
-        robot.follower.update();
+
         controlsOperator = new OperatorController(codriverGamepad, robot);
-        SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
-        otos.calibrateImu();
+        // SparkFunOTOS otos = hardwareMap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
+        // otos.calibrateImu();
         controlsDriver = new DriverController(driverGamepad, robot);
         if (Setup.Connected.LIMELIGHT) {
             limelight = hardwareMap.get(Limelight3A.class, LIMELIGHT);
@@ -93,10 +91,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
             limelight.start();
         }
         // use only if useing Move foward auto that relys on just setting motor powers
-        CommandScheduler.scheduleForState(
-            new SequentialCommandGroup(HeadingHelper.RestorePreviousPosition(robot.follower)),
-            OpModeState.INIT
-        );
+
         if (Setup.Connected.LAUNCHER) {
             CommandScheduler.register(robot.launcherSubsystem);
         }
@@ -105,147 +100,11 @@ public class JustDrivingTeleOp extends CommandOpMode {
         }
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
-        robot.follower.setMaxPowerScaling(.75);
     }
 
     @Override
     public void uponStart() {
-        robot.follower.startTeleopDrive();
         robot.atStart();
-    }
-
-    @Override
-    public void runLoop() {
-        // telemetry.addData("imu ori", hardware.imu.getHeading(AngleUnit.DEGREES));
-        // telemetry.update();
-        robot.follower.update();
-
-        robot.follower.setTeleOpDrive(
-            -gamepad1.left_stick_y,
-            -gamepad1.left_stick_x,
-            -gamepad1.right_stick_x,
-            false // Robot Centric
-        );
-        LLStatus status = null;
-        if (Setup.Connected.LIMELIGHT) {
-            status = limelight.getStatus();
-            limelight.updateRobotOrientation(hardware.imu.getHeadingInDegrees());
-            controlsDriver.bindPipelineControls();
-        }
-
-        if (Setup.Connected.LAUNCHER) {
-            // robot.launcherSubsystem.RunLoop(telemetry);
-        }
-
-        if (Setup.Connected.LIMELIGHT) {
-            // here
-            telemetry.addData("Name", "%s", status.getName());
-            telemetry.addData(
-                "Motif:",
-                Setup.HardwareNames.Motif[0] +
-                    " " +
-                    Setup.HardwareNames.Motif[1] +
-                    " " +
-                    Setup.HardwareNames.Motif[2]
-            );
-            telemetry.addData(
-                "Pipeline",
-                "Index: %d, Type: %s",
-                status.getPipelineIndex(),
-                status.getPipelineType()
-            );
-
-            LLResult result = limelight.getLatestResult();
-
-            if (result != null) {
-                long staleness = result.getStaleness();
-                if (staleness < 100) {
-                    // Less than 100 milliseconds old
-                    telemetry.addData("Data", "Good");
-                } else {
-                    telemetry.addData("Data", "Old (" + staleness + " ms)");
-                }
-                // Access general information
-                Pose3D botpose = result.getBotpose_MT2();
-                double captureLatency = result.getCaptureLatency();
-                double targetingLatency = result.getTargetingLatency();
-                double parseLatency = result.getParseLatency();
-                telemetry.addData("LL Latency", captureLatency + targetingLatency);
-                //                telemetry.addData("Parse Latency", parseLatency);
-
-                if (result.isValid()) {
-                    //                    telemetry.addData("tx", result.getTx());
-                    //                    telemetry.addData("txnc", result.getTxNC());
-                    //                    telemetry.addData("ty", result.getTy());
-                    //                    telemetry.addData("tync", result.getTyNC());
-                    //
-                    //                    telemetry.addData("Botpose", botpose.toString());
-
-                    if (result.getPipelineIndex() == Setup.HardwareNames.AprilTag_Pipeline) {
-                        // Access fiducial results
-                        List<LLResultTypes.FiducialResult> fiducialResults =
-                            result.getFiducialResults();
-                        for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                            if (
-                                fr.getFiducialId() == 23 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
-                            ) {
-                                Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
-                                Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
-                                Setup.HardwareNames.Motif[2] = "\uD83D\uDFE2";
-                            } else if (
-                                fr.getFiducialId() == 22 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
-                            ) {
-                                Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
-                                Setup.HardwareNames.Motif[1] = "\uD83D\uDFE2";
-                                Setup.HardwareNames.Motif[2] = "\uD83D\uDFE3";
-                            } else if (
-                                fr.getFiducialId() == 21 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
-                            ) {
-                                Setup.HardwareNames.Motif[0] = "\uD83D\uDFE2";
-                                Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
-                                Setup.HardwareNames.Motif[2] = "\uD83D\uDFE3";
-                            }
-
-                            // distance to apriltag
-                            double distance = calculateDistanceFromPose(fiducialResults.get(0));
-                            telemetry.addData("Distance to AprilTag", String.valueOf(distance));
-                        }
-                    } else if (
-                        result.getPipelineIndex() == Setup.HardwareNames.Green_Color_Pipeline
-                    ) {
-                        // Access color results
-                        List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                        //                        for (LLResultTypes.ColorResult cr : colorResults) {
-                        //
-                        //                        }
-                    } else if (
-                        result.getPipelineIndex() == Setup.HardwareNames.Purple_Color_Pipeline
-                    ) {
-                        // Access color results
-                        List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                        //                        for (LLResultTypes.ColorResult cr : colorResults) {
-                        //
-                        //                        }
-                    }
-                }
-            } else {
-                telemetry.addData("Limelight", "No data available");
-            }
-        }
-        panelsTelemetry.update(telemetry);
-        telemetry.update();
     }
 
     @Override
