@@ -29,12 +29,12 @@ public class Launcher {
 
         // You can pull this from a Setup.* location
         public static String getMotorName() {
-            return "top";
+            return "launcher1";
         }
 
         // You can pull this from a Setup.* location. Return 'null' if there's only one motor
         public static String get2ndMotorName() {
-            return null;
+            return "launcher2-odo1";
         }
 
         // Is the primary intake motor reversed?

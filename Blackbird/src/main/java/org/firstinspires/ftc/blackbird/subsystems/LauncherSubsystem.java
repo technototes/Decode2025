@@ -53,8 +53,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
-    public static double kStaticFriction = 0.19; // Measured by the Launcher FF helper
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(
+        0.0000000000,
+        0.000000000000,
+        0.0,
+        0
+    );
+    public static double kStaticFriction = 0.2; // Measured by the Launcher FF helper
     public static double kVelocityConstant = 0.0043; // Measured by the Launcher FF helper
     public static double kMotorResistance = 12 / 9.2; // From goBilda motor spec sheet
 
@@ -119,6 +124,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void Launch() {
         // Spin the motors pid goes here
         if (hasHardware) {
+            TurretSubsystem.setTurretPosTXWithPos(0);
             setTargetSpeed(testingLaunchVelocity);
         }
     }
