@@ -6,6 +6,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.ParallelRaceGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
@@ -75,10 +76,14 @@ public class Red15BallNear extends CommandOpMode {
 //                    ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.RLaunchtoIntakeGateInOne, p.power9).alongWith(TeleCommands.Intake(robot)),
                     new WaitCommand(2),
-                    new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch2).alongWith(
-                        TeleCommands.IntakeStop(robot)
+                    new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch2)
+                        .alongWith(
+                        new ParallelRaceGroup(TeleCommands.Intake(robot), new WaitCommand(2))
+                            .andThen(
+                            TeleCommands.IntakeStop(robot)
+                        )
                     ),
-                    new WaitCommand(0.1),
+                    new WaitCommand(0.2),
                     Paths.AutoLaunching3Balls(robot),
                     //                    new PedroPathCommand(robot.follower, p.RLaunchtoIntakeGate).alongWith(
                     //                        TeleCommands.IntakeStop(robot)
@@ -109,9 +114,11 @@ public class Red15BallNear extends CommandOpMode {
                         p.RIntake3toIntake3end,
                         p.power85
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(0.1),
+                    new WaitCommand(0.2),
                     new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch2).alongWith(
-                        TeleCommands.IntakeStop(robot)
+                        new ParallelRaceGroup(TeleCommands.Intake(robot), new WaitCommand(2))
+                            .andThen(
+                        TeleCommands.IntakeStop(robot))
                     ),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RLaunch2toEnd),
