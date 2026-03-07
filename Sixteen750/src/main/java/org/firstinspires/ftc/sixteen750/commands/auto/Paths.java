@@ -203,17 +203,19 @@ public class Paths {
     public static Pose RIntake2ControlPoint = new Pose(73, 64.369);
     public static Pose RIntake2end = new Pose(128, 62);
     public static Pose RIntake2endControlPoint = new Pose(95, 65.696);
-    public static Pose RIntake3 = new Pose(95, 41);
+    public static Pose RIntake3 = new Pose(95, 42);
     public static Pose RIntakeGate = new Pose(131, 70);
     public static Pose RIntakeGateControlPoint = new Pose(90, 67.549);
-    public static Pose RIntakeGateDown = new Pose(133, 55);//136, 60
+    public static Pose RIntakeGateDown = new Pose(135, 58);//136, 60
+    public static Pose RIntakeGateDownControlPoint1 = new Pose(108,38);//136, 60
+    public static Pose RIntakeGateDownControlPoint2 = new Pose(136, 89);//136, 60
     public static Pose RIntakeGateDownControlPoint = new Pose(70, 70.179);
     public static Pose IntakeGate = new Pose(13, 60); // 13, 60
     public static Pose IntakeGateControlPoint = new Pose(71, 67);
     public static Pose IntakeGateDown = new Pose(10, 45);
     public static Pose IntakeGateDownControlPoint = new Pose(80, 70);
     public static Pose RIntake3ControlPoint = new Pose(70, 41.585);
-    public static Pose RIntake3end = new Pose(127, 41);
+    public static Pose RIntake3end = new Pose(127, 42);
     public static Pose RIntake3endControlPoint = new Pose(82, 84.000);
     public static Pose Rlever = new Pose(125, 79);
     public static Pose Rlever2 = new Pose(125, 70);
@@ -710,7 +712,7 @@ public class Paths {
             .build();
         RLaunchtoIntakeGateInOne = follower
             .pathBuilder()
-            .addPath(new BezierCurve(RLaunch, new Pose(108,38), new Pose(140, 83), RIntakeGateDown))
+            .addPath(new BezierCurve(RLaunch, RIntakeGateDownControlPoint1, RIntakeGateDownControlPoint2, RIntakeGateDown))
             .setConstantHeadingInterpolation(Math.toRadians(30))
             .build();
         RIntakeGatetoIntakeGateDown = follower
