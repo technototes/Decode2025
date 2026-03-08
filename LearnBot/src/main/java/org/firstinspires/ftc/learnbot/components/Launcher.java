@@ -54,16 +54,18 @@ public class Launcher {
         // It's output is a power value in the -1 to +1 range.
         // So, P is probably in the range of .001-ish.
         // For a velocity-targeting PIDF, we probably want an I value, not a D value.
-        public static PIDFCoefficients launchPID = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
+        public static PIDFCoefficients launchPID = new PIDFCoefficients(0.0, 0.0, 0.0, 0);
 
         // Stuff used for the Feed Forward function.
         // This one is highly variable, based on the amount of friction in the system
-        public static double kStaticFriction = 0.15;
-        // This one tends to be somewhere between 0.0038 to 0.0046 or so.
+        public static double kStaticFriction = 0.183;
+        public static double kDynamicFriction = 0.168;
+
+        // This one tends to be somewhere between 0.0035 to 0.005 or so.
         public static double kVelocityConstant = 0.0043;
 
         // This is only used if we can't read the voltage.
-        public static double PeakVoltage = 13.6;
+        public static double DefaultVoltage = 12.0;
 
         // GoBilda says stall current of 9.2A at 12V, so V = I * R, R = 12 / 9.2 (about 1.3 ohms)
         // As the motor heats up, resistance also increase, so we could increase this a little bit
@@ -80,6 +82,10 @@ public class Launcher {
 
         public static double CalcVelocity(double distInInches) {
             return Regression_M * distInInches + Regression_B;
+        }
+
+        public static double GetFrictionConstant(boolean inMotion) {
+            return inMotion ? kDynamicFriction : kStaticFriction;
         }
     }
 
@@ -148,26 +154,31 @@ public class Launcher {
     public static class Component implements Loggable, Subsystem {
 
         @Log.Number(name = "Target Velocity")
-        public static double targetVelocity = 0.0;
+        public double targetVelocity = 0.0;
 
         @Log.Number(name = "Current Velocity")
-        public static double motorVelocity;
+        public double motorVelocity;
 
         @Log.Number(name = "Target Power")
-        public static double targetPower;
+        public double targetPower;
 
         @Log.Number(name = "Manual Extra Power")
-        public static double additionalAmount;
+        public double additionalAmount;
 
         @Log.Number(name = "AutoAim Velocity")
-        public static double autoVelocity;
+        public double autoVelocity;
 
-        private static PIDFController pidfController;
+        // This the PIDF controller that's used manage the power power.
+        // The PIDF values are set in the Config class above.
+        private final PIDFController pidfController;
 
         // External dependencies this component requires:
+        // The two launcher motors:
         EncodedMotor<DcMotorEx> launcher1;
         EncodedMotor<DcMotorEx> launcher2;
+        // Interface to indicate position of a target
         TargetAcquisition targetAcquisition;
+        // Get the voltage, needed for a sensible FeedFwd function
         DoubleSupplier voltage;
 
         private static EncodedMotor<DcMotorEx> configMotor(EncodedMotor<DcMotorEx> m, boolean rev) {
@@ -187,7 +198,10 @@ public class Launcher {
             launcher1 = configMotor(primary, Config.PrimaryReversed);
             launcher2 = configMotor(secondary, Config.SecondaryReversed);
             targetAcquisition = targetSubsystem;
-            voltage = voltageSup != null ? voltageSup : () -> Config.PeakVoltage;
+            voltage = () -> {
+                double v = (voltageSup != null) ? voltageSup.getAsDouble() : Config.DefaultVoltage;
+                return (v > 0) ? v : Config.DefaultVoltage;
+            };
 
             // A quick wander around google comes up with something like this for motor feedfwd:
 
@@ -206,7 +220,8 @@ public class Launcher {
                 Config.launchPID,
                 target ->
                     (Math.signum(target) * // signum(<0) = -1, signum(>0) = 1, signum(0) = *0*
-                            (Config.kStaticFriction + getMotor1Current() * Config.MotorResistance) +
+                            (Config.GetFrictionConstant(getActualVelocity() != 0) +
+                                getMotor1Current() * Config.MotorResistance) +
                         Config.kVelocityConstant * target) /
                     voltage.getAsDouble()
             );
@@ -239,14 +254,17 @@ public class Launcher {
             this(primary, secondary, null, voltageSup);
         }
 
+        // Explicitly set the target velocity for the motors
         public void setVelocityTarget(double speed) {
             pidfController.setTarget(speed);
         }
 
+        // Returns the current target velocity (which may be set explicity, or automatically)
         public double getVelocityTarget() {
             return pidfController.getTarget();
         }
 
+        // Set the velocity target based on the TargetAcquisition interface
         public void autoSetVelocityTarget() {
             // Spin the motors pid goes here
             setVelocityTarget(calculateVelocityTarget()); //change to auto aim velocity
@@ -272,11 +290,11 @@ public class Launcher {
         }
 
         public double getMotor1Current() {
-            return hasLaunch1() ? launcher1.getAmperage(CurrentUnit.AMPS) : -1;
+            return hasLaunch1() ? launcher1.getAmperage(CurrentUnit.AMPS) : 0;
         }
 
         public double getMotor2Current() {
-            return hasLaunch2() ? launcher2.getAmperage(CurrentUnit.AMPS) : -1;
+            return hasLaunch2() ? launcher2.getAmperage(CurrentUnit.AMPS) : 0;
         }
 
         public void stop() {
@@ -293,6 +311,9 @@ public class Launcher {
             additionalAmount -= Config.PowerDelta;
         }
 
+        // This reads the distance from the TargetAcquisition interface, then
+        // uses the M/B values from Config to return the goal velocity.
+        // We could add stuff to compensate for the robot velocity to better aim while in motion.
         public double calculateVelocityTarget() {
             // x = distance in inches
             double x = getTargetDistance();
@@ -300,7 +321,8 @@ public class Launcher {
         }
 
         // This lets the 'no hardware' or 'subsystem disabled' thing still work without a functional
-        // target acquisition subsystem
+        // target acquisition subsystem. If there is a TA subsystem, it uses that, otherwise it
+        // uses Config.DefaultDistance.
         private double getTargetDistance() {
             if (targetAcquisition != null) {
                 return targetAcquisition.getDistance();
@@ -310,18 +332,12 @@ public class Launcher {
 
         @Override
         public void periodic() {
+            // Update some values for logging:
             autoVelocity = calculateVelocityTarget();
             targetVelocity = getVelocityTarget();
             motorVelocity = getActualVelocity();
-            if (pidfController.getTarget() != 0) {
-                double power = pidfController.update(motorVelocity);
-                setPower(power + Math.copySign(additionalAmount, power));
-            } else {
-                setPower(0);
-                // When we want to stop, reset the PID controller, too
-                pidfController.update(motorVelocity);
-                pidfController.reset();
-            }
+            double power = pidfController.update(motorVelocity);
+            setPower(power + Math.copySign(additionalAmount, power));
         }
 
         boolean hasLaunch1() {
@@ -345,7 +361,7 @@ public class Launcher {
             String name2 = Config.get2ndMotorName();
             lc = new Launcher.Component(
                 new EncodedMotor<>(Config.getMotorName()),
-                name2 == null ? null : new EncodedMotor<>(name2),
+                (name2 == null) ? null : new EncodedMotor<>(name2),
                 this::getVoltage
             );
         }
@@ -360,13 +376,13 @@ public class Launcher {
             double p1 = gamepad1.left_trigger;
             double p2 = gamepad1.right_trigger;
             if (lc.hasLaunch1()) {
-                lc.launcher2.setPower(p1);
+                lc.launcher1.setPower(p1);
                 res += "lt " + p1;
             } else {
                 res += "(no launcher1) ";
             }
             if (lc.hasLaunch2()) {
-                lc.launcher1.setPower(p2);
+                lc.launcher2.setPower(p2);
                 res += "rt " + p2;
             } else {
                 res += "(no launcher2) ";
@@ -391,6 +407,9 @@ public class Launcher {
 
         private enum State {
             MeasureStaticFriction,
+            ValidateStaticFriction,
+            MeasureDynamicFriction,
+            ValidateDynamicFriction,
             DoneWithFriction,
             MeasureVelocity,
             DoneWithVelocity,
@@ -416,9 +435,10 @@ public class Launcher {
         }
 
         double staticFriction = 0.001;
+        double dynamicFriction = 0.001;
         double velocityConstant = 0;
 
-        double staticFrictionStep = 0.001;
+        double frictionStep = 0.001;
         MovingStatistics velocityConstantStats = new MovingStatistics(50);
         double vel = 0;
         double peakVel = 0;
@@ -440,20 +460,14 @@ public class Launcher {
             addLine("*** Please be patient");
             addLine("*** (press a button to abort)");
             addLine("************");
-            if (lastUpdate.milliseconds() >= 100) {
+            if (lastUpdate.milliseconds() >= 50) {
                 lastUpdate.reset();
-                // We update every 100 milliseconds, just to give it time to trigger the encoder
+                // We update every 50 milliseconds, just to give it time to trigger the encoder
                 double measuredVelocity = lc.getActualVelocity();
                 if (measuredVelocity != 0) {
-                    lc.setPower(0);
-                    staticFriction -= staticFrictionStep;
-                    if (measuredVelocity < 0) {
-                        extra = "Make sure to set Reverse the encoder!";
-                        Config.ReverseEncoder = true;
-                    }
-                    return State.DoneWithFriction;
+                    return State.ValidateStaticFriction;
                 }
-                staticFriction += staticFrictionStep;
+                staticFriction += frictionStep;
             }
             if (anyButtonsReleased()) {
                 lc.setPower(0);
@@ -462,11 +476,77 @@ public class Launcher {
             return State.MeasureStaticFriction;
         }
 
+        private State ValidateStaticFriction() {
+            addLine("(Waiting to validate kStaticFriction)");
+            if (lastUpdate.milliseconds() >= 2000) {
+                double measuredVelocity = lc.getActualVelocity();
+                // If it's still moving, we found the static friction value:
+                if (measuredVelocity != 0) {
+                    dynamicFriction = staticFriction;
+                    staticFriction -= frictionStep;
+                    Config.ReverseEncoder = (measuredVelocity < 0) != Config.ReverseEncoder;
+                    extra = Config.ReverseEncoder
+                        ? "Make sure to set Config.ReverseEncoder to true!"
+                        : "Set Config.Reversed to false!";
+                    return State.MeasureDynamicFriction;
+                } else {
+                    // If it didn't keep moving, it was probably a fluke: Keep searching
+                    return State.MeasureStaticFriction;
+                }
+            }
+            return State.ValidateStaticFriction;
+        }
+
+        public State MeasureDynamicFriction() {
+            double v = getVoltage();
+            double amps = lc.getMotor1Current();
+            double power = (dynamicFriction + amps * Config.MotorResistance) / v;
+            lc.setPower(power);
+            addData("kDynamicFriction", dynamicFriction);
+            addData("Voltage", v);
+            addData("Power", power);
+            addLine("************");
+            addLine("*** Please be patient");
+            addLine("*** (press a button to abort)");
+            addLine("************");
+            if (lastUpdate.milliseconds() >= 500) {
+                lastUpdate.reset();
+                // We update every 50 milliseconds, just to give it time to trigger the encoder
+                double measuredVelocity = lc.getActualVelocity();
+                if (measuredVelocity == 0) {
+                    return State.ValidateDynamicFriction;
+                }
+                dynamicFriction -= frictionStep;
+            }
+            if (anyButtonsReleased()) {
+                lc.setPower(0);
+                return State.Abort;
+            }
+            return State.MeasureDynamicFriction;
+        }
+
+        private State ValidateDynamicFriction() {
+            addLine("(Waiting to validate kDynamicFriction)");
+            if (lastUpdate.milliseconds() >= 2000) {
+                double measuredVelocity = lc.getActualVelocity();
+                // If it's still moving, we found the static friction value:
+                if (measuredVelocity == 0) {
+                    dynamicFriction -= frictionStep;
+                    return State.DoneWithFriction;
+                } else {
+                    // If it didn't keep moving, it was probably a fluke: Keep searching
+                    return State.MeasureDynamicFriction;
+                }
+            }
+            return State.ValidateDynamicFriction;
+        }
+
         private State DoneWithFriction() {
             // If we're here, the system started moving. Stop the motors and set kStaticFriction to
             // just below what was necessary to start the system moving.
             // Display results of Static Friction calculator & wait for user.
             addData("kStaticFriction-->>", staticFriction);
+            addData("kDynamicFriction-->>", dynamicFriction);
             if (!extra.isBlank()) addLine(extra);
             addLine("************");
             addLine("*** Hit a button to begin velocity measurement");
@@ -479,7 +559,6 @@ public class Launcher {
 
         private State MeasureVelocity() {
             // We're measuring the kVelocityConstant:
-            double vol = 0;
             double amps;
             if (anyButtonsReleased()) {
                 velocityConstant = velocityConstantStats.getMean();
@@ -487,26 +566,21 @@ public class Launcher {
                 return State.DoneWithVelocity;
             }
             lc.setPower(1);
-            if (lastUpdate.milliseconds() >= 50) {
-                lastUpdate.reset();
-                vel = lc.getActualVelocity();
-                peakVel = Math.max(peakVel, vel);
-                double curVol = getVoltage();
-                if (curVol > 0) {
-                    vol = curVol;
-                }
-                amps = lc.getMotor1Current();
-                if (vel != 0) {
-                    // power = (kStaticFriction + kVelocityConstant * RPM + motorAmperage * motorResistance) / v
-                    // So
-                    //   1 = (kSF + kV * RPM + motorAmperage * motorResistance) / v;
-                    // solve for kV:
-                    //   kV = (v - kSF - motorAmperage * motorResistance) / RPM
-                    velocityConstant = (vol - staticFriction - amps * Config.MotorResistance) / vel;
-                    velocityConstantStats.add(velocityConstant);
-                }
+            vel = lc.getActualVelocity();
+            peakVel = Math.max(peakVel, vel);
+            double vol = getVoltage();
+            amps = lc.getMotor1Current();
+            if (vel != 0) {
+                // power = (kFriction + kVelocityConstant * RPM + motorAmperage * motorResistance) / v
+                // So
+                //   1 = (kF + kV * RPM + motorAmperage * motorResistance) / v;
+                // solve for kV:
+                //   kV = (v - kF - motorAmperage * motorResistance) / RPM
+                velocityConstant = (vol - dynamicFriction - amps * Config.MotorResistance) / vel;
+                velocityConstantStats.add(velocityConstant);
             }
             addData("kStaticFriction!", staticFriction);
+            addData("kDynamicFriction!", dynamicFriction);
             addData("Current kV", velocityConstant);
             addData("Average kV", velocityConstantStats.getMean());
             addData("Velocity", vel);
@@ -519,33 +593,53 @@ public class Launcher {
         }
 
         private State DoneWithVelocity() {
-            // Update the values from the Velocity Constant calculator & go to testing
-            lc.setVelocityTarget(vel * 0.5);
-            error.clear();
-            error.add(0);
-            lastUpdate.reset();
-            Config.kStaticFriction = staticFriction;
-            Config.kVelocityConstant = velocityConstant;
-            return State.Testing;
+            addData("kStaticFriction!", staticFriction);
+            addData("kDynamicFriction!", dynamicFriction);
+            addData("kVelocityConstant!", velocityConstant);
+            if (!extra.isBlank()) addLine(extra);
+            addLine("************");
+            addLine("*** Press a button to continue on to testing");
+            addLine("************");
+            if (anyButtonsReleased()) {
+                // Update the values from the Velocity Constant calculator & go to testing
+                targetVelocity = vel * 0.5;
+                error.clear();
+                error.add(0);
+                lastUpdate.reset();
+                Config.kStaticFriction = staticFriction;
+                Config.kDynamicFriction = dynamicFriction;
+                Config.kVelocityConstant = velocityConstant;
+                return State.Testing;
+            } else {
+                lc.setPower(0);
+                return State.DoneWithVelocity;
+            }
         }
 
         private State Testing() {
             // DoneWithVelocity sets the config values, so let's use the launcher's periodic
             // function to test the results.
-            lc.periodic();
+            lc.setVelocityTarget(targetVelocity);
             if (lastUpdate.milliseconds() > 100) {
                 lastUpdate.reset();
                 vel = lc.getActualVelocity();
                 error.add(targetVelocity - vel);
             }
+            lc.periodic();
             addData("kStaticFriction", staticFriction);
+            addData("kDynamicFriction", dynamicFriction);
             addData("kVelocityConstant", velocityConstant);
             addData("Current", lc.getMotor1Current());
             addData("Voltage", getVoltage());
             addLine(
-                String.format(Locale.ENGLISH, "Vel target: %f (actual: %f)", targetVelocity, vel)
+                String.format(
+                    Locale.ENGLISH,
+                    "Vel target: %.1f (actual: %.1f)",
+                    targetVelocity,
+                    vel
+                )
             );
-            addData("Power", Component.targetPower);
+            addData("Power", lc.targetPower);
             if (!extra.isBlank()) addLine(extra);
             addLine(
                 String.format(
@@ -579,6 +673,15 @@ public class Launcher {
             switch (state) {
                 case MeasureStaticFriction:
                     state = MeasureStaticFriction();
+                    break;
+                case ValidateStaticFriction:
+                    state = ValidateStaticFriction();
+                    break;
+                case MeasureDynamicFriction:
+                    state = MeasureDynamicFriction();
+                    break;
+                case ValidateDynamicFriction:
+                    state = ValidateDynamicFriction();
                     break;
                 case DoneWithFriction:
                     state = DoneWithFriction();
