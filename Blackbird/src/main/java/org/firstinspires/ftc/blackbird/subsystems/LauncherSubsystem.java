@@ -36,8 +36,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double currentLaunchVelocity = 0.0;
 
     public static double motorVelocity;
-    public static double additionAmount;
-    public static double additionDelta = 5;
+    public static double additionAmount = 0.0;
+    public static double additionDelta = 0.025;
 
     //@Log(name = "Launcher Power: ")
     public static double power;
@@ -53,24 +53,19 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(
-        0.0000000000,
-        0.000000000000,
-        0.0,
-        0
-    );
-    public static double kStaticFriction = 0.2; // Measured by the Launcher FF helper
+    public static PIDFCoefficients launchPIDValues = new PIDFCoefficients(0.0001, 0.000005, 0.0, 0);
+    public static double kStaticFriction = 0.183; // Measured by the Launcher FF helper
+    public static double kDynamicFriction = 0.168; // Measured by the Launcher FF helper
     public static double kVelocityConstant = 0.0043; // Measured by the Launcher FF helper
     public static double kMotorResistance = 12 / 9.2; // From goBilda motor spec sheet
 
     public static double VELOCITY_RANGE = 50;
 
-    private static PIDFController launcherPID;
+    private static PIDFController launchPIDController;
     public static double lastAutoVelocity = 0;
 
     boolean hasHardware;
     public Robot robot;
-    public PIDFCoefficients launcherPIDF = new PIDFCoefficients(0.0001, 0.0001, 0.0, 0);
 
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_INCH = 5.2;
@@ -99,17 +94,13 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         hasHardware = Setup.Connected.LAUNCHERSUBSYSTEM;
         // Do stuff in here
         if (hasHardware) {
-            launcher1 = h.launcher1;
-            launcher2 = h.launcher2;
-            launcher1.setDirection(DcMotorSimple.Direction.REVERSE);
-            launcher2.setDirection(DcMotorSimple.Direction.FORWARD);
-            launcher1.coast();
-            launcher2.coast();
-            launcher1.setPIDFCoefficients(launcherPIDF);
-            launcher2.setPIDFCoefficients(launcherPIDF);
+            launcher1 = h.launcher1.setDirection(DcMotorSimple.Direction.REVERSE).coast();
+            launcher2 = h.launcher2.setDirection(DcMotorSimple.Direction.FORWARD).coast();
             ls = new LimelightSubsystem(h);
-            launcherPID = new PIDFController(launcherPI, target ->
-                ((Math.signum(target) * (kStaticFriction + getMotor1Current() * kMotorResistance) +
+            launchPIDController = new PIDFController(launchPIDValues, target ->
+                ((Math.signum(target) *
+                            (getFrictionConst(getMotorSpeed() != 0) +
+                                getMotor1Current() * kMotorResistance) +
                         kVelocityConstant * target) /
                     h.voltage())
             );
@@ -119,6 +110,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             launcher2 = null;
         }
         CommandScheduler.register(this);
+    }
+
+    private static double getFrictionConst(boolean inMotion) {
+        return inMotion ? kDynamicFriction : kStaticFriction;
     }
 
     public void Launch() {
@@ -170,7 +165,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public void setTargetSpeed(double speed) {
         targetSpeed = speed;
-        launcherPID.setTarget(speed);
+        launchPIDController.setTarget(speed);
     }
 
     public double getTargetSpeed() {
@@ -188,7 +183,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public double getMotorSpeed() {
         if (launcher1 != null) {
-            // The motor spins backward so flip the sing on velocity
+            // The motor spins backward so flip the sign on velocity
             return -launcher1.getVelocity();
         }
         return -1;
@@ -210,7 +205,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public void Stop() {
         if (hasHardware) {
-            launcherPID.setTarget(0);
+            launchPIDController.setTarget(0);
         }
     }
 
@@ -243,16 +238,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         double x = ls.getDistance();
 
         if (x < 100 && x > 0) {
-            //launcherPI.p = 0.0015;
-            //launcherPI.i = 0;
             lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
             return lastAutoVelocity;
         }
         if (x < 0) {
             return lastAutoVelocity;
         } else {
-            launcherPI.p = 0.004;
-            launcherPI.i = 0.0002;
             return REGRESSION_C * x + REGRESSION_D;
         }
 
@@ -283,15 +274,15 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void periodic() {
         // autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
-        if (launcherPID.getTarget() != 0) {
-            setMotorPower(launcherPID.update(getMotorSpeed()));
+        if (launchPIDController.getTarget() != 0) {
+            setMotorPower(launchPIDController.update(getMotorSpeed()) + additionAmount);
         } else {
             setMotorPower(0);
-            launcherPID.update(getMotorSpeed());
-            launcherPID.reset();
+            launchPIDController.update(getMotorSpeed());
+            launchPIDController.reset();
         }
 
-        err = launcherPID.getLastError();
+        err = launchPIDController.getLastError();
         motorVelocity = getMotorSpeed();
         power = launcher1.getPower();
         launcher1Current = getMotor1Current();
