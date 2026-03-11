@@ -26,7 +26,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double testingLaunchVelocity = 1400;
 
-    public static double closetargetLaunchVelocity = 1400;
+    public static double closetargetLaunchVelocity = 1550;
     public static double fartargetLaunchVelocity = 1775;
     public static double fartargetLaunchVelocityforAuto = 2300;
     public static double targetLaunchVelocityforAuto1 = 1950;
@@ -53,7 +53,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launchPIDValues = new PIDFCoefficients(0.0001, 0.000005, 0.0, 0);
+    public static PIDFCoefficients launchPIDValues = new PIDFCoefficients(0.002, 0.0001, 0.0, 0);
     public static double kStaticFriction = 0.183; // Measured by the Launcher FF helper
     public static double kDynamicFriction = 0.168; // Measured by the Launcher FF helper
     public static double kVelocityConstant = 0.0043; // Measured by the Launcher FF helper
