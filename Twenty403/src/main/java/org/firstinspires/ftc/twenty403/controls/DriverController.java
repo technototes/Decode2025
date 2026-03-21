@@ -104,16 +104,9 @@ public class DriverController {
             )
         );
 
-        turboButton.whenPressed(EZCmd.Drive.TurboMode(robot.follower));
-        turboButton.whenReleased(EZCmd.Drive.NormalMode(robot.follower));
-
-        snailButton.whenPressed(EZCmd.Drive.SnailMode(robot.follower));
-        snailButton.whenReleased(EZCmd.Drive.NormalMode(robot.follower));
         if (Setup.Connected.LIMELIGHT) {
             AutoAim.whenPressed(EZCmd.Drive.AutoAim());
         }
-
-        resetGyroButton.whenPressed(EZCmd.Drive.ResetGyro(robot.follower));
     }
 
     public void bindLaunchControls() {

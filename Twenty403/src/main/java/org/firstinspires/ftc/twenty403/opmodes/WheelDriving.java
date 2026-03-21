@@ -1,15 +1,13 @@
-package org.firstinspires.ftc.crossbones.opmodes;
+package org.firstinspires.ftc.twenty403.opmodes;
 
-import static org.firstinspires.ftc.crossbones.Setup.HardwareNames.AprilTag_Pipeline;
-import static org.firstinspires.ftc.crossbones.Setup.HardwareNames.LIMELIGHT;
+import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.AprilTag_Pipeline;
+import static org.firstinspires.ftc.twenty403.Setup.HardwareNames.LIMELIGHT;
 
-import android.app.appsearch.SearchResult;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -22,26 +20,24 @@ import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
 import java.util.Arrays;
 import java.util.List;
-import org.firstinspires.ftc.crossbones.AutoConstants;
-import org.firstinspires.ftc.crossbones.Hardware;
-import org.firstinspires.ftc.crossbones.Robot;
-import org.firstinspires.ftc.crossbones.Setup;
-import org.firstinspires.ftc.crossbones.commands.EZCmd;
-import org.firstinspires.ftc.crossbones.controls.DriverController;
-import org.firstinspires.ftc.crossbones.controls.OperatorController;
-import org.firstinspires.ftc.crossbones.helpers.HeadingHelper;
-import org.firstinspires.ftc.crossbones.helpers.StartingPosition;
 import org.firstinspires.ftc.robotcore.external.Supplier;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.twenty403.AutoConstants;
+import org.firstinspires.ftc.twenty403.Hardware;
+import org.firstinspires.ftc.twenty403.Robot;
+import org.firstinspires.ftc.twenty403.Setup;
+import org.firstinspires.ftc.twenty403.controls.DriverController;
+import org.firstinspires.ftc.twenty403.controls.OperatorController;
+import org.firstinspires.ftc.twenty403.helpers.StartingPosition;
 
 // unicode is moai emoji
 @Configurable
-@TeleOp(name = "Two Controller Drive \uD83D\uDDFF")
+@TeleOp(name = "Wheel \u2388")
 @SuppressWarnings("unused")
-public class JustDrivingTeleOp extends CommandOpMode {
+public class WheelDriving extends CommandOpMode {
 
     public Robot robot;
     public DriverController controlsDriver;
@@ -121,7 +117,7 @@ public class JustDrivingTeleOp extends CommandOpMode {
         robot.follower.update();
 
         robot.follower.setTeleOpDrive(
-            -gamepad1.left_stick_y,
+            -gamepad1.left_stick_y + gamepad1.right_stick_y,
             -gamepad1.left_stick_x,
             -gamepad1.right_stick_x,
             false // Robot Centric

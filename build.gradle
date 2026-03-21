@@ -38,8 +38,7 @@ task justAssembleDebug(type: GradleBuild) {
         ':Twenty403:assembleDebug',
         ':Sixteen750:assembleDebug',
         ':SwerveBot:assembleDebug',
-        ':Blackbird:assembleDebug',
-        ':CrossBones:assembleDebug'
+        ':Blackbird:assembleDebug'
     ]
 }
 
