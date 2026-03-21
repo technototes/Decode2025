@@ -4,6 +4,9 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.technototes.library.command.Command;
+import com.technototes.library.control.CommandAxis;
+import com.technototes.library.control.CommandButton;
+import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.util.MathUtils;
@@ -23,6 +26,25 @@ public class JoystickDriveCommand implements Command, Loggable {
     private Limelight3A limelight;
     public static boolean faceTagMode = false;
 
+    // This is for driving with the wheel
+    public JoystickDriveCommand(
+        Follower follower,
+        CommandAxis accelerate,
+        CommandAxis brake,
+        CommandAxis turn,
+        CommandButton strafeLeft,
+        CommandButton strafeRight
+    ) {
+        this.follower = follower;
+        x = () -> strafeLeft.getAsBoolean() ? -1 : strafeRight.getAsBoolean() ? 1 : 0;
+        y = () -> accelerate.getAsDouble() - brake.getAsDouble();
+        r = turn;
+        driveStraighten = null;
+        drive45 = null;
+        driverDriving = true;
+        operatorDriving = false;
+    }
+
     public JoystickDriveCommand(
         Follower follower,
         Stick xyStick,
@@ -32,7 +54,7 @@ public class JoystickDriveCommand implements Command, Loggable {
     ) {
         this.follower = follower;
         x = xyStick.getXSupplier();
-        y = xyStick.getYSupplier();
+        y = () -> (xyStick.getYSupplier().getAsDouble() - 1) / 2.0;
         r = rotStick.getXSupplier();
         driveStraighten = strtDrive;
         drive45 = angleDrive;
