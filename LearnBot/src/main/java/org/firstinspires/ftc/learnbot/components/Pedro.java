@@ -286,16 +286,28 @@ public class Pedro {
 
         protected static Component self;
 
-        public static Command DrivePower(double p1, double p2, double p3, double p4) {
+        public static Command ManualDrivePower(double p1, double p2, double p3, double p4) {
             return new DrivePowerImpl(p1, p2, p3, p4);
         }
 
-        public static Command DrivePower(double pow) {
+        public static Command ManualDrivePower(double pow) {
             return new DrivePowerImpl(pow, pow, pow, pow);
         }
 
         public static Command JoystickDrive(Stick xyStick, Stick rotStick) {
-            return new JoystickImpl(xyStick, rotStick);
+            return new JoystickImpl(
+                xyStick.getYSupplier(),
+                xyStick.getXSupplier(),
+                rotStick.getXSupplier()
+            );
+        }
+
+        public static Command JoystickDrive(
+            DoubleSupplier fwdSup,
+            DoubleSupplier strafeSup,
+            DoubleSupplier rotSup
+        ) {
+            return new JoystickImpl(fwdSup, strafeSup, rotSup);
         }
 
         public static Command FollowPath(PathChain p) {
@@ -366,16 +378,20 @@ public class Pedro {
 
         protected static class JoystickImpl implements Command {
 
-            // The sticks (probably each are CommandAxis suppliers)
+            // The sticks for driving (probably CommandAxis suppliers)
             // Note that the stick values returned are oriented like this:
             // Up is a negative value, down is a positive value.
             // Left is a negative value, right is a positive value.
             DoubleSupplier x, y, r;
 
-            public JoystickImpl(Stick xyStick, Stick rotStick) {
-                x = xyStick.getXSupplier();
-                y = xyStick.getYSupplier();
-                r = rotStick.getXSupplier();
+            public JoystickImpl(
+                DoubleSupplier fwdSup,
+                DoubleSupplier strafeSup,
+                DoubleSupplier rotSup
+            ) {
+                x = strafeSup;
+                y = fwdSup;
+                r = rotSup;
                 addRequirements(self);
             }
 
@@ -567,7 +583,7 @@ public class Pedro {
 
         // These numbers seem a little weird, but the target value is *radians* and the output is
         // 'stick distance'.
-        public static PIDFCoefficients pidf = new PIDFCoefficients(0.9, 0.3, 0.05, 0);
+        public static PIDFCoefficients turningPIDValues = new PIDFCoefficients(0.9, 0.3, 0.05, 0);
         // This is the limit above which we don't consider "error" for the turning PID controller.
         // 4.5 degree 'range' for the error to start accumulating
         public static double WIND_UP_LIMIT = HalfPi * 0.05;
@@ -579,10 +595,10 @@ public class Pedro {
         private double D = 0;
         private double F = 0;
 
-        private PIDFController turningPIDF = new PIDFController(pidf);
+        private PIDFController turningPIDController = new PIDFController(turningPIDValues);
         private boolean turnPidStarted = false;
 
-        public double rotationTransform(double r) {
+        public double RotationTransform(double r) {
             // This gives you more sensitivity at the low end:
             // .25^2 = .0625, .5^2 = .25, .75^2 = .5625, etc...
             return Math.copySign(r * r * driveStyle.rotationSpeed, r);
@@ -608,31 +624,31 @@ public class Pedro {
         Pose holdPose;
         boolean started;
 
-        public RotationMode getRotationMode() {
+        public RotationMode GetRotationMode() {
             return driveStyle.rotation;
         }
 
-        public void setRotationalMode(RotationMode r) {
+        public void SetRotationalMode(RotationMode r) {
             driveStyle.rotation = r;
         }
 
-        public TranslationMode getTranslationMode() {
+        public TranslationMode GetTranslationMode() {
             return driveStyle.translation;
         }
 
-        public void setTranslationMode(TranslationMode t) {
+        public void SetTranslationMode(TranslationMode t) {
             driveStyle.translation = t;
         }
 
-        public DrivingPerspective getPerspective() {
+        public DrivingPerspective GetPerspective() {
             return driveStyle.perspective;
         }
 
-        private double baseHeadingOffset() {
+        private double BaseHeadingOffset() {
             return alliance == Alliance.BLUE ? Math.PI : 0;
         }
 
-        private double getHeadingOffsetRadians() {
+        private double GetHeadingOffsetRadians() {
             return driveStyle.perspective == DrivingPerspective.FieldCentric
                 ? headingOffsetRadians
                 : 0;
@@ -644,7 +660,7 @@ public class Pedro {
             follower = f;
             targetAcquisition = viz;
             alliance = all;
-            headingOffsetRadians = baseHeadingOffset();
+            headingOffsetRadians = BaseHeadingOffset();
             holdPose = null;
             forward = 0;
             strafe = 0;
@@ -673,7 +689,7 @@ public class Pedro {
             this(f, null, Alliance.NONE);
         }
 
-        // Command to start autonomous driving)
+        // Do we need a function to start autonomous driving?
         // Command to start teleop driving
         public void StartTele() {
             started = true;
@@ -683,7 +699,7 @@ public class Pedro {
         // Methods to bind to buttons (Commands)
         public void ResetGyro() {
             headingOffsetRadians = MathUtils.normalizeRadians(
-                follower.getHeading() + baseHeadingOffset()
+                follower.getHeading() + BaseHeadingOffset()
             );
         }
 
@@ -705,7 +721,7 @@ public class Pedro {
             driveStyle.rotationSpeed = Config.TURBO_TURN;
         }
 
-        private void switchDrivingMode(TranslationMode x, RotationMode r) {
+        private void SwitchDrivingMode(TranslationMode x, RotationMode r) {
             TranslationMode px = driveStyle.translation;
             RotationMode pr = driveStyle.rotation;
             if (px == x && pr == r) {
@@ -731,11 +747,11 @@ public class Pedro {
         }
 
         public void SetFreeDriving() {
-            switchDrivingMode(TranslationMode.Free, RotationMode.Free);
+            SwitchDrivingMode(TranslationMode.Free, RotationMode.Free);
         }
 
         public void SetFreeRotation() {
-            switchDrivingMode(getTranslationMode(), RotationMode.Free);
+            SwitchDrivingMode(GetTranslationMode(), RotationMode.Free);
         }
 
         // The list of rotation points (in degrees) you want to snap to
@@ -752,44 +768,44 @@ public class Pedro {
             // point of the circle. So, if you want to snap to 15 and -170, we'll append 190 so that 175
             // will wind up going to 190 (which then normalizes back to -170). Neat, huh?
             snapRadians[degrees.length] = lowest + TwoPi;
-            switchDrivingMode(getTranslationMode(), RotationMode.Snap);
+            SwitchDrivingMode(GetTranslationMode(), RotationMode.Snap);
         }
 
         public void SetSnapRotation() {
-            switchDrivingMode(getTranslationMode(), RotationMode.Snap);
+            SwitchDrivingMode(GetTranslationMode(), RotationMode.Snap);
         }
 
         public void SetTangentRotation() {
-            switchDrivingMode(getTranslationMode(), RotationMode.Tangential);
+            SwitchDrivingMode(GetTranslationMode(), RotationMode.Tangential);
         }
 
         public void SetBidirectionalRotation() {
-            switchDrivingMode(getTranslationMode(), RotationMode.Bidirectional);
+            SwitchDrivingMode(GetTranslationMode(), RotationMode.Bidirectional);
         }
 
         public void SetVisionRotation() {
-            switchDrivingMode(getTranslationMode(), RotationMode.Vision);
+            SwitchDrivingMode(GetTranslationMode(), RotationMode.Vision);
         }
 
         public void SetHoldRotation() {
-            switchDrivingMode(getTranslationMode(), RotationMode.Hold);
+            SwitchDrivingMode(GetTranslationMode(), RotationMode.Hold);
         }
 
         public void HoldCurrentPosition() {
-            switchDrivingMode(TranslationMode.Hold, RotationMode.Hold);
+            SwitchDrivingMode(TranslationMode.Hold, RotationMode.Hold);
         }
 
         public void SetFreeMotion() {
-            switchDrivingMode(TranslationMode.Free, getRotationMode());
+            SwitchDrivingMode(TranslationMode.Free, GetRotationMode());
         }
 
         public void SetSquareMotion() {
-            switchDrivingMode(TranslationMode.Square, getRotationMode());
+            SwitchDrivingMode(TranslationMode.Square, GetRotationMode());
         }
 
         public void SetVisionDriving() {
             prevDriveStyle = new DrivingStyle(driveStyle);
-            switchDrivingMode(TranslationMode.Vision, RotationMode.Vision);
+            SwitchDrivingMode(TranslationMode.Vision, RotationMode.Vision);
         }
 
         public void SetRobotCentricMode() {
@@ -833,20 +849,26 @@ public class Pedro {
         }
 
         public void RegisterJoystickRead(double f, double s, double r) {
-            this.strafe = s;
             this.forward = f;
+            this.strafe = s;
             this.rotation = r;
         }
 
         @Override
         public void periodic() {
-            if (pidf.p != P || pidf.i != I || pidf.d != D || pidf.f != F) {
+            // I think this is unnecessary:
+            if (
+                turningPIDValues.p != P ||
+                turningPIDValues.i != I ||
+                turningPIDValues.d != D ||
+                turningPIDValues.f != F
+            ) {
                 // Someone changed the PIDF on the panels: Updated it in realtime...
-                turningPIDF = new PIDFController(pidf);
-                P = pidf.p;
-                I = pidf.i;
-                D = pidf.d;
-                F = pidf.f;
+                turningPIDController = new PIDFController(turningPIDValues);
+                P = turningPIDValues.p;
+                I = turningPIDValues.i;
+                D = turningPIDValues.d;
+                F = turningPIDValues.f;
             }
             // If subsystem is busy it is running a path, just ignore the stick.
             ShowDriveInfo();
@@ -883,8 +905,8 @@ public class Pedro {
                     botCentric = true;
                 }
             }
-            ShowDriveVectors(forward, strafe, rot, getHeadingOffsetRadians());
-            follower.setTeleOpDrive(forward, strafe, rot, botCentric, getHeadingOffsetRadians());
+            ShowDriveVectors(forward, strafe, rot, GetHeadingOffsetRadians());
+            follower.setTeleOpDrive(forward, strafe, rot, botCentric, GetHeadingOffsetRadians());
             follower.update();
         }
 
@@ -892,7 +914,7 @@ public class Pedro {
             // Negative, because pushing left is negative, but that is a positive change in Pedro's
             // coordinate system.
             curHeading = MathUtils.normalizeDeltaRadians(
-                follower.getHeading() - getHeadingOffsetRadians()
+                follower.getHeading() - GetHeadingOffsetRadians()
             );
             switch (driveStyle.rotation) {
                 case Target_NYI:
@@ -904,7 +926,7 @@ public class Pedro {
                 // and accurately. If the rotation stick goes to zero, we probably just hold the
                 // current location.
                 case Free:
-                    return rotationTransform(rotation);
+                    return RotationTransform(rotation);
                 case Snap:
                     // Angle-focused driving styles override target-based driving mode
                     targetHeading = MathUtils.closestTo(curHeading, snapRadians);
@@ -913,7 +935,7 @@ public class Pedro {
                     // Hold the current heading
                     if (driveStyle.translation != TranslationMode.Hold && holdPose != null) {
                         targetHeading = MathUtils.normalizeDeltaRadians(
-                            holdPose.getHeading() - getHeadingOffsetRadians()
+                            holdPose.getHeading() - GetHeadingOffsetRadians()
                         );
                     } else {
                         // This is weird: We have a rotational hold, but not a translational hold, and
@@ -964,7 +986,7 @@ public class Pedro {
                             curHeading + Math.toRadians(x)
                         );
                     } else {
-                        return rotationTransform(rotation);
+                        return RotationTransform(rotation);
                     }
                     break;
                 default:
@@ -972,7 +994,7 @@ public class Pedro {
             }
             // Use the turn PID controller to get to the target heading
             if (!turnPidStarted) {
-                turningPIDF.reset();
+                turningPIDController.reset();
                 turnPidStarted = true;
             }
             if (
@@ -980,9 +1002,9 @@ public class Pedro {
                 WIND_UP_LIMIT
             ) {
                 // The goal is to prevent *massive* early error from making the I value useless.
-                turningPIDF.reset();
+                turningPIDController.reset();
             }
-            turningPIDF.setTarget(targetHeading);
+            turningPIDController.setTarget(targetHeading);
             // We need to handle a weird case: When the current/target heading values are close
             // to the angle wrap-around point, we should switch one of them from -180 to 180 to 0-360
             // or -360 - 0 instead. This minimizes the error. Without this, when your target heading is
@@ -991,7 +1013,7 @@ public class Pedro {
             if (Math.abs(curHeading - targetHeading) > Math.PI) {
                 curHeading += Math.signum(targetHeading) * TwoPi;
             }
-            return turningPIDF.update(curHeading);
+            return turningPIDController.update(curHeading);
         }
 
         // Everything below here is just for displaying/diagnostics
