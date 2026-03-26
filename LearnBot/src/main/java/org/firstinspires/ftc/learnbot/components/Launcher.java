@@ -27,15 +27,11 @@ public class Launcher {
     @Configurable
     public static class Config {
 
-        // You can pull this from a Setup.* location
-        public static String getMotorName() {
-            return "launcher1";
-        }
+        // This should be the motor that has the encoder
+        public static String MotorName1 = "launcher1";
 
-        // You can pull this from a Setup.* location. Return 'null' if there's only one motor
-        public static String get2ndMotorName() {
-            return "launcher2-odo1";
-        }
+        // Set this to null if there's only one motor
+        public static String MotorName2 = "launcher2-odo1";
 
         // Is the primary intake motor reversed?
         public static boolean PrimaryReversed = true;
@@ -181,22 +177,19 @@ public class Launcher {
         // Get the voltage, needed for a sensible FeedFwd function
         DoubleSupplier voltage;
 
-        private static EncodedMotor<DcMotorEx> configMotor(EncodedMotor<DcMotorEx> m, boolean rev) {
-            return (m == null)
+        private static EncodedMotor<DcMotorEx> configMotor(String motorName, boolean rev) {
+            return (motorName == null)
                 ? null
-                : m.setDirection(rev ? Direction.REVERSE : Direction.FORWARD).coast();
+                : new EncodedMotor<DcMotorEx>(motorName)
+                      .setDirection(rev ? Direction.REVERSE : Direction.FORWARD)
+                      .coast();
         }
 
-        public Component(
-            EncodedMotor<DcMotorEx> primary,
-            EncodedMotor<DcMotorEx> secondary,
-            TargetAcquisition targetSubsystem,
-            DoubleSupplier voltageSup
-        ) {
+        public Component(TargetAcquisition targetSubsystem, DoubleSupplier voltageSup) {
             // Save this off for commands to use
             Commands.component = this;
-            launcher1 = configMotor(primary, Config.PrimaryReversed);
-            launcher2 = configMotor(secondary, Config.SecondaryReversed);
+            launcher1 = configMotor(Config.MotorName1, Config.PrimaryReversed);
+            launcher2 = configMotor(Config.MotorName2, Config.SecondaryReversed);
             targetAcquisition = targetSubsystem;
             voltage = () -> {
                 double v = (voltageSup != null) ? voltageSup.getAsDouble() : Config.DefaultVoltage;
@@ -231,27 +224,11 @@ public class Launcher {
         }
 
         public Component() {
-            this(null, null, null, null);
+            this(null, null);
         }
 
-        public Component(
-            EncodedMotor<DcMotorEx> primary,
-            TargetAcquisition targetSubsystem,
-            DoubleSupplier voltageSup
-        ) {
-            this(primary, null, targetSubsystem, voltageSup);
-        }
-
-        public Component(EncodedMotor<DcMotorEx> primary, DoubleSupplier voltageSup) {
-            this(primary, null, null, voltageSup);
-        }
-
-        public Component(
-            EncodedMotor<DcMotorEx> primary,
-            EncodedMotor<DcMotorEx> secondary,
-            DoubleSupplier voltageSup
-        ) {
-            this(primary, secondary, null, voltageSup);
+        public Component(DoubleSupplier voltageSup) {
+            this(null, voltageSup);
         }
 
         // Explicitly set the target velocity for the motors
@@ -358,12 +335,8 @@ public class Launcher {
         @Override
         public void init() {
             super.init();
-            String name2 = Config.get2ndMotorName();
-            lc = new Launcher.Component(
-                new EncodedMotor<>(Config.getMotorName()),
-                (name2 == null) ? null : new EncodedMotor<>(name2),
-                this::getVoltage
-            );
+            String name2 = Config.MotorName2;
+            lc = new Launcher.Component(this::getVoltage);
         }
 
         @Override
@@ -424,12 +397,7 @@ public class Launcher {
         @Override
         public void init() {
             super.init();
-            String name2 = Config.get2ndMotorName();
-            lc = new Launcher.Component(
-                new EncodedMotor<>(Config.getMotorName()),
-                name2 == null ? null : new EncodedMotor<>(name2),
-                this::getVoltage
-            );
+            lc = new Launcher.Component(this::getVoltage);
             state = State.MeasureStaticFriction;
             lc.setPower(0);
         }
@@ -453,6 +421,7 @@ public class Launcher {
             double amps = lc.getMotor1Current();
             double power = (staticFriction + amps * Config.MotorResistance) / v;
             lc.setPower(power);
+            addLine("Search for static friction constant...");
             addData("kStaticFriction", staticFriction);
             addData("Voltage", v);
             addData("Power", power);
@@ -477,17 +446,18 @@ public class Launcher {
         }
 
         private State ValidateStaticFriction() {
-            addLine("(Waiting to validate kStaticFriction)");
+            addLine("Validating observed kStaticFriction value");
             if (lastUpdate.milliseconds() >= 2000) {
                 double measuredVelocity = lc.getActualVelocity();
                 // If it's still moving, we found the static friction value:
                 if (measuredVelocity != 0) {
+                    // Set the dynamicFriction value for the next step...
                     dynamicFriction = staticFriction;
                     staticFriction -= frictionStep;
                     Config.ReverseEncoder = (measuredVelocity < 0) != Config.ReverseEncoder;
                     extra = Config.ReverseEncoder
-                        ? "Make sure to set Config.ReverseEncoder to true!"
-                        : "Set Config.Reversed to false!";
+                        ? "Set Config.ReverseEncoder to true!"
+                        : "Set Config.ReverseEncoder to false!";
                     return State.MeasureDynamicFriction;
                 } else {
                     // If it didn't keep moving, it was probably a fluke: Keep searching
@@ -497,11 +467,12 @@ public class Launcher {
             return State.ValidateStaticFriction;
         }
 
-        public State MeasureDynamicFriction() {
+        private State MeasureDynamicFriction() {
             double v = getVoltage();
             double amps = lc.getMotor1Current();
             double power = (dynamicFriction + amps * Config.MotorResistance) / v;
             lc.setPower(power);
+            addLine("Search for dynamic friction constant...");
             addData("kDynamicFriction", dynamicFriction);
             addData("Voltage", v);
             addData("Power", power);
@@ -511,7 +482,7 @@ public class Launcher {
             addLine("************");
             if (lastUpdate.milliseconds() >= 500) {
                 lastUpdate.reset();
-                // We update every 50 milliseconds, just to give it time to trigger the encoder
+                // We update every 500 milliseconds, to give the system time to halt
                 double measuredVelocity = lc.getActualVelocity();
                 if (measuredVelocity == 0) {
                     return State.ValidateDynamicFriction;
@@ -526,12 +497,11 @@ public class Launcher {
         }
 
         private State ValidateDynamicFriction() {
-            addLine("(Waiting to validate kDynamicFriction)");
+            addLine("Validating observed kDynamicFriction value");
             if (lastUpdate.milliseconds() >= 2000) {
                 double measuredVelocity = lc.getActualVelocity();
-                // If it's still moving, we found the static friction value:
+                // If it has stopped moving, we found the dynamic friction value:
                 if (measuredVelocity == 0) {
-                    dynamicFriction -= frictionStep;
                     return State.DoneWithFriction;
                 } else {
                     // If it didn't keep moving, it was probably a fluke: Keep searching
