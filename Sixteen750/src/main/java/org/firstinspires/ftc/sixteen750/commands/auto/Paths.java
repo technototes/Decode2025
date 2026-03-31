@@ -206,8 +206,10 @@ public class Paths {
     public static Pose RIntake3 = new Pose(95, 41);
     public static Pose RIntakeGate = new Pose(131, 70);
     public static Pose RIntakeGateControlPoint = new Pose(90, 67.549);
-    public static Pose RIntakeGateDown = new Pose(135, 55);//136, 60
+    public static Pose RIntakeGateDown = new Pose(135, 55); //136, 60
     public static Pose RIntakeGateDownControlPoint = new Pose(70, 70.179);
+    public static Pose IntakeGateDownControlPoint1 = new Pose(36, 38);
+    public static Pose IntakeGateDownControlPoint2 = new Pose(8, 89);
     public static Pose IntakeGate = new Pose(13, 60); // 13, 60
     public static Pose IntakeGateControlPoint = new Pose(71, 67);
     public static Pose IntakeGateDown = new Pose(10, 45);
@@ -361,6 +363,7 @@ public class Paths {
     public PathChain RLaunch2toEnd;
     public PathChain RIntakeGateDowntoLaunch2;
     public PathChain RLaunchtoIntakeGateInOne;
+    public PathChain LaunchtoIntakeGateInOne;
 
     public static Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
@@ -688,7 +691,7 @@ public class Paths {
             .build();
         RIntake1endtoLaunch = follower
             .pathBuilder()
-            .addPath(new BezierLine(RIntake1end, RLaunch))
+            .addPath(new BezierLine(RIntake1end, RLaunch2))
             .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RlaunchHeading2))
             .build();
 
@@ -710,7 +713,9 @@ public class Paths {
             .build();
         RLaunchtoIntakeGateInOne = follower
             .pathBuilder()
-            .addPath(new BezierCurve(RLaunch, new Pose(138,53), new Pose(143, 72), RIntakeGateDown))
+            .addPath(
+                new BezierCurve(RLaunch, new Pose(138, 53), new Pose(143, 72), RIntakeGateDown)
+            )
             .setConstantHeadingInterpolation(Math.toRadians(30))
             .build();
         RIntakeGatetoIntakeGateDown = follower
@@ -725,24 +730,26 @@ public class Paths {
             .build();
         RIntakeGateDowntoLaunch2 = follower
             .pathBuilder()
-            .addPath(new BezierCurve(RIntakeGateDown, RIntakeGateDownControlPoint, RLaunch2))
+            .addPath(new BezierCurve(RIntakeGateDown, RIntakeGateDownControlPoint, RLaunch))
             .setConstantHeadingInterpolation(Math.toRadians(45))
             .build();
 
-        LaunchtoIntakeGate = follower
+        LaunchtoIntakeGateInOne = follower
             .pathBuilder()
-            .addPath(new BezierCurve(Launch, IntakeGateControlPoint, IntakeGate))
-            .setConstantHeadingInterpolation(Math.toRadians(115))
-            .build();
-        IntakeGatetoIntakeGateDown = follower
-            .pathBuilder()
-            .addPath(new BezierLine(IntakeGate, IntakeGateDown))
-            .setConstantHeadingInterpolation(Math.toRadians(115))
+            .addPath(
+                new BezierCurve(
+                    Launch,
+                    IntakeGateDownControlPoint1,
+                    IntakeGateDownControlPoint2,
+                    IntakeGateDown
+                )
+            )
+            .setConstantHeadingInterpolation(Math.toRadians(150))
             .build();
         IntakeGateDowntoLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(IntakeGateDown, IntakeGateDownControlPoint, Launch))
-            .setConstantHeadingInterpolation(Math.toRadians(115))
+            .setConstantHeadingInterpolation(Math.toRadians(135))
             .build();
 
         RIntake2endtoLaunch = follower
