@@ -125,9 +125,9 @@ public class Red15BallNear extends CommandOpMode {
                     Paths.AutoLaunching3Balls(robot).andThen(TeleCommands.IntakeStop(robot)),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RLaunch2toEnd),
-                    TeleCommands.IntakeStop(robot)
-                ),
-                CommandScheduler::terminateOpMode
+                    TeleCommands.IntakeStop(robot),
+                    CommandScheduler::terminateOpMode
+                )
             ),
             OpModeState.RUN
         );
