@@ -47,12 +47,12 @@ public class Blue15BallNear extends CommandOpMode {
                     TeleCommands.GateUp(robot),
                     TeleCommands.Intake(robot),
                     TeleCommands.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.StarttoLaunch, p.power2),
+                    new PedroPathCommand(robot.follower, p.StarttoLaunch, p.power9),
                     Paths.AutoLaunching3Balls(robot),
                     // new WaitCommand(0.5),
                     new PedroPathCommand(robot.follower, p.LaunchtoIntake2),
                     // new WaitCommand(1),
-                    new PedroPathCommand(robot.follower, p.Intake2toIntake2end, p.power).alongWith(
+                    new PedroPathCommand(robot.follower, p.Intake2toIntake2end, p.power85).alongWith(
                         TeleCommands.Intake(robot)
                     ),
                     new PedroPathCommand(robot.follower, p.Intake2endtoLaunch),
@@ -64,30 +64,28 @@ public class Blue15BallNear extends CommandOpMode {
                         p.LaunchtoIntakeGateInOne,
                         p.power9
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(2),
+                    new WaitCommand(1.7),
                     new PedroPathCommand(robot.follower, p.IntakeGateDowntoLaunch).alongWith(
                         new ParallelRaceGroup(
                             TeleCommands.Intake(robot),
-                            new WaitCommand(2)
+                            new WaitCommand(1.7)
                         ).andThen(TeleCommands.IntakeStop(robot))
                     ),
-                    new WaitCommand(0.2),
+                    new WaitCommand(0.1),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(
                         robot.follower,
                         p.LaunchtoIntakeGateInOne,
                         p.power9
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(2),
+                    new WaitCommand(1.7),
                     new PedroPathCommand(robot.follower, p.IntakeGateDowntoLaunch).alongWith(
                         new ParallelRaceGroup(
                             TeleCommands.Intake(robot),
-                            new WaitCommand(2)
+                            new WaitCommand(1.7)
                         ).andThen(TeleCommands.IntakeStop(robot))
                     ),
-                    new WaitCommand(0.2),
-                    Paths.AutoLaunching3Balls(robot),
-                    new WaitCommand(0.05),
+                    new WaitCommand(0.1),
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.LaunchtoIntake1),
                     new PedroPathCommand(robot.follower, p.Intake1toIntake1end).alongWith(
@@ -96,7 +94,7 @@ public class Blue15BallNear extends CommandOpMode {
                     new PedroPathCommand(robot.follower, p.Intake1endtoLaunch),
                     new WaitCommand(0.05),
                     Paths.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.LaunchtoEnd, p.power2),
+                    new PedroPathCommand(robot.follower, p.LaunchtoEnd),
                     TeleCommands.IntakeStop(robot),
                     CommandScheduler::terminateOpMode
                 )

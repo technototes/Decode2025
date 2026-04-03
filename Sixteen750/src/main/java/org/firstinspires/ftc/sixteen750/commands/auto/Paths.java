@@ -126,9 +126,9 @@ public class Paths {
 
     public static Pose Start = new Pose(30.5, 135.152);
     public static Pose Launch = new Pose(54, 93);
-    public static Pose Intake1 = new Pose(49, 86);
+    public static Pose Intake1 = new Pose(49, 88);
     public static Pose Intake1ControlPoint = new Pose(61, 89.143);
-    public static Pose Intake1end = new Pose(19, 86);
+    public static Pose Intake1end = new Pose(19, 88);
     public static Pose Lever = new Pose(18, 75);
     public static Pose Lever2 = new Pose(18, 67);
     public static Pose LeverControlPoint = new Pose(26, 75);
@@ -143,7 +143,7 @@ public class Paths {
     public static Pose Intake3end = new Pose(15, 37);
     public static Pose Intake3endControlPoint = new Pose(62.000, 84.000);
     public static Pose Startfar;
-    public static Pose End = new Pose(34, 76);
+    public static Pose End = new Pose(59, 99);
     public static Pose FarStart = new Pose(49, 11);
     public static Pose FarLaunch = new Pose(63, 14);
     public static Pose IntakeCorner = new Pose(10, 12);
