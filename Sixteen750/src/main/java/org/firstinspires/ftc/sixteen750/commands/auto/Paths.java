@@ -51,7 +51,7 @@ public class Paths {
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
-            new WaitCommand(0.75),
+            new WaitCommand(0.83),
             TeleCommands.GateUp(r),
             TeleCommands.IntakeStop(r)
 
@@ -126,9 +126,9 @@ public class Paths {
 
     public static Pose Start = new Pose(30.5, 135.152);
     public static Pose Launch = new Pose(54, 93);
-    public static Pose Intake1 = new Pose(49, 88);
-    public static Pose Intake1ControlPoint = new Pose(61, 89.143);
-    public static Pose Intake1end = new Pose(19, 88);
+    public static Pose Intake1 = new Pose(49, 86);
+    public static Pose Intake1ControlPoint = new Pose(63, 87);
+    public static Pose Intake1end = new Pose(19, 86);
     public static Pose Lever = new Pose(18, 75);
     public static Pose Lever2 = new Pose(18, 67);
     public static Pose LeverControlPoint = new Pose(26, 75);
@@ -364,6 +364,7 @@ public class Paths {
     public PathChain RIntakeGateDowntoLaunch2;
     public PathChain RLaunchtoIntakeGateInOne;
     public PathChain LaunchtoIntakeGateInOne;
+    public PathChain Rparktolaunchfar;
 
     public static Pose getStart() {
         return new Pose(32.671, 135.916, Math.toRadians(90));
@@ -714,7 +715,7 @@ public class Paths {
         RLaunchtoIntakeGateInOne = follower
             .pathBuilder()
             .addPath(
-                new BezierCurve(RLaunch, new Pose(138, 53), new Pose(143, 72), RIntakeGateDown)
+                new BezierCurve(RLaunch, new Pose(136, 56), new Pose(144, 75), RIntakeGateDown)
             )
             .setConstantHeadingInterpolation(Math.toRadians(30))
             .build();
@@ -1060,7 +1061,13 @@ public class Paths {
             .pathBuilder()
             .addPath(new BezierLine(farPark, farLaunch))
             .setConstantHeadingInterpolation(Math.toRadians(farlaunchHeading4))
-            .setVelocityConstraint(0.3)
+            .setVelocityConstraint(0.5)
+            .build();
+        Rparktolaunchfar = follower
+            .pathBuilder()
+            .addPath(new BezierLine(RfarPark, RfarLaunch))
+            .setConstantHeadingInterpolation(Math.toRadians(RfarlaunchHeading4))
+            .setVelocityConstraint(0.5)
             .build();
         Rlaunchfartogateintake = follower
             .pathBuilder()

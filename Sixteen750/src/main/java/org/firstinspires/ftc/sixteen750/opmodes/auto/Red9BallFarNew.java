@@ -16,9 +16,9 @@ import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "Blue9BallFarNew", preselectTeleOp = "Dual Control")
+@Autonomous(name = "Red9BallFarNew", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class Blue9BallFarNew extends CommandOpMode {
+public class Red9BallFarNew extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -41,7 +41,7 @@ public class Blue9BallFarNew extends CommandOpMode {
                 TeleCommands.FarAutoLaunch(robot),
                 TeleCommands.HoldIntake(robot),
                 TeleCommands.HoodUp(robot),
-                new PedroPathCommand(robot.follower, p.StartFartolaunchfar),
+                new PedroPathCommand(robot.follower, p.RStartFartolaunchfar),
                 new WaitCommand(0.5),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
                 TeleCommands.HoldIntake(robot),
@@ -53,37 +53,37 @@ public class Blue9BallFarNew extends CommandOpMode {
                 //                new WaitCommand(3.5),
                 //                new PedroPathCommand(robot.follower, p.gateintaketolaunchfar),
                 //                Paths.AutoLaunching3Balls(robot),
-                new PedroPathCommand(robot.follower, p.launchfartopark).alongWith(
+                new PedroPathCommand(robot.follower, p.Rlaunchfartopark).alongWith(
                     TeleCommands.Intake(robot)
                 ),
                 new WaitCommand(1),
-                new PedroPathCommand(robot.follower, p.parktolaunchfar),
+                new PedroPathCommand(robot.follower, p.Rparktolaunchfar),
                 new WaitCommand(0.5),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
                 new WaitCommand(0.3),
-                new PedroPathCommand(robot.follower, p.launchfartopark).alongWith(
+                new PedroPathCommand(robot.follower, p.Rlaunchfartopark).alongWith(
                     TeleCommands.Intake(robot)
                 ),
                 new WaitCommand(1),
-                new PedroPathCommand(robot.follower, p.parktolaunchfar),
+                new PedroPathCommand(robot.follower, p.Rparktolaunchfar),
                 new WaitCommand(0.5),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
-                new PedroPathCommand(robot.follower, p.launchfartopark).alongWith(
+                new PedroPathCommand(robot.follower, p.Rlaunchfartopark).alongWith(
                     TeleCommands.Intake(robot)
                 ),
                 new WaitCommand(1),
-                new PedroPathCommand(robot.follower, p.parktolaunchfar),
+                new PedroPathCommand(robot.follower, p.Rparktolaunchfar),
                 new WaitCommand(0.5),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
-                new PedroPathCommand(robot.follower, p.launchfartopark).alongWith(
+                new PedroPathCommand(robot.follower, p.Rlaunchfartopark).alongWith(
                     TeleCommands.Intake(robot)
                 ),
                 new WaitCommand(1),
-                new PedroPathCommand(robot.follower, p.parktolaunchfar),
+                new PedroPathCommand(robot.follower, p.Rparktolaunchfar),
                 new WaitCommand(0.5),
                 Paths.AutoLaunching3BallsSlowIntake(robot),
                 new WaitCommand(1),
-                new PedroPathCommand(robot.follower, p.launchfartopark).alongWith(
+                new PedroPathCommand(robot.follower, p.Rlaunchfartopark).alongWith(
                     TeleCommands.Intake(robot)
                 ),
                 new WaitCommand(1),

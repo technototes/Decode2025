@@ -79,7 +79,7 @@ public class Red15BallNear extends CommandOpMode {
                         p.RLaunchtoIntakeGateInOne,
                         p.power9
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(1.7),
+                    new WaitCommand(1.4),
                     new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch2).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),
@@ -106,11 +106,11 @@ public class Red15BallNear extends CommandOpMode {
                         p.RLaunchtoIntakeGateInOne,
                         p.power9
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(1.7),
+                    new WaitCommand(1.4),
                     new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch2).alongWith(
                         new ParallelRaceGroup(
                             TeleCommands.Intake(robot),
-                            new WaitCommand(1.7)
+                            new WaitCommand(1.4)
                         ).andThen(TeleCommands.IntakeStop(robot))
                     ),
                     new WaitCommand(0.1),
@@ -123,7 +123,6 @@ public class Red15BallNear extends CommandOpMode {
                     ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.RIntake1endtoLaunch),
                     Paths.AutoLaunching3Balls(robot).andThen(TeleCommands.IntakeStop(robot)),
-                    Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RLaunch2toEnd),
                     TeleCommands.IntakeStop(robot),
                     CommandScheduler::terminateOpMode

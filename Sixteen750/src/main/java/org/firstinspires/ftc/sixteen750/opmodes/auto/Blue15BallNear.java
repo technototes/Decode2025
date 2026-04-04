@@ -52,9 +52,11 @@ public class Blue15BallNear extends CommandOpMode {
                     // new WaitCommand(0.5),
                     new PedroPathCommand(robot.follower, p.LaunchtoIntake2),
                     // new WaitCommand(1),
-                    new PedroPathCommand(robot.follower, p.Intake2toIntake2end, p.power85).alongWith(
-                        TeleCommands.Intake(robot)
-                    ),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.Intake2toIntake2end,
+                        p.power85
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.Intake2endtoLaunch),
                     //   TeleCommands.AutoLaunch2(robot),
 
@@ -64,11 +66,11 @@ public class Blue15BallNear extends CommandOpMode {
                         p.LaunchtoIntakeGateInOne,
                         p.power9
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(1.7),
+                    new WaitCommand(1.4),
                     new PedroPathCommand(robot.follower, p.IntakeGateDowntoLaunch).alongWith(
                         new ParallelRaceGroup(
                             TeleCommands.Intake(robot),
-                            new WaitCommand(1.7)
+                            new WaitCommand(1.4)
                         ).andThen(TeleCommands.IntakeStop(robot))
                     ),
                     new WaitCommand(0.1),
@@ -78,11 +80,11 @@ public class Blue15BallNear extends CommandOpMode {
                         p.LaunchtoIntakeGateInOne,
                         p.power9
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(1.7),
+                    new WaitCommand(1.4),
                     new PedroPathCommand(robot.follower, p.IntakeGateDowntoLaunch).alongWith(
                         new ParallelRaceGroup(
                             TeleCommands.Intake(robot),
-                            new WaitCommand(1.7)
+                            new WaitCommand(1.4)
                         ).andThen(TeleCommands.IntakeStop(robot))
                     ),
                     new WaitCommand(0.1),
