@@ -55,9 +55,9 @@ public class Red15BallNear extends CommandOpMode {
                     new PedroPathCommand(
                         robot.follower,
                         p.RIntake2toIntake2end,
-                        p.power75
+                        p.power85
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(0.2),
+                    new WaitCommand(0.1),
                     //   TeleCommands.AutoLaunch2(robot),
                     new PedroPathCommand(robot.follower, p.RIntake2endtoLaunch).alongWith(
                         TeleCommands.IntakeStop(robot)
@@ -79,14 +79,11 @@ public class Red15BallNear extends CommandOpMode {
                         p.RLaunchtoIntakeGateInOne,
                         p.power9
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(2),
+                    new WaitCommand(1.4),
                     new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch2).alongWith(
-                        new ParallelRaceGroup(
-                            TeleCommands.Intake(robot),
-                            new WaitCommand(2)
-                        ).andThen(TeleCommands.IntakeStop(robot))
+                        TeleCommands.IntakeStop(robot)
                     ),
-                    new WaitCommand(0.2),
+                    new WaitCommand(0.1),
                     Paths.AutoLaunching3Balls(robot),
                     //                    new PedroPathCommand(robot.follower, p.RLaunchtoIntakeGate).alongWith(
                     //                        TeleCommands.IntakeStop(robot)
@@ -104,29 +101,28 @@ public class Red15BallNear extends CommandOpMode {
                     //                    new WaitCommand(0.05),
                     //                    Paths.AutoLaunching3Balls(robot),
 
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.RLaunchtoIntakeGateInOne,
+                        p.power9
+                    ).alongWith(TeleCommands.Intake(robot)),
+                    new WaitCommand(1.4),
+                    new PedroPathCommand(robot.follower, p.RIntakeGateDowntoLaunch2).alongWith(
+                        new ParallelRaceGroup(
+                            TeleCommands.Intake(robot),
+                            new WaitCommand(1.4)
+                        ).andThen(TeleCommands.IntakeStop(robot))
+                    ),
+                    new WaitCommand(0.1),
+                    Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RLaunch2toIntake1),
                     new PedroPathCommand(
                         robot.follower,
                         p.RIntake1toIntake1end,
                         p.power85
                     ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(0.1),
                     new PedroPathCommand(robot.follower, p.RIntake1endtoLaunch),
-                    Paths.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.RLaunchtoIntake3),
-                    new PedroPathCommand(
-                        robot.follower,
-                        p.RIntake3toIntake3end,
-                        p.power85
-                    ).alongWith(TeleCommands.Intake(robot)),
-                    new WaitCommand(0.2),
-                    new PedroPathCommand(robot.follower, p.RIntake3endtoLaunch2).alongWith(
-                        new ParallelRaceGroup(
-                            TeleCommands.Intake(robot),
-                            new WaitCommand(2)
-                        ).andThen(TeleCommands.IntakeStop(robot))
-                    ),
-                    Paths.AutoLaunching3Balls(robot),
+                    Paths.AutoLaunching3Balls(robot).andThen(TeleCommands.IntakeStop(robot)),
                     new PedroPathCommand(robot.follower, p.RLaunch2toEnd),
                     TeleCommands.IntakeStop(robot),
                     CommandScheduler::terminateOpMode

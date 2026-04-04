@@ -15,7 +15,7 @@ public class AimingSubsystem implements Loggable, Subsystem {
 
     public static double HOOD_POS = 0.5; // 0.5 1.0
     public static double HOOD_POS_MIDDLE = 0.72;
-    public static double HOOD_POS_UP = 1; // 0.5 1.0
+    public static double HOOD_POS_UP = .88; // 0.5 1.0
     public static double HOD_POS_UP_AUTO_ONLY = 0.90;
     public static double HOD_POS_UP_AUTO_ONLY2 = 0.80;
 

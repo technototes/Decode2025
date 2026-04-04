@@ -2,6 +2,9 @@ package org.firstinspires.ftc.sixteen750.commands;
 
 import com.pedropathing.geometry.BezierPoint;
 import com.technototes.library.command.Command;
+import com.technototes.library.command.SequentialCommandGroup;
+import com.technototes.library.command.WaitCommand;
+
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
@@ -141,4 +144,37 @@ public class TeleCommands {
     public static Command IncreaseRegressionDTeleop(Robot r) {
         return Command.create(r.launcherSubsystem::increaseRegressionDTeleop);
     }
-}
+    public static SequentialCommandGroup OutreachLaunch(Robot r) {
+        return new SequentialCommandGroup(
+            Command.create(r.launcherSubsystem::Launch),
+            new WaitCommand(0.8),
+            Command.create(r.intakeSubsystem::Intake),
+            Command.create(r.aimingSubsystem::GoBall),
+            new WaitCommand(.8),
+            Command.create(r.launcherSubsystem::Stop),
+            Command.create(r.intakeSubsystem::StopIntake),
+            Command.create(r.aimingSubsystem::StopBall
+
+        )
+            .raceWith(new AltAutoOrient(r))
+            )
+           ;
+    }
+    public static SequentialCommandGroup OutreachLaunchFar(Robot r) {
+        return new SequentialCommandGroup(
+            Command.create(r.launcherSubsystem::Launch),
+            new WaitCommand(1.4),
+            Command.create(r.intakeSubsystem::Hold),
+            Command.create(r.aimingSubsystem::GoBall),
+            new WaitCommand(2.5),
+            Command.create(r.launcherSubsystem::Stop),
+            Command.create(r.intakeSubsystem::StopIntake),
+            Command.create(r.aimingSubsystem::StopBall
+
+                )
+                .raceWith(new AltAutoOrient(r))
+        )
+            ;
+    }
+
+    }

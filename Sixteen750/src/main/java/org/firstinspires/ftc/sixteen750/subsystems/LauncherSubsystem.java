@@ -4,7 +4,10 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.SequentialCommandGroup;
+import com.technototes.library.command.WaitCommand;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
@@ -14,7 +17,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.controls.DriverController;
 
 @Configurable
 public class LauncherSubsystem implements Loggable, Subsystem {
@@ -137,6 +142,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             //            launcher2.setVelocity(TargetLaunchVelocity);
         }
     }
+
+
 
     public void CloseShoot() {
         // Spin the motors pid goes here
