@@ -28,7 +28,7 @@ dependencies {
     // implementation 'com.github.technototes:technolib:2.3.0' // FLIP: TechnoLibLocal
 
     // Adding support for Pedro Pathing
-    implementation 'com.pedropathing:ftc:2.0.6'
+    implementation 'com.pedropathing:ftc:2.1.1'
     implementation 'com.pedropathing:telemetry:1.0.0'
     implementation 'com.bylazar:fullpanels:1.0.12'
 
