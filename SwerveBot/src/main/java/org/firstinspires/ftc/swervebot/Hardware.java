@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.swervebot;
 
+import static java.lang.Math.PI;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -24,6 +26,7 @@ import org.firstinspires.ftc.swervebot.swerveutil.AbsoluteAnalogEncoder;
 public class Hardware implements Loggable {
 
     public List<LynxModule> hubs;
+
 
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, testMotor;
@@ -55,16 +58,12 @@ public class Hardware implements Loggable {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
             );
         }
-        if (Setup.Connected.DRIVEBASE) {
-            fl = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.FL_DRIVE_MOTOR);
-            fr = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.FR_DRIVE_MOTOR);
-            rl = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.RL_DRIVE_MOTOR);
-            rr = new EncodedMotor<DcMotorEx>(Setup.HardwareNames.RR_DRIVE_MOTOR);
-        }
+
+
         if (Setup.Connected.ODOSUBSYSTEM) {
             odoFB = new MotorEncoder(Setup.HardwareNames.ODOFB);
             odoRL = new MotorEncoder(Setup.HardwareNames.ODORL);
-        }
+       }
         if (Setup.Connected.INTAKESUBSYSTEM) {
             intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
         }
@@ -84,10 +83,14 @@ public class Hardware implements Loggable {
             flswervo = new CRServo(Setup.HardwareNames.FL_SWERVO);
             rlswervo = new CRServo(Setup.HardwareNames.RL_SWERVO);
             rrswervo = new CRServo(Setup.HardwareNames.RR_SWERVO);
-            frswervoenc = new AbsoluteAnalogEncoder(hwmap.get(AnalogInput.class, Setup.HardwareNames.FR_SWERVO_ENCODER));
-            flswervoenc = new AbsoluteAnalogEncoder(hwmap.get(AnalogInput.class, Setup.HardwareNames.FL_SWERVO_ENCODER));
-            rlswervoenc = new AbsoluteAnalogEncoder(hwmap.get(AnalogInput.class, Setup.HardwareNames.RL_SWERVO_ENCODER));
-            rrswervoenc = new AbsoluteAnalogEncoder(hwmap.get(AnalogInput.class, Setup.HardwareNames.RR_SWERVO_ENCODER));
+            frswervoenc = new AbsoluteAnalogEncoder(hwmap.get(AnalogInput.class, Setup.HardwareNames.FR_SWERVO_ENCODER))
+                .zero(-2.925);
+            flswervoenc = new AbsoluteAnalogEncoder(hwmap.get(AnalogInput.class, Setup.HardwareNames.FL_SWERVO_ENCODER))
+                .zero(-0.179);
+            rlswervoenc = new AbsoluteAnalogEncoder(hwmap.get(AnalogInput.class, Setup.HardwareNames.RL_SWERVO_ENCODER))
+                .zero(0.159);
+            rrswervoenc = new AbsoluteAnalogEncoder(hwmap.get(AnalogInput.class, Setup.HardwareNames.RR_SWERVO_ENCODER))
+                .zero(-0.115);
         }
     }
 

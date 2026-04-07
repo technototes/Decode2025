@@ -38,11 +38,10 @@ public class Robot implements Loggable {
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             this.limelightSubsystem = new LimelightSubsystem(hw);
         }
-        if (Setup.Connected.DRIVEBASE) {
-            follower = AutoConstants.createFollower(hw.map);
-        }
+
         if (Setup.Connected.SWERVESUBSYSTEM) {
-            this.swerveDriveSubsystem = new SimpleCoaxSwerveDriveSubsystem(hw);
+            swerveDriveSubsystem = new SimpleCoaxSwerveDriveSubsystem(hw);
+            follower = AutoConstants.createFollower(hw.map);
         }
     }
 

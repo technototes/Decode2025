@@ -39,7 +39,7 @@ public class AutoConstants {
     public static double latDeceleration = -71.1;
     public static double centripetalScaling = 0.0005;
     public static double steeringMaxPower = Math.PI;
-    public static double steeringMinPower = -0.05;
+    public static double steeringMinPower = 0.05;
 
 
     // These are hand tuned to work how we want
@@ -48,7 +48,7 @@ public class AutoConstants {
     public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.5, 0, 0.03, 0.03); //11-7 tuning i = 0.00055
     public static PIDFCoefficients second_headingPIDF = new PIDFCoefficients(0.5, 0.05, 0.03, 0);
     public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.07, 0, 0.009, 0.02); //11-7 tuning i = 0.00015
-    public static com.qualcomm.robotcore.hardware.PIDFCoefficients swervoPIDF = new com.qualcomm.robotcore.hardware.PIDFCoefficients(0,0,0, 0);
+    public static com.qualcomm.robotcore.hardware.PIDFCoefficients swervoPIDF = new com.qualcomm.robotcore.hardware.PIDFCoefficients(.3,0,0.005, 0);
 
     // "Kalman filtering": T in this constructor is the % of the previous
     // derivative that should be used to calculate the derivative.
@@ -98,8 +98,8 @@ public class AutoConstants {
     @Configurable
     public static class TwoWheelConfig {
 
-        public static String forwardName = HardwareNames.ODOFB;
-        public static String strafeName = HardwareNames.ODORL;
+        public static String forwardName = HardwareNames.FL_SWERVEDRIVE;
+        public static String strafeName = HardwareNames.FR_SWERVEDRIVE;
         public static double forwardTicksToInches = ((17.5 / 25.4) * 2 * Math.PI) / 8192; // 5.42, 5.47, 5.49
         public static double strafeTicksToInches = ((17.5 / 25.4) * 2 * Math.PI) / 8192; // 5.37, 5.39, 5.38
         public static double forwardPodYOffset = -3.9; // From Colin's CAD 10/31
@@ -183,7 +183,7 @@ public class AutoConstants {
 
     public static CoaxialSwerveConstants getSwerveConstants() {
         return new CoaxialSwerveConstants()
-            .withMotorNames(HardwareNames.FL_DRIVE_MOTOR, HardwareNames.FR_DRIVE_MOTOR, HardwareNames.RL_DRIVE_MOTOR, HardwareNames.RR_DRIVE_MOTOR)
+            .withMotorNames(HardwareNames.FL_SWERVEDRIVE, HardwareNames.FR_SWERVEDRIVE, HardwareNames.RL_SWERVEDRIVE, HardwareNames.RR_SWERVEDRIVE)
             .withServoNames(HardwareNames.FL_SWERVO, HardwareNames.FR_SWERVO, HardwareNames.RL_SWERVO, HardwareNames.RR_SWERVO)
             .withEncoderNames(HardwareNames.FL_SWERVO_ENCODER, HardwareNames.FR_SWERVO_ENCODER, HardwareNames.RL_SWERVO_ENCODER, HardwareNames.RR_SWERVO_ENCODER)
             .withSteeringParams(swervoPIDF, steeringMaxPower, steeringMinPower)

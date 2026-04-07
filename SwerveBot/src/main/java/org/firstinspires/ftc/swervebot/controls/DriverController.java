@@ -18,9 +18,11 @@ public class DriverController {
 
     public Stick driveLeftStick, driveRightStick;
     public CommandButton spinallswervos;
+    public CommandButton setAll180Cmd;
 
     public static double triggerThreshold = 0.1;
     public Command SwerveDriveCmd;
+    public Command Drive;
 
     public DriverController(CommandGamepad g, Robot r) {
         this.robot = r;
@@ -36,13 +38,14 @@ public class DriverController {
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
         spinallswervos = gamepad.ps_cross;
+        setAll180Cmd = gamepad.dpadUp;
     }
 
     public void bindDriveControls() {
        SwerveDriveCmd = new SwerveDriveCmd(robot.swerveDriveSubsystem, driveLeftStick, driveRightStick);
         CommandScheduler.scheduleJoystick(SwerveDriveCmd);
-        spinallswervos.whenPressed(robot.swerveDriveSubsystem.setSwervosCmd());
-        spinallswervos.whenReleased(robot.swerveDriveSubsystem.stopSwervosCmd());
+        setAll180Cmd.whenPressed(robot.swerveDriveSubsystem.setAll180Cmd());
+
 
     }
 

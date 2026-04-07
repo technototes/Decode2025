@@ -33,33 +33,33 @@ public class CoaxialSwerveConstants {
 
     // Encoder zero offsets (in radians)
     // These should be calibrated by pointing each module forward and recording the encoder value
-    public double frontLeftEncoderOffset = 0.0;
-    public double frontRightEncoderOffset = 0.0;
-    public double rearLeftEncoderOffset = 0.0;
-    public double rearRightEncoderOffset = 0.0;
+    public double frontLeftEncoderOffset = -0.179;
+    public double frontRightEncoderOffset = -2.925;
+    public double rearLeftEncoderOffset = 0.159;
+    public double rearRightEncoderOffset = -0.115;
 
 
     // encoder inverted status
-    public boolean isFrontLeftEncoderInverted = false;
-    public boolean isFrontRightEncoderInverted = false;
-    public boolean isRearLeftEncoderInverted = false;
-    public boolean isRearRightEncoderInverted = false;
+    public boolean isFrontLeftEncoderInverted = true;
+    public boolean isFrontRightEncoderInverted = true;
+    public boolean isRearLeftEncoderInverted = true;
+    public boolean isRearRightEncoderInverted = true;
 
     // ==================== MOTOR DIRECTIONS ====================
     // Set these based on how your motors are mounted
 
-    public DcMotorSimple.Direction frontLeftDriveMotorDirection = DcMotorSimple.Direction.FORWARD;
-    public DcMotorSimple.Direction frontRightDriveMotorDirection = DcMotorSimple.Direction.REVERSE;
-    public DcMotorSimple.Direction rearLeftDriveMotorDirection = DcMotorSimple.Direction.FORWARD;
-    public DcMotorSimple.Direction rearRightDriveMotorDirection = DcMotorSimple.Direction.REVERSE;
+    public DcMotorSimple.Direction frontLeftDriveMotorDirection = DcMotorSimple.Direction.REVERSE;
+    public DcMotorSimple.Direction frontRightDriveMotorDirection = DcMotorSimple.Direction.FORWARD;
+    public DcMotorSimple.Direction rearLeftDriveMotorDirection = DcMotorSimple.Direction.REVERSE;
+    public DcMotorSimple.Direction rearRightDriveMotorDirection = DcMotorSimple.Direction.FORWARD;
 
     // ==================== SERVO DIRECTIONS ====================
     // Set these based on how your servos are mounted
 
-    public CRServo.Direction frontLeftSteeringServoDirection = CRServo.Direction.FORWARD;
-    public CRServo.Direction frontRightSteeringServoDirection = CRServo.Direction.FORWARD;
-    public CRServo.Direction rearLeftSteeringServoDirection = CRServo.Direction.FORWARD;
-    public CRServo.Direction rearRightSteeringServoDirection = CRServo.Direction.FORWARD;
+    public CRServo.Direction frontLeftSteeringServoDirection = CRServo.Direction.REVERSE;
+    public CRServo.Direction frontRightSteeringServoDirection = CRServo.Direction.REVERSE;
+    public CRServo.Direction rearLeftSteeringServoDirection = CRServo.Direction.REVERSE;
+    public CRServo.Direction rearRightSteeringServoDirection = CRServo.Direction.REVERSE;
 
     // ==================== PHYSICAL DIMENSIONS ====================
     // All measurements should be in the same unit (inches or meters)
@@ -83,13 +83,13 @@ public class CoaxialSwerveConstants {
      * Higher values make steering more aggressive but can cause oscillation
      * Start with a low value (0.5-1.0) and increase if steering is too slow
      */
-    PIDFCoefficients steeringPIDF = new PIDFCoefficients(0, 0, 0, 0);
+    PIDFCoefficients steeringPIDF = new PIDFCoefficients(.3, 0, 0.008, 0);
 
     /**
      * Maximum steering speed (radians per second)
      * This limits how fast the modules can rotate
      */
-    public double steeringSpeed = Math.PI; // 180 degrees per second
+    public double steeringSpeed = Math.PI*2.8; // 180 degrees per second
 
     // ==================== SLEW RATE LIMITING ====================
 
@@ -105,11 +105,11 @@ public class CoaxialSwerveConstants {
      * Higher values = more responsive but jerkier
      * Lower values = smoother but less responsive
      */
-    public double driveMaxAcceleration = 4.0; // 0 to 1.0 in 0.25 seconds
+    public double driveMaxAcceleration = 10; // 0 to 1.0 in 0.25 seconds
 
     public double steeringDeadband = Math.toRadians(2);
 
-    public double steeringMinPower = 0.05;
+    public double steeringMinPower = 0.02;
 
     /**
      * Constructor with default values
