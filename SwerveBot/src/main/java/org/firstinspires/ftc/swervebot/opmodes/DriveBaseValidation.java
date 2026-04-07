@@ -65,9 +65,9 @@ public class DriveBaseValidation extends LinearOpMode {
         }
     }
 
-    public static double motorPower = 0.2;
+    public static double motorPower = 0.5;
     // Radians/second?
-    public static double motorVelocity = Math.PI / 2;
+    public static double motorVelocity = Math.PI / 1;
     public static double triggerThreshold = 0.2;
     public TelemetryManager ptel;
     public CommandAxis trigger;
@@ -81,18 +81,18 @@ public class DriveBaseValidation extends LinearOpMode {
         trigger = new CommandAxis(() -> gamepad1.left_trigger);
         button = trigger.getAsButton(triggerThreshold);
 
-        if (Connected.DRIVEBASE) {
+        if (Connected.SWERVESUBSYSTEM) {
             motors = new MotorConfig[4];
-            motors[0] = new MotorConfig(hardwareMap, HardwareNames.FL_DRIVE_MOTOR, true, () ->
+            motors[0] = new MotorConfig(hardwareMap, HardwareNames.FL_SWERVEDRIVE, true, () ->
                 triggered(gamepad1.left_trigger)
             );
-            motors[1] = new MotorConfig(hardwareMap, HardwareNames.FR_DRIVE_MOTOR, true, () ->
+            motors[1] = new MotorConfig(hardwareMap, HardwareNames.FR_SWERVEDRIVE, true, () ->
                 triggered(gamepad1.right_trigger)
             );
-            motors[2] = new MotorConfig(hardwareMap, HardwareNames.RL_DRIVE_MOTOR, true, () ->
+            motors[2] = new MotorConfig(hardwareMap, HardwareNames.RL_SWERVEDRIVE, true, () ->
                 gamepad1.left_bumper
             );
-            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RR_DRIVE_MOTOR, true, () ->
+            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RR_SWERVEDRIVE, true, () ->
                 gamepad1.right_bumper
             );
         } else {
