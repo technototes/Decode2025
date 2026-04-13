@@ -28,11 +28,13 @@ public class SwerveDriveCmd implements Command, Loggable {
 
     @Override
     public void execute() {
-        double xvalue = -x.getAsDouble();
-        double yvalue = y.getAsDouble();
-        double rvalue = r.getAsDouble();
-        subsystem.updateValues(xvalue, yvalue, rvalue);
-    }
+
+            double xvalue = x.getAsDouble();
+            double yvalue = -y.getAsDouble();
+            double rvalue = r.getAsDouble();
+            subsystem.updateValues(yvalue,-xvalue, rvalue);
+        }
+
 
     @Override
     public boolean isFinished() {

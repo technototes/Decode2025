@@ -52,7 +52,7 @@ public class AbsoluteAnalogEncoder {
      * @return position in radians
      */
     public double getCurrentPosition() {
-        return  MathUtils.normalizeRadians(
+        return  MathUtils.normalizeDeltaRadians(
             (!inverted ? 1 - getVoltage() / analogRange : getVoltage() / analogRange) * (Math.PI*2) - offset);
     }
 
