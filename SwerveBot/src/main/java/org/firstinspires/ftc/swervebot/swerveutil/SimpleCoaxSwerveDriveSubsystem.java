@@ -105,6 +105,14 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     public static double raw2 = 0;
     @Log.Number(name = "Raw3 (deg): ")
     public static double raw3 = 0;
+    @Log.Number(name = "AngleDiff0: ")
+    public static double diff0 = 0;
+    @Log.Number(name = "AngleDiff1: ")
+    public static double diff1 = 0;
+    @Log.Number(name = "AngleDiff2: ")
+    public static double diff2 = 0;
+    @Log.Number(name = "AngleDiff3: ")
+    public static double diff3 = 0;
     double[] unfilteredWheelPowers = new double[4];
 
     OptionalDouble maxPower = OptionalDouble.of(0.0);
@@ -218,7 +226,7 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
 
     public void updateValues(double x, double y, double r) {
         if (hasHardware) {
-            robotHeading = -imu.getHeadingInRadians() - Math.PI / 2;
+            robotHeading = imu.getHeadingInRadians() - Math.PI / 2;
             forwardInput = x * Math.cos(robotHeading) + y * Math.sin(robotHeading);
             strafeInput = -x * Math.sin(robotHeading) + y * Math.cos(robotHeading);
             rotationInput = r;
@@ -231,9 +239,9 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
             F = strafeInput + rNeg * (driveLength / R);
             G = forwardInput - rNeg * (trackWidth / R);
             H = forwardInput + rNeg * (trackWidth / R);
-            unfilteredWheelPowers[0] = Math.sqrt((F * F) + (G * G));
+            unfilteredWheelPowers[0] = Math.sqrt((F * F) + (G * G)) * (r != 0 ? (-rotationInput / r ) : 1);
             unfilteredWheelPowers[1] = Math.sqrt((B * B) + (D * D));
-            unfilteredWheelPowers[2] = Math.sqrt((E * E) + (H * H));
+            unfilteredWheelPowers[2] = Math.sqrt((E * E) + (H * H)) * (r !=0 ? (-rotationInput / r ) : 1);
             unfilteredWheelPowers[3] = Math.sqrt((A * A) + (C * C));
             maxPower = Arrays.stream(unfilteredWheelPowers).max();
             for (int i = 0; i < 4; i++) {
@@ -272,10 +280,15 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
             raw1 = Math.toDegrees((swervoencs[1].getVoltage() / 3.3) * 360);
             raw2 = Math.toDegrees((swervoencs[2].getVoltage() / 3.3) * 360);
             raw3 = Math.toDegrees((swervoencs[3].getVoltage() / 3.3) * 360);
+            diff0 = Math.toDegrees(angleDifferences[0]);
+            diff1 = Math.toDegrees(angleDifferences[1]);
+            diff2 = Math.toDegrees(angleDifferences[2]);
+            diff3 = Math.toDegrees(angleDifferences[3]);
             for (int i = 0; i < 4; i++) {
                 swervoPIDF[i].setTarget(wheelAngles[i]);
                 setSwervoPow(swervo[i], -swervoPIDF[i].update(swervopos[i]));
                 drive[i].setPower(wheelPowers[i]);
+
             }
         }
     }
