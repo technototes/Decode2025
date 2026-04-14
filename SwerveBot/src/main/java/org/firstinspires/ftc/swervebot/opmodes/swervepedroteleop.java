@@ -1,0 +1,148 @@
+package org.firstinspires.ftc.swervebot.opmodes;
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.swervebot.AutoConstants;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.command.SequentialCommandGroup;
+import com.technototes.library.structure.CommandOpMode;
+import com.technototes.library.util.Alliance;
+import com.technototes.library.util.HeadingHelper;
+
+import org.firstinspires.ftc.swervebot.Hardware;
+import org.firstinspires.ftc.swervebot.Robot;
+import org.firstinspires.ftc.swervebot.Setup;
+import org.firstinspires.ftc.swervebot.controls.DriverController;
+import org.firstinspires.ftc.swervebot.helpers.StartingPosition;
+import org.firstinspires.ftc.swervebot.swerveutil.SimpleCoaxSwerveDriveSubsystem;
+import org.firstinspires.ftc.swervebot.swerveutil.CoaxialSwerveConstants;
+import org.firstinspires.ftc.swervebot.swerveutil.CoaxialSwerveDrive;
+
+import java.util.function.Supplier;
+
+@Configurable
+
+
+@TeleOp(name = "SwervePedroTeleOp")
+public class swervepedroteleop extends OpMode {
+    private Follower follower;
+    public static Pose startingPose; //See ExampleAuto to understand how to use this
+    private boolean automatedDrive;
+    private Supplier<PathChain> pathChain;
+    private TelemetryManager telemetryM;
+    private boolean slowMode = false;
+    private double slowModeMultiplier = 0.5;
+    private SimpleCoaxSwerveDriveSubsystem swerve;
+    public Hardware hardware;
+
+
+
+    @Override
+    public void init() {
+        follower = AutoConstants.createFollower(hardwareMap);
+        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
+        follower.update();
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+
+        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+            .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
+            .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+            .build();
+
+
+
+
+
+    }
+
+
+    @Override
+    public void start() {
+        //The parameter controls whether the Follower should use break mode on the motors (using it is recommended).
+        //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
+        //If you don't pass anything in, it uses the default (false)
+        follower.startTeleopDrive();
+
+
+    }
+
+    @Override
+    public void loop() {
+        //Call this once per loop
+        follower.update();
+        telemetryM.update();
+
+
+
+        if (!automatedDrive) {
+            //Make the last parameter false for field-centric
+            //In case the drivers want to use a "slowMode" you can scale the vectors
+
+            //This is the normal version to use in the TeleOp
+            if (!slowMode) follower.setTeleOpDrive(
+                -gamepad1.left_stick_y,
+                -gamepad1.left_stick_x,
+                -gamepad1.right_stick_x,
+                true // Robot Centric
+            );
+
+                //This is how it looks with slowMode on
+            else follower.setTeleOpDrive(
+                -gamepad1.left_stick_y * slowModeMultiplier,
+                -gamepad1.left_stick_x * slowModeMultiplier,
+                -gamepad1.right_stick_x * slowModeMultiplier,
+                true // Robot Centric
+            );
+        }
+
+        //Automated PathFollowing
+        if (gamepad1.aWasPressed()) {
+            follower.followPath(pathChain.get());
+            automatedDrive = true;
+        }
+
+        //Stop automated following if the follower is done
+        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
+        }
+
+        //Slow Mode
+        if (gamepad1.rightBumperWasPressed()) {
+            slowMode = !slowMode;
+        }
+
+        //Optional way to change slow mode strength
+        if (gamepad1.xWasPressed()) {
+            slowModeMultiplier += 0.25;
+        }
+
+        //Optional way to change slow mode strength
+        if (gamepad1.yWasPressed()) {
+            slowModeMultiplier -= 0.25;
+        }
+        if (gamepad1.dpad_up) {
+            follower.breakFollowing(); // stop pedro
+            automatedDrive = false;
+            swerve.setAllModules180();
+        }
+
+
+        telemetryM.debug("position", follower.getPose());
+        telemetryM.debug("velocity", follower.getVelocity());
+        telemetryM.debug("automatedDrive", automatedDrive);
+        telemetryM.debug("swervestuff", follower.getDrivetrain().debugString());
+    }
+}
+

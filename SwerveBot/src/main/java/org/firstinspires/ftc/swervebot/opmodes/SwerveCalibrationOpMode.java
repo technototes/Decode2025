@@ -117,24 +117,24 @@ public class SwerveCalibrationOpMode extends LinearOpMode {
             telemetry.addData("Back Right", "%.3fV", rrVolt);
             if (gamepad1.crossWasPressed() && flsteer != null){
                 flsteer.setPower(1);
-            } else if (gamepad1.crossWasReleased() && flsteer != null){
+            } else
                 flsteer.setPower(0);
-            }
+
             if (gamepad1.squareWasPressed() && frsteer != null) {
                 frsteer.setPower(1);
-            } else if (gamepad1.squareWasReleased() && frsteer != null){
+            } else
                 flsteer.setPower(0);
-            }
+
             if (gamepad1.circleWasPressed() && rlsteer != null){
                 rlsteer.setPower(1);
-            } else if (gamepad1.circleWasReleased() && rlsteer != null){
+            } else
                 flsteer.setPower(0);
-            }
+
             if (gamepad1.triangleWasPressed() && rrsteer != null){
                 rrsteer.setPower(1);
-            } else   if (gamepad1.triangleWasReleased() && rrsteer != null){
+            } else
                 flsteer.setPower(0);
-            }
+
 
             telemetry.addLine();
             telemetry.addLine("========================================");

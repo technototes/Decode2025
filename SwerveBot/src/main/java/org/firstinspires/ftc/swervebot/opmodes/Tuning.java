@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.swervebot.opmodes.Tuning.follower;
 import static org.firstinspires.ftc.swervebot.opmodes.Tuning.stopRobot;
 import static org.firstinspires.ftc.swervebot.opmodes.Tuning.telemetryM;
 
+
 import android.annotation.SuppressLint;
 import com.bylazar.configurables.PanelsConfigurables;
 import com.bylazar.configurables.annotations.Configurable;
@@ -29,6 +30,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.technototes.library.structure.BetterSelectableOpMode;
+
+import org.firstinspires.ftc.swervebot.AutoConstants;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,10 +101,10 @@ public class Tuning extends BetterSelectableOpMode {
     @Override
     public void onSelect() {
         if (follower == null) {
-            follower = Constants.createFollower(hardwareMap);
+            follower = AutoConstants.createFollower(hardwareMap);
             PanelsConfigurables.INSTANCE.refreshClass(this);
         } else {
-            follower = Constants.createFollower(hardwareMap);
+            follower = AutoConstants.createFollower(hardwareMap);
         }
 
         follower.setStartingPose(new Pose());
@@ -1620,10 +1624,10 @@ class AnalogMinMaxTuner extends OpMode {
 
     //populate the below with your names for the servos and encoders
     public String[] encoderNames = {
-        "leftFrontEncoder",
-        "rightFrontEncoder",
-        "leftBackEncoder",
-        "rightBackEncoder",
+        "servoenc0",
+        "servoenc1",
+        "servoenc2",
+        "servoenc3",
     };
     public AnalogInput[] encoders = new AnalogInput[encoderNames.length];
     public double[] minVoltages = new double[encoderNames.length];
@@ -1679,7 +1683,7 @@ class AnalogMinMaxTuner extends OpMode {
             telemetryM.addLine("");
         }
 
-        telemetryM.update();
+        telemetryM.update(telemetry);
     }
 }
 
