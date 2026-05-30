@@ -42,14 +42,16 @@ public class DualTeleOp extends CommandOpMode {
         // limelight = hardwareMap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);
         if (Setup.Connected.DRIVEBASE) {
             controlsDriver = new DriverController(driverGamepad, robot);
-            robot.intakeSubsystem.setGamepad(gamepad1);
+            if (Setup.Connected.INTAKESUBSYSTEM) {
+                robot.intakeSubsystem.setGamepad(gamepad1);
+            }
             // Just pick a starting point
             CommandScheduler.scheduleForState(
                 new SequentialCommandGroup(
                     HeadingHelper.RestorePreviousPosition(robot.follower),
                     DrivingCommands.ResetGyro(controlsDriver.pedroDriver)
-//                    TeleCommands.SetRegressionCTeleop(robot),
-//                    TeleCommands.SetRegressionDTeleop(robot)
+                    //                    TeleCommands.SetRegressionCTeleop(robot),
+                    //                    TeleCommands.SetRegressionDTeleop(robot)
                 ),
                 OpModeState.INIT
             );

@@ -9,16 +9,16 @@ public class Setup {
     public static class Connected {
 
         public static final boolean TESTSUBSYSTEM = true;
-        public static final boolean LIMELIGHTSUBSYSTEM = true;
+        public static final boolean LIMELIGHTSUBSYSTEM = false;
         public static boolean DRIVEBASE = true;
         public static boolean ODOSUBSYSTEM = true;
         public static boolean SAFETYSUBSYSTEM = false;
         public static boolean EXTERNAL_IMU = true;
         public static boolean OTOS = false;
-        public static boolean INTAKESUBSYSTEM = true;
-        public static boolean LAUNCHERSUBSYSTEM = true;
-        public static boolean AIMINGSUBSYSTEM = true;
-        public static boolean BRAKESUBSYSTEM = true;
+        public static boolean INTAKESUBSYSTEM = false;
+        public static boolean LAUNCHERSUBSYSTEM = false;
+        public static boolean AIMINGSUBSYSTEM = false;
+        public static boolean BRAKESUBSYSTEM = false;
     }
 
     @Configurable

@@ -19,6 +19,7 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
+import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.controls.SingleController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
@@ -27,7 +28,7 @@ public class SingleTeleOp extends CommandOpMode {
 
     public Robot robot;
     public Setup setup;
-    public SingleController controls;
+    public OperatorController controls;
     public Hardware hardware;
     private Limelight3A limelight;
 
@@ -35,28 +36,9 @@ public class SingleTeleOp extends CommandOpMode {
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
-        controls = new SingleController(driverGamepad, robot, setup);
+        controls = new OperatorController(driverGamepad, robot);
         //CommandScheduler.scheduleInit(HorizontalSlidesCommands.transferring(robot));
-        CommandScheduler.scheduleForState(
-            new SequentialCommandGroup(
-                HeadingHelper.RestorePreviousPosition(robot.follower),
-                DrivingCommands.ResetGyro(controls.pedroDriver)
-            ),
-            OpModeState.INIT
-        );
-        if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
-            limelight = hardware.limelight;
-            limelight.setPollRateHz(100);
-
-            telemetry.setMsTransmissionInterval(11);
-
-            limelight.pipelineSwitch(AprilTag_Pipeline);
-
-            /*
-             * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
-             */
-            limelight.start();
-        }
+        robot.follower.startTeleOpDrive();
 
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
