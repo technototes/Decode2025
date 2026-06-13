@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.swervebot.swerveutil;
 
-import com.pedropathing.Drivetrain;
+import com.pedropathing.drivetrain.Drivetrain;
 import com.pedropathing.math.MathFunctions;
 import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -213,7 +213,9 @@ public class CoaxialSwerveDrive extends Drivetrain {
 
             // Optimize the module angle to avoid rotating more than 90 degrees
             // If the module needs to rotate >90°, we can reverse the drive direction instead
-            double angleDifference = MathUtils.normalizeDeltaRadians(moduleAngles[i] - currentAngles[i]);
+            double angleDifference = MathUtils.normalizeDeltaRadians(
+                moduleAngles[i] - currentAngles[i]
+            );
 
             // If we need to turn more than 90 degrees, flip the angle and reverse speed
             if (Math.abs(angleDifference) > Math.PI / 2) {
@@ -251,7 +253,9 @@ public class CoaxialSwerveDrive extends Drivetrain {
         double[] steeringPowers = new double[4];
         for (int i = 0; i < 4; i++) {
             // Get actual current angle from absolute encoder and normalize
-            currentAngles[i] = MathUtils.normalizeDeltaRadians(steeringEncoders[i].getCurrentPosition());
+            currentAngles[i] = MathUtils.normalizeDeltaRadians(
+                steeringEncoders[i].getCurrentPosition()
+            );
 
             // Set the target for the controller (already normalized in loop above)
             steeringControllers[i].setTarget(targetAngles[i]);

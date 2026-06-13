@@ -25,7 +25,7 @@ dependencies {
     implementation('org.ejml:ejml-simple:0.44.0') {
         exclude group: 'org.ejml', module: 'ejml-all'
     }
-    implementation 'com.pedropathing:ftc:2.0.6'
+    implementation 'com.pedropathing:ftc:2.1.2'
     implementation 'com.pedropathing:telemetry:1.0.0'
     /*
     testImplementation(platform('org.junit:junit-bom:5.7.0'))
