@@ -35,7 +35,7 @@ public class DualTeleOp extends CommandOpMode {
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
-        controlsOperator = new OperatorController(codriverGamepad, robot);
+        // controlsOperator = new OperatorController(codriverGamepad, robot);
         panelsTelemetry = PanelsTelemetry.INSTANCE;
         robot.follower.setStartingPose(Paths.getRSegmentedCurveStart());
         // limelight = hardwareMap.get(Limelight3A.class, Setup.HardwareNames.LIMELIGHT);

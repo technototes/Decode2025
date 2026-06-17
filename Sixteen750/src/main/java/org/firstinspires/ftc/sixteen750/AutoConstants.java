@@ -3,6 +3,7 @@ package org.firstinspires.ftc.sixteen750;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PredictiveBrakingCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -35,13 +36,20 @@ public class AutoConstants {
     public static double yvelocity = 62.4;
     public static double fwdDeceleration = -42.8;
     public static double latDeceleration = -71.1;
+    // Predictive Braking doesn't need centripetal scaling
     public static double centripetalScaling = 0.0005;
+
+    // Predictive Braking tuning (Measured on the bot on June 17)
+    public static double kQuadratic = 8.6266e-4;
+    public static double kLinear = 0.1149;
+    public static double kP = 0.1;
 
     // These are hand tuned to work how we want
     public static double brakingStrength = 1;
     public static double brakingStart = 1;
     public static PIDFCoefficients headingPIDF = new PIDFCoefficients(0.5, 0, 0.03, 0.03); //11-7 tuning i = 0.00055
     public static PIDFCoefficients second_headingPIDF = new PIDFCoefficients(0.5, 0.05, 0.03, 0);
+    // Predictive Braking doesn't use the translational PIDF anymore.
     public static PIDFCoefficients translationPIDF = new PIDFCoefficients(0.07, 0, 0.009, 0.02); //11-7 tuning i = 0.00015
 
     // "Kalman filtering": T in this constructor is the % of the previous
@@ -56,7 +64,9 @@ public class AutoConstants {
     );
 
     // The percent of a path that must be complete for Pedro to decide it's done
-    public static double TValueConstraint = 0.99;
+    // For predictive braking, this is supposed to be lower, so I dropped it from
+    // 0.99 to 0.95
+    public static double TValueConstraint = 0.95;
     // Time, in *milliseconds*, to let the follower algorithm correct
     // before the path is considered "complete".
     public static double timeoutConstraint = 100;
@@ -70,8 +80,8 @@ public class AutoConstants {
     // while still saying the path is complete.
     public static double acceptableHeading = 2.5;
 
-    //public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
-    //public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
+    // public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
+    // public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
 
     @Configurable
     public static class DriveEncoderConfig {
@@ -138,13 +148,16 @@ public class AutoConstants {
             .mass(botWeightKg)
             .forwardZeroPowerAcceleration(fwdDeceleration)
             .lateralZeroPowerAcceleration(latDeceleration)
+            .predictiveBrakingCoefficients(
+                new PredictiveBrakingCoefficients(kP, kLinear, kQuadratic)
+            )
             // .holdPointTranslationalScaling(1)
             .headingPIDFCoefficients(headingPIDF)
             .useSecondaryHeadingPIDF(true)
             .secondaryHeadingPIDFCoefficients(second_headingPIDF)
-            .drivePIDFCoefficients(drivePIDF)
-            .translationalPIDFCoefficients(translationPIDF)
-            .centripetalScaling(centripetalScaling);
+            // .drivePIDFCoefficients(drivePIDF)
+            // .translationalPIDFCoefficients(translationPIDF)
+            .centripetalScaling(0 /*centripetalScaling*/);
     }
 
     public static PathConstraints getPathConstraints() {
