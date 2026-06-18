@@ -33,6 +33,8 @@ public class Red15BallNear extends CommandOpMode {
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
 
+    // POSITION FOR COLIN:
+    // X = 132.5 Y = 65.75 H = 41
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
