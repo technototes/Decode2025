@@ -53,8 +53,8 @@ public class Paths2 {
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
             new WaitCommand(0.55),
-            TeleCommands.GateUp(r),
-            TeleCommands.IntakeStop(r)
+            TeleCommands.GateUp(r)
+
 
             // want to keep launcher running during auto also no need to stop intake
         )

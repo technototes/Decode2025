@@ -25,9 +25,9 @@ import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths2;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
 
-@Autonomous(name = "Red18BallNear", preselectTeleOp = "Dual Control")
+@Autonomous(name = "Blue18BallNear", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class Red18BallNear extends CommandOpMode {
+public class Blue18BallNear extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -43,7 +43,7 @@ public class Red18BallNear extends CommandOpMode {
         robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
         Paths2 p = new Paths2(robot.follower);
         panelsTelemetry = PanelsTelemetry.INSTANCE;
-        robot.follower.setStartingPose(Poses.getRStart());
+        robot.follower.setStartingPose(Poses.getBStart());
         CommandScheduler.scheduleForState(
             new AltAutoVelocity(robot).alongWith(
                 new SequentialCommandGroup(
@@ -52,18 +52,18 @@ public class Red18BallNear extends CommandOpMode {
                     TeleCommands.GateUp(robot),
                     TeleCommands.Intake(robot),
                     TeleCommands.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.RStartToRLaunch, Paths.power9),
+                    new PedroPathCommand(robot.follower, p.BStartToBLaunch, Paths.power9),
                     Paths2.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.RLaunchToRInt1),
-                    new PedroPathCommand(robot.follower, p.RInt1ToRLaunch),
+                    new PedroPathCommand(robot.follower, p.BLaunchToBInt1),
+                    new PedroPathCommand(robot.follower, p.BInt1ToBLaunch),
                     Paths2.AutoLaunching3Balls(robot),
-                    Paths2.RedGateCycle(robot),
-                    Paths2.RedGateCycle(robot),
-                    new PedroPathCommand(robot.follower, p.RLaunchToRInt2),
-                    new PedroPathCommand(robot.follower, p.RInt2ToRLaunch),
+                    Paths2.BlueGateCycle(robot),
+                    Paths2.BlueGateCycle(robot),
+                    new PedroPathCommand(robot.follower, p.BLaunchToBInt2),
+                    new PedroPathCommand(robot.follower, p.BInt2ToBLaunch),
                     Paths2.AutoLaunching3Balls(robot),
-                    Paths2.RedGateCycle(robot),
-                    new PedroPathCommand(robot.follower, p.RLaunchToREnd, Paths.power9),
+                    Paths2.BlueGateCycle(robot),
+                    new PedroPathCommand(robot.follower, p.BLaunchToBEnd, Paths.power9),
                     TeleCommands.StopLaunch(robot),
 
 
