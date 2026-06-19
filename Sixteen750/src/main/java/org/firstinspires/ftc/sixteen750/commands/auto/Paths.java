@@ -380,7 +380,7 @@ public class Paths {
     }
 
     public static Pose getRSegmentedCurveStart() {
-        return new Pose(114, 135.152, Math.toRadians(90));
+        return new Pose(114, 135, Math.toRadians(90));
     }
 
     public static Pose getRFar9BallStart() {

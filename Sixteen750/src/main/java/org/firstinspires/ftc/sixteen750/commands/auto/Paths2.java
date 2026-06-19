@@ -53,7 +53,8 @@ public class Paths2 {
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
             new WaitCommand(0.55),
-            TeleCommands.GateUp(r)
+            TeleCommands.GateUp(r),
+            TeleCommands.IntakeStop(r)
 
 
             // want to keep launcher running during auto also no need to stop intake
@@ -86,61 +87,86 @@ public class Paths2 {
     public PathChain RStartToRLaunch;
     public PathChain RLaunchToRInt1;
     public PathChain RInt1ToRLaunch;
-    public PathChain RLaunchToRGateInt;
-    public PathChain RGateIntToRLaunch;
+    public static PathChain RLaunchToRGateInt;
+    public static PathChain RGateIntToRLaunch;
+    public static PathChain RLaunchToRGateInt2;
+    public static PathChain RLaunchToRGateInt3;
+    public static PathChain RGateInt2ToRLaunch;
+    public static PathChain RGateInt3ToRLaunch;
     public PathChain RLaunchToRInt2;
     public PathChain RInt2ToRLaunch;
     public PathChain RLaunchToREnd;
     public PathChain BStartToBLaunch;
     public PathChain BLaunchToBInt1;
     public PathChain BInt1ToBLaunch;
-    public PathChain BLaunchToBGateInt;
-    public PathChain BGateIntToBLaunch;
+    public static PathChain BLaunchToBGateInt;
+    public static PathChain BGateIntToBLaunch;
     public PathChain BLaunchToBInt2;
     public PathChain BInt2ToBLaunch;
     public PathChain BLaunchToBEnd;
 
 
     public Paths2(Follower follower) {
+        follower.setMaxPowerScaling(1);
         RStartToRLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(Poses.RStart, Poses.RLaunch))
-            .setConstantHeadingInterpolation(Poses.RLaunchHead)
+            .setConstantHeadingInterpolation(Math.toRadians(Poses.RLaunchHead))
             .build();
         RLaunchToRInt1 = follower
             .pathBuilder()
             .addPath(new BezierCurve(Poses.RLaunch, Poses.RInt1CtrlPoint1, Poses.RInt1CtrlPoint2, Poses.RInt1))
-            .setConstantHeadingInterpolation(Poses.RInt1Head)
+            .setConstantHeadingInterpolation(Math.toRadians(Poses.RInt1Head))
             .build();
         RInt1ToRLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(Poses.RInt1, Poses.RInt1ToLaunchCtrlPoint, Poses.RLaunch))
-            .setConstantHeadingInterpolation(Poses.RLaunchHead)
+            .setConstantHeadingInterpolation(Math.toRadians(Poses.RLaunchHead))
             .build();
         RLaunchToRGateInt = follower
             .pathBuilder()
             .addPath(new BezierCurve(Poses.RLaunch, Poses.RGateCycleCtrlPoint, Poses.RGateInt))
-            .setLinearHeadingInterpolation(Poses.RLaunchHead, Poses.RGateIntHead)
+            .setLinearHeadingInterpolation(Math.toRadians(Poses.RLaunchHead), Math.toRadians(Poses.RGateIntHead))
             .build();
         RGateIntToRLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(Poses.RGateInt, Poses.RGateCycleCtrlPoint, Poses.RLaunch))
-            .setLinearHeadingInterpolation(Poses.RGateIntHead, Poses.RLaunchHead)
+            .setLinearHeadingInterpolation(Math.toRadians(Poses.RGateIntHead), Math.toRadians(Poses.RLaunchHead))
+            .build();
+        RLaunchToRGateInt2 = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(Poses.RLaunch, Poses.RGateCycleCtrlPoint, Poses.RGateInt2))
+            .setLinearHeadingInterpolation(Math.toRadians(Poses.RLaunchHead), Math.toRadians(Poses.RGateIntHead))
+            .build();
+        RGateInt2ToRLaunch = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(Poses.RGateInt2, Poses.RGateCycleCtrlPoint, Poses.RLaunch))
+            .setLinearHeadingInterpolation(Math.toRadians(Poses.RGateIntHead), Math.toRadians(Poses.RLaunchHead))
+            .build();
+        RLaunchToRGateInt3 = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(Poses.RLaunch, Poses.RGateCycleCtrlPoint, Poses.RGateInt3))
+            .setLinearHeadingInterpolation(Math.toRadians(Poses.RLaunchHead), Math.toRadians(Poses.RGateIntHead))
+            .build();
+        RGateInt3ToRLaunch = follower
+            .pathBuilder()
+            .addPath(new BezierCurve(Poses.RGateInt3, Poses.RGateCycleCtrlPoint, Poses.RLaunch))
+            .setLinearHeadingInterpolation(Math.toRadians(Poses.RGateIntHead), Math.toRadians(Poses.RLaunchHead))
             .build();
         RLaunchToRInt2 = follower
             .pathBuilder()
             .addPath(new BezierLine(Poses.RLaunch, Poses.RInt2))
-            .setConstantHeadingInterpolation(Poses.RInt2Head)
+            .setConstantHeadingInterpolation(Math.toRadians(Poses.RInt2Head))
             .build();
         RInt2ToRLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(Poses.RInt2, Poses.RLaunch))
-            .setLinearHeadingInterpolation(Poses.RInt2Head, Poses.RLaunchHead)
+            .setLinearHeadingInterpolation(Math.toRadians(Poses.RInt2Head), Math.toRadians(Poses.RLaunchHead))
             .build();
         RLaunchToREnd = follower
             .pathBuilder()
             .addPath(new BezierLine(Poses.RLaunch, Poses.REnd))
-            .setConstantHeadingInterpolation(Poses.REndHead)
+            .setConstantHeadingInterpolation(Math.toRadians(Poses.REndHead))
             .build();
         BStartToBLaunch = follower
             .pathBuilder()
@@ -185,29 +211,8 @@ public class Paths2 {
 
 
     }
-    public static Paths2 p = new Paths2(follower);
-    public static Command RedGateCycle(Robot r) {
-        return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower,p.RLaunchToRGateInt),
-            new WaitCommand(1.1),
-            new PedroPathCommand(r.follower,p.RGateIntToRLaunch),
-            AutoLaunching3Balls(r)
 
 
-        );
-    }
-    public static Command BlueGateCycle(Robot r) {
-        return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower,p.BLaunchToBGateInt),
-            new WaitCommand(1.1),
-            new PedroPathCommand(r.follower,p.BGateIntToBLaunch),
-            AutoLaunching3Balls(r)
-
-
-        );
-    }
 
 }
 //    public static Command Pedropathcommand(Robot r){

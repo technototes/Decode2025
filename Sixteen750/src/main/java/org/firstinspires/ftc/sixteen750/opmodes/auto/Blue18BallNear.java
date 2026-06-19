@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.sixteen750.Setup.HardwareNames.AprilTag_Pipe
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.ParallelRaceGroup;
 import com.technototes.library.command.SequentialCommandGroup;
@@ -34,6 +35,17 @@ public class Blue18BallNear extends CommandOpMode {
     public Hardware hardware;
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
+    public static Command BlueGateCycle(Robot r) {
+        return new SequentialCommandGroup(
+            TeleCommands.Intake(r),
+            new PedroPathCommand(r.follower,Paths2.BLaunchToBGateInt),
+            new WaitCommand(1.1),
+            new PedroPathCommand(r.follower,Paths2.BGateIntToBLaunch),
+            Paths2.AutoLaunching3Balls(r)
+
+
+        );
+    }
 
     // POSITION FOR COLIN:
     // X = 132.5 Y = 65.75 H = 41
@@ -57,12 +69,12 @@ public class Blue18BallNear extends CommandOpMode {
                     new PedroPathCommand(robot.follower, p.BLaunchToBInt1),
                     new PedroPathCommand(robot.follower, p.BInt1ToBLaunch),
                     Paths2.AutoLaunching3Balls(robot),
-                    Paths2.BlueGateCycle(robot),
-                    Paths2.BlueGateCycle(robot),
+                    BlueGateCycle(robot),
+                    BlueGateCycle(robot),
                     new PedroPathCommand(robot.follower, p.BLaunchToBInt2),
                     new PedroPathCommand(robot.follower, p.BInt2ToBLaunch),
                     Paths2.AutoLaunching3Balls(robot),
-                    Paths2.BlueGateCycle(robot),
+                    BlueGateCycle(robot),
                     new PedroPathCommand(robot.follower, p.BLaunchToBEnd, Paths.power9),
                     TeleCommands.StopLaunch(robot),
 

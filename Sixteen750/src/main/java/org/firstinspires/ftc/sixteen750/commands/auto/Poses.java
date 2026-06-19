@@ -7,7 +7,6 @@ import com.pedropathing.geometry.Pose;
 // so i created this cause i cause absolutely freaking tired and fed up of navigating paths v1 so yeah yay!!!
 @Configurable
 public class Poses {
-
     public static Follower follower;
 
     public static Pose RStart = new Pose(114,135);
@@ -15,16 +14,18 @@ public class Poses {
         return new Pose(114, 135, Math.toRadians(90));
     }
     public static Pose RLaunch = new Pose(88,82);
-    public static double RLaunchHead = 42;
-    public static Pose RInt1 = new Pose(131.5,58);
+    public static double RLaunchHead = 49;
+    public static Pose RInt1 = new Pose(134.5,65.6);
     public static double RInt1Head = 0;
-    public static Pose RInt1CtrlPoint1 = new Pose(82.5,56);
-    public static Pose RInt1CtrlPoint2 = new Pose(102,58);
-    public static Pose RInt1ToLaunchCtrlPoint = new Pose(100,67);
-    public static Pose RGateInt = new Pose(132.5,65.75);
-    public static double RGateIntHead = 41;
+    public static Pose RInt1CtrlPoint1 = new Pose(82.5,64);
+    public static Pose RInt1CtrlPoint2 = new Pose(102,66);
+    public static Pose RInt1ToLaunchCtrlPoint = new Pose(85,48);
+    public static Pose RGateInt = new Pose(135,64.75);
+    public static Pose RGateInt2 = new Pose(135.3,65.66);
+    public static Pose RGateInt3 = new Pose(135.3,67.4);
+    public static double RGateIntHead = 40;
     public static Pose RGateCycleCtrlPoint = new Pose(96,64);
-    public static Pose RInt2 = new Pose(125,82);
+    public static Pose RInt2 = new Pose(125.7,932);
     public static double RInt2Head = 0;
     public static Pose REnd = new Pose(120,75);
     public static double REndHead = 0;
@@ -46,6 +47,4 @@ public class Poses {
     public static double BInt2Head = 180;
     public static Pose BEnd = new Pose(30,135);
     public static double BEndHead = 180;
-
-
 }

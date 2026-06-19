@@ -69,16 +69,16 @@ public class AutoConstants {
     public static double TValueConstraint = 0.95;
     // Time, in *milliseconds*, to let the follower algorithm correct
     // before the path is considered "complete".
-    public static double timeoutConstraint = 100;
+    public static double timeoutConstraint = 60;
     // The maximum velocity (in inches/second) the bot can be moving while still
     // saying the path is complete.
-    public static double acceptableVelocity = 1.0;
+    public static double acceptableVelocity = 2;
     // The maximum distance (in inches) the bot can be from the path end
     // while still saying the path is complete.
     public static double acceptableDistance = 2.0;
     // The maximum heading error (in degrees) the bot can be from the path end
     // while still saying the path is complete.
-    public static double acceptableHeading = 2.5;
+    public static double acceptableHeading = 1.5;
 
     // public static FilteredPIDFCoefficients drivePIDF = new FilteredPIDFCoefficients(0.1, 0, 0, 0.01);
     // public static PIDFCoefficients centripetalPIDF = new PIDFCoefficients(0.1, 0, 0, 0.01);
