@@ -23,9 +23,9 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "Red15BallNear", preselectTeleOp = "Dual Control")
+@Autonomous(name = "RAD", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class Red15BallNear extends CommandOpMode {
+public class RAD extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
