@@ -66,16 +66,16 @@ public class Red15BallFar extends CommandOpMode {
                     Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFInt1),
                     new PedroPathCommand(robot.follower, p.RFInt1ToRFLaunch),
-                    Paths.AutoLaunching3BallsSlowIntake(robot),
+                    Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFInt2),
                     new PedroPathCommand(robot.follower, p.RFInt2ToRFLaunch),
-                    Paths.AutoLaunching3BallsSlowIntakeFar(robot),
+                    Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFInt3),
                     new PedroPathCommand(robot.follower, p.RFInt3ToRFLaunch),
-                    Paths.AutoLaunching3BallsSlowIntakeFar(robot),
+                    Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFInt3),
                     new PedroPathCommand(robot.follower, p.RFInt3ToRFLaunch),
-                    Paths.AutoLaunching3BallsSlowIntakeFar(robot),
+                    Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFEnd),
                     TeleCommands.StopLaunch(robot),
                     TeleCommands.IntakeStop(robot),
@@ -107,27 +107,7 @@ public class Red15BallFar extends CommandOpMode {
         robot.prepForStart();
     }
 
-    public void runLoop() {
-        panelsTelemetry
-            .getTelemetry()
-            .addData(
-                "currentLaunchVelocity",
-                String.valueOf(LauncherSubsystem.currentLaunchVelocity)
-            );
-        panelsTelemetry
-            .getTelemetry()
-            .addData("launcherError", String.valueOf(LauncherSubsystem.err));
-        panelsTelemetry
-            .getTelemetry()
-            .addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
-        panelsTelemetry
-            .getTelemetry()
-            .addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
-        panelsTelemetry
-            .getTelemetry()
-            .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
-        panelsTelemetry.getTelemetry().update(telemetry);
-    }
+    public void runLoop() {}
 
     public void end() {
         HeadingHelper.savePose(robot.follower.getPose());

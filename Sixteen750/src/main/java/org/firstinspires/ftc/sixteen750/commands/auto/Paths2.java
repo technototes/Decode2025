@@ -62,22 +62,19 @@ public class Paths2 {
 
     public static Command AutoLaunching3BallsSlowIntake(Robot r) {
         return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                //TeleCommands.IntakeStop(r),
-                TeleCommands.GateUp(r),
-                new WaitCommand(0.2)
-            )
-                .raceWith(new AltAutoOrient(r)),
+            TeleCommands.GateUp(r),
             TeleCommands.HoldIntake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
-            new WaitCommand(1.5),
+            new WaitCommand(1.3),
             TeleCommands.GateUp(r),
             TeleCommands.Intake(r)
+        )
+            .raceWith(new AltAutoOrient(r));
 
-            // want to keep launcher running during auto also no need to stop intake
-        );
+        // want to keep launcher running during auto also no need to stop intake
+
         //.raceWith(new AltAutoOrient(r));
     }
 
@@ -122,6 +119,8 @@ public class Paths2 {
     public PathChain BFLaunchToBFInt2;
     public PathChain BFLaunchToBFInt3;
     public PathChain BFLaunchToBFEnd;
+    public static double power085 = 0.85;
+    public static double power092 = 0.92;
 
     public Paths2(Follower follower) {
         follower.setMaxPowerScaling(1);

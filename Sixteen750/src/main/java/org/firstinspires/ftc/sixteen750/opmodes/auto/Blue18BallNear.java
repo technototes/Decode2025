@@ -83,18 +83,26 @@ public class Blue18BallNear extends CommandOpMode {
                     TeleCommands.GateUp(robot),
                     TeleCommands.Intake(robot),
                     TeleCommands.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.BStartToBLaunch, Paths.power9),
+                    new PedroPathCommand(robot.follower, p.BStartToBLaunch),
                     Paths2.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.BLaunchToBInt1),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.BLaunchToBInt1,
+                        Paths2.power092
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.BInt1ToBLaunch),
                     Paths2.AutoLaunching3Balls(robot),
-                    BlueGateCycle1(robot),
-                    BlueGateCycle2(robot),
-                    new PedroPathCommand(robot.follower, p.BLaunchToBInt2),
+                    BlueGateCycle1(robot).alongWith(TeleCommands.Intake(robot)),
+                    BlueGateCycle2(robot).alongWith(TeleCommands.Intake(robot)),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.BLaunchToBInt2,
+                        Paths2.power085
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.BInt2ToBLaunch),
                     Paths2.AutoLaunching3Balls(robot),
-                    BlueGateCycle3(robot),
-                    new PedroPathCommand(robot.follower, p.BLaunchToBEnd, Paths.power9),
+                    BlueGateCycle3(robot).alongWith(TeleCommands.Intake(robot)),
+                    new PedroPathCommand(robot.follower, p.BLaunchToBEnd),
                     TeleCommands.StopLaunch(robot),
                     CommandScheduler::terminateOpMode
                 )

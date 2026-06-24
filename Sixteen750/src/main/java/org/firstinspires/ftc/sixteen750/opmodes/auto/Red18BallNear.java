@@ -20,11 +20,11 @@ import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
+import org.firstinspires.ftc.sixteen750.commands.auto.Paths2;
+import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
-import org.firstinspires.ftc.sixteen750.commands.auto.Paths2;
-import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
 
 @Autonomous(name = "Red18BallNear", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
@@ -39,30 +39,33 @@ public class Red18BallNear extends CommandOpMode {
     public static Command RedGateCycle(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower,Paths2.RLaunchToRGateInt),
+            new PedroPathCommand(r.follower, Paths2.RLaunchToRGateInt),
             new WaitCommand(1.1),
-            new PedroPathCommand(r.follower,Paths2.RGateIntToRLaunch),
+            new PedroPathCommand(r.follower, Paths2.RGateIntToRLaunch),
             Paths2.AutoLaunching3Balls(r)
         );
     }
+
     public static Command RedGateCycle2(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower,Paths2.RLaunchToRGateInt2),
+            new PedroPathCommand(r.follower, Paths2.RLaunchToRGateInt2),
             new WaitCommand(1.1),
-            new PedroPathCommand(r.follower,Paths2.RGateInt2ToRLaunch),
+            new PedroPathCommand(r.follower, Paths2.RGateInt2ToRLaunch),
             Paths2.AutoLaunching3Balls(r)
         );
     }
+
     public static Command RedGateCycle3(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower,Paths2.RLaunchToRGateInt3),
+            new PedroPathCommand(r.follower, Paths2.RLaunchToRGateInt3),
             new WaitCommand(1.1),
-            new PedroPathCommand(r.follower,Paths2.RGateInt3ToRLaunch),
+            new PedroPathCommand(r.follower, Paths2.RGateInt3ToRLaunch),
             Paths2.AutoLaunching3Balls(r)
         );
     }
+
     // POSITION FOR COLIN:
     // X = 132.5 Y = 65.75 H = 41
     @Override
@@ -81,20 +84,24 @@ public class Red18BallNear extends CommandOpMode {
                     TeleCommands.HoodUp(robot),
                     new PedroPathCommand(robot.follower, p.RStartToRLaunch),
                     Paths2.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.RLaunchToRInt1).alongWith(TeleCommands.Intake(robot)),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.RLaunchToRInt1,
+                        Paths2.power092
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.RInt1ToRLaunch),
                     Paths2.AutoLaunching3Balls(robot),
                     RedGateCycle(robot).alongWith(TeleCommands.Intake(robot)),
                     RedGateCycle2(robot).alongWith(TeleCommands.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.RLaunchToRInt2).alongWith(TeleCommands.Intake(robot)),
+                    new PedroPathCommand(
+                        robot.follower,
+                        p.RLaunchToRInt2,
+                        Paths2.power085
+                    ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.RInt2ToRLaunch),
                     Paths2.AutoLaunching3Balls(robot),
                     RedGateCycle3(robot).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.RLaunchToREnd),
-
-
-
-
                     CommandScheduler::terminateOpMode
                 )
             ),

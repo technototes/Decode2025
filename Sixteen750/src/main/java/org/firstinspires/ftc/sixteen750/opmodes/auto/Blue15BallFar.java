@@ -47,6 +47,7 @@ public class Blue15BallFar extends CommandOpMode {
     public Robot robot;
     public DriverController controls;
     public Hardware hardware;
+
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
 
@@ -66,16 +67,16 @@ public class Blue15BallFar extends CommandOpMode {
                     Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.BFLaunchToBFInt1),
                     new PedroPathCommand(robot.follower, p.BFInt1ToBFLaunch),
-                    Paths.AutoLaunching3BallsSlowIntake(robot),
+                    Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.BFLaunchToBFInt2),
                     new PedroPathCommand(robot.follower, p.BFInt2ToBFLaunch),
-                    Paths.AutoLaunching3BallsSlowIntakeFar(robot),
+                    Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.BFLaunchToBFInt3),
                     new PedroPathCommand(robot.follower, p.BFInt3ToBFLaunch),
-                    Paths.AutoLaunching3BallsSlowIntakeFar(robot),
+                    Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.BFLaunchToBFInt3),
                     new PedroPathCommand(robot.follower, p.BFInt3ToBFLaunch),
-                    Paths.AutoLaunching3BallsSlowIntakeFar(robot),
+                    Paths2.AutoLaunching3BallsSlowIntake(robot),
                     new PedroPathCommand(robot.follower, p.BFLaunchToBFEnd),
                     TeleCommands.StopLaunch(robot),
                     TeleCommands.IntakeStop(robot),
@@ -107,27 +108,7 @@ public class Blue15BallFar extends CommandOpMode {
         robot.prepForStart();
     }
 
-    public void runLoop() {
-        panelsTelemetry
-            .getTelemetry()
-            .addData(
-                "currentLaunchVelocity",
-                String.valueOf(LauncherSubsystem.currentLaunchVelocity)
-            );
-        panelsTelemetry
-            .getTelemetry()
-            .addData("launcherError", String.valueOf(LauncherSubsystem.err));
-        panelsTelemetry
-            .getTelemetry()
-            .addData("launcherTargetVelocity", String.valueOf(LauncherSubsystem.targetSpeed));
-        panelsTelemetry
-            .getTelemetry()
-            .addData("launcher1Current", String.valueOf(LauncherSubsystem.launcher1Current));
-        panelsTelemetry
-            .getTelemetry()
-            .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
-        panelsTelemetry.getTelemetry().update(telemetry);
-    }
+    public void runLoop() {}
 
     public void end() {
         HeadingHelper.savePose(robot.follower.getPose());
