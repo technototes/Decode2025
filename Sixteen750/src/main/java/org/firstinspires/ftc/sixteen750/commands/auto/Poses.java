@@ -22,10 +22,10 @@ public class Poses {
     public static double RInt1Head = Math.toRadians(0);
     public static Pose RInt1CtrlPoint1 = new Pose(82.5, 64);
     public static Pose RInt1CtrlPoint2 = new Pose(102, 66);
-    public static Pose RInt1ToLaunchCtrlPoint = new Pose(85, 48);
-    public static Pose RGateInt = new Pose(135, 64.95);
+    public static Pose RInt1ToLaunchCtrlPoint = new Pose(85, 42);
+    public static Pose RGateInt = new Pose(135, 65);
     public static Pose RGateInt2 = new Pose(135.3, 65.86);
-    public static Pose RGateInt3 = new Pose(135.3, 67.4);
+    public static Pose RGateInt3 = new Pose(135.3, 67.75);
     public static double RGateIntHead = Math.toRadians(40);
     public static Pose RGateCycleCtrlPoint = new Pose(96, 64);
     public static Pose RInt2 = new Pose(125.7, 93.2);

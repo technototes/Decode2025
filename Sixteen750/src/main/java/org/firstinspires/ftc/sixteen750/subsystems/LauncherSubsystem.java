@@ -56,14 +56,14 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.001, 0.00004, 0.0, 0);
     public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
         0.0015,
         0.0000,
         0.0,
         0
     ); //p = 0.004, i = 0.00020
-    public static double SPIN_F_SCALE = 0.00021;
+    public static double SPIN_F_SCALE = 0.0002605;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
     public static double PEAK_VOLTAGE = 13;
@@ -78,10 +78,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
-    public static double REGRESSION_A = 6.261; // multiplier for x for close zone launch speed formula
-    public static double REGRESSION_B = 1485; // minimum velocity for close zone launch speed formula 1560
-    public static double REGRESSION_C = 20.3; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 280; // minimum velocity for far zone launch speed formula - 130, 255
+    public static double REGRESSION_A = 5.5; // multiplier for x for close zone launch speed formula
+    public static double REGRESSION_B = 1100; // minimum velocity for close zone launch speed formula 1560
+    public static double REGRESSION_C = 13.6; // multiplier for x for far zone launch speed formula
+    public static double REGRESSION_D = 50; // minimum velocity for far zone launch speed formula - 130, 255
     public static double REGRESSION_C_TELEOP = 20.3; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D_TELEOP = 160; // minimum velocity for far zone launch speed formula
     public static double REGRESSION_C_AUTO = 17.25; // multiplier for x for far zone launch speed formula

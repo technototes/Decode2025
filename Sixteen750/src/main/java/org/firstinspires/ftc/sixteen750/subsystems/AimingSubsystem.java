@@ -4,7 +4,6 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.servo.Servo;
 import com.technototes.library.logger.Log;
-import com.technototes.library.logger.LogConfig;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import org.firstinspires.ftc.sixteen750.Hardware;
@@ -14,12 +13,13 @@ import org.firstinspires.ftc.sixteen750.Setup;
 public class AimingSubsystem implements Loggable, Subsystem {
 
     public static double HOOD_POS = 0.5; // 0.5 1.0
-    public static double HOOD_POS_MIDDLE = 0.72;
-    public static double HOOD_POS_UP = .88; // 0.5 1.0
+    public static double HoodPosDown = 0.45; // 0.5 1.0
+    public static double HoodPosMiddle = 0.72;
+    public static double HoodPosUp = .88; // 0.5 1.0
     public static double HOD_POS_UP_AUTO_ONLY = 0.90;
     public static double HOD_POS_UP_AUTO_ONLY2 = 0.80;
-
-    public static double HOOD_POS_DOWN = 0.45; // 0.5 1.0
+    public double BangBangAdjust;
+    public static double BangBangConstant = 0.0002; // multiplier for ratio of encoder ticks per second to hood adjustment in terms of servo pos ie 0-1 still needs some tuning
 
     public static double LEVER_POS = 0.7; //.65
     public static double LEVER_POS_GO = 0.4; //0.2
@@ -70,7 +70,7 @@ public class AimingSubsystem implements Loggable, Subsystem {
     }
 
     public void testHoodUp() {
-        setHoodPos(HOOD_POS_UP);
+        setHoodPos(HoodPosUp);
     }
 
     public void testHoodUpAutoOnly() {
@@ -82,7 +82,7 @@ public class AimingSubsystem implements Loggable, Subsystem {
     }
 
     public void testHoodDown() {
-        setHoodPos(HOOD_POS_DOWN);
+        setHoodPos(HoodPosDown);
     }
 
     public void StopBall() {
@@ -93,20 +93,26 @@ public class AimingSubsystem implements Loggable, Subsystem {
         setLeverPos(LEVER_POS_GO);
     }
 
+    public void BangBang() {
+        if (LauncherSubsystem.err < 500 && LauncherSubsystem.err > -200) {
+            // we dont want the hood having a stroke when the lancher starts spinning up cause error is really high so limit to to only when its within shot drop range
+            BangBangAdjust = LauncherSubsystem.err * -BangBangConstant;
+        } else BangBangAdjust = 0;
+    }
+
     public void DistanceHoodPos() {
         if (ls.getDistance() > -1 && ls.getDistance() < 35) {
-            setHoodPos(HOOD_POS_DOWN);
+            setHoodPos(HoodPosUp + BangBangAdjust);
         } else {
             if (ls.getDistance() > 35 && ls.getDistance() < 105) {
-            setHoodPos(HOOD_POS_MIDDLE);
-        }
-         else
-             setHoodPos(HOOD_POS_UP);
+                setHoodPos(HoodPosMiddle + BangBangAdjust);
+            } else setHoodPos(HoodPosUp + BangBangAdjust);
         }
     }
 
     @Override
     public void periodic() {
         DistanceHoodPos();
+        BangBang();
     }
 }

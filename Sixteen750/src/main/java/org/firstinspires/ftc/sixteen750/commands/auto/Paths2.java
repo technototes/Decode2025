@@ -169,10 +169,7 @@ public class Paths2 {
         RLaunchToRGateInt3 = follower
             .pathBuilder()
             .addPath(new BezierCurve(Poses.RLaunch, Poses.RGateCycleCtrlPoint, Poses.RGateInt3))
-            .setLinearHeadingInterpolation(
-                Math.toRadians(Poses.RLaunchHead),
-                Math.toRadians(Poses.RGateIntHead)
-            )
+            .setLinearHeadingInterpolation((Poses.RLaunchHead), (Poses.RGateIntHead))
             .build();
         RGateInt3ToRLaunch = follower
             .pathBuilder()

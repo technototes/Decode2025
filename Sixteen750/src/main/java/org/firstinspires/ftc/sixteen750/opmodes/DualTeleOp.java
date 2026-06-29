@@ -19,6 +19,7 @@ import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
 @TeleOp(name = "Dual Control")
 @SuppressWarnings("unused")
@@ -81,7 +82,6 @@ public class DualTeleOp extends CommandOpMode {
         robot.prepForStart();
     }
 
-    /*
     @Override
     public void runLoop() {
         panelsTelemetry
@@ -102,9 +102,11 @@ public class DualTeleOp extends CommandOpMode {
         panelsTelemetry
             .getTelemetry()
             .addData("launcher2Current", String.valueOf(LauncherSubsystem.launcher2Current));
+        panelsTelemetry
+            .getTelemetry()
+            .addData("launcher1Pow", String.valueOf(LauncherSubsystem.power));
         panelsTelemetry.getTelemetry().update(telemetry);
     }
-    */
 
     /*
     @Override
