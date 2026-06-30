@@ -54,9 +54,9 @@ public class Setup {
     @Configurable
     public static class OtherSettings {
 
-        public static double AUTO_SCALING = 0.95;
+        public static double AUTO_SCALING = 1;
         public static double NORMAL_SPEED = 1.0;
-        public static double NORMAL_TURN = 0.8;
+        public static double NORMAL_TURN = 1;
         public static double TURBO_SPEED = 1.0;
         public static double TURBO_TURN = 0.8;
         public static double SNAIL_SPEED = 0.5;

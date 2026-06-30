@@ -8,9 +8,13 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.technototes.library.command.Command;
 import com.technototes.library.logger.Log;
+import com.technototes.library.util.Alliance;
 import com.technototes.library.util.PIDFController;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
+import org.firstinspires.ftc.sixteen750.opmodes.BlueTele;
+import org.firstinspires.ftc.sixteen750.opmodes.RedTele;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
@@ -83,11 +87,14 @@ public class AltAutoOrient implements Command {
             //                    targetHeading =
             //                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
             // Kooolpool here below was my original prototype for auto orient and it worked decently well
-            if (robot.limelightSubsystem.getDistance() >= 0) {
-                rotation = pid.update(LimelightSubsystem.Xangle * SIGN);
-                //                                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
-                //                                    robot.limelightSubsystem.getDistance());
-            }
+
+            rotation = pid.update(LimelightSubsystem.Xangle * SIGN);
+            //                                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
+            //                                    robot.limelightSubsystem.getDistance());
+
+            //                                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
+            //                                    robot.limelightSubsystem.getDistance());
+
             //lowkey forgot what kevin said but i think it just sets the target heading to
             //where the limelight is so that vision can make the bot turn that way
         }

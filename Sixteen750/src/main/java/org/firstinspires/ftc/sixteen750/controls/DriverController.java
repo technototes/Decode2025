@@ -152,6 +152,7 @@ public class DriverController implements Loggable {
 
     public void bindBrakeControls() {
         brakeButton.whilePressed(TeleCommands.EngageBrake(robot));
+        brakeButton.whenPressed(TeleCommands.StopLaunch(robot));
         brakeButton.whenReleased(TeleCommands.DisengageBrake(robot));
     }
 

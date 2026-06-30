@@ -16,6 +16,8 @@ import com.technototes.library.util.PIDFController;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.Setup.OtherSettings;
+import org.firstinspires.ftc.sixteen750.opmodes.BlueTele;
+import org.firstinspires.ftc.sixteen750.opmodes.RedTele;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 /* Recall, the Pedro Path coordinate system:
@@ -300,14 +302,13 @@ public class PedroDriver implements Command, Loggable {
                         return rotation;
                     }
                     return pid.update(LimelightSubsystem.Xangle * SIGN);
-                    //                        (VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
-                    //                        limelightSubsystem.getDistance()
-                    //                    );
-                    //lowkey forgot what kevin said but i think it just sets the target heading to
-                    //where the limelight is so that vision can make the bot turn that way
                 } else {
                     return rotation;
-                }
+                } //                        (VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
+            //                        limelightSubsystem.getDistance()
+            //                    );
+            //lowkey forgot what kevin said but i think it just sets the target heading to
+            //where the limelight is so that vision can make the bot turn that way
             case Free:
             case Straight:
             default:

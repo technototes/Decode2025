@@ -19,7 +19,7 @@ public class AimingSubsystem implements Loggable, Subsystem {
     public static double HOD_POS_UP_AUTO_ONLY = 0.90;
     public static double HOD_POS_UP_AUTO_ONLY2 = 0.80;
     public double BangBangAdjust;
-    public static double BangBangConstant = 0.0002; // multiplier for ratio of encoder ticks per second to hood adjustment in terms of servo pos ie 0-1 still needs some tuning
+    public static double BangBangConstant = 0.001; // multiplier for ratio of encoder ticks per second to hood adjustment in terms of servo pos ie 0-1 still needs some tuning
 
     public static double LEVER_POS = 0.7; //.65
     public static double LEVER_POS_GO = 0.4; //0.2
@@ -101,10 +101,10 @@ public class AimingSubsystem implements Loggable, Subsystem {
     }
 
     public void DistanceHoodPos() {
-        if (ls.getDistance() > -1 && ls.getDistance() < 35) {
-            setHoodPos(HoodPosUp + BangBangAdjust);
+        if (ls.getDistance() > -1 && ls.getDistance() < 38) {
+            setHoodPos(HoodPosDown + BangBangAdjust);
         } else {
-            if (ls.getDistance() > 35 && ls.getDistance() < 105) {
+            if (ls.getDistance() > 38 && ls.getDistance() < 105) {
                 setHoodPos(HoodPosMiddle + BangBangAdjust);
             } else setHoodPos(HoodPosUp + BangBangAdjust);
         }

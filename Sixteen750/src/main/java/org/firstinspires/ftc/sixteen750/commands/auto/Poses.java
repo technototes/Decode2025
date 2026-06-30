@@ -18,19 +18,19 @@ public class Poses {
 
     public static Pose RLaunch = new Pose(88, 82);
     public static double RLaunchHead = Math.toRadians(49);
-    public static Pose RInt1 = new Pose(134.5, 65.6);
-    public static double RInt1Head = Math.toRadians(0);
+    public static Pose RInt1 = new Pose(135, 64.8);
+    public static double RInt1Head = Math.toRadians(348);
     public static Pose RInt1CtrlPoint1 = new Pose(82.5, 64);
     public static Pose RInt1CtrlPoint2 = new Pose(102, 66);
-    public static Pose RInt1ToLaunchCtrlPoint = new Pose(85, 42);
-    public static Pose RGateInt = new Pose(135, 65);
-    public static Pose RGateInt2 = new Pose(135.3, 65.86);
-    public static Pose RGateInt3 = new Pose(135.3, 67.75);
-    public static double RGateIntHead = Math.toRadians(40);
+    public static Pose RInt1ToLaunchCtrlPoint = new Pose(96, 42);
+    public static Pose RGateInt = new Pose(135, 66.9);
+    public static Pose RGateInt2 = new Pose(135, 68.6);
+    public static Pose RGateInt3 = new Pose(135, 69.2);
+    public static double RGateIntHead = Math.toRadians(18);
     public static Pose RGateCycleCtrlPoint = new Pose(96, 64);
-    public static Pose RInt2 = new Pose(125.7, 93.2);
+    public static Pose RInt2 = new Pose(125.7, 93.5);
     public static double RInt2Head = Math.toRadians(0);
-    public static Pose REnd = new Pose(120, 75);
+    public static Pose REnd = new Pose(120, 90);
     public static double REndHead = Math.toRadians(0);
     public static Pose BStart = new Pose(30, 135);
 
@@ -40,19 +40,19 @@ public class Poses {
 
     public static Pose BLaunch = new Pose(56, 82);
     public static double BLaunchHead = Math.toRadians(131);
-    public static Pose BInt1 = new Pose(10.5, 65.6);
-    public static double BInt1Head = Math.toRadians(180);
+    public static Pose BInt1 = new Pose(9, 64.8);
+    public static double BInt1Head = Math.toRadians(192);
     public static Pose BInt1CtrlPoint1 = new Pose(61.5, 56);
     public static Pose BInt1CtrlPoint2 = new Pose(42, 58);
-    public static Pose BInt1ToLaunchCtrlPoint = new Pose(59, 48);
-    public static Pose BGateInt1 = new Pose(9, 64.75);
-    public static Pose BGateInt2 = new Pose(8.7, 65.66);
-    public static Pose BGateInt3 = new Pose(8.7, 67.4);
-    public static double BGateIntHead = Math.toRadians(140);
+    public static Pose BInt1ToLaunchCtrlPoint = new Pose(48, 42);
+    public static Pose BGateInt1 = new Pose(9, 66.9);
+    public static Pose BGateInt2 = new Pose(9, 68.6);
+    public static Pose BGateInt3 = new Pose(9, 69.2);
+    public static double BGateIntHead = Math.toRadians(162);
     public static Pose BGateCycleCtrlPoint = new Pose(48, 64);
-    public static Pose BInt2 = new Pose(18.3, 93.2);
+    public static Pose BInt2 = new Pose(18.3, 93.5);
     public static double BInt2Head = Math.toRadians(180);
-    public static Pose BEnd = new Pose(24, 75);
+    public static Pose BEnd = new Pose(24, 90);
     public static double BEndHead = Math.toRadians(180);
 
     public static Pose getRFStart() {

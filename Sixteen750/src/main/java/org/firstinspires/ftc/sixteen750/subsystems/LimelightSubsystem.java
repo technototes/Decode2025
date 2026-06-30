@@ -35,6 +35,9 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     @Log.Number(name = "distance")
     public static double distance;
 
+    public static double BHeadingOffset = 2.2;
+    public static double RHeadingOffset = -2.2;
+
     @Log(name = "new data")
     public static boolean new_result;
 

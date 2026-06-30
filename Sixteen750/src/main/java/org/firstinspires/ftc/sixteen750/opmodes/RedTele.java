@@ -20,10 +20,11 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
+import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
-@TeleOp(name = "Dual Control")
+@TeleOp(name = "RedTele")
 @SuppressWarnings("unused")
-public class DualTeleOp extends CommandOpMode {
+public class RedTele extends CommandOpMode {
 
     public Robot robot;
     public OperatorController controlsOperator;
@@ -31,11 +32,13 @@ public class DualTeleOp extends CommandOpMode {
     public Hardware hardware;
     private Limelight3A limelight;
     private PanelsTelemetry panelsTelemetry;
+    public static double red = 0;
 
     @Override
     public void uponInit() {
+        red = 1;
         hardware = new Hardware(hardwareMap);
-        robot = new Robot(hardware, Alliance.NONE, StartingPosition.Unspecified);
+        robot = new Robot(hardware, Alliance.RED, StartingPosition.Unspecified);
         // controlsOperator = new OperatorController(codriverGamepad, robot);
         panelsTelemetry = PanelsTelemetry.INSTANCE;
         robot.follower.setStartingPose(Paths.getRSegmentedCurveStart());
@@ -105,6 +108,10 @@ public class DualTeleOp extends CommandOpMode {
         panelsTelemetry
             .getTelemetry()
             .addData("launcher1Pow", String.valueOf(LauncherSubsystem.power));
+        panelsTelemetry
+            .getTelemetry()
+            .addData("Distraw", String.valueOf(LimelightSubsystem.distance));
+
         panelsTelemetry.getTelemetry().update(telemetry);
     }
 

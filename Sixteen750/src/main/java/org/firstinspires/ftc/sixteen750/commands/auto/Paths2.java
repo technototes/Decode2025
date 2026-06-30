@@ -46,12 +46,11 @@ public class Paths2 {
     public static Command AutoLaunching3Balls(Robot r) {
         return new SequentialCommandGroup(
             //TeleCommands.IntakeStop(r),
-            TeleCommands.GateUp(r),
             TeleCommands.Intake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
             TeleCommands.GateDown(r),
-            new WaitCommand(0.55),
+            new WaitCommand(0.52),
             TeleCommands.GateUp(r)
 
             // want to keep launcher running during auto also no need to stop intake
