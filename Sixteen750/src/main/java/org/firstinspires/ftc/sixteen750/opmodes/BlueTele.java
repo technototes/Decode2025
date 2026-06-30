@@ -7,6 +7,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
+import com.technototes.library.logger.Loggable;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.HeadingHelper;
@@ -24,7 +25,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 @TeleOp(name = "BlueTele")
 @SuppressWarnings("unused")
-public class BlueTele extends CommandOpMode {
+public class BlueTele extends CommandOpMode implements Loggable {
 
     public Robot robot;
     public OperatorController controlsOperator;
@@ -85,6 +86,7 @@ public class BlueTele extends CommandOpMode {
 
     @Override
     public void runLoop() {
+        /*
         panelsTelemetry
             .getTelemetry()
             .addData(
@@ -111,6 +113,8 @@ public class BlueTele extends CommandOpMode {
             .addData("Distraw", String.valueOf(LimelightSubsystem.distance));
 
         panelsTelemetry.getTelemetry().update(telemetry);
+
+         */
     }
 
     /*

@@ -16,8 +16,6 @@ import com.technototes.library.util.PIDFController;
 import java.util.function.DoubleSupplier;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.Setup.OtherSettings;
-import org.firstinspires.ftc.sixteen750.opmodes.BlueTele;
-import org.firstinspires.ftc.sixteen750.opmodes.RedTele;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
 /* Recall, the Pedro Path coordinate system:
@@ -41,8 +39,10 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 public class PedroDriver implements Command, Loggable {
 
     public static double VISION_TURN_SCALE = 0.7;
-    public static PIDFCoefficients turnpidvalues = new PIDFCoefficients(0.017, 0, 0.0017, 0);
-    PIDFController pid;
+    public static PIDFCoefficients vizPIDValues = new PIDFCoefficients(0.017, 0, 0.0017, 0);
+    public static PIDFCoefficients snapPIDValues = new PIDFCoefficients(0.017, 0, 0.0017, 0);
+    PIDFController vizPid;
+    PIDFController snapPid;
     public static double SIGN = 1;
     public static double SNAP_SIGN = 1;
 
@@ -218,8 +218,10 @@ public class PedroDriver implements Command, Loggable {
         headingOffset = 0.0;
         alliance = all;
         holdPose = null;
-        pid = new PIDFController(turnpidvalues);
-        pid.setTarget(0);
+        vizPid = new PIDFController(vizPIDValues);
+        vizPid.setTarget(0);
+        snapPid = new PIDFController(snapPIDValues);
+        snapPid.setTarget(0);
         x = DeadZoneScale(xyStick.getXSupplier());
         y = DeadZoneScale(xyStick.getYSupplier());
         r = DeadZoneScale(rotStick.getXSupplier());
@@ -297,7 +299,10 @@ public class PedroDriver implements Command, Loggable {
         // Negative, because pushing left is negative, but that is a positive change in Pedro's
         // coordinate system.
         double rotation = -r.getAsDouble();
-        double curHeading = follower.getHeading() - headingOffset;
+        curHeading = MathUtils.normalizeDeltaRadians(
+            MathUtils.normalizeDeltaRadians(follower.getHeading()) -
+                MathUtils.normalizeDeltaRadians(headingOffset)
+        );
         double targetHeading = 0;
         switch (driveStyle) {
             case Right:
@@ -306,7 +311,12 @@ public class PedroDriver implements Command, Loggable {
                 targetHeading = MathUtils.snapToNearestRadiansMultiple(curHeading, Math.PI / 2);
                 break;
             case Snap:
-                return pid.update(SNAP_SIGN * (snapTargetHeading - Math.toDegrees(curHeading)));
+                return snapPid.update(
+                    SNAP_SIGN *
+                        MathUtils.normalizeDeltaDegrees(
+                            snapTargetHeading - Math.toDegrees(curHeading)
+                        )
+                );
             case Vision:
                 if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
                     // --- Face AprilTag using Limelight ---
@@ -316,7 +326,7 @@ public class PedroDriver implements Command, Loggable {
                     if (limelightSubsystem.getDistance() < 0) {
                         return rotation;
                     }
-                    return pid.update(LimelightSubsystem.Xangle * SIGN);
+                    return vizPid.update(LimelightSubsystem.Xangle * SIGN);
                 } else {
                     return rotation;
                 } //                        (VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
@@ -370,6 +380,9 @@ public class PedroDriver implements Command, Loggable {
     @Log(name = "Pose")
     public static String drvLoc = "";
 
+    @Log(name = "Heading(R)")
+    public static double curHeading = 0.0;
+
     private static void ShowDriveInfo(DrivingStyle driveStyle, DrivingMode driveMode, Follower f) {
         switch (driveStyle) {
             case Free:
@@ -388,7 +401,10 @@ public class PedroDriver implements Command, Loggable {
                 drvMode = "!Hold!";
                 break;
             case Vision:
-                drvMode = "Vision[NYI]";
+                drvMode = "Vision";
+                break;
+            case Snap:
+                drvMode = "Snap";
                 break;
             default:
                 drvMode = "Unknown";
