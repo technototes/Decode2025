@@ -28,4 +28,8 @@ public class DrivingCommands {
     public static Command ResetGyro(PedroDriver pd) {
         return pd::ResetGyro;
     }
+
+    public static Command SnapDriving(PedroDriver pd, double target) {
+        return () -> pd.EnableSnapTargetDriving(target);
+    }
 }

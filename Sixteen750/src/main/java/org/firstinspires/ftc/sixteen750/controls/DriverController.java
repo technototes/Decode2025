@@ -6,12 +6,14 @@ import com.technototes.library.control.CommandButton;
 import com.technototes.library.control.CommandGamepad;
 import com.technototes.library.control.Stick;
 import com.technototes.library.logger.Loggable;
+import com.technototes.library.util.Alliance;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.DriveAutoCommand;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
@@ -116,6 +118,23 @@ public class DriverController implements Loggable {
             DrivingCommands.SnailDriving(pedroDriver),
             DrivingCommands.NormalDriving(pedroDriver)
         );
+        if (robot.alliance == Alliance.BLUE) {
+            snailButton.whenPressed(
+                DrivingCommands.SnapDriving(
+                    pedroDriver,
+                    Setup.OtherSettings.GATE_INTAKE_HEADING_BLUE
+                )
+            );
+        } else {
+            snailButton.whenPressed(
+                DrivingCommands.SnapDriving(
+                    pedroDriver,
+                    Setup.OtherSettings.GATE_INTAKE_HEADING_RED
+                )
+            );
+        }
+        snailButton.whenReleased(DrivingCommands.NoAutoOrient(pedroDriver));
+
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(pedroDriver));
         //MotorDecrease.whenPressed(TeleCommands.DecreaseMotor(robot));
         //MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));

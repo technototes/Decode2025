@@ -32,11 +32,9 @@ public class BlueTele extends CommandOpMode {
     public Hardware hardware;
     private Limelight3A limelight;
     private PanelsTelemetry panelsTelemetry;
-    public static double blue = 0;
 
     @Override
     public void uponInit() {
-        blue = 1;
         hardware = new Hardware(hardwareMap);
         robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Unspecified);
         // controlsOperator = new OperatorController(codriverGamepad, robot);

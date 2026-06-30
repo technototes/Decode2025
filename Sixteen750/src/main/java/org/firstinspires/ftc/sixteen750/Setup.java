@@ -56,14 +56,16 @@ public class Setup {
 
         public static double AUTO_SCALING = 1;
         public static double NORMAL_SPEED = 1.0;
-        public static double NORMAL_TURN = 1;
+        public static double NORMAL_TURN = 0.8;
         public static double TURBO_SPEED = 1.0;
         public static double TURBO_TURN = 0.8;
-        public static double SNAIL_SPEED = 0.5;
-        public static double SNAIL_TURN = 0.25;
+        public static double SNAIL_SPEED = 0.67;
+        public static double SNAIL_TURN = 0.8;
         public static double STRAIGHTEN_DEAD_ZONE = 0.08;
         public static double STICK_DEAD_ZONE = 0.05;
         public static double ANGULAR_VELOCITY_MAX = 0.6;
         public static double TRIGGER_THRESHOLD = 0.5;
+        public static double GATE_INTAKE_HEADING_BLUE = 155;
+        public static double GATE_INTAKE_HEADING_RED = 25;
     }
 }

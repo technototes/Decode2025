@@ -44,6 +44,7 @@ public class PedroDriver implements Command, Loggable {
     public static PIDFCoefficients turnpidvalues = new PIDFCoefficients(0.017, 0, 0.0017, 0);
     PIDFController pid;
     public static double SIGN = 1;
+    public static double SNAP_SIGN = 1;
 
     // Methods to bind to buttons (Commands)
     public void ResetGyro() {
@@ -86,13 +87,18 @@ public class PedroDriver implements Command, Loggable {
         switchDriveStyle(DrivingStyle.Straight);
     }
 
-    public void EnableSnap90Driving() {
-        switchDriveStyle(DrivingStyle.Right);
+    public void EnableSnapTargetDriving(double target) {
+        switchDriveStyle(DrivingStyle.Snap);
+        snapTargetHeading = target;
     }
 
-    public void EnableSquareDriving() {
-        switchDriveStyle(DrivingStyle.Square);
-    }
+    // public void EnableSnap90Driving() {
+    //    switchDriveStyle(DrivingStyle.Right);
+    // }
+
+    // public void EnableSquareDriving() {
+    //    switchDriveStyle(DrivingStyle.Square);
+    // }
 
     public void HoldCurrentPosition() {
         switchDriveStyle(DrivingStyle.Hold);
@@ -171,6 +177,7 @@ public class PedroDriver implements Command, Loggable {
         Square, // Both Straight & Right driving styles
         Hold, // Stay right where you are (just use Pedro)
         Vision, // Bot will use Vision to find the target and aim toward it
+        Snap, // Bot will go to a specific configurable heading
         None,
     }
 
@@ -181,7 +188,13 @@ public class PedroDriver implements Command, Loggable {
 
     DrivingStyle driveStyle;
     DrivingMode driveMode;
+    // This is the heading that DrivingStyle.Snap will go to
+    double snapTargetHeading;
     Pose holdPose;
+
+    public void SetSnapTargetHeading(double target) {
+        snapTargetHeading = target;
+    }
 
     public DrivingStyle getCurrentDriveStyle() {
         return driveStyle;
@@ -292,6 +305,8 @@ public class PedroDriver implements Command, Loggable {
                 // Angle-focused driving styles override target-based driving mode
                 targetHeading = MathUtils.snapToNearestRadiansMultiple(curHeading, Math.PI / 2);
                 break;
+            case Snap:
+                return pid.update(SNAP_SIGN * (snapTargetHeading - Math.toDegrees(curHeading)));
             case Vision:
                 if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
                     // --- Face AprilTag using Limelight ---

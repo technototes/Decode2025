@@ -26,7 +26,7 @@ public class Blue9BallFar extends CommandOpMode {
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
-        robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
+        robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Net);
         Paths p = new Paths(robot.follower);
         robot.follower.setStartingPose(p.getFar9BallStart());
         CommandScheduler.scheduleForState(
