@@ -8,23 +8,32 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.technototes.library.hardware.motor.EncodedMotor;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
+import com.technototes.library.util.Alliance;
 import java.util.List;
 import org.firstinspires.ftc.sixteen750.Hardware;
+import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 
 @Configurable
 public class LimelightSubsystem implements Loggable, Subsystem {
 
     boolean hasHardware;
+    public Robot robot;
 
     //data should not be flickering anymore on the driverstation because we are logging
     //instead of updating telemetry
     @Log.Number(name = "LLX angle")
     public static double Xangle = 0.0;
+
+    Gamepad gamepad;
+    public static double RumbleDistScalar = 110; // fyi this is inverted from whatd youd expect bigger makes it scale less agressively right now it should roughly double from the nearest we can see the april tag to the farthest spot in the far zone
+
+    public static double RumbleDistScalarOffset = 32;
 
     @Log.Number(name = "LLY angle")
     public static double Yangle = 0.0;
@@ -34,6 +43,9 @@ public class LimelightSubsystem implements Loggable, Subsystem {
 
     @Log.Number(name = "distance")
     public static double distance;
+
+    public static int dur;
+    public static double DurationConstant = 80;
 
     public static double BHeadingOffset = 2.2;
     public static double RHeadingOffset = -2.2;
@@ -77,7 +89,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
             //&& result.isValid()
             // Not sure this is the right angle, because the camera is mounted sideways
             // IIRC, you should be using getTy() instead.
-            Xangle = recentItem.getTargetYDegrees();
+            Xangle = recentItem.getTargetYDegrees() + 3.5;
             Yangle = -recentItem.getTargetXDegrees() + LIMELIGHT_ANGLE;
             Area = recentItem.getTargetArea();
             return true;
@@ -154,9 +166,41 @@ public class LimelightSubsystem implements Loggable, Subsystem {
         // apriltag height from floor- 29.5 inches
     }
 
+    public void setGamepad(Gamepad g) {
+        gamepad = g;
+    }
+
+    public void setRumble() {
+        DurationConstant = 80;
+    }
+
+    public void setRumbleOff() {
+        DurationConstant = 1;
+    }
+
+    /*public void setduration() {
+        if (DurationConstant == 80) {
+            dur = (int) (DurationConstant / (Math.abs(Xangle)
+                + (2.7* (distance - 1 + RumbleDistScalarOffset) / RumbleDistScalar)));
+        }
+            else {
+                dur = (int) (DurationConstant / (Math.abs(Xangle)
+                    - (2.7* (distance - 1 + RumbleDistScalarOffset) / RumbleDistScalar)));
+            }
+
+    }
+    public void vibrate() {
+        if (Xangle > -10 && Xangle < 10 && Xangle != 0) ;
+        if (gamepad != null && dur != 0) {
+            gamepad.rumble(800/dur);
+        }
+    }*/
+
     @Override
     public void periodic() {
         new_result = getLatestResult();
         distance = getDistance();
+        // setduration();
+        //vibrate();
     }
 }

@@ -45,6 +45,7 @@ public class RedTele extends CommandOpMode implements Loggable {
         if (Setup.Connected.DRIVEBASE) {
             controlsDriver = new DriverController(driverGamepad, robot);
             robot.intakeSubsystem.setGamepad(gamepad1);
+            robot.limelightSubsystem.setGamepad(gamepad1);
             // Just pick a starting point
             CommandScheduler.scheduleForState(
                 new SequentialCommandGroup(
@@ -86,8 +87,7 @@ public class RedTele extends CommandOpMode implements Loggable {
 
     @Override
     public void runLoop() {
-        /*
-        panelsTelemetry
+        /* panelsTelemetry
             .getTelemetry()
             .addData(
                 "currentLaunchVelocity",
@@ -112,8 +112,7 @@ public class RedTele extends CommandOpMode implements Loggable {
             .getTelemetry()
             .addData("Distraw", String.valueOf(LimelightSubsystem.distance));
 
-        panelsTelemetry.getTelemetry().update(telemetry);
-         */
+        panelsTelemetry.getTelemetry().update(telemetry);*/
     }
 
     /*

@@ -4,7 +4,6 @@ import com.pedropathing.geometry.BezierPoint;
 import com.technototes.library.command.Command;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
-
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
@@ -45,12 +44,16 @@ public class TeleCommands {
         return Command.create(r.launcherSubsystem::Stop);
     }
 
+    public static Command IdleLaunch(Robot r) {
+        return Command.create(r.launcherSubsystem::Idle);
+    }
+
     public static Command Rumble(Robot r) {
-        return Command.create(r.intakeSubsystem::setRumble);
+        return Command.create(r.limelightSubsystem::setRumble);
     }
 
     public static Command RumbleOff(Robot r) {
-        return Command.create(r.intakeSubsystem::setRumbleOff);
+        return Command.create(r.limelightSubsystem::setRumbleOff);
     }
 
     public static Command IncreaseMotor(Robot r) {
@@ -67,6 +70,14 @@ public class TeleCommands {
 
     public static Command IntakeStop(Robot r) {
         return Command.create(r.intakeSubsystem::StopIntake);
+    }
+
+    public static Command GobbleGulp(Robot r) {
+        return Command.create(r.intakeSubsystem::GobbleGulp);
+    }
+
+    public static Command IThinkIAteTooMuch(Robot r) {
+        return Command.create(r.intakeSubsystem::IThinkIAteTooMuch);
     }
 
     public static Command Spit(Robot r) {
@@ -144,6 +155,7 @@ public class TeleCommands {
     public static Command IncreaseRegressionDTeleop(Robot r) {
         return Command.create(r.launcherSubsystem::increaseRegressionDTeleop);
     }
+
     public static SequentialCommandGroup OutreachLaunch(Robot r) {
         return new SequentialCommandGroup(
             Command.create(r.launcherSubsystem::Launch),
@@ -153,13 +165,10 @@ public class TeleCommands {
             new WaitCommand(.8),
             Command.create(r.launcherSubsystem::Stop),
             Command.create(r.intakeSubsystem::StopIntake),
-            Command.create(r.aimingSubsystem::StopBall
-
-        )
-            .raceWith(new AltAutoOrient(r))
-            )
-           ;
+            Command.create(r.aimingSubsystem::StopBall).raceWith(new AltAutoOrient(r))
+        );
     }
+
     public static SequentialCommandGroup OutreachLaunchFar(Robot r) {
         return new SequentialCommandGroup(
             Command.create(r.launcherSubsystem::Launch),
@@ -169,12 +178,7 @@ public class TeleCommands {
             new WaitCommand(2.5),
             Command.create(r.launcherSubsystem::Stop),
             Command.create(r.intakeSubsystem::StopIntake),
-            Command.create(r.aimingSubsystem::StopBall
-
-                )
-                .raceWith(new AltAutoOrient(r))
-        )
-            ;
+            Command.create(r.aimingSubsystem::StopBall).raceWith(new AltAutoOrient(r))
+        );
     }
-
-    }
+}

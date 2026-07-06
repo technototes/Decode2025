@@ -7,7 +7,6 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
-import com.technototes.library.command.ParallelRaceGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
@@ -17,18 +16,18 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
+import org.firstinspires.ftc.sixteen750.commands.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
-import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
-import org.firstinspires.ftc.sixteen750.commands.auto.Paths2;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
+import org.firstinspires.ftc.sixteen750.commands.auto.RPaths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "Blue18BallNear", preselectTeleOp = "Dual Control")
+@Autonomous(name = "RedNear18Safe", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
-public class Blue18BallNear extends CommandOpMode {
+public class RedNear18Safe extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
@@ -36,33 +35,23 @@ public class Blue18BallNear extends CommandOpMode {
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
 
-    public static Command BlueGateCycle1(Robot r) {
+    private static Command RedGateCycle(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, Paths2.BLaunchToBGateInt1),
+            new PedroPathCommand(r.follower, RPaths.SRLaunchToRGateInt1),
             new WaitCommand(1.1),
-            new PedroPathCommand(r.follower, Paths2.BGateInt1ToBLaunch),
-            Paths2.AutoLaunching3Balls(r)
+            new PedroPathCommand(r.follower, RPaths.SRGateInt1ToRLaunch),
+            AutoCommands.AutoLaunching3Balls(r)
         );
     }
 
-    public static Command BlueGateCycle2(Robot r) {
+    private static Command RedGateCycle2(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, Paths2.BLaunchToBGateInt2),
+            new PedroPathCommand(r.follower, RPaths.SRLaunchToRGateInt2),
             new WaitCommand(1.1),
-            new PedroPathCommand(r.follower, Paths2.BGateInt2ToBLaunch),
-            Paths2.AutoLaunching3Balls(r)
-        );
-    }
-
-    public static Command BlueGateCycle3(Robot r) {
-        return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, Paths2.BLaunchToBGateInt3),
-            new WaitCommand(1.1),
-            new PedroPathCommand(r.follower, Paths2.BGateInt3ToBLaunch),
-            Paths2.AutoLaunching3Balls(r)
+            new PedroPathCommand(r.follower, RPaths.SRGateInt2ToRLaunch),
+            AutoCommands.AutoLaunching3Balls(r)
         );
     }
 
@@ -71,39 +60,38 @@ public class Blue18BallNear extends CommandOpMode {
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
-        robot = new Robot(hardware, Alliance.BLUE, StartingPosition.Net);
-        Paths2 p = new Paths2(robot.follower);
+        robot = new Robot(hardware, Alliance.RED, StartingPosition.Net);
+        RPaths p = new RPaths(robot.follower);
+        TeleCommands t = new TeleCommands();
+        AutoCommands a = new AutoCommands();
         panelsTelemetry = PanelsTelemetry.INSTANCE;
-        robot.follower.setStartingPose(Poses.getBStart());
+        robot.follower.setStartingPose(Poses.StartPoses.getRStart());
         CommandScheduler.scheduleForState(
             new AltAutoVelocity(robot).alongWith(
                 new SequentialCommandGroup(
-                    TeleCommands.Launch(robot),
                     //TeleCommands.AutoLaunch1(robot),
-                    TeleCommands.GateUp(robot),
-                    TeleCommands.Intake(robot),
-                    TeleCommands.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.BStartToBLaunch),
-                    Paths2.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(
-                        robot.follower,
-                        p.BLaunchToBInt1,
-                        Paths2.power092
-                    ).alongWith(TeleCommands.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.BInt1ToBLaunch),
-                    Paths2.AutoLaunching3Balls(robot),
-                    BlueGateCycle1(robot).alongWith(TeleCommands.Intake(robot)),
-                    BlueGateCycle2(robot).alongWith(TeleCommands.Intake(robot)),
-                    new PedroPathCommand(
-                        robot.follower,
-                        p.BLaunchToBInt2,
-                        Paths2.power085
-                    ).alongWith(TeleCommands.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.BInt2ToBLaunch),
-                    Paths2.AutoLaunching3Balls(robot),
-                    BlueGateCycle3(robot).alongWith(TeleCommands.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.BLaunchToBEnd),
-                    TeleCommands.StopLaunch(robot),
+                    t.GateUp(robot),
+                    t.Intake(robot),
+                    t.HoodUp(robot),
+                    new PedroPathCommand(robot.follower, p.SRStartToRLaunch),
+                    a.AutoLaunching3Balls(robot),
+                    new PedroPathCommand(robot.follower, p.SRLaunchToRInt1, p.power092).alongWith(
+                        t.Intake(robot)
+                    ),
+                    new PedroPathCommand(robot.follower, p.SRInt1ToRLaunch),
+                    a.AutoLaunching3Balls(robot),
+                    RedGateCycle(robot).alongWith(t.Intake(robot)),
+                    new PedroPathCommand(robot.follower, p.SRLaunchToRInt2, p.power092).alongWith(
+                        t.Intake(robot)
+                    ),
+                    new PedroPathCommand(robot.follower, p.SRInt2ToRLaunch),
+                    RedGateCycle2(robot).alongWith(t.Intake(robot)),
+                    new PedroPathCommand(robot.follower, p.SRLaunchToRInt3, p.power085).alongWith(
+                        t.Intake(robot)
+                    ),
+                    new PedroPathCommand(robot.follower, p.SRInt3ToRLaunch),
+                    a.AutoLaunching3Balls(robot),
+                    new PedroPathCommand(robot.follower, p.SRLaunchToREnd),
                     CommandScheduler::terminateOpMode
                 )
             ),

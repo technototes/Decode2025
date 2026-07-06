@@ -118,23 +118,23 @@ public class DriverController implements Loggable {
             DrivingCommands.SnailDriving(pedroDriver),
             DrivingCommands.NormalDriving(pedroDriver)
         );
-        if (robot.alliance == Alliance.BLUE) {
-            snailButton.whenPressed(
-                DrivingCommands.SnapDriving(
-                    pedroDriver,
-                    Setup.OtherSettings.GATE_INTAKE_HEADING_BLUE
-                )
-            );
-        } else {
-            snailButton.whenPressed(
-                DrivingCommands.SnapDriving(
-                    pedroDriver,
-                    Setup.OtherSettings.GATE_INTAKE_HEADING_RED
-                )
-            );
-        }
-        snailButton.whenReleased(DrivingCommands.NoAutoOrient(pedroDriver));
-
+        /*  if (robot.alliance == Alliance.BLUE) {
+                    snailButton.whenPressed(
+                       DrivingCommands.SnapDriving(
+                            pedroDriver,
+                            Setup.OtherSettings.GATE_INTAKE_HEADING_BLUE
+                        )
+                    );
+                } else {
+                   snailButton.whenPressed(
+                        DrivingCommands.SnapDriving(
+                            pedroDriver,
+                            Setup.OtherSettings.GATE_INTAKE_HEADING_RED
+                        )
+                   );
+                }
+                snailButton.whenReleased(DrivingCommands.NoAutoOrient(pedroDriver));
+*/
         resetGyroButton.whenPressed(DrivingCommands.ResetGyro(pedroDriver));
         //MotorDecrease.whenPressed(TeleCommands.DecreaseMotor(robot));
         //MotorIncrease.whenPressed(TeleCommands.IncreaseMotor(robot));
@@ -142,6 +142,7 @@ public class DriverController implements Loggable {
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             autoAim.whenPressed(DrivingCommands.AutoOrient(pedroDriver));
             autoAim.whenReleased(DrivingCommands.NoAutoOrient(pedroDriver));
+            RumbleToggle.toggle(TeleCommands.Rumble(robot), TeleCommands.RumbleOff(robot));
             //AltAutoAlign.whenPressed(new AltAutoOrient(robot));
             //AltAutoAlign.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
         }
@@ -150,7 +151,7 @@ public class DriverController implements Loggable {
 
     public void bindLaunchControls() {
         launchButton.whilePressed(TeleCommands.Launch(robot));
-        launchButton.whenReleased(TeleCommands.StopLaunch(robot));
+        launchButton.whileReleased(TeleCommands.StopLaunch(robot));
         //        CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
         //        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
         MotorIncrease.whenPressed(robot.launcherSubsystem::IncreaseMotorVelocity);
@@ -162,8 +163,9 @@ public class DriverController implements Loggable {
         spitButton.whenPressed(TeleCommands.Spit(robot));
         spitButton.whenReleased(TeleCommands.IntakeStop(robot));
         intakeTrigger.whenPressed(TeleCommands.Intake(robot));
+        intakeTrigger.whenPressed(TeleCommands.GobbleGulp(robot));
+        intakeTrigger.whenReleased(TeleCommands.IThinkIAteTooMuch(robot));
         intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot));
-        RumbleToggle.toggle(TeleCommands.Rumble(robot), TeleCommands.RumbleOff(robot));
     }
 
     // spitTrigger.whilePressed(TeleCommands.Spit(robot.intakeSubsystem));

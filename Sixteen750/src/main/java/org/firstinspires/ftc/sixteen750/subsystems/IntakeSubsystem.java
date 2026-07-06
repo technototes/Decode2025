@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.technototes.library.command.CommandScheduler;
+import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -18,13 +19,16 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     Gamepad gamepad;
     public static double one_threshold = 1.65;
     public static double two_threshold = 3;
-    public static double theree_threshold = 4.5;
+    public static double theree_threshold = 10;
     public static double MOTOR_VELOCITY = 1; // 0.5 1.0
     public static double SLOW_MOTOR_VELOCITY = 0.67; // 0.5 1.0
     public static int duration = 80;
+    public static double GATE_INTAKE_HEADING_BLUE = 155;
+    public static double GATE_INTAKE_HEADING_RED = 25;
     boolean hasHardware;
     int currentIndex = 0;
     double[] pastValuesArray;
+    public static double SIGN = 1;
 
     @Log.Number(name = "artifacts")
     public static double artifacts = 0;
@@ -37,6 +41,8 @@ public class IntakeSubsystem implements Loggable, Subsystem {
 
     DcMotorEx intake;
     DcMotorEx intake2;
+    CRServo gobbleServo;
+    CRServo gulpServo;
 
     public IntakeSubsystem(Hardware h) {
         // intake.getRawMotor(DcMotorEx.class).getCurrent(CurrentUnit.AMPS)
@@ -45,6 +51,8 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         if (hasHardware) {
             intake = h.intake;
             intake2 = h.intake2;
+            gobbleServo = h.gobbleServo;
+            gulpServo = h.gulpServo;
             intakecurrent = getCurrent();
             CommandScheduler.register(this);
             gamepad = null;
@@ -62,6 +70,8 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         if (hasHardware) {
             intake.setPower(MOTOR_VELOCITY);
             intake2.setPower(MOTOR_VELOCITY);
+            gobbleServo.setPower(1);
+            gulpServo.setPower(-1);
         }
     }
 
@@ -91,6 +101,22 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         if (hasHardware) {
             intake.setPower(0);
             intake2.setPower(0);
+            gobbleServo.setPower(0);
+            gulpServo.setPower(0);
+        }
+    }
+
+    public void GobbleGulp() {
+        if (hasHardware) {
+            gobbleServo.setPower(1 * SIGN); // they are inverted from each other cause mirrored i added sign in there so its easy to invert both of them
+            gulpServo.setPower(-1 * SIGN);
+        }
+    }
+
+    public void IThinkIAteTooMuch() {
+        if (hasHardware) {
+            gobbleServo.setPower(0);
+            gulpServo.setPower(0);
         }
     }
 

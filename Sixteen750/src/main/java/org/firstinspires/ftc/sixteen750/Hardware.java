@@ -37,6 +37,8 @@ public class Hardware implements Loggable {
     public CRServo testCRServo;
     public Servo testServo;
     public Limelight3A limelight;
+    public CRServo gobbleServo;
+    public CRServo gulpServo;
     public HardwareMap map;
 
     /* Put other hardware here! */
@@ -69,6 +71,8 @@ public class Hardware implements Loggable {
         if (Setup.Connected.INTAKESUBSYSTEM) {
             intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
             intake2 = this.map.get(DcMotorEx.class, Setup.HardwareNames.ODOFB);
+            gulpServo = new CRServo(Setup.HardwareNames.ITKANL);
+            gobbleServo = new CRServo(Setup.HardwareNames.ITKANR);
         }
         if (Setup.Connected.LAUNCHERSUBSYSTEM) {
             launcher1 = new EncodedMotor(Setup.HardwareNames.LAUNCHER_MOTOR1);

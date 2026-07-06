@@ -39,8 +39,8 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 public class PedroDriver implements Command, Loggable {
 
     public static double VISION_TURN_SCALE = 0.7;
-    public static PIDFCoefficients vizPIDValues = new PIDFCoefficients(0.017, 0, 0.0017, 0);
-    public static PIDFCoefficients snapPIDValues = new PIDFCoefficients(0.017, 0, 0.0017, 0);
+    public static PIDFCoefficients vizPIDValues = new PIDFCoefficients(0.012, 0.0000, 0.001, 0);
+    public static PIDFCoefficients snapPIDValues = new PIDFCoefficients(0.0005, 0, 0.00, 0);
     PIDFController vizPid;
     PIDFController snapPid;
     public static double SIGN = 1;
@@ -299,10 +299,8 @@ public class PedroDriver implements Command, Loggable {
         // Negative, because pushing left is negative, but that is a positive change in Pedro's
         // coordinate system.
         double rotation = -r.getAsDouble();
-        curHeading = MathUtils.normalizeDeltaRadians(
-            MathUtils.normalizeDeltaRadians(follower.getHeading()) -
-                MathUtils.normalizeDeltaRadians(headingOffset)
-        );
+        curHeading = (MathUtils.normalizeDeltaRadians(follower.getHeading()) -
+            MathUtils.normalizeDeltaRadians(headingOffset));
         double targetHeading = 0;
         switch (driveStyle) {
             case Right:

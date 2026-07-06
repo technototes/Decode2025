@@ -43,6 +43,9 @@ public class Setup {
         public static String TESTMOTOR = "testmotor";
         public static String TESTCRSERVO = "testcrservo";
         public static String LIMELIGHT = "limelight";
+        public static String ITKANL = "gulpServo";
+        public static String ITKANR = "gobbleServo";
+
         public static int Green_Color_Pipeline = 0;
         // public static int Classifier_Pipeline = 2;
         // public static int Object_Detection_Pipeline = 3;
@@ -59,13 +62,13 @@ public class Setup {
         public static double NORMAL_TURN = 0.8;
         public static double TURBO_SPEED = 1.0;
         public static double TURBO_TURN = 0.8;
-        public static double SNAIL_SPEED = 0.67;
-        public static double SNAIL_TURN = 0.8;
+        public static double SNAIL_SPEED = 0.64;
+        public static double SNAIL_TURN = 0.18;
         public static double STRAIGHTEN_DEAD_ZONE = 0.08;
         public static double STICK_DEAD_ZONE = 0.05;
         public static double ANGULAR_VELOCITY_MAX = 0.6;
         public static double TRIGGER_THRESHOLD = 0.5;
-        public static double GATE_INTAKE_HEADING_BLUE = 155;
-        public static double GATE_INTAKE_HEADING_RED = 25;
+        public static double GATE_INTAKE_HEADING_BLUE = 25;
+        public static double GATE_INTAKE_HEADING_RED = 205;
     }
 }

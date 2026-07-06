@@ -31,6 +31,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double closetargetLaunchVelocity = 1400;
     public static double fartargetLaunchVelocity = 1850;
+    public static double IdleTargetVelocity = 1300;
+
     public static double fartargetLaunchVelocityforAuto = 2300;
     public static double targetLaunchVelocityforAuto1 = 1950;
     public static double targetLaunchVelocityforAuto2 = 1850;
@@ -56,14 +58,14 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     @Log(name = "Target Power: ")
     public static double targetPower;
 
-    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.005, 0.0000167, 0.0, 0);
+    public static PIDFCoefficients launcherPI = new PIDFCoefficients(0.004, 0.0002, 0.0, 0);
     public static PIDFCoefficients launcherPI_ForAuto = new PIDFCoefficients(
         0.0015,
         0.0000,
         0.0,
         0
     ); //p = 0.004, i = 0.00020
-    public static double SPIN_F_SCALE = 0.000253;
+    public static double SPIN_F_SCALE = 0.0002;
     public static double SPIN_VOLT_COMP = 0.0216;
     public static double DIFFERENCE = 0.0046;
     public static double PEAK_VOLTAGE = 13;
@@ -78,10 +80,10 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
-    public static double REGRESSION_A = 8.6; // multiplier for x for close zone launch speed formula
-    public static double REGRESSION_B = 1250; // minimum velocity for close zone launch speed formula 1560
+    public static double REGRESSION_A = 8.73; // multiplier for x for close zone launch speed formula
+    public static double REGRESSION_B = 1280; // minimum velocity for close zone launch speed formula 1560
     public static double REGRESSION_C = 17.5; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 180; // minimum velocity for far zone launch speed formula - 130, 255
+    public static double REGRESSION_D = 110; // minimum velocity for far zone launch speed formula - 130, 255
     public static double REGRESSION_C_TELEOP = 20.3; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D_TELEOP = 160; // minimum velocity for far zone launch speed formula
     public static double REGRESSION_C_AUTO = 17.25; // multiplier for x for far zone launch speed formula
@@ -125,6 +127,16 @@ public class LauncherSubsystem implements Loggable, Subsystem {
                     : (SPIN_F_SCALE * target) +
                       (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()))
             );
+
+            //            top.setPIDFCoefficients(launcherP);
+            setTargetSpeed(0);
+            launcherPID = new PIDFController(launcherPI, target ->
+                target == 0.00001
+                    ? 0.00001
+                    : (SPIN_F_SCALE * target) +
+                      (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()))
+            );
+
             //            top.setPIDFCoefficients(launcherP);
             setTargetSpeed(0);
         } else {
@@ -243,6 +255,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             //launcher1.setPower(0);
             //launcher2.setPower(0);
             launcherPID.setTarget(0);
+        }
+    }
+
+    public void Idle() {
+        if (hasHardware) {
+            launcherPID.setTarget(0.00001);
         }
     }
 

@@ -45,6 +45,7 @@ public class BlueTele extends CommandOpMode implements Loggable {
         if (Setup.Connected.DRIVEBASE) {
             controlsDriver = new DriverController(driverGamepad, robot);
             robot.intakeSubsystem.setGamepad(gamepad1);
+            robot.limelightSubsystem.setGamepad(gamepad1);
             // Just pick a starting point
             CommandScheduler.scheduleForState(
                 new SequentialCommandGroup(
