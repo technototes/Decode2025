@@ -42,6 +42,7 @@ public class DriverController implements Loggable {
     public CommandButton override;
     public CommandButton hooddownButton;
     public CommandButton RumbleToggle;
+    public CommandButton RelocButton;
     public CommandButton holdButton;
     public CommandButton CloseShoot;
     public CommandButton FarShoot;
@@ -100,7 +101,7 @@ public class DriverController implements Loggable {
         gateButton = gamepad.ps_cross;
         holdButton = gamepad.ps_circle; // made it not bound the same as decrease velo
         //TripleBallLaunch = gamepad.ps_share; // made the auto launching command testable in tele
-        RumbleToggle = gamepad.ps_share;
+        RelocButton = gamepad.ps_share;
     }
 
     public void bindDriveControls() {
@@ -142,7 +143,7 @@ public class DriverController implements Loggable {
         if (Setup.Connected.LIMELIGHTSUBSYSTEM) {
             autoAim.whenPressed(DrivingCommands.AutoOrient(pedroDriver));
             autoAim.whenReleased(DrivingCommands.NoAutoOrient(pedroDriver));
-            RumbleToggle.toggle(TeleCommands.Rumble(robot), TeleCommands.RumbleOff(robot));
+            RelocButton.whenPressed(TeleCommands.LLRelocCommand(robot));
             //AltAutoAlign.whenPressed(new AltAutoOrient(robot));
             //AltAutoAlign.whenReleased(DrivingCommands.NormalDriving(pedroDriver));
         }

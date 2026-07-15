@@ -18,6 +18,9 @@ import java.util.List;
 import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
+import com.pedropathing.geometry.Pose;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 @Configurable
 public class LimelightSubsystem implements Loggable, Subsystem {
@@ -99,6 +102,33 @@ public class LimelightSubsystem implements Loggable, Subsystem {
         } else {
             return false;
         }
+    }
+    public void updateRobotOrientation(double headingRadians) {
+        if (!hasHardware) return;
+        limelight.updateRobotOrientation(Math.toDegrees(headingRadians));
+    }
+    public Pose getPose() {
+        if (!hasHardware) return null;
+
+        LLResult r = limelight.getLatestResult();
+        if (r == null || !r.isValid()) return null;
+
+        Pose3D botpose = r.getBotpose_MT2();
+        if (botpose == null) {
+            botpose = r.getBotpose();
+        }
+        if (botpose == null) return null;
+
+        // Limelight reports position in meters; Pedro wants inches.
+        double xInches = botpose.getPosition().x * 39.3701;
+        double yInches = botpose.getPosition().y * 39.3701;
+        double headingRad = botpose.getOrientation().getYaw(AngleUnit.RADIANS);
+
+        // Shift from field-centered origin to Pedro's corner origin.
+        double pedroX = xInches + 72;
+        double pedroY = yInches + 72;
+
+        return new Pose(pedroX, pedroY, headingRad);
     }
 
     //distance = DISTANCE_FROM_LIMELIGHT_TO_APRILTAG/arctan(result.getTx())
