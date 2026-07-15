@@ -23,7 +23,7 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "BAD", preselectTeleOp = "Dual Control")
+@Autonomous(name = "zBAD", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 public class BAD extends CommandOpMode {
 

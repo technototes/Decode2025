@@ -16,22 +16,26 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
-import org.firstinspires.ftc.sixteen750.commands.AutoCommands;
+import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
 import org.firstinspires.ftc.sixteen750.commands.auto.RPaths;
+import org.firstinspires.ftc.sixteen750.commands.auto.WaitForArtifacts;
+import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "RedNear18Partner", preselectTeleOp = "Dual Control")
+@Autonomous(name = "RedNear18Partner", preselectTeleOp = "RedTele")
 @SuppressWarnings("unused")
 public class RedNear18Partner extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
     public Hardware hardware;
+    public PedroDriver pedroDriver;
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
 
@@ -39,7 +43,7 @@ public class RedNear18Partner extends CommandOpMode {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
             new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt1),
-            new WaitCommand(1.1),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.5),
             new PedroPathCommand(r.follower, RPaths.PRGateInt1ToRLaunch),
             AutoCommands.AutoLaunching3Balls(r)
         );
@@ -49,7 +53,7 @@ public class RedNear18Partner extends CommandOpMode {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
             new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt2),
-            new WaitCommand(1.1),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.5),
             new PedroPathCommand(r.follower, RPaths.PRGateInt2ToRLaunch),
             AutoCommands.AutoLaunching3Balls(r)
         );
@@ -59,7 +63,7 @@ public class RedNear18Partner extends CommandOpMode {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
             new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt3),
-            new WaitCommand(1.1),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.5),
             new PedroPathCommand(r.follower, RPaths.PRGateInt3ToRLaunch),
             AutoCommands.AutoLaunching3Balls(r)
         );
@@ -81,6 +85,7 @@ public class RedNear18Partner extends CommandOpMode {
                 new SequentialCommandGroup(
                     //TeleCommands.AutoLaunch1(robot),
                     t.GateUp(robot),
+                    t.Launch(robot),
                     t.Intake(robot),
                     t.HoodUp(robot),
                     new PedroPathCommand(robot.follower, p.PRStartToRLaunch),
@@ -88,11 +93,12 @@ public class RedNear18Partner extends CommandOpMode {
                     new PedroPathCommand(robot.follower, p.PRLaunchToRInt1, p.power092).alongWith(
                         t.Intake(robot)
                     ),
+                    t.IntakeStop(robot),
                     new PedroPathCommand(robot.follower, p.PRInt1ToRLaunch),
                     a.AutoLaunching3Balls(robot),
                     RedGateCycle(robot).alongWith(t.Intake(robot)),
                     RedGateCycle2(robot).alongWith(t.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.PRLaunchToRInt2, p.power085).alongWith(
+                    new PedroPathCommand(robot.follower, p.PRLaunchToRInt2, p.power092).alongWith(
                         t.Intake(robot)
                     ),
                     new PedroPathCommand(robot.follower, p.PRInt2ToRLaunch),

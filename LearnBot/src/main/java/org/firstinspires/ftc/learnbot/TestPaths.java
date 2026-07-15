@@ -5,6 +5,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 
 /**** DO NOT EDIT ****
@@ -104,7 +105,7 @@ public class TestPaths {
             .addPath(unused4)
             .addPath(u4_ol)
             .addPath(otherLine)
-            .setHeadingInterpolator(HeadingInterpolator.facingPoint(1, 1))
+            .setHeadingInterpolation(HeadingInterpolator.facingPoint(1, 1))
             .build();
     }
 }

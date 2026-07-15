@@ -16,7 +16,6 @@ import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoOrientFar;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
-
 @Configurable
 public class Paths {
 
@@ -376,11 +375,11 @@ public class Paths {
     }
 
     public static Pose getBSegmentedCurveStart() {
-        return new Pose(30.748, 135.152, Math.toRadians(90));
+        return new Pose(30.748, 135.152, Math.toRadians(180));
     }
 
     public static Pose getRSegmentedCurveStart() {
-        return new Pose(114, 135, Math.toRadians(90));
+        return new Pose(114, 135, Math.toRadians(0));
     }
 
     public static Pose getRFar9BallStart() {

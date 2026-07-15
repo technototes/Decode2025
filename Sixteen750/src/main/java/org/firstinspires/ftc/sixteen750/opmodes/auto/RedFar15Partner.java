@@ -15,21 +15,24 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
-import org.firstinspires.ftc.sixteen750.commands.AutoCommands;
+import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
 import org.firstinspires.ftc.sixteen750.commands.auto.RPaths;
+import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "Red15BallFar", preselectTeleOp = "Dual Control")
+@Autonomous(name = "RedFar15Partner(sus)", preselectTeleOp = "RedTele")
 @SuppressWarnings("unused")
-public class Red15BallFar extends CommandOpMode {
+public class RedFar15Partner extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
     public Hardware hardware;
+    public PedroDriver pedroDriver;
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
 
@@ -48,19 +51,19 @@ public class Red15BallFar extends CommandOpMode {
                     t.HoodUp(robot),
                     new PedroPathCommand(robot.follower, p.RFStartToRFLaunch),
                     new WaitCommand(0.7),
-                    a.AutoLaunching3BallsFar(robot),
+                    a.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFInt1),
                     new PedroPathCommand(robot.follower, p.RFInt1ToRFLaunch),
-                    a.AutoLaunching3BallsFar(robot),
+                    a.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFInt2),
                     new PedroPathCommand(robot.follower, p.RFInt2ToRFLaunch),
-                    a.AutoLaunching3BallsFar(robot),
+                    a.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFInt3),
                     new PedroPathCommand(robot.follower, p.RFInt3ToRFLaunch),
-                    a.AutoLaunching3BallsFar(robot),
+                    a.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFInt3),
                     new PedroPathCommand(robot.follower, p.RFInt3ToRFLaunch),
-                    a.AutoLaunching3BallsFar(robot),
+                    a.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.RFLaunchToRFEnd),
                     t.StopLaunch(robot),
                     t.IntakeStop(robot),

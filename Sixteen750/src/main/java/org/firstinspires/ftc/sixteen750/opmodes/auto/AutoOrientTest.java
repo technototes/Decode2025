@@ -21,7 +21,7 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
-@Autonomous(name = "AutoOrientTest", preselectTeleOp = "Dual Control")
+@Autonomous(name = "zAutoOrientTest", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 public class AutoOrientTest extends CommandOpMode {
 

@@ -16,22 +16,25 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
-import org.firstinspires.ftc.sixteen750.commands.AutoCommands;
+import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.BPaths;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
+import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "BlueNear18Partner", preselectTeleOp = "Dual Control")
+@Autonomous(name = "BlueNear18Partner", preselectTeleOp = "BlueTele")
 @SuppressWarnings("unused")
 public class BlueNear18Partner extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
     public Hardware hardware;
+    public PedroDriver pedroDriver;
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
 
@@ -82,13 +85,13 @@ public class BlueNear18Partner extends CommandOpMode {
                     t.Launch(robot),
                     //TeleCommands.AutoLaunch1(robot),
                     t.GateUp(robot),
-                    t.Intake(robot),
                     t.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.PBStartToBLaunch),
+                    new PedroPathCommand(robot.follower, p.PBStartToBLaunch, p.power085),
                     a.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.PBLaunchToBInt1, p.power092).alongWith(
                         t.Intake(robot)
                     ),
+                    t.IntakeStop(robot),
                     new PedroPathCommand(robot.follower, p.PBInt1ToBLaunch),
                     a.AutoLaunching3Balls(robot),
                     BlueGateCycle1(robot).alongWith(t.Intake(robot)),

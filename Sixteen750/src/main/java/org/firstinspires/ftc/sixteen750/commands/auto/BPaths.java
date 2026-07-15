@@ -5,9 +5,19 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.PathChain;
+import com.technototes.library.command.Command;
+import com.technototes.library.command.SequentialCommandGroup;
+import com.technototes.library.command.WaitCommand;
+import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
+import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
 public class BPaths {
+
+    Poses.StartPoses sp = new Poses.StartPoses();
+
+    public static Follower follower;
 
     public PathChain PBStartToBLaunch;
     public PathChain PBLaunchToBInt1;
@@ -47,8 +57,6 @@ public class BPaths {
     public BPaths(Follower follower) {
         follower.setMaxPowerScaling(1);
 
-        // These are for readability only: They aren't necessary...
-        Poses.StartPoses sp = new Poses.StartPoses();
         Poses.BNear18PartnerPoses p = new Poses.BNear18PartnerPoses();
 
         PBStartToBLaunch = follower
@@ -98,13 +106,13 @@ public class BPaths {
             .build();
         PBLaunchToBInt2 = follower
             .pathBuilder()
-            .addPath(new BezierLine(p.BLaunch, p.BInt2))
+            .addPath(new BezierCurve(p.BLaunch, p.BInt2CtrlPoint, p.BInt2))
             .setConstantHeadingInterpolation(p.BInt2Head)
             .build();
         PBInt2ToBLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(p.BInt2, p.BLaunch))
-            .setLinearHeadingInterpolation(p.BInt2Head, p.BLaunchHead)
+            .setConstantHeadingInterpolation(p.BLaunchHead)
             .build();
         PBLaunchToBEnd = follower
             .pathBuilder()
@@ -142,12 +150,12 @@ public class BPaths {
         SBLaunchToBInt2 = follower
             .pathBuilder()
             .addPath(new BezierCurve(p1.BLaunch, p1.BInt2CtrlPoint1, p1.BInt2CtrlPoint2, p1.BInt2))
-            .setTangentHeadingInterpolation()
+            .setConstantHeadingInterpolation(p1.BInt2Head)
             .build();
         SBInt2ToBLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(p1.BInt2, p1.BLaunch))
-            .setLinearHeadingInterpolation(p1.BInt2Head, p1.BLaunchHead)
+            .setLinearHeadingInterpolation((p1.BInt2Head), (p1.BLaunchHead))
             .build();
         SBLaunchToBGateInt2 = follower
             .pathBuilder()
@@ -161,13 +169,13 @@ public class BPaths {
             .build();
         SBLaunchToBInt3 = follower
             .pathBuilder()
-            .addPath(new BezierLine(p1.BLaunch, p1.BInt3))
+            .addPath(new BezierCurve(p1.BLaunch, p1.BInt3CtrlPoint, p1.BInt3))
             .setConstantHeadingInterpolation(p1.BInt3Head)
             .build();
         SBInt3ToBLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(p1.BInt3, p1.BLaunch))
-            .setLinearHeadingInterpolation(p1.BInt3Head, p1.BLaunchHead)
+            .setConstantHeadingInterpolation(p1.BLaunchHead)
             .build();
         SBLaunchToBEnd = follower
             .pathBuilder()
@@ -223,3 +231,7 @@ public class BPaths {
             .build();
     }
 }
+
+//    public static Command Pedropathcommand(Robot r){
+//        return new PPPathCommand()
+//    }

@@ -71,6 +71,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double PEAK_VOLTAGE = 13;
     private static PIDFController launcherPID;
     public static double lastAutoVelocity = 0;
+    public static double IdlePower = 0.4; // idle power
 
     boolean hasHardware;
     public Robot robot;
@@ -81,9 +82,9 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double MINIMUM_VELOCITY = 1140;
     public static double RPM_PER_FOOT = 62.3;
     public static double REGRESSION_A = 8.73; // multiplier for x for close zone launch speed formula
-    public static double REGRESSION_B = 1280; // minimum velocity for close zone launch speed formula 1560
-    public static double REGRESSION_C = 17.5; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 110; // minimum velocity for far zone launch speed formula - 130, 255
+    public static double REGRESSION_B = 1240; // minimum velocity for close zone launch speed formula 1560
+    public static double REGRESSION_C = 18.1; // multiplier for x for far zone launch speed formula
+    public static double REGRESSION_D = 220; // minimum velocity for far zone launch speed formula - 130, 255
     public static double REGRESSION_C_TELEOP = 20.3; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D_TELEOP = 160; // minimum velocity for far zone launch speed formula
     public static double REGRESSION_C_AUTO = 17.25; // multiplier for x for far zone launch speed formula
@@ -260,7 +261,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
 
     public void Idle() {
         if (hasHardware) {
-            launcherPID.setTarget(0.00001);
+            //set a boolean to tell the launcher to idle
+            launcherPID.setTarget(Math.PI);
         }
     }
 
@@ -313,6 +315,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             launcherPI.p = 0.004;
             launcherPI.i = 0.0002;
             lastAutoVelocity = REGRESSION_C * x + REGRESSION_D;
+        } else if (lastAutoVelocity == 0) {
+            lastAutoVelocity = 1500;
         }
         return lastAutoVelocity;
     }
@@ -369,7 +373,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public void periodic() {
         autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
-        if (launcherPID.getTarget() != 0) {
+
+        if (launcherPID.getTarget() == (Math.PI)) {
+            setMotorPower(IdlePower);
+            launcherPID.update(getMotorSpeed());
+            launcherPID.reset();
+        } else if (launcherPID.getTarget() != 0) {
             setMotorPower(launcherPID.update(getMotorSpeed()));
         } else {
             setMotorPower(0);

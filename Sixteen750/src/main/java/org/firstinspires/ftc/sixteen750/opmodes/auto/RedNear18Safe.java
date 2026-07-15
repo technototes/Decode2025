@@ -16,30 +16,34 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
-import org.firstinspires.ftc.sixteen750.commands.AutoCommands;
+import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
 import org.firstinspires.ftc.sixteen750.commands.auto.RPaths;
+import org.firstinspires.ftc.sixteen750.commands.auto.WaitForArtifacts;
+import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "RedNear18Safe", preselectTeleOp = "Dual Control")
+@Autonomous(name = "RedNear18Safe", preselectTeleOp = "RedTele")
 @SuppressWarnings("unused")
 public class RedNear18Safe extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
     public Hardware hardware;
+    public PedroDriver pedroDriver;
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
 
-    private static Command RedGateCycle(Robot r) {
+    static Command RedGateCycle(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
             new PedroPathCommand(r.follower, RPaths.SRLaunchToRGateInt1),
-            new WaitCommand(1.1),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
             new PedroPathCommand(r.follower, RPaths.SRGateInt1ToRLaunch),
             AutoCommands.AutoLaunching3Balls(r)
         );
@@ -49,7 +53,7 @@ public class RedNear18Safe extends CommandOpMode {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
             new PedroPathCommand(r.follower, RPaths.SRLaunchToRGateInt2),
-            new WaitCommand(1.1),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
             new PedroPathCommand(r.follower, RPaths.SRGateInt2ToRLaunch),
             AutoCommands.AutoLaunching3Balls(r)
         );
@@ -69,9 +73,9 @@ public class RedNear18Safe extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new AltAutoVelocity(robot).alongWith(
                 new SequentialCommandGroup(
+                    t.Launch(robot),
                     //TeleCommands.AutoLaunch1(robot),
                     t.GateUp(robot),
-                    t.Intake(robot),
                     t.HoodUp(robot),
                     new PedroPathCommand(robot.follower, p.SRStartToRLaunch),
                     a.AutoLaunching3Balls(robot),
@@ -85,8 +89,9 @@ public class RedNear18Safe extends CommandOpMode {
                         t.Intake(robot)
                     ),
                     new PedroPathCommand(robot.follower, p.SRInt2ToRLaunch),
+                    a.AutoLaunching3Balls(robot),
                     RedGateCycle2(robot).alongWith(t.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.SRLaunchToRInt3, p.power085).alongWith(
+                    new PedroPathCommand(robot.follower, p.SRLaunchToRInt3, p.power092).alongWith(
                         t.Intake(robot)
                     ),
                     new PedroPathCommand(robot.follower, p.SRInt3ToRLaunch),

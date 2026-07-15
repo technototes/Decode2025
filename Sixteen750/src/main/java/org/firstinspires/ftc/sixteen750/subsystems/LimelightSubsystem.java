@@ -56,10 +56,11 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     public boolean startup_done;
 
     public static double SIGN = 1.0;
-    public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 17.2;
+    public static double DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY = 19.15;
     public static double CAMERA_TO_CENTER_OF_ROBOT = 7.2;
     public static double EXTRA_OFFSET = -3;
-    public static double LIMELIGHT_ANGLE = 11;
+    public static double LL_DISTANCE_OFFSET = 2.62; // distance offset forwards and backwards from the center of the ll lense the center of robot
+    public static double LIMELIGHT_ANGLE = 26.51;
     public static Limelight3A limelight;
     LLResult result;
 
@@ -89,8 +90,8 @@ public class LimelightSubsystem implements Loggable, Subsystem {
             //&& result.isValid()
             // Not sure this is the right angle, because the camera is mounted sideways
             // IIRC, you should be using getTy() instead.
-            Xangle = recentItem.getTargetYDegrees() + 3.5;
-            Yangle = -recentItem.getTargetXDegrees() + LIMELIGHT_ANGLE;
+            Xangle = recentItem.getTargetXDegrees();
+            Yangle = recentItem.getTargetYDegrees() + LIMELIGHT_ANGLE;
             Area = recentItem.getTargetArea();
             return true;
             //            getLatestResult returns the x-angle, the y-angle,
@@ -155,8 +156,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
             distance =
                 (DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY /
                     Math.tan(Math.toRadians(Yangle))) +
-                CAMERA_TO_CENTER_OF_ROBOT +
-                EXTRA_OFFSET;
+                LL_DISTANCE_OFFSET;
             return distance;
         }
         return -1;

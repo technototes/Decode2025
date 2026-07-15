@@ -68,6 +68,10 @@ public class TeleCommands {
         return Command.create(r.intakeSubsystem::Intake);
     }
 
+    public static Command Feed(Robot r) {
+        return Command.create(r.intakeSubsystem::Feed);
+    }
+
     public static Command IntakeStop(Robot r) {
         return Command.create(r.intakeSubsystem::StopIntake);
     }
