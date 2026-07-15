@@ -16,6 +16,7 @@ public class Setup {
         public static boolean EXTERNAL_IMU = true;
         public static boolean OTOS = false;
         public static boolean INTAKESUBSYSTEM = true;
+        public static boolean SMARTINTAKE = true;
         public static boolean LAUNCHERSUBSYSTEM = true;
         public static boolean AIMINGSUBSYSTEM = true;
         public static boolean BRAKESUBSYSTEM = true;
@@ -64,6 +65,7 @@ public class Setup {
         public static double TURBO_TURN = 0.8;
         public static double SNAIL_SPEED = 0.64;
         public static double SNAIL_TURN = 0.18;
+        public static double ALLIANCE_OFFSET = 3.5;
         public static double STRAIGHTEN_DEAD_ZONE = 0.08;
         public static double STICK_DEAD_ZONE = 0.05;
         public static double ANGULAR_VELOCITY_MAX = 0.6;

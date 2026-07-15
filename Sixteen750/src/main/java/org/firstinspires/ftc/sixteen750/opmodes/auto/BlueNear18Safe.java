@@ -16,22 +16,25 @@ import org.firstinspires.ftc.sixteen750.Hardware;
 import org.firstinspires.ftc.sixteen750.Robot;
 import org.firstinspires.ftc.sixteen750.Setup;
 import org.firstinspires.ftc.sixteen750.commands.AltAutoVelocity;
-import org.firstinspires.ftc.sixteen750.commands.AutoCommands;
+import org.firstinspires.ftc.sixteen750.commands.PedroDriver;
 import org.firstinspires.ftc.sixteen750.commands.PedroPathCommand;
 import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.BPaths;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
+import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "BlueNear18Safe", preselectTeleOp = "Dual Control")
+@Autonomous(name = "BlueNear18Safe", preselectTeleOp = "BlueTele")
 @SuppressWarnings("unused")
 public class BlueNear18Safe extends CommandOpMode {
 
     public Robot robot;
     public DriverController controls;
     public Hardware hardware;
+    public PedroDriver pedroDriver;
     private PanelsTelemetry panelsTelemetry;
     private Limelight3A limelight;
 
@@ -72,9 +75,8 @@ public class BlueNear18Safe extends CommandOpMode {
                     t.Launch(robot),
                     //TeleCommands.AutoLaunch1(robot),
                     t.GateUp(robot),
-                    t.Intake(robot),
                     t.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.SBStartToBLaunch),
+                    new PedroPathCommand(robot.follower, p.SBStartToBLaunch, p.power085),
                     a.AutoLaunching3Balls(robot),
                     new PedroPathCommand(robot.follower, p.SBLaunchToBInt1, p.power092).alongWith(
                         t.Intake(robot)
@@ -86,6 +88,7 @@ public class BlueNear18Safe extends CommandOpMode {
                         t.Intake(robot)
                     ),
                     new PedroPathCommand(robot.follower, p.SBInt2ToBLaunch),
+                    a.AutoLaunching3Balls(robot),
                     BlueGateCycle2(robot).alongWith(t.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.SBLaunchToBInt3, p.power085).alongWith(
                         t.Intake(robot)

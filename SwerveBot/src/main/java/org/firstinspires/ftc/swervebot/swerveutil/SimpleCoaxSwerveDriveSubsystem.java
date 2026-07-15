@@ -14,22 +14,21 @@ import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
 import com.technototes.library.util.MathUtils;
 import com.technototes.library.util.PIDFController;
-
+import java.util.Arrays;
+import java.util.OptionalDouble;
 import org.firstinspires.ftc.swervebot.Hardware;
 import org.firstinspires.ftc.swervebot.Setup;
 
-import java.util.Arrays;
-import java.util.OptionalDouble;
-
 @Configurable
 public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
+
     //fr,fl,rl,rr
     DcMotorEx[] drive = new DcMotorEx[4];
     //fr,fl,rl,rr
     CRServo[] swervo = new CRServo[4];
     //fr,fl,rl,rr
     AbsoluteAnalogEncoder[] swervoencs = new AbsoluteAnalogEncoder[4];
-    public static PIDFCoefficients swervoPID = new PIDFCoefficients(0.2,0,0,0);
+    public static PIDFCoefficients swervoPID = new PIDFCoefficients(0.2, 0, 0, 0);
     PIDFController[] swervoPIDF = new PIDFController[4];
 
     boolean hasHardware;
@@ -40,29 +39,36 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     double trackWidth = 8;
     double driveLength = 8.2;
     double R = Math.sqrt((trackWidth * trackWidth) + (driveLength * driveLength));
+
     @Log.Number(name = "X: ")
     public static double forwardInput = 0;
+
     @Log.Number(name = "Y: ")
     public static double strafeInput = 0;
+
     @Log.Number(name = "R: ")
     public static double rotationInput = 0;
+
     @Log.Number(name = "A: ")
     public static double A = 0;
+
     @Log.Number(name = "B: ")
     public static double B = 0;
+
     @Log.Number(name = "C: ")
     public static double C = 0;
+
     @Log.Number(name = "D: ")
     public static double D = 0;
+
     double[] unfilteredWheelPowers = new double[4];
 
-    OptionalDouble maxPower = OptionalDouble.of(0.0);
+    OptionalDouble maxPower = OptionalDouble.of(1.0);
     double[] wheelPowers = new double[4];
     double[] wheelAngles = new double[4];
     double[] angleDifferences = new double[4];
     IGyro imu;
     double robotHeading;
-
 
     public SimpleCoaxSwerveDriveSubsystem(Hardware hw) {
         hasHardware = Setup.Connected.SWERVESUBSYSTEM;
@@ -102,9 +108,12 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
     public void periodic() {
         if (hasHardware) {
             for (int i = 0; i < 4; i++) {
-                if (0 <= Math.abs(swervoPIDF[i].getLastError()) && Math.abs(swervoPIDF[i].getLastError()) < Math.toRadians(1)) {
+                if (
+                    0 <= Math.abs(swervoPIDF[i].getLastError()) &&
+                    Math.abs(swervoPIDF[i].getLastError()) < Math.toRadians(1)
+                ) {
                     //commenting out is helpful for just tuning swervo pid
-//                drive[i].setPower(wheelPowers[i]);
+                    //                drive[i].setPower(wheelPowers[i]);
                 }
             }
         }
@@ -115,35 +124,42 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
             crServo.setPower(power);
         }
     }
+
     public void setSwervosPow() {
         if (hasHardware) {
             swervo[0].setPower(1);
             swervo[1].setPower(1);
             swervo[2].setPower(1);
             swervo[3].setPower(1);
-
         }
     }
+
     public Command setSwervosCmd() {
         if (hasHardware) {
-            return () -> new ParallelCommandGroup(() -> swervo[0].setPower(1),
-                () -> swervo[1].setPower(1),
-                () -> swervo[2].setPower(1),
-                () -> swervo[3].setPower(1));
-
+            return () ->
+                new ParallelCommandGroup(
+                    () -> swervo[0].setPower(1),
+                    () -> swervo[1].setPower(1),
+                    () -> swervo[2].setPower(1),
+                    () -> swervo[3].setPower(1)
+                );
         }
         return null;
     }
+
     public Command stopSwervosCmd() {
         if (hasHardware) {
-            return () -> new ParallelCommandGroup(() -> swervo[0].setPower(0),
-                () -> swervo[1].setPower(0),
-                () -> swervo[2].setPower(0),
-                () -> swervo[3].setPower(0));
-
+            return () ->
+                new ParallelCommandGroup(
+                    () -> swervo[0].setPower(0),
+                    () -> swervo[1].setPower(0),
+                    () -> swervo[2].setPower(0),
+                    () -> swervo[3].setPower(0)
+                );
         }
         return null;
     }
+
     private void zeroEncoders() {
         if (hasHardware) {
             for (int i = 0; i < 4; i++) {
@@ -151,6 +167,7 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
             }
         }
     }
+
     public void setSwervosPowZero() {
         if (hasHardware) {
             for (int i = 0; i < 4; i++) {
@@ -158,6 +175,7 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
             }
         }
     }
+
     private void setSwervoPos(PIDFController swervoPIDF, double pos) {
         if (hasHardware) {
             swervoPIDF.setTarget(pos);
@@ -191,13 +209,23 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
                     wheelPowers[i] = unfilteredWheelPowers[i] / maxPower.getAsDouble();
                 }
             }
-            wheelAngles[0] = C == 0 && B == 0 ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(C, B));
-            wheelAngles[1] = D == 0 && B == 0 ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(D, B));
-            wheelAngles[2] = D == 0 && A == 0 ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(D, A));
-            wheelAngles[3] = C == 0 && A == 0 ? 0 : MathUtils.normalizeDeltaRadians(Math.atan2(C, A));
+            wheelAngles[0] = C == 0 && B == 0
+                ? 0
+                : MathUtils.normalizeDeltaRadians(Math.atan2(C, B));
+            wheelAngles[1] = D == 0 && B == 0
+                ? 0
+                : MathUtils.normalizeDeltaRadians(Math.atan2(D, B));
+            wheelAngles[2] = D == 0 && A == 0
+                ? 0
+                : MathUtils.normalizeDeltaRadians(Math.atan2(D, A));
+            wheelAngles[3] = C == 0 && A == 0
+                ? 0
+                : MathUtils.normalizeDeltaRadians(Math.atan2(C, A));
             for (int i = 0; i < 4; i++) {
                 swervopos[i] = swervoencs[i].getCurrentPosition();
-                angleDifferences[i] = MathUtils.normalizeDeltaRadians(wheelAngles[i] - swervopos[i]);
+                angleDifferences[i] = MathUtils.normalizeDeltaRadians(
+                    wheelAngles[i] - swervopos[i]
+                );
                 if (Math.abs(angleDifferences[i]) > Math.PI / 2) {
                     wheelAngles[i] += Math.PI;
                     wheelPowers[i] *= -1;
@@ -212,20 +240,19 @@ public class SimpleCoaxSwerveDriveSubsystem implements Loggable, Subsystem {
             }
         }
     }
+
     private double DeadZoneScale(double d) {
         // Okay, we want a small dead zone in the middle of the stick, but that also means that
         // you can't have a value any smaller than that value, so instead, we're going to scale
         // the value after compensating for the dead zone
-            // If the value is inside the dead zone, just make it zero
-            if (Math.abs(d) <= Setup.OtherSettings.STICK_DEAD_ZONE) {
-                return 0.0;
-            }
-            // If the value is outside the dead zone, scale it
-            return (
-                    (d - Math.copySign(Setup.OtherSettings.STICK_DEAD_ZONE, d)) /
-                            (1.0 - Setup.OtherSettings.STICK_DEAD_ZONE)
-            );
-
+        // If the value is inside the dead zone, just make it zero
+        if (Math.abs(d) <= Setup.OtherSettings.STICK_DEAD_ZONE) {
+            return 0.0;
+        }
+        // If the value is outside the dead zone, scale it
+        return (
+            (d - Math.copySign(Setup.OtherSettings.STICK_DEAD_ZONE, d)) /
+            (1.0 - Setup.OtherSettings.STICK_DEAD_ZONE)
+        );
     }
-
 }

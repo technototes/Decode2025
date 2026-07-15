@@ -20,7 +20,7 @@ public class WaitForArtifacts implements Command {
     // Run this command until we've successfully acquired 3 artifacts...
     @Override
     public boolean isFinished() {
-        return IntakeSubsystem.artifacts == 3;
+        return intake.intakeFull;
     }
 
     // I think if the command gets cancelled (it's timed out by an parallel wait command)
@@ -30,13 +30,5 @@ public class WaitForArtifacts implements Command {
         if (!cancel) {
             intake.Hold();
         }
-    }
-
-    // This should give you a command that will wait *at most* 'timeout' seconds, or stop early
-    // if it already has 3 artifacts.
-    // EXAMPLE CODE:
-    // button.whenPressed(WaitForArtifacts.Until(i, 3));
-    public static Command Until(IntakeSubsystem i, double timeout) {
-        return new WaitCommand(timeout).raceWith(new WaitForArtifacts(i));
     }
 }

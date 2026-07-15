@@ -17,30 +17,48 @@ import org.firstinspires.ftc.sixteen750.Setup;
 public class IntakeSubsystem implements Loggable, Subsystem {
 
     Gamepad gamepad;
-    public static double one_threshold = 1.65;
-    public static double two_threshold = 3;
-    public static double theree_threshold = 10;
-    public static double MOTOR_VELOCITY = 1; // 0.5 1.0
-    public static double SLOW_MOTOR_VELOCITY = 0.67; // 0.5 1.0
+
+    @Log.Number(name = "intakePow")
+    public static double SMART_INTAKE_VELOCITY = 1;
+
+    @Log.Number(name = "transferPow")
+    public static double SMART_TRANSFER_VELOCITY = 1;
+
+    public static double TRANSFER_ONE_THRESHOLD = 2.5;
+    public static double TRANSFER_TWO_THRESHOLD = 3.2;
+    public static double INTAKE_THRESHOLD = 3;
+    public static double ONE_THRESHOLD = 1.65;
+    public static double TWO_THRESHOLD = 3;
+    public static double THREE_THRESHOLD = 10;
+    public static double INTAKE_VELOCITY = 1;
+    public static double SLOW_MOTOR_VELOCITY = 0.55; // 0.5 1.0
     public static int duration = 80;
     public static double GATE_INTAKE_HEADING_BLUE = 155;
     public static double GATE_INTAKE_HEADING_RED = 25;
+
     boolean hasHardware;
     int currentIndex = 0;
-    double[] pastValuesArray;
+    double[] pastIntakeValuesArray;
+    double[] pastTransferValuesArray;
     public static double SIGN = 1;
 
     @Log.Number(name = "artifacts")
     public static double artifacts = 0;
 
-    @Log.Number(name = "intakeCurrent")
-    public static double intakecurrent = 0;
+    @Log.Number(name = "transferFull")
+    public boolean transferFull = false;
 
-    @Log.Number(name = "intakespike")
+    public static boolean robotFull = false;
+
+    @Log.Number(name = "intakeFull")
+    public boolean intakeFull = false;
+
+    public static double intakecurrent = 0;
+    public static double transfercurrent = 0;
     public static double intakespike = 0; //the current it goes to when a ball is intake - will test and see
 
     DcMotorEx intake;
-    DcMotorEx intake2;
+    DcMotorEx transfer;
     CRServo gobbleServo;
     CRServo gulpServo;
 
@@ -50,28 +68,37 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         // Do stuff in here
         if (hasHardware) {
             intake = h.intake;
-            intake2 = h.intake2;
+            transfer = h.intake2;
             gobbleServo = h.gobbleServo;
             gulpServo = h.gulpServo;
-            intakecurrent = getCurrent();
+            intakecurrent = getIntakeCurrent();
+            transfercurrent = getTransferCurrent();
             CommandScheduler.register(this);
             gamepad = null;
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake2.setDirection(DcMotorSimple.Direction.REVERSE);
+            transfer.setDirection(DcMotorSimple.Direction.REVERSE);
         } else {
             intake = null;
         }
         // Create the array to hold past current values
-        pastValuesArray = new double[10];
+        pastIntakeValuesArray = new double[4];
+        pastTransferValuesArray = new double[8];
     }
 
     public void Intake() {
         // Spin the motors
         if (hasHardware) {
-            intake.setPower(MOTOR_VELOCITY);
-            intake2.setPower(MOTOR_VELOCITY);
+            intake.setPower(INTAKE_VELOCITY);
+            transfer.setPower(SLOW_MOTOR_VELOCITY);
             gobbleServo.setPower(1);
             gulpServo.setPower(-1);
+        }
+    }
+
+    public void Feed() {
+        if (hasHardware) {
+            intake.setPower(INTAKE_VELOCITY);
+            transfer.setPower(INTAKE_VELOCITY);
         }
     }
 
@@ -83,8 +110,8 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         // Spin the motors
         if (hasHardware) {
             //intake.setDirection(DcMotorSimple.Direction.FORWARD);
-            intake.setPower(-MOTOR_VELOCITY);
-            intake2.setPower(-MOTOR_VELOCITY);
+            intake.setPower(-INTAKE_VELOCITY);
+            transfer.setPower(-INTAKE_VELOCITY);
         }
     }
 
@@ -92,15 +119,15 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         if (hasHardware) {
             intake.setDirection(DcMotorSimple.Direction.REVERSE);
             intake.setPower(SLOW_MOTOR_VELOCITY);
-            intake2.setDirection(DcMotorSimple.Direction.REVERSE);
-            intake2.setPower(SLOW_MOTOR_VELOCITY); // needed to make hold a little bit faster to keep spinning at atleast a slow speed
+            transfer.setDirection(DcMotorSimple.Direction.REVERSE);
+            transfer.setPower(SLOW_MOTOR_VELOCITY); // needed to make hold a little bit faster to keep spinning at atleast a slow speed
         }
     }
 
     public void StopIntake() {
         if (hasHardware) {
             intake.setPower(0);
-            intake2.setPower(0);
+            transfer.setPower(0);
             gobbleServo.setPower(0);
             gulpServo.setPower(0);
         }
@@ -128,16 +155,20 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         duration = 0;
     }
 
-    public double getCurrent() {
+    public double getIntakeCurrent() {
         return intake.getCurrent(CurrentUnit.AMPS);
     }
 
-    public void detectBall(double averageCurrent) {
-        if (averageCurrent < one_threshold) {
+    public double getTransferCurrent() {
+        return transfer.getCurrent(CurrentUnit.AMPS);
+    }
+
+    /* public void detectBall(double averageCurrent) {
+        if (averageCurrent < ONE_THRESHOLD) {
             artifacts = 0;
-        } else if (averageCurrent < two_threshold) {
+        } else if (averageCurrent < TWO_THRESHOLD) {
             artifacts = 1;
-        } else if (averageCurrent < theree_threshold) {
+        } else if (averageCurrent < THREE_THRESHOLD) {
             artifacts = 2;
         } else {
             artifacts = 3;
@@ -145,22 +176,85 @@ public class IntakeSubsystem implements Loggable, Subsystem {
                 gamepad.rumble(duration);
             }
         }
+    }*/
+
+    public void SmartIntake(double averageIntakeCurrent, double averageTransferCurrent) {
+        if (Setup.Connected.SMARTINTAKE) {
+            if (averageTransferCurrent < TRANSFER_ONE_THRESHOLD) {
+                artifacts = 0;
+                transferFull = false;
+                if (averageIntakeCurrent < INTAKE_THRESHOLD) {
+                    intakeFull = false;
+                }
+            } else if (averageTransferCurrent < TRANSFER_TWO_THRESHOLD) {
+                transferFull = false;
+                artifacts = 1;
+                if (averageIntakeCurrent < INTAKE_THRESHOLD) {
+                    intakeFull = false;
+                }
+            } else if (averageTransferCurrent >= TRANSFER_TWO_THRESHOLD) {
+                transferFull = true;
+                artifacts = 2;
+                if (averageIntakeCurrent < INTAKE_THRESHOLD) {
+                    intakeFull = false;
+                } else if (averageIntakeCurrent >= INTAKE_THRESHOLD) {
+                    intakeFull = true;
+                    artifacts = 3;
+                } else robotFull = intakeFull;
+            }
+        }
     }
 
-    public double getAverageCurrent() {
+    public void SmartVelocity() {
+        if (AimingSubsystem.GateDown) {
+            SMART_INTAKE_VELOCITY = 1;
+            SMART_TRANSFER_VELOCITY = 1;
+        } else if (intakeFull) {
+            SMART_INTAKE_VELOCITY = 0;
+            SMART_TRANSFER_VELOCITY = 0;
+        } else if (transferFull) {
+            SMART_INTAKE_VELOCITY = 1;
+            SMART_TRANSFER_VELOCITY = 0;
+        } else {
+            SMART_INTAKE_VELOCITY = 1;
+            SMART_TRANSFER_VELOCITY = 1;
+        }
+    }
+
+    public void SmartTransferVelocity() {
+        if (AimingSubsystem.GateDown) {
+            SMART_TRANSFER_VELOCITY = 1;
+        } else {
+            SMART_TRANSFER_VELOCITY = 0.38;
+        }
+    }
+
+    public double getAverageIntakeCurrent() {
         // Calculate the average of the values in the array
         double valuesTotal = 0;
-        for (int i = 0; i < pastValuesArray.length; i++) {
-            valuesTotal += pastValuesArray[i];
+        for (int i = 0; i < pastIntakeValuesArray.length; i++) {
+            valuesTotal += pastIntakeValuesArray[i];
         }
-        return valuesTotal / 10;
+        return valuesTotal / 4;
+    }
+
+    public double getAverageTransferCurrent() {
+        // Calculate the average of the values in the array
+        double valuesTotal = 0;
+        for (int i = 0; i < pastTransferValuesArray.length; i++) {
+            valuesTotal += pastTransferValuesArray[i];
+        }
+        return valuesTotal / 8;
     }
 
     @Override
     public void periodic() {
         // Add an item to the array and update the index for the next update to the 'circular' array
-        pastValuesArray[currentIndex] = getCurrent();
-        currentIndex = (currentIndex + 1) % pastValuesArray.length;
-        detectBall(getAverageCurrent());
+        pastIntakeValuesArray[currentIndex] = getIntakeCurrent();
+        pastTransferValuesArray[currentIndex] = getTransferCurrent();
+        currentIndex = (currentIndex + 1) % pastIntakeValuesArray.length;
+        // detectBall(getAverageIntakeCurrent());
+        SmartIntake(getAverageIntakeCurrent(), getAverageTransferCurrent());
+        SmartTransferVelocity();
     }
 }

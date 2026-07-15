@@ -16,7 +16,7 @@ import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "BlueNearLever1️⃣NoThird", preselectTeleOp = "Dual Control")
+@Autonomous(name = "zBlueNearLever1️⃣NoThird", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 public class BlueNearLeverNoThird extends CommandOpMode {
 

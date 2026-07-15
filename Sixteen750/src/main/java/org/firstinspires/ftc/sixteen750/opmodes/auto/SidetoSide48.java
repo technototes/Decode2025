@@ -14,7 +14,7 @@ import org.firstinspires.ftc.sixteen750.commands.auto.LinePaths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "SidetoSide48", preselectTeleOp = "Dual Control")
+@Autonomous(name = "zSidetoSide48", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 @Disabled
 public class SidetoSide48 extends CommandOpMode {

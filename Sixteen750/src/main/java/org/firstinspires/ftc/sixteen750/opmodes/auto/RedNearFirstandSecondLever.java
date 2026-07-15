@@ -22,7 +22,7 @@ import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 
-@Autonomous(name = "RedNearLever1️⃣2️⃣", preselectTeleOp = "Dual Control")
+@Autonomous(name = "zRedNearLever1️⃣2️⃣", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 public class RedNearFirstandSecondLever extends CommandOpMode {
 

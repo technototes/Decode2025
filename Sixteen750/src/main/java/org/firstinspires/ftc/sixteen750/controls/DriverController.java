@@ -77,7 +77,7 @@ public class DriverController implements Loggable {
         }
     }
 
-    private void AssignNamedControllerButton() {
+    public void AssignNamedControllerButton() {
         resetGyroButton = gamepad.ps_options;
         driveLeftStick = gamepad.leftStick;
         driveRightStick = gamepad.rightStick;
@@ -151,7 +151,7 @@ public class DriverController implements Loggable {
 
     public void bindLaunchControls() {
         launchButton.whilePressed(TeleCommands.Launch(robot));
-        launchButton.whileReleased(TeleCommands.StopLaunch(robot));
+        launchButton.whileReleased(TeleCommands.IdleLaunch(robot));
         //        CloseShoot.whenPressed(TeleCommands.SetCloseShoot(robot));
         //        FarShoot.whenPressed(TeleCommands.SetFarShoot(robot));
         MotorIncrease.whenPressed(robot.launcherSubsystem::IncreaseMotorVelocity);
@@ -162,7 +162,7 @@ public class DriverController implements Loggable {
     public void bindIntakeControls() {
         spitButton.whenPressed(TeleCommands.Spit(robot));
         spitButton.whenReleased(TeleCommands.IntakeStop(robot));
-        intakeTrigger.whenPressed(TeleCommands.Intake(robot));
+        intakeTrigger.whilePressed(TeleCommands.Intake(robot));
         intakeTrigger.whenPressed(TeleCommands.GobbleGulp(robot));
         intakeTrigger.whenReleased(TeleCommands.IThinkIAteTooMuch(robot));
         intakeTrigger.whenReleased(TeleCommands.IntakeStop(robot));
@@ -188,6 +188,8 @@ public class DriverController implements Loggable {
         //     yippee = true;
         // }
         gateButton.whenPressed(TeleCommands.GateDown(robot));
+        gateButton.whenPressed(TeleCommands.Feed(robot));
+        gateButton.whenReleased(TeleCommands.IntakeStop(robot));
         gateButton.whenReleased(TeleCommands.GateUp(robot));
 
         //

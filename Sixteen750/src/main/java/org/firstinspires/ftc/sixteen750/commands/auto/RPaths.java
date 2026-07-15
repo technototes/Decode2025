@@ -4,6 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
 import com.technototes.library.command.Command;
 import com.technototes.library.command.SequentialCommandGroup;
@@ -51,7 +52,7 @@ public class RPaths {
     public PathChain RFLaunchToRFInt2;
     public PathChain RFLaunchToRFInt3;
     public PathChain RFLaunchToRFEnd;
-    public static double power085 = 0.72;
+    public static double power085 = 0.85;
     public static double power092 = 0.92;
 
     public RPaths(Follower follower) {
@@ -66,7 +67,16 @@ public class RPaths {
         PRLaunchToRInt1 = follower
             .pathBuilder()
             .addPath(new BezierCurve(p.RLaunch, p.RInt1CtrlPoint1, p.RInt1CtrlPoint2, p.RInt1))
-            .setConstantHeadingInterpolation(p.RInt1Head)
+            .setHeadingInterpolation(
+                HeadingInterpolator.piecewise(
+                    new HeadingInterpolator.PiecewiseNode(0, .5, HeadingInterpolator.tangent),
+                    new HeadingInterpolator.PiecewiseNode(
+                        .5,
+                        1,
+                        HeadingInterpolator.constant(p.RInt1Head)
+                    )
+                )
+            )
             .build();
         PRInt1ToRLaunch = follower
             .pathBuilder()
@@ -105,13 +115,13 @@ public class RPaths {
             .build();
         PRLaunchToRInt2 = follower
             .pathBuilder()
-            .addPath(new BezierLine(p.RLaunch, p.RInt2))
-            .setConstantHeadingInterpolation((p.RInt2Head))
+            .addPath(new BezierCurve(p.RLaunch, p.RInt2CtrlPoint, p.RInt2))
+            .setConstantHeadingInterpolation(p.RInt2Head)
             .build();
         PRInt2ToRLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(p.RInt2, p.RLaunch))
-            .setLinearHeadingInterpolation((p.RInt2Head), (p.RLaunchHead))
+            .setConstantHeadingInterpolation(p.RLaunchHead)
             .build();
         PRLaunchToREnd = follower
             .pathBuilder()
@@ -149,7 +159,7 @@ public class RPaths {
         SRLaunchToRInt2 = follower
             .pathBuilder()
             .addPath(new BezierCurve(p1.RLaunch, p1.RInt2CtrlPoint1, p1.RInt2CtrlPoint2, p1.RInt2))
-            .setTangentHeadingInterpolation()
+            .setConstantHeadingInterpolation(p1.RInt2Head)
             .build();
         SRInt2ToRLaunch = follower
             .pathBuilder()
@@ -168,13 +178,13 @@ public class RPaths {
             .build();
         SRLaunchToRInt3 = follower
             .pathBuilder()
-            .addPath(new BezierLine(p1.RLaunch, p1.RInt3))
-            .setConstantHeadingInterpolation((p1.RInt3Head))
+            .addPath(new BezierCurve(p1.RLaunch, p1.RInt3CtrlPoint, p1.RInt3))
+            .setConstantHeadingInterpolation(p1.RInt3Head)
             .build();
         SRInt3ToRLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(p1.RInt3, p1.RLaunch))
-            .setLinearHeadingInterpolation((p1.RInt3Head), (p1.RLaunchHead))
+            .setConstantHeadingInterpolation(p1.RLaunchHead)
             .build();
         SRLaunchToREnd = follower
             .pathBuilder()

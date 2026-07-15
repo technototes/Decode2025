@@ -16,7 +16,7 @@ import org.firstinspires.ftc.sixteen750.commands.auto.LinePaths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "ForwardBackward48", preselectTeleOp = "Dual Control")
+@Autonomous(name = "zForwardBackward48", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 @Disabled
 public class ForwardBackward48 extends CommandOpMode {

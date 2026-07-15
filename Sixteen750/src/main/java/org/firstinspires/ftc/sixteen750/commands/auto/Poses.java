@@ -10,6 +10,7 @@ public class Poses {
 
     public static Follower follower;
 
+    @Configurable
     public static class StartPoses {
 
         public static Pose RStart = new Pose(114, 135);
@@ -36,6 +37,7 @@ public class Poses {
         public static Pose BFStart = new Pose(55.5, 9);
     }
 
+    @Configurable
     public static class RNear18PartnerPoses {
 
         public static Pose RLaunch = new Pose(88, 82);
@@ -50,35 +52,39 @@ public class Poses {
         public static Pose RGateInt3 = new Pose(134.4, 67.2);
         public static double RGateIntHead = Math.toRadians(18);
         public static Pose RGateCycleCtrlPoint = new Pose(96, 64);
-        public static Pose RInt2 = new Pose(125.7, 93.9);
+        public static Pose RInt2 = new Pose(125.7, 90);
+        public static Pose RInt2CtrlPoint = new Pose(90, 90);
         public static double RInt2Head = Math.toRadians(0);
         public static Pose REnd = new Pose(120, 90);
         public static double REndHead = Math.toRadians(0);
     }
 
+    @Configurable
     public static class RNear18SafePoses {
 
         public static Pose RLaunch = new Pose(88, 82);
         public static double RLaunchHead = Math.toRadians(49);
         public static Pose RInt1 = new Pose(135, 64.8);
-        public static double RInt1Head = Math.toRadians(348);
+        public static double RInt1Head = Math.toRadians(354);
         public static Pose RInt1CtrlPoint1 = new Pose(82.5, 64);
         public static Pose RInt1CtrlPoint2 = new Pose(102, 66);
         public static Pose RInt1ToLaunchCtrlPoint = new Pose(96, 42);
-        public static Pose RGateInt = new Pose(134.4, 65.1);
+        public static Pose RGateInt = new Pose(134.4, 65);
         public static Pose RInt2 = new Pose(135, 42);
         public static double RInt2Head = Math.toRadians(0);
         public static Pose RInt2CtrlPoint1 = new Pose(92, 42);
         public static Pose RInt2CtrlPoint2 = new Pose(96, 42);
-        public static Pose RGateInt2 = new Pose(134.4, 66.9);
+        public static Pose RGateInt2 = new Pose(134.4, 66.5);
         public static double RGateIntHead = Math.toRadians(18);
         public static Pose RGateCycleCtrlPoint = new Pose(96, 64);
-        public static Pose RInt3 = new Pose(125.7, 93.9);
+        public static Pose RInt3 = new Pose(125.7, 90);
+        public static Pose RInt3CtrlPoint = new Pose(90, 90);
         public static double RInt3Head = Math.toRadians(0);
         public static Pose REnd = new Pose(120, 90);
         public static double REndHead = Math.toRadians(0);
     }
 
+    @Configurable
     public static class RFar15PartnerPoses {
 
         public static Pose RFLaunch = new Pose(82, 16);
@@ -98,6 +104,7 @@ public class Poses {
         public static double RFEndHead = Math.toRadians(0);
     }
 
+    @Configurable
     public static class BNear18PartnerPoses {
 
         public static Pose BLaunch = new Pose(56, 82);
@@ -112,35 +119,39 @@ public class Poses {
         public static Pose BGateInt3 = new Pose(9.6, 67.2);
         public static double BGateIntHead = Math.toRadians(162);
         public static Pose BGateCycleCtrlPoint = new Pose(48, 64);
-        public static Pose BInt2 = new Pose(18.3, 93.9);
+        public static Pose BInt2 = new Pose(18.3, 90);
+        public static Pose BInt2CtrlPoint = new Pose(54, 90);
         public static double BInt2Head = Math.toRadians(180);
         public static Pose BEnd = new Pose(24, 90);
         public static double BEndHead = Math.toRadians(180);
     }
 
+    @Configurable
     public static class BNear18SafePoses {
 
         public static Pose BLaunch = new Pose(56, 82);
         public static double BLaunchHead = Math.toRadians(131);
-        public static Pose BInt1 = new Pose(9, 64.8);
-        public static double BInt1Head = Math.toRadians(192);
+        public static Pose BInt1 = new Pose(9, 65.2);
+        public static double BInt1Head = Math.toRadians(186);
         public static Pose BInt1CtrlPoint1 = new Pose(61.5, 56);
         public static Pose BInt1CtrlPoint2 = new Pose(42, 58);
         public static Pose BInt1ToLaunchCtrlPoint = new Pose(48, 42);
-        public static Pose BGateInt1 = new Pose(9.6, 65.1);
+        public static Pose BGateInt1 = new Pose(9.6, 65);
         public static Pose BInt2 = new Pose(9, 42);
         public static double BInt2Head = Math.toRadians(180);
         public static Pose BInt2CtrlPoint1 = new Pose(52, 42);
         public static Pose BInt2CtrlPoint2 = new Pose(48, 42);
-        public static Pose BGateInt2 = new Pose(9.6, 66.9);
+        public static Pose BGateInt2 = new Pose(9.6, 66.5);
         public static double BGateIntHead = Math.toRadians(162);
         public static Pose BGateCycleCtrlPoint = new Pose(48, 64);
-        public static Pose BInt3 = new Pose(18.3, 93.9);
+        public static Pose BInt3 = new Pose(18.3, 90);
+        public static Pose BInt3CtrlPoint = new Pose(54, 90);
         public static double BInt3Head = Math.toRadians(180);
         public static Pose BEnd = new Pose(24, 90);
         public static double BEndHead = Math.toRadians(180);
     }
 
+    @Configurable
     public static class BFar15PartnerPoses {
 
         public static Pose BFLaunch = new Pose(62, 16);

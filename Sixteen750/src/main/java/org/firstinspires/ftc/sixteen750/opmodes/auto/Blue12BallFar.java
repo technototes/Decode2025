@@ -16,7 +16,7 @@ import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 
-@Autonomous(name = "Blue12BallFar", preselectTeleOp = "Dual Control")
+@Autonomous(name = "zBlue12BallFar", preselectTeleOp = "Dual Control")
 @SuppressWarnings("unused")
 public class Blue12BallFar extends CommandOpMode {
 

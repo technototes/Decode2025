@@ -106,13 +106,13 @@ public class BPaths {
             .build();
         PBLaunchToBInt2 = follower
             .pathBuilder()
-            .addPath(new BezierLine(p.BLaunch, p.BInt2))
+            .addPath(new BezierCurve(p.BLaunch, p.BInt2CtrlPoint, p.BInt2))
             .setConstantHeadingInterpolation(p.BInt2Head)
             .build();
         PBInt2ToBLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(p.BInt2, p.BLaunch))
-            .setLinearHeadingInterpolation(p.BInt2Head, p.BLaunchHead)
+            .setConstantHeadingInterpolation(p.BLaunchHead)
             .build();
         PBLaunchToBEnd = follower
             .pathBuilder()
@@ -150,7 +150,7 @@ public class BPaths {
         SBLaunchToBInt2 = follower
             .pathBuilder()
             .addPath(new BezierCurve(p1.BLaunch, p1.BInt2CtrlPoint1, p1.BInt2CtrlPoint2, p1.BInt2))
-            .setTangentHeadingInterpolation()
+            .setConstantHeadingInterpolation(p1.BInt2Head)
             .build();
         SBInt2ToBLaunch = follower
             .pathBuilder()
@@ -169,13 +169,13 @@ public class BPaths {
             .build();
         SBLaunchToBInt3 = follower
             .pathBuilder()
-            .addPath(new BezierLine(p1.BLaunch, p1.BInt3))
-            .setConstantHeadingInterpolation((p1.BInt3Head))
+            .addPath(new BezierCurve(p1.BLaunch, p1.BInt3CtrlPoint, p1.BInt3))
+            .setConstantHeadingInterpolation(p1.BInt3Head)
             .build();
         SBInt3ToBLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(p1.BInt3, p1.BLaunch))
-            .setLinearHeadingInterpolation((p1.BInt3Head), (p1.BLaunchHead))
+            .setConstantHeadingInterpolation(p1.BLaunchHead)
             .build();
         SBLaunchToBEnd = follower
             .pathBuilder()
