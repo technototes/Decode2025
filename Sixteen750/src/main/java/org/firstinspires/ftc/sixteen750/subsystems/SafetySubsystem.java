@@ -251,9 +251,9 @@ public class SafetySubsystem implements Subsystem, Loggable {
 // start monitoring after robot starts moving (wait a little bit after start, then start monitoring)
 //in auto there is this thingy where it says opmodestate.RUN and idk if there is a subsystem version of that
 //im now looking for that in a subsystem UPDATE: idk where
-// stop monitoring if we know that distance sensors wil get close to walls
+// stop monitoring if we know that RawDistance sensors wil get close to walls
 // stop monitoring if auto is going to a stop to go to next sequential command
-// start monitoring again after distance sensors are far away and if next sequential auto command is starting again
+// start monitoring again after RawDistance sensors are far away and if next sequential auto command is starting again
 // need to look at IMU to determine wonkiness
 //using elapsed timer instead of numfailed cause periodic does NOT occur every 1/2 second, but constantly, so need to add that
 //its a sequential command btw

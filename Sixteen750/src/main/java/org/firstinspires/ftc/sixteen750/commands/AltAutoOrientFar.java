@@ -79,7 +79,7 @@ public class AltAutoOrientFar implements Command {
             //                    targetHeading =
             //                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
             // Kooolpool here below was my original prototype for auto orient and it worked decently well
-            if (robot.limelightSubsystem.getDistance() >= 0) {
+            if (robot.limelightSubsystem.getRawDistance() >= 0) {
                 rotation = pid.update((LimelightSubsystem.Xangle + offsetDegrees) * SIGN);
                 //                                rotation = ((PedroDriver.VISION_TURN_SCALE * -LimelightSubsystem.Xangle) /
                 //                                    robot.limelightSubsystem.getDistance());

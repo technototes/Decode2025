@@ -159,7 +159,7 @@ public class SingleTeleOp extends CommandOpMode {
                             double tx = targetPose.getPosition().x;
                             double ty = targetPose.getPosition().y;
                             double tz = targetPose.getPosition().z;
-                            // supposedly distance to apriltag
+                            // supposedly RawDistance to apriltag
                             double distance = Math.sqrt(tx * tx + ty * ty + tz * tz);
                             telemetry.addData("Distance to AprilTag", String.valueOf(distance));
                         }

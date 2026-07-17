@@ -321,7 +321,7 @@ public class PedroDriver implements Command, Loggable {
                     //                    targetHeading =
                     //                        curHeading - Math.toRadians(limelightSubsystem.getLimelightRotation());
                     // Kooolpool here below was my original prototype for auto orient and it worked decently well
-                    if (limelightSubsystem.getDistance() < 0) {
+                    if (limelightSubsystem.getRawDistance() < 0) {
                         return rotation;
                     }
                     return vizPid.update(LimelightSubsystem.Xangle * SIGN);

@@ -5,14 +5,14 @@ import com.technototes.library.command.Command;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
 import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.LLRelocCommand;
 import org.firstinspires.ftc.sixteen750.commands.auto.Paths;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
-import org.firstinspires.ftc.sixteen750.commands.LLRelocCommand;
 
 public class TeleCommands {
 
     public static Command LLRelocCommand(Robot r) {
-        return Command.create(LLRelocCommand(r));
+        return Command.create(new LLRelocCommand(r));
     }
 
     public static Command TurnTo90(Robot r) {

@@ -110,7 +110,7 @@ public class RedTele extends CommandOpMode implements Loggable {
             .addData("launcher1Pow", String.valueOf(LauncherSubsystem.power));
         panelsTelemetry
             .getTelemetry()
-            .addData("Distraw", String.valueOf(LimelightSubsystem.distance));
+            .addData("Distraw", String.valueOf(LimelightSubsystem.RawDistance));
 
         panelsTelemetry.getTelemetry().update(telemetry);*/
     }
@@ -189,22 +189,22 @@ public class RedTele extends CommandOpMode implements Loggable {
                             double tx = targetPose.getPosition().x;
                             double ty = targetPose.getPosition().y;
                             double tz = targetPose.getPosition().z;
-                            // supposedly distance to apriltag
-                            double distance = Math.sqrt(tx * tx + ty * ty + tz * tz);
+                            // supposedly RawDistance to apriltag
+                            double RawDistance = Math.sqrt(tx * tx + ty * ty + tz * tz);
                             if (tag_id == 21 || tag_id == 22 || tag_id == 23) {
                                 telemetry.addData(
                                     "Distance to AprilTag (Obelisk)",
-                                    String.valueOf(distance)
+                                    String.valueOf(RawDistance)
                                 );
                             } else if (tag_id == 20) {
                                 telemetry.addData(
                                     "Distance to AprilTag (Blue)",
-                                    String.valueOf(distance)
+                                    String.valueOf(RawDistance)
                                 );
                             } else if (tag_id == 24) {
                                 telemetry.addData(
                                     "Distance to AprilTag (Red)",
-                                    String.valueOf(distance)
+                                    String.valueOf(RawDistance)
                                 );
                             }
                         }
