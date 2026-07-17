@@ -69,9 +69,9 @@ public class RPaths {
             .addPath(new BezierCurve(p.RLaunch, p.RInt1CtrlPoint1, p.RInt1CtrlPoint2, p.RInt1))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
-                    new HeadingInterpolator.PiecewiseNode(0, .5, HeadingInterpolator.tangent),
+                    new HeadingInterpolator.PiecewiseNode(0, .4, HeadingInterpolator.tangent),
                     new HeadingInterpolator.PiecewiseNode(
-                        .5,
+                        .4,
                         1,
                         HeadingInterpolator.constant(p.RInt1Head)
                     )

@@ -32,8 +32,8 @@ public class AutoConstants {
     public static double robotWidth = 11.5;
 
     // These come from Tuners:
-    public static double xvelocity = 67.3;
-    public static double yvelocity = 62.4;
+    public static double xvelocity = 84.5;
+    public static double yvelocity = 74.75;
     public static double fwdDeceleration = -42.8;
     public static double latDeceleration = -71.1;
     // Predictive Braking doesn't need centripetal scaling
@@ -73,7 +73,7 @@ public class AutoConstants {
     // The maximum velocity (in inches/second) the bot can be moving while still
     // saying the path is complete.
     public static double acceptableVelocity = 2;
-    // The maximum distance (in inches) the bot can be from the path end
+    // The maximum RawDistance (in inches) the bot can be from the path end
     // while still saying the path is complete.
     public static double acceptableDistance = 2.0;
     // The maximum heading error (in degrees) the bot can be from the path end

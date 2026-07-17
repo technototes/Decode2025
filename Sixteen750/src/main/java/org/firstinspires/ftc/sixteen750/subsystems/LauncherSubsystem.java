@@ -71,7 +71,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double PEAK_VOLTAGE = 13;
     private static PIDFController launcherPID;
     public static double lastAutoVelocity = 0;
-    public static double IdlePower = 0.4; // idle power
+    public static double IdlePowerNear = 0.55; // idle power
+    public static double IdlePowerFar = 0.85; // idle power
 
     boolean hasHardware;
     public Robot robot;
@@ -306,12 +307,29 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         }
     }
 
-    public double autoVelocity() {
-        // x = distance in inches
-        double x = ls.getDistance();
-        if (x < 100 && x > 0) {
+    public double SotmAutoVelocity() {
+        // x = RawDistance in inches
+        double y = ls.getRawDistance();
+        double x = ls.getPredictedDistance() * 1;
+        if (y < 100 && y > 0) {
             lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
-        } else if (x > 0) {
+        } else if (y > 0) {
+            launcherPI.p = 0.004;
+            launcherPI.i = 0.0002;
+            lastAutoVelocity = REGRESSION_C * x + REGRESSION_D;
+        } else if (lastAutoVelocity == 0) {
+            lastAutoVelocity = 1500;
+        }
+        return lastAutoVelocity;
+    }
+
+    public double autoVelocity() {
+        // x = RawDistance in inches
+        double y = ls.getRawDistance();
+        double x = ls.getRawDistance();
+        if (y < 100 && y > 0) {
+            lastAutoVelocity = REGRESSION_A * x + REGRESSION_B;
+        } else if (y > 0) {
             launcherPI.p = 0.004;
             launcherPI.i = 0.0002;
             lastAutoVelocity = REGRESSION_C * x + REGRESSION_D;
@@ -324,8 +342,8 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     //return ((RPM_PER_FOOT * ls.getDistance()) / 12 + MINIMUM_VELOCITY) + addtionamount;
 
     public double autoVelocityForAuto() {
-        // x = distance in feet
-        double x = ls.getDistance();
+        // x = RawDistance in feet
+        double x = ls.getRawDistance();
 
         if (x < 100 && x > 0) {
             //launcherPI.p = 0.0015;
@@ -374,8 +392,12 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
 
-        if (launcherPID.getTarget() == (Math.PI)) {
-            setMotorPower(IdlePower);
+        if (launcherPID.getTarget() == (Math.PI) && ls.getRawDistance() <= 100) {
+            setMotorPower(IdlePowerNear);
+            launcherPID.update(getMotorSpeed());
+            launcherPID.reset();
+        } else if (launcherPID.getTarget() == (Math.PI) && ls.getRawDistance() > 100) {
+            setMotorPower(IdlePowerFar);
             launcherPID.update(getMotorSpeed());
             launcherPID.reset();
         } else if (launcherPID.getTarget() != 0) {

@@ -11,7 +11,7 @@ import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 @Configurable
 public class SotmCompensator implements Loggable {
 
-    public static double FlightTime = .5; // time ball is in air might need to make scale with distance
+    public static double FlightTime = .5; // time ball is in air might need to make scale with RawDistance
     public static double MinSpeed = 5; // min speed in in/s at which sotm applies
     public static double DistanceCorrectionScale = 1; // use this to scale how aggressive sotm velocity correction is
     public static double AngleCorrectionScale = 1; // use this to scale how aggressive sotm angle compensation is

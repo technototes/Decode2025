@@ -107,7 +107,7 @@ public class AimingSubsystem implements Loggable, Subsystem {
     }
 
     public double BangBangBounds() {
-        double x = ls.getDistance();
+        double x = ls.getPredictedDistance();
         if (x > -1 && x <= 90) {
             BangBangLowerBound = 200;
         } else {
@@ -122,15 +122,17 @@ public class AimingSubsystem implements Loggable, Subsystem {
         if (
             LauncherSubsystem.err < BangBangLowerBound && LauncherSubsystem.err > BangBangUpperBound
         ) {
-            if (ls.getDistance() <= HOOD_MIDDLE_THRESHOLD && ls.getDistance() > -1) {
+            if (
+                ls.getPredictedDistance() <= HOOD_MIDDLE_THRESHOLD && ls.getPredictedDistance() > -1
+            ) {
                 // we dont want the hood having a stroke when the lancher starts spinning up cause error is really high so limit to to only when its within shot drop range
                 BangBangAdjust = LauncherSubsystem.err * -BangBangRegConstant;
             } else if (
-                ls.getDistance() > HOOD_MIDDLE_THRESHOLD &&
-                ls.getDistance() <= DAMN_THAT_IS_A_BIG_NUMBER
+                ls.getPredictedDistance() > HOOD_MIDDLE_THRESHOLD &&
+                ls.getPredictedDistance() <= DAMN_THAT_IS_A_BIG_NUMBER
             ) {
                 BangBangAdjust = LauncherSubsystem.err * -BangBangFarConstant;
-            } else if (ls.getDistance() == -1) {
+            } else if (ls.getPredictedDistance() == -1) {
                 BangBangAdjust = 0;
             }
         }
@@ -138,7 +140,7 @@ public class AimingSubsystem implements Loggable, Subsystem {
     }
 
     public double AutoHoodPos() {
-        double x = ls.getDistance();
+        double x = ls.getPredictedDistance();
         if (x > -1 && x <= HOOD_DOWN_THRESHOLD) {
             LastHoodPos = HoodPosDown + BangBangAdjust;
         } else {
