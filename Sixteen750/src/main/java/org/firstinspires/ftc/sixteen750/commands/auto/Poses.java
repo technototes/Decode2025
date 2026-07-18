@@ -1,40 +1,35 @@
 package org.firstinspires.ftc.sixteen750.commands.auto;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
 // so i created this cause im absolutely freaking tired and fed up of navigating paths v1 so yeah yay!!!
 @Configurable
 public class Poses {
 
-    public static Follower follower;
-
     @Configurable
     public static class StartPoses {
 
-        public static Pose RStart = new Pose(114, 135);
+        public static Pose RStart = new Pose(114, 135, Math.toRadians(90));
+        public static Pose RFStart = new Pose(88.5, 9, Math.toRadians(90));
+        public static Pose BStart = new Pose(30, 135, Math.toRadians(90));
+        public static Pose BFStart = new Pose(55.5, 9, Math.toRadians(90));
 
         public static Pose getRStart() {
-            return new Pose(114, 135, Math.toRadians(90));
+            return RStart;
         }
 
         public static Pose getRFStart() {
-            return new Pose(88.5, 9, Math.toRadians(90));
+            return RFStart;
         }
 
-        public static Pose RFStart = new Pose(88.5, 9);
-        public static Pose BStart = new Pose(30, 135);
-
         public static Pose getBStart() {
-            return new Pose(30, 135, Math.toRadians(90));
+            return BStart;
         }
 
         public static Pose getBFStart() {
-            return new Pose(55.5, 9, Math.toRadians(90));
+            return BFStart;
         }
-
-        public static Pose BFStart = new Pose(55.5, 9);
     }
 
     @Configurable
@@ -42,8 +37,7 @@ public class Poses {
 
         public static Pose RLaunch = new Pose(88, 82);
         public static double RLaunchHead = Math.toRadians(49);
-        public static Pose RInt1 = new Pose(135, 64.8);
-        public static double RInt1Head = Math.toRadians(348);
+        public static Pose RInt1 = new Pose(135, 64.8, Math.toRadians(348));
         public static Pose RInt1CtrlPoint1 = new Pose(104, 84);
         public static Pose RInt1CtrlPoint2 = new Pose(102, 66);
         public static Pose RInt1ToLaunchCtrlPoint = new Pose(96, 42);
@@ -64,8 +58,7 @@ public class Poses {
 
         public static Pose RLaunch = new Pose(88, 82);
         public static double RLaunchHead = Math.toRadians(49);
-        public static Pose RInt1 = new Pose(135, 64.8);
-        public static double RInt1Head = Math.toRadians(354);
+        public static Pose RInt1 = new Pose(135, 64.8, Math.toRadians(354));
         public static Pose RInt1CtrlPoint1 = new Pose(82.5, 64);
         public static Pose RInt1CtrlPoint2 = new Pose(102, 66);
         public static Pose RInt1ToLaunchCtrlPoint = new Pose(96, 42);
@@ -89,9 +82,8 @@ public class Poses {
 
         public static Pose RFLaunch = new Pose(82, 16);
         public static double RFLaunchHead = Math.toRadians(62);
-        public static Pose RFInt1 = new Pose(132, 35);
+        public static Pose RFInt1 = new Pose(132, 35, Math.toRadians(0));
         public static Pose RFInt1CtrlPoint = new Pose(75, 38);
-        public static double RFInt1Head = Math.toRadians(0);
         public static Pose RFInt2 = new Pose(132, 6); //sussy bezier go brrrr
         public static Pose RFInt2CtrlPoint1 = new Pose(170, 15);
         public static Pose RFInt2CtrlPoint2 = new Pose(108, 18);
