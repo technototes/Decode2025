@@ -1,7 +1,9 @@
+import { ReactElement } from 'react';
+import { useAtom } from 'jotai';
+
 import { Button, Switch } from '@fluentui/react-components';
 import { WeatherMoonFilled, WeatherSunnyRegular } from '@fluentui/react-icons';
-import { useAtom } from 'jotai';
-import { ReactElement } from 'react';
+
 import { ThemeAtom } from './state/Atoms';
 
 export function Settings(): ReactElement {
@@ -12,8 +14,7 @@ export function Settings(): ReactElement {
         onClick={() => {
           localStorage.clear();
           window.location.reload();
-        }}
-      >
+        }}>
         Reset
       </Button>
       <span style={{ width: '10px' }} />

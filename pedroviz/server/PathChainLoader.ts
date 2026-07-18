@@ -1,10 +1,5 @@
-import {
-  hasField,
-  isArray,
-  isDefined,
-  isString,
-  isUndefined,
-} from '@freik/typechk';
+import { promises as fsp } from 'node:fs';
+
 import {
   BaseJavaCstVisitorWithDefaults,
   BlockStatementCstNode,
@@ -20,7 +15,14 @@ import {
   UnaryExpressionCtx,
   VariableDeclaratorCtx,
 } from 'java-parser';
-import { promises as fsp } from 'node:fs';
+import {
+  hasField,
+  isArray,
+  isDefined,
+  isString,
+  isUndefined,
+} from '@freik/typechk';
+
 import {
   AnonymousBezier,
   AnonymousPose,
@@ -93,7 +95,7 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
   // double's, int's, pose's, BezierCurve's, BezierLine's.
   // PathChains shouldn't be static
 
-  fieldDeclaration(ctx: FieldDeclarationCtx) {
+  override fieldDeclaration(ctx: FieldDeclarationCtx) {
     // We're looking for public static double/int name = value;
     const maybeNamedValue = tryMatchingNamedValues(ctx);
     if (isDefined(maybeNamedValue)) {
@@ -117,7 +119,7 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     return super.fieldDeclaration(ctx);
   }
 
-  constructorDeclaration(ctx: ConstructorDeclarationCtx) {
+  override constructorDeclaration(ctx: ConstructorDeclarationCtx) {
     this.info.pathChains.push(...getPathChainFactories(ctx));
     return super.constructorDeclaration(ctx);
   }
@@ -164,11 +166,10 @@ function isPublicStaticField(ctx: FieldDeclarationCtx): boolean {
 }
 
 function isPublicField(ctx: FieldDeclarationCtx): boolean {
-  return (
-    ctx.fieldModifier &&
-    ctx.fieldModifier.length === 1 &&
-    isDefined(ctx.fieldModifier[0].children.Public)
-  );
+  if (!ctx.fieldModifier || ctx.fieldModifier.length !== 1) {
+    return false;
+  }
+  return isDefined(ctx.fieldModifier[0]!.children.Public);
 }
 
 // This matches the 'public static int/double name = value;' pattern
@@ -267,15 +268,21 @@ function getRef(expr: ExpressionCstNode): string | undefined {
 }
 
 function getRefOr<Str, T>(
-  expr: ExpressionCstNode,
+  expr: ExpressionCstNode | undefined,
   getOr: (expr: ExpressionCstNode) => T | undefined,
 ): T | Str | undefined {
+  if (isUndefined(expr)) {
+    return undefined;
+  }
   const ref = getRef(expr);
   return isString(ref) ? (ref as Str) : getOr(expr);
 }
 
 function getMethodInvoke(primary: PrimaryCtx): [string, string] | undefined {
   const methodInvoke = child(primary.primaryPrefix)?.fqnOrRefType;
+  if (isUndefined(methodInvoke)) {
+    return;
+  }
   const objName = getRefTypeName(methodInvoke);
   if (isUndefined(objName)) {
     return;
@@ -295,25 +302,31 @@ function getToRadians(
     child(
       child(child(expr.children.conditionalExpression)?.binaryExpression)
         ?.unaryExpression,
-    ).primary,
+    )?.primary,
   );
+  if (isUndefined(maybeMethod)) {
+    return;
+  }
   const maybeMathToRad = getMethodInvoke(maybeMethod);
   if (
     isUndefined(maybeMathToRad) ||
     maybeMathToRad[0] !== 'Math' ||
-    maybeMathToRad[1] !== 'toRadians'
+    maybeMathToRad[1] !== 'toRadians' ||
+    isUndefined(expr.children.conditionalExpression)
   ) {
     return;
   }
-  const argList = getArgList(
+  const maybeArgList = child(
     child(
-      child(
-        child(child(expr.children.conditionalExpression)?.binaryExpression)
-          ?.unaryExpression,
-      )?.primary,
-    )?.primarySuffix[0],
-  );
-  if (argList.length !== 1) {
+      child(child(expr.children.conditionalExpression)?.binaryExpression)
+        ?.unaryExpression,
+    )?.primary,
+  )?.primarySuffix;
+  if (isUndefined(maybeArgList) || maybeArgList.length === 0) {
+    return;
+  }
+  const argList = getArgList(maybeArgList[0]);
+  if (isUndefined(argList) || argList.length !== 1) {
     return;
   }
   const numRef = getOnlyValueRef(argList[0]);
@@ -378,7 +391,7 @@ function getCtorArgs(
     }
     expr = theExpr;
   } else {
-    expr = decl;
+    expr = decl as unknown as ExpressionCstNode;
   }
   const newExpr = child(
     child(
@@ -398,7 +411,7 @@ function getCtorArgs(
   if (isDefined(type) && dataType !== type) {
     return ['', undefined];
   }
-  return [type || dataType, child(newExpr?.argumentList)?.expression];
+  return [type || dataType || '', child(newExpr?.argumentList)?.expression];
 }
 
 function tryMatchingNamedPoses(
@@ -438,7 +451,8 @@ function getAnonymousPose(
   if (isUndefined(x) || isUndefined(y)) {
     return;
   }
-  const heading = getHeadingRef(ctorArgs[2]);
+  const heading =
+    ctorArgs.length === 3 ? getHeadingRef(ctorArgs[2]!) : undefined;
   return isUndefined(heading) ? { x, y } : { x, y, heading };
 }
 
@@ -451,15 +465,22 @@ function getAnonymousBezier(
   checkType?: string,
 ): AnonymousBezier | undefined {
   const firstExpr = isArray(expr) ? expr[0] : expr;
+  if (isUndefined(firstExpr)) {
+    return;
+  }
   const [foundType, ctorArgs] = getCtorArgs(firstExpr, checkType);
   if (isUndefined(ctorArgs)) {
     return;
   }
-  const points = ctorArgs.map(getPoseRef);
+  const type = getBType(foundType);
+  if (isUndefined(type)) {
+    return;
+  }
+  const points: PoseRef[] = ctorArgs.map(getPoseRef) as unknown as PoseRef[];
   if (!points.every(isDefined)) {
     return;
   }
-  return { type: getBType(foundType), points };
+  return { type, points };
 }
 
 function tryMatchingBeziers(ctx: FieldDeclarationCtx): NamedBezier | undefined {
@@ -467,6 +488,9 @@ function tryMatchingBeziers(ctx: FieldDeclarationCtx): NamedBezier | undefined {
     return;
   }
   const classType = getClassTypeName(ctx.unannType);
+  if (isUndefined(classType)) {
+    return;
+  }
   const type = getBType(classType);
   const decl = getVariableDeclarator(ctx);
   if (isUndefined(decl) || isUndefined(type)) {
@@ -503,13 +527,13 @@ function tryMatchingPathChainFields(
 
 function getArgList(
   cstNode: PrimarySuffixCstNode | undefined,
-): ExpressionCstNode[] {
-  return child(child(cstNode.children.methodInvocationSuffix)?.argumentList)
+): ExpressionCstNode[] | undefined {
+  return child(child(cstNode?.children.methodInvocationSuffix)?.argumentList)
     ?.expression;
 }
 
 function getHeadingRef(
-  arg: ExpressionCstNode,
+  arg: ExpressionCstNode | undefined,
   poseAllowed: boolean = false,
 ): HeadingRef | undefined {
   if (poseAllowed) {
@@ -522,7 +546,9 @@ function getHeadingRef(
   return getValueRef(arg);
 }
 
-function getBezierRef(arg: ExpressionCstNode): BezierRef | undefined {
+function getBezierRef(
+  arg: ExpressionCstNode | undefined,
+): BezierRef | undefined {
   return getRefOr(arg, getAnonymousBezier);
 }
 
@@ -541,13 +567,16 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
       )?.conditionalExpression,
     )?.binaryExpression,
   );
-  if (isUndefined(stmt.AssignmentOperator)) {
+  if (isUndefined(stmt) || isUndefined(stmt.AssignmentOperator)) {
     return;
   }
-  const fieldName = getRefTypeName(
-    child(child(child(stmt.unaryExpression)?.primary)?.primaryPrefix)
-      .fqnOrRefType,
+  const maybeFqnOrRef = child(
+    child(child(stmt.unaryExpression)?.primary)?.primaryPrefix,
   );
+  if (isUndefined(maybeFqnOrRef) || isUndefined(maybeFqnOrRef.fqnOrRefType)) {
+    return;
+  }
+  const fieldName = getRefTypeName(maybeFqnOrRef.fqnOrRefType);
   // TODO: make sure the field name is in the list of fields
   const builder = child(
     child(
@@ -556,6 +585,9 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
       )?.unaryExpression,
     )?.primary,
   );
+  if (isUndefined(builder)) {
+    return;
+  }
   const objInvoke = getMethodInvoke(builder);
   if (
     isUndefined(objInvoke) ||
@@ -565,19 +597,19 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
     return;
   }
   const methods = builder.primarySuffix;
-  if (methods.length < 5) {
+  if (isUndefined(methods) || methods.length < 5) {
     return;
   }
   // Okay, remove the '.pathBuilder()' prefix, and the
   // '.build();' suffix.
   let chain: BezierRef[] = [];
   let heading: HeadingType | null = null;
-  let lastMethodName = 'pathBuilder';
+  let lastMethodName: string | undefined = 'pathBuilder';
   for (let index = 0; index < methods.length; index++) {
-    const method = methods[index];
+    const method = methods[index]!;
     if (index % 2 === 1) {
       // This should be a dot
-      if (isUndefined(method.children.Dot)) {
+      if (isUndefined(method?.children?.Dot)) {
         return;
       }
       lastMethodName = nameOf(method.children.Identifier);
@@ -608,7 +640,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           continue;
         case 'setLinearHeadingInterpolation':
           const linearArgs = getArgList(method);
-          if (linearArgs.length !== 2) {
+          if (linearArgs?.length !== 2) {
             return;
           }
           const startHeading = getHeadingRef(linearArgs[0], true);
@@ -623,7 +655,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           continue;
         case 'setConstantHeadingInterpolation':
           const constantArgs = getArgList(method);
-          if (constantArgs.length !== 1) {
+          if (constantArgs?.length !== 1) {
             return;
           }
           const headingRef = getHeadingRef(constantArgs[0], true);
@@ -634,7 +666,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           continue;
         case 'addPath':
           const pathArgs = getArgList(method);
-          if (pathArgs.length !== 1) {
+          if (pathArgs?.length !== 1) {
             return;
           }
           const bezierRef = getBezierRef(pathArgs[0]);
@@ -648,6 +680,9 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
       }
     }
   }
+  if (heading === null) {
+    return;
+  }
   return { name: fieldName as PathChainName, paths: chain, heading };
 }
 
@@ -660,8 +695,7 @@ function getPathChainFactories(
   if (isUndefined(statements)) {
     return [];
   }
-  const pathChains = statements.map(getPathChain);
-  return pathChains.filter(isDefined);
+  return statements.map(getPathChain).filter(isDefined) as NamedPathChain[];
 }
 
 export async function MakePathChainFile(

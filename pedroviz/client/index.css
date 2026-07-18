@@ -13,45 +13,53 @@ body {
 
 .app {
   display: grid;
-  grid-template-rows: auto 1fr; /* header + content */
+  grid-template-rows: auto 1fr auto; /* header + content */
   grid-template-columns: auto 1fr;
   height: 100vh;
 }
 
-.header {
-  grid-row: 1;
-  grid-column-start: 1;
-  grid-column-end: 3;
-  display: flex;
-  justify-content: space-between; /* pushes left and right apart */
-  align-items: center;
-}
-
 .header-left {
+  grid-row: 1;
+  grid-column: 1;
   justify-content: flex-start;
 }
 
 .header-center {
+  grid-row: 1;
+  grid-column: 2;
   margin: 0 auto;
 }
 
 .header-right {
+  grid-row: 1;
+  grid-column: 3;
   justify-content: flex-end;
 }
 
-.sidebar {
+.main {
   grid-row: 2;
-  grid-column: 1;
+  grid-column: 1/4;
+}
+
+.sidebar {
   overflow-y: auto;
 }
 
 .display {
-  grid-row: 2;
-  grid-column: 2;
   display: grid;
   justify-content: end; /* stick to right */
   align-items: start; /* stick to top */
   overflow: hidden;
+}
+
+#view-separator {
+  background: linear-gradient(to right, #fff 0%, #000 45%, #000 55%, #fff 100%);
+  opacity: 0.2;
+  transition: opacity 0.2s;
+  width: 1px;
+}
+#view-separator:hover {
+  opacity: 0.8;
 }
 
 /* Square canvas area */

@@ -1,5 +1,6 @@
-import { useAtomValue } from 'jotai';
 import { ReactElement, useEffect, useRef } from 'react';
+import { useAtomValue } from 'jotai';
+
 import { NamedPathChain } from '../../server/types';
 import {
   ColorsAtom,
@@ -10,7 +11,7 @@ import {
   MappedValuesAtom,
 } from '../state/Atoms';
 import { calcBezierRef } from '../state/IndexedFile';
-import { Point } from '../types';
+import { AnonymousPathChain, Point } from '../types';
 import { bezierLength, deCasteljau } from './bezier';
 
 const Scale = 1;
@@ -29,7 +30,7 @@ export function ScaledCanvas(): ReactElement {
   const points = [
     ...pathChains
       .values()
-      .map((npc: NamedPathChain) =>
+      .map((npc: AnonymousPathChain) =>
         npc.paths.map((br) => calcBezierRef(file, br)),
       ),
   ].flat(1);
@@ -63,7 +64,7 @@ export function ScaledCanvas(): ReactElement {
     ctx.clearRect(0, 0, fix * Scale, fix * Scale);
 
     points.forEach((ctrlPoints, index) =>
-      renderPath(ctx, ctrlPoints, colors[index % colors.length]),
+      renderPath(ctx, ctrlPoints, colors[index % colors.length]!),
     );
     if (showTime) {
       drawTime(ctx, performance.now() - start, dpr, scale);
@@ -82,6 +83,9 @@ function renderPath(
   curveControlPoints: Point[],
   color: string,
 ) {
+  if (curveControlPoints.length < 2) {
+    return;
+  }
   const len = bezierLength(curveControlPoints);
   const pts: Point[] = [];
   for (let t = 0; t <= 1.0; t += 1 / len) {
@@ -100,13 +104,16 @@ function renderPath(
   ctx.beginPath();
   ctx.lineWidth = 0.25;
   ctx.strokeStyle = color;
-  ctx.moveTo(curveControlPoints[0].x * Scale, curveControlPoints[0].y * Scale);
+  ctx.moveTo(
+    curveControlPoints[0]!.x * Scale,
+    curveControlPoints[0]!.y * Scale,
+  );
   for (const pt of pts) {
     ctx.lineTo(pt.x * Scale, pt.y * Scale);
   }
   ctx.lineTo(
-    curveControlPoints[curveControlPoints.length - 1].x * Scale,
-    curveControlPoints[curveControlPoints.length - 1].y * Scale,
+    curveControlPoints[curveControlPoints.length - 1]!.x * Scale,
+    curveControlPoints[curveControlPoints.length - 1]!.y * Scale,
   );
   ctx.stroke();
   ctx.beginPath();
@@ -141,7 +148,7 @@ function drawColors(ctx: CanvasRenderingContext2D, colors: string[]) {
   ctx.save();
   for (let j = 0; j < colors.length; j++) {
     ctx.beginPath();
-    ctx.fillStyle = colors[(j + 7) % colors.length];
+    ctx.fillStyle = colors[(j + 7) % colors.length]!;
     ctx.fillRect(j * 4, 0, 4, 4);
     ctx.stroke();
   }

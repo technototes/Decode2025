@@ -1,3 +1,6 @@
+import { CSSProperties, ReactElement, useState } from 'react';
+import { useSetAtom } from 'jotai';
+
 import {
   Button,
   Combobox,
@@ -11,18 +14,17 @@ import {
   Text,
 } from '@fluentui/react-components';
 import { EditRegular } from '@fluentui/react-icons';
-import { useSetAtom } from 'jotai';
-import { CSSProperties, ReactElement, useState } from 'react';
+
 import { isIntValue, isValueName, ValueRef } from '../../server/types';
 import { BlurAtom } from '../state/Atoms';
-import { GetValueAsString, HasKeys } from '../types';
+import { GetValueAsString, HasItem, HasKeys } from '../types';
 import {
   CheckValidValueOrName,
   IsValidJavaIdentifier,
   IsValidNumber,
 } from './Validation';
 
-export function NumberOrNamedValue<T extends string, U extends HasKeys<T>>({
+export function NumberOrNamedValue<U extends HasKeys<string>>({
   style,
   names,
   placeholder,
@@ -48,7 +50,7 @@ export function NumberOrNamedValue<T extends string, U extends HasKeys<T>>({
     if (IsValidJavaIdentifier(value)) {
       const valLC = value.toLowerCase();
       const matches = options.filter((_, index) =>
-        optsLC[index].startsWith(valLC),
+        optsLC[index]!.startsWith(valLC),
       );
       setMatchingOptions(matches);
       if (value.length && matches.length < 1) {
@@ -84,10 +86,10 @@ export function NumberOrNamedValue<T extends string, U extends HasKeys<T>>({
       true,
     ));
     if (state !== 'error') {
-      setValue(data.optionText);
+      setValue(data.optionText || '');
     } else {
-      setCurValue(data.optionText);
-      setBlur(data.optionText);
+      setCurValue(data.optionText || '');
+      setBlur(data.optionText || '');
     }
   };
 
@@ -103,8 +105,7 @@ export function NumberOrNamedValue<T extends string, U extends HasKeys<T>>({
             <Field
               style={style}
               validationMessage={message}
-              validationState={state}
-            >
+              validationState={state}>
               <Combobox
                 freeform
                 placeholder={placeholder || 'Select a variable'}
@@ -116,8 +117,7 @@ export function NumberOrNamedValue<T extends string, U extends HasKeys<T>>({
                     : isIntValue(value)
                       ? value.int.toFixed(0)
                       : value.double.toFixed(2)
-                }
-              >
+                }>
                 {customSearch ? (
                   <Option key="freeform" text={customSearch}>
                     Search for "{customSearch}"

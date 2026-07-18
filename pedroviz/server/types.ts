@@ -29,7 +29,7 @@ export function makeError(
   error: string | string[] | ErrorVal,
   more?: string | string[] | ErrorVal,
 ): ErrorVal {
-  const errors = [];
+  const errors: string[] = [];
   errors.push(
     ...(isString(error) ? [error] : isError(error) ? error.errors() : error),
   );
@@ -92,7 +92,8 @@ export type InterpolatedHeading = {
   type: 'interpolated';
   headings: [HeadingRef, HeadingRef];
 };
-export type HeadingType = // ReversedHeading & HeadingTiming ( FacingHeading | ...
+export type HeadingType =
+  // ReversedHeading & HeadingTiming ( FacingHeading | ...
   TangentHeading | ConstantHeading | InterpolatedHeading;
 
 // No such thing as an anonymous PathChain

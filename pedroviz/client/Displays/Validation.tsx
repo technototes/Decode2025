@@ -1,4 +1,5 @@
 import { isArray } from '@freik/typechk';
+
 import { ValueName, ValueRef } from '../../server/types';
 import { HasItem, ValidationData, ValidData } from '../types';
 
@@ -14,10 +15,16 @@ export function IsValidNumber(str: string): boolean {
 }
 
 function has<T extends string, U extends HasItem<T>>(
+  value: string,
+  maps: U | U[],
+): boolean;
+
+function has<T extends string, U extends HasItem<T>>(
   value: T,
   maps: U | U[],
 ): boolean {
-  return (isArray(maps) ? maps : [maps]).some((mp) => mp.has(value));
+  const mapArray = isArray(maps) ? maps : [maps];
+  return mapArray.some((mp) => mp.has(value));
 }
 
 export function CheckValidName<T extends string, U extends HasItem<T>>(
@@ -26,7 +33,7 @@ export function CheckValidName<T extends string, U extends HasItem<T>>(
   exists: boolean,
 ): ValidationData {
   const trimmed = expr.trim();
-  if (exists !== has(trimmed, validNames)) {
+  if (exists !== has<T, U>(trimmed, validNames)) {
     return {
       message: exists
         ? 'Please enter an existing variable.'

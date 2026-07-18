@@ -1,4 +1,5 @@
 import { isString } from '@freik/typechk';
+
 import { MakePathChainFile } from './PathChainLoader';
 import { PathChainFile } from './types';
 import { getProjectFilePath } from './utility';

@@ -1,9 +1,9 @@
 import { serve } from 'bun';
+
+import index from './index.html';
 import { GetPathFileNames } from './server/getpaths';
 import { LoadPath } from './server/loadpath';
 import { SavePath } from './server/savepath';
-
-import index from './index.html';
 
 const server = serve({
   routes: {

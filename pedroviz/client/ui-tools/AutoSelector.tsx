@@ -1,3 +1,5 @@
+import { ReactElement } from 'react';
+
 import {
   Menu,
   MenuButton,
@@ -9,7 +11,6 @@ import {
   useId,
 } from '@fluentui/react-components';
 import { isString } from '@freik/typechk';
-import { ReactElement } from 'react';
 
 // Show a selection, unless there are no items, then disable the selector entirely
 export function AutoSelector({
@@ -27,15 +28,17 @@ export function AutoSelector({
 }): ReactElement {
   const id = useId('ADS');
   const onChange: MenuProps['onCheckedValueChange'] = (_, { checkedItems }) => {
-    setSelected(checkedItems[0]);
+    if (checkedItems.length >= 1) {
+      setSelected(checkedItems[0]!);
+    }
   };
   let selectedItem = selected.length === 0 ? prompt : selected;
   if (items.length === 1 && selected !== items[0]) {
     // If we only have 1 item go ahead & select it, but schedule it in the future
     // so we don't screw up the render cycle in an unpredictable manner.
-    setTimeout(() => setSelected(items[0]), 0);
+    setTimeout(() => setSelected(items[0]!), 0);
     // This *should* prevent a full visual re-render.
-    selectedItem = items[0];
+    selectedItem = items[0]!;
   } else if (selected === '' && isString(defItem) && defItem.length > 0) {
     // If we don't have a selection, pick the default one
     setTimeout(() => setSelected(defItem), 0);
@@ -54,8 +57,7 @@ export function AutoSelector({
               key={`${id}:${val}`}
               name={`${id}`}
               onSelect={() => setSelected(val)}
-              value={val}
-            >
+              value={val}>
               {val}
             </MenuItemRadio>
           ))}

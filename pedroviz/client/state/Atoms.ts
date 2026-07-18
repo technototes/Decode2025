@@ -1,24 +1,28 @@
-import { hasField } from '@freik/typechk';
 import { atom, WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai-family';
 import { focusAtom } from 'jotai-optics';
 import { atomWithStorage } from 'jotai/utils';
+
+import { hasField } from '@freik/typechk';
+
 import {
   BezierName,
   BezierRef,
   ErrorOr,
   isError,
+  Path,
   PathChainName,
   PoseName,
   PoseRef,
   RadiansRef,
+  TeamPaths,
   ValueName,
   ValueRef,
 } from '../../server/types';
+import { AnonymousPathChain, MappedIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetPaths, LoadAndIndexFile, UpdateIndexFile } from './API';
 import { EmptyMappedFile } from './IndexedFile';
-import { AnonymousPathChain, MappedIndex } from '../types';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
   'theme',
@@ -62,7 +66,7 @@ export const SelectedTeamAtom = atom(
       if (curPath !== '') {
         const paths = await get(PathsAtom);
         if (hasField(paths, val)) {
-          const files = paths[val];
+          const files = paths[val] as Path;
           if (!files.includes(curPath)) {
             set(SelectedFileAtom, '');
           } else {
@@ -75,16 +79,16 @@ export const SelectedTeamAtom = atom(
   },
 );
 
-export const FilesForSelectedTeam = atom(async (get) => {
+export const FilesForSelectedTeam = atom(async (get): Promise<Path[]> => {
   const selTeam = await get(SelectedTeamAtom);
   const thePaths = await get(PathsAtom);
   if (selTeam === '') {
-    return [];
+    return [] as Path[];
   }
   if (hasField(thePaths, selTeam)) {
-    return thePaths[selTeam];
+    return thePaths[selTeam] as Path[];
   }
-  return [];
+  return [] as Path[];
 });
 
 export const SelectedFileAtom = atomWithStorage<string>(

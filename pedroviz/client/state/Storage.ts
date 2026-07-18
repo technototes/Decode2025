@@ -1,5 +1,6 @@
-import { typecheck } from '@freik/typechk';
 import { createStore } from 'jotai';
+
+import { typecheck } from '@freik/typechk';
 
 // import { atomWithStorage } from 'jotai/utils';
 // import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
@@ -19,7 +20,7 @@ export function getStore(curStore?: MyStore): MyStore {
 export async function fetchApi<T>(
   key: string,
   chk: typecheck<T>,
-  def?: T,
+  def: T,
 ): Promise<T> {
   const fetched = await fetch('/api/' + key);
   if (fetched.ok) {

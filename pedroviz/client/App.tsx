@@ -1,10 +1,13 @@
+import { ReactElement, Suspense } from 'react';
+import { Provider, useAtomValue } from 'jotai';
+
 import {
   FluentProvider,
   webDarkTheme,
   webLightTheme,
 } from '@fluentui/react-components';
-import { Provider, useAtomValue } from 'jotai';
-import { ReactElement, Suspense } from 'react';
+import { Group, Panel, Separator } from 'react-resizable-panels';
+
 import { PathsDataDisplay } from './PathsDataDisplay';
 import { PathSelector } from './PathSelector';
 import { Settings } from './Settings';
@@ -18,21 +21,22 @@ export function MyApp(): ReactElement {
   return (
     <div className="app">
       <Suspense>
-        <div className="header">
-          <div className="header-left">
-            <PathSelector />
-          </div>
-          <div className="header-center">Viz4Pedro</div>
-          <div className="header-right">
-            <Settings />
-          </div>
+        <div className="header-left">
+          <PathSelector />
         </div>
-        <div className="sidebar">
-          <PathsDataDisplay />
+        <div className="header-center">Viz4Pedro</div>
+        <div className="header-right">
+          <Settings />
         </div>
-        <div className="display">
-          <ScaledCanvas />
-        </div>
+        <Group className="main">
+          <Panel className="sidebar">
+            <PathsDataDisplay />
+          </Panel>
+          <Separator id="view-separator" />
+          <Panel className="display">
+            <ScaledCanvas />
+          </Panel>
+        </Group>
       </Suspense>
     </div>
   );

@@ -1,3 +1,7 @@
+import { ReactElement, useState } from 'react';
+import { useAtomValue } from 'jotai';
+import { useAtomCallback } from 'jotai/utils';
+
 import {
   Button,
   Dialog,
@@ -15,9 +19,7 @@ import {
   RadioGroupProps,
   Select,
 } from '@fluentui/react-components';
-import { useAtomValue } from 'jotai';
-import { useAtomCallback } from 'jotai/utils';
-import { ReactElement, useState } from 'react';
+
 import {
   AnonymousValue,
   RadiansRef,
@@ -111,8 +113,7 @@ export function NewValue(): ReactElement {
   const label = (
     <Select
       value={isVal ? 'Value' : 'Variable'}
-      onChange={(_, data) => setIsVal(data.value === 'Value')}
-    >
+      onChange={(_, data) => setIsVal(data.value === 'Value')}>
       <option>Value</option>
       <option>Variable</option>
     </Select>
@@ -147,16 +148,14 @@ export function NewValue(): ReactElement {
                 className="col2"
                 label="Name"
                 validationMessage={validNameMessage}
-                validationState={nameValidationState}
-              >
+                validationState={nameValidationState}>
                 <Input value={name.trim()} onChange={nameChange} />
               </Field>
               <Field
                 className="col3"
                 label={label}
                 validationMessage={validValueMessage}
-                validationState={valueValidationState}
-              >
+                validationState={valueValidationState}>
                 {valOrVar}
               </Field>
             </div>
@@ -166,8 +165,7 @@ export function NewValue(): ReactElement {
               <Button
                 disabled={!saveEnabled}
                 appearance="primary"
-                onClick={saveValue}
-              >
+                onClick={saveValue}>
                 Save
               </Button>
             </DialogTrigger>

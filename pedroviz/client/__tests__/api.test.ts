@@ -1,5 +1,6 @@
-import { isNumber, isString } from '@freik/typechk';
 import { describe, expect, test } from 'bun:test';
+import { isNumber, isString } from '@freik/typechk';
+
 import {
   AnonymousBezier,
   AnonymousPose,
@@ -52,6 +53,7 @@ function mkVal(
   } else if (isNumber(value)) {
     return Number.isInteger(value) ? { int: value } : { double: value };
   }
+  return { double: 0 };
 }
 function mkNmVal(
   name: string,
@@ -128,7 +130,7 @@ const fullPathChainFile: PathChainFile = {
     mkNmVal('val3', mkVal('radians', 90)),
     mkNmVal('valCirc', mkVal('radians', 'valCirc2')),
     mkNmVal('valCirc2', mkVal('radians', 'valCirc')),
-    mkNmVal('refVal', mkValNm('val1'))
+    mkNmVal('refVal', mkValNm('val1')),
   ],
   poses: [
     mkNmPose('pose1', mkPose(mkVal('double', 2.5), mkValNm('val1'))),

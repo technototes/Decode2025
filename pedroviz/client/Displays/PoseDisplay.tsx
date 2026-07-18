@@ -1,6 +1,9 @@
-import { Text } from '@fluentui/react-components';
-import { useAtom, useAtomValue } from 'jotai';
 import { CSSProperties, ReactElement } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
+import { Text } from '@fluentui/react-components';
+import { isDefined } from '@freik/typechk';
+
 import { AnonymousPose, isPoseName, isRef, PoseName } from '../../server/types';
 import { HeadingRefDisplay } from '../PathsDataDisplay';
 import { getColorFor } from '../state/API';
@@ -10,6 +13,7 @@ import {
   MappedValuesAtom,
   PoseAtomFamily,
 } from '../state/Atoms';
+import { HasKeys } from '../types';
 import { ItemWithStyle } from '../ui-tools/types';
 import { NumberOrNamedValue } from './NumberOrNamedValueEditor';
 import { ValRefFromString } from './Validation';
@@ -27,9 +31,7 @@ export function AnonymousPoseDisplay({
   // const colors = usAtomValue(ColorsAtom);
   const names = useAtomValue(MappedValuesAtom);
 
-  const style = {
-    /* color: colors[getColorFor(pose)]*/
-  };
+  const style = {/* color: colors[getColorFor(pose)]*/};
   /*
 
       <EditableOnlyValueRef
@@ -44,7 +46,7 @@ export function AnonymousPoseDisplay({
   return (
     <>
       <NumberOrNamedValue
-        names={names}
+        names={names as unknown as HasKeys<string>}
         placeholder="Enter a value or select a variable"
         value={pose.x}
         setValue={(str: string) =>
@@ -52,14 +54,14 @@ export function AnonymousPoseDisplay({
         }
       />
       <NumberOrNamedValue
-        names={names}
+        names={names as unknown as HasKeys<string>}
         placeholder="Enter a value or select a variable"
         value={pose.y}
         setValue={(str: string) =>
           setPose({ ...pose, y: ValRefFromString(str) })
         }
       />
-      {!noHeading && <HeadingRefDisplay style={style} item={pose.heading} />}
+      {!noHeading && <HeadingRefDisplay style={style} item={pose.heading!} />}
     </>
   );
 }
@@ -86,7 +88,7 @@ export function NamedPoseItem({
   const names = useAtomValue(MappedValuesAtom);
   if (isPoseName(pose)) {
     return <Text>{pose}</Text>;
-  } else {
+  } else if (isDefined(pose)) {
     return (
       <>
         <Text style={style}>{item}</Text>
@@ -94,6 +96,7 @@ export function NamedPoseItem({
       </>
     );
   }
+  return <></>;
 }
 
 export function NamedPoseList(): ReactElement {

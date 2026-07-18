@@ -5,7 +5,12 @@ import {
   webDarkTheme,
   webLightTheme,
 } from '@fluentui/react-components';
+
 import '@testing-library/jest-dom';
+
+import { ReactElement } from 'react';
+import { Provider, useAtom } from 'jotai';
+
 import {
   act,
   fireEvent,
@@ -14,8 +19,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { Provider, useAtom } from 'jotai';
-import { ReactElement } from 'react';
+
 import {
   AnonymousBezier,
   BezierName,
@@ -46,6 +50,7 @@ import {
 } from '../state/Atoms';
 import { getStore } from '../state/Storage';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
+
 import './jest-dom-types-fix.test';
 
 // Mocks & phony data for my tests:
@@ -199,7 +204,7 @@ function JotaiProvider({
   const store = getStore();
   return (
     <Provider store={store}>
-      <FluentFixture change={false || change}>{children}</FluentFixture>
+      <FluentFixture change={change!!}>{children}</FluentFixture>
     </Provider>
   );
 }

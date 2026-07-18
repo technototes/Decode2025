@@ -1,9 +1,10 @@
 // A little control that expands or collapses the children
 
+import { ReactElement, useState } from 'react';
+
 import { Button, Text, TextProps } from '@fluentui/react-components';
 import { ChevronDownRegular, ChevronRightRegular } from '@fluentui/react-icons';
 import { isString } from '@freik/typechk';
-import { ReactElement, useState } from 'react';
 
 export type ExpandoProps = TextProps & {
   children: ReactElement | ReactElement[];

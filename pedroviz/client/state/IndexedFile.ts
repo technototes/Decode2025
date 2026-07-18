@@ -1,4 +1,5 @@
 import { isDefined, isUndefined } from '@freik/typechk';
+
 import {
   accError,
   AnonymousBezier,
@@ -25,12 +26,10 @@ import {
   ValueName,
   ValueRef,
 } from '../../server/types';
-import { ValidRes } from './API';
 import { AnonymousPathChain, MappedIndex, Point } from '../types';
+import { ValidRes } from './API';
 
-export function MakeMappedIndex(
-  pcf: PathChainFile,
-): ErrorOr<MappedIndex> {
+export function MakeMappedIndex(pcf: PathChainFile): ErrorOr<MappedIndex> {
   const namedValues = new Map<ValueName, ValueRef | RadiansRef>(
     pcf.values.map((nv) => [nv.name, nv.value]),
   );
@@ -203,7 +202,11 @@ export function calcValueRef(
       throw cerr(av, seen);
     }
     seen.add(av);
-    av = idx.namedValues.get(av as ValueName);
+    const maybe = idx.namedValues.get(av as ValueName);
+    if (isUndefined(maybe)) {
+      throw new Error(`Invalid ValueRef ${vr} through ${av}`);
+    }
+    av = maybe;
   }
   /* This shouldn't ever occur
   if (isUndefined(av)) {
@@ -225,16 +228,18 @@ export function calcPoseRefHeading(
       throw cerr(ap, seen);
     }
     seen.add(ap);
-    ap = idx.namedPoses.get(ap);
+    const maybe = idx.namedPoses.get(ap);
+    if (isUndefined(maybe)) {
+      throw new Error(`Invalid PoseRef heading ${pr} through ${ap}`);
+    }
+    ap = maybe;
   }
-  /*
   if (isUndefined(ap)) {
     throw new Error(`Invalid PoseRef ${pr}`);
   }
   if (isUndefined(ap.heading)) {
     throw new Error(`No heading for Pose ${ap} from PoseRef ${pr}`);
   }
-  */
   return calcHeadingRef(idx, ap.heading, seen);
 }
 
@@ -250,7 +255,11 @@ export function calcPoseRef(
       throw cerr(ap, seen);
     }
     seen.add(ap);
-    ap = idx.namedPoses.get(ap);
+    const maybe = idx.namedPoses.get(ap);
+    if (isUndefined(maybe)) {
+      throw new Error(`Invalid PoseRef ${pr} through ${ap}`);
+    }
+    ap = maybe;
   }
   if (isUndefined(ap)) {
     throw new Error(`Invalid PoseRef ${pr}`);
@@ -270,7 +279,11 @@ export function calcBezierRef(
       throw cerr(ab, seen);
     }
     seen.add(ab);
-    ab = idx.namedBeziers.get(ab);
+    const maybe = idx.namedBeziers.get(ab);
+    if (isUndefined(maybe)) {
+      throw new Error(`Invalid BezierRef ${br} through ${ab}`);
+    }
+    ab = maybe;
   }
   /*
   if (isUndefined(ab)) {

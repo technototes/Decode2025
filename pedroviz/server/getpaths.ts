@@ -1,6 +1,7 @@
 import fs, { promises as fsp } from 'node:fs';
 import path from 'node:path';
-import { TeamPaths } from './types';
+
+import { Path, Team, TeamPaths } from './types';
 import { firstFtcSrc, isDirectory } from './utility';
 
 // Send the list of TeamPaths to the client
@@ -26,14 +27,14 @@ const pathNameMatch = /Path[^\/\\]*\.java$/;
 export async function getPathFiles(
   repoRoot: string,
   teamName: string,
-): Promise<string[]> {
+): Promise<Path[]> {
   const teamDir = path.join(
     repoRoot,
     teamName,
     firstFtcSrc,
     teamName.toLocaleLowerCase(),
   );
-  const pathFiles: string[] = [];
+  const pathFiles: Path[] = [];
   // A worklist of directories to check for PedroPath-containing java files
   const pathsToCheck: string[] = [teamDir];
   while (pathsToCheck.length > 0) {
@@ -44,7 +45,7 @@ export async function getPathFiles(
       if (entry.isDirectory()) {
         pathsToCheck.push(fullPath);
       } else if (await isPathFile(entry)) {
-        pathFiles.push(path.relative(teamDir, fullPath));
+        pathFiles.push(path.relative(teamDir, fullPath) as Path);
       }
     }
   }
@@ -97,11 +98,11 @@ export async function getRelativeRepoRoot(
   throw new Error('Could not find repository root');
 }
 
-export async function getTeamDirectories(repoRoot: string): Promise<string[]> {
+export async function getTeamDirectories(repoRoot: string): Promise<Team[]> {
   const entries = await fsp.readdir(`${repoRoot}`, { withFileTypes: true });
   const teamDirs = entries
     .filter((dir) => isTeamDirectory(repoRoot, dir))
-    .map((dir) => dir.name);
+    .map((dir) => dir.name as Team);
   return teamDirs;
 }
 

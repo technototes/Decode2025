@@ -1,7 +1,9 @@
+import { CSSProperties, Fragment, ReactElement } from 'react';
+import { useAtomValue } from 'jotai';
+
 import { Button, Text } from '@fluentui/react-components';
 import { isDefined } from '@freik/typechk';
-import { useAtomValue } from 'jotai';
-import { CSSProperties, Fragment, ReactElement } from 'react';
+
 import {
   HeadingRef,
   HeadingType,
@@ -87,23 +89,9 @@ function InlinePoseRefDisplay({ pose }: { pose: PoseRef }): ReactElement {
   const color = getColorFor(ap);*/
   // const style = { color: colors[color % colors.length] };
   return isRef(pose) ? (
-    <Text
-      style={
-        {
-          /*style*/
-        }
-      }
-    >
-      {pose}
-    </Text>
+    <Text style={{/*style*/}}>{pose}</Text>
   ) : (
-    <Text
-      style={
-        {
-          /*style*/
-        }
-      }
-    >
+    <Text style={{/*style*/}}>
       (<ValueRefDisplay item={pose.x} />, <ValueRefDisplay item={pose.y} />)
     </Text>
   );
@@ -152,7 +140,7 @@ export function NamedBezierList(): ReactElement {
               const color = getColorFor(br);
               const style = {
                 color: colors[color % colors.length],
-                ...rowSpan(1, rowData[index]),
+                ...rowSpan(1, rowData[index]!),
               };
               return (
                 <Fragment key={`br-${name}`}>
@@ -235,15 +223,14 @@ export function NamedPathChainDisplay({
                 gridColumnEnd: 4,
                 justifySelf: 'center',
                 /*color: colors[color % colors.length],*/
-              }}
-            >
+              }}>
               {br}
             </Text>
           );
         } else {
           const style = {
             // color: colors[color % colors.length],
-            ...rowSpan(1, rowdata.children[index]),
+            ...rowSpan(1, rowdata.children[index]!),
           };
           return (
             <Fragment key={`npc-${index}`}>
@@ -296,8 +283,7 @@ export function PathChainList(): ReactElement {
           gridColumnStart: 2,
           gridColumnEnd: 4,
           justifySelf: 'center',
-        }}
-      >
+        }}>
         Paths
       </Text>
       {[
@@ -307,7 +293,7 @@ export function PathChainList(): ReactElement {
             <NamedPathChainDisplay
               key={pc[0]}
               chain={pc}
-              rowdata={nestedRowData[index]}
+              rowdata={nestedRowData[index]!}
             />
           )),
       ]}

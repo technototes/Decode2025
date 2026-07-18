@@ -1,11 +1,16 @@
 /// <reference lib="dom" />
 
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
+
 import '@testing-library/jest-dom';
+
+import { act } from 'react';
+
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, mock, test } from 'bun:test';
-import { act } from 'react';
+
 import { AutoSelector } from '../ui-tools/AutoSelector';
+
 import './jest-dom-types-fix.test';
 
 // I'm *really* new to all this UI testing. These are all *terrible* tests,

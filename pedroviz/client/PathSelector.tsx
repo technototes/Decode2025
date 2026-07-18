@@ -1,6 +1,8 @@
-import { Text } from '@fluentui/react-components';
-import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
+import { Text } from '@fluentui/react-components';
+
 import { select_a_bot, select_a_file } from './constants';
 import {
   BlurAtom,

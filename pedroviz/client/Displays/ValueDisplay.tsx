@@ -1,6 +1,9 @@
-import { Field, Input, InputProps, Text } from '@fluentui/react-components';
-import { useAtom, useAtomValue } from 'jotai';
 import { CSSProperties, ReactElement, useState } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
+import { Field, Input, InputProps, Text } from '@fluentui/react-components';
+import { isDefined } from '@freik/typechk';
+
 import {
   AnonymousValue,
   isDoubleValue,
@@ -11,6 +14,7 @@ import {
   ValueRef,
 } from '../../server/types';
 import { MappedValuesAtom, ValueAtomFamily } from '../state/Atoms';
+import { HasKeys } from '../types';
 import { ItemWithStyle } from '../ui-tools/types';
 import { NumberOrNamedValue } from './NumberOrNamedValueEditor';
 import { CheckValidName, ValRefFromString } from './Validation';
@@ -54,8 +58,7 @@ export function EditableValueRef({
     <Field
       style={style}
       validationMessage={validNameMessage}
-      validationState={nameValidationState}
-    >
+      validationState={nameValidationState}>
       <Input
         type="text"
         value={curVal}
@@ -132,7 +135,7 @@ export function NamedValueElem({ name }: { name: ValueName }): ReactElement {
   if (isRadiansRef(item)) {
     editable = (
       <NumberOrNamedValue
-        names={names}
+        names={names as unknown as HasKeys<string>}
         value={item.radians}
         placeholder="RADIANS!"
         setValue={(val) => setItem({ radians: ValRefFromString(val) })}
@@ -152,16 +155,18 @@ export function NamedValueElem({ name }: { name: ValueName }): ReactElement {
         />
       );
     }*/
-  } else {
+  } else if (isDefined(item)) {
     //    editable = <EditableOnlyValueRef ref={item} setRef={setItem} />;
     editable = (
       <NumberOrNamedValue
-        names={names}
+        names={names as unknown as HasKeys<string>}
         value={item}
         placeholder="NotRadians"
         setValue={(val) => setItem(ValRefFromString(val))}
       />
     );
+  } else {
+    return <></>;
   }
   return (
     <>

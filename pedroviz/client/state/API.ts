@@ -1,4 +1,5 @@
 import { chkAnyOf, isString } from '@freik/typechk';
+
 import {
   AnonymousBezier,
   AnonymousPose,
@@ -8,11 +9,12 @@ import {
   isError,
   makeError,
   PathChainFile,
+  Team,
   TeamPaths,
 } from '../../server/types';
+import { MappedIndex } from '../types';
 import { MakeMappedIndex } from './IndexedFile';
 import { fetchApi } from './Storage';
-import { MappedIndex } from '../types';
 
 export type ValidRes = ErrorOr<true>;
 // Some of the logic seems a little odd, because I want the validation to fully
@@ -28,15 +30,15 @@ export function getColorFor(
     if (!colorLookup.has(item)) {
       colorLookup.set(item, colorCount++);
     }
-    return colorLookup.get(item);
+    return colorLookup.get(item)!;
   }
   return getColorFor(JSON.stringify(item));
 }
 
 export async function GetPaths(): Promise<TeamPaths> {
   const teamFileList = await fetchApi('getpaths', chkTeamPaths, {});
-  for (const i of Object.keys(teamFileList)) {
-    teamFileList[i].sort();
+  for (const i of Object.keys(teamFileList) as Team[]) {
+    teamFileList[i]!.sort();
   }
   return teamFileList;
 }

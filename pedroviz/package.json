@@ -11,36 +11,62 @@
     "open:mac": "open",
     "open:lin": "xdg-open",
     "os": "bun run scripts/os.ts",
-    "types": "tsc --noEmit -p tsconfig.json",
+    "types": "tsc --noEmit -p pv-tsconfig.json",
     "pvdev": "bun --hot index.tsx",
     "pvbuild": "bun build ./index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
     "pvstart": "NODE_ENV=production bun index.tsx"
   },
   "dependencies": {
-    "@fluentui/react-components": "^9.73.2",
-    "@fluentui/react-icons": "^2.0.320",
-    "@freik/containers": "^0.4.5",
-    "@freik/fluentui-tools": "^1.2.5",
-    "@freik/react-tools": "^0.3.5",
-    "@freik/typechk": "^0.9.1",
+    "@fluentui/react-components": "^9.74.4",
+    "@fluentui/react-icons": "^2.0.333",
+    "@freik/containers": "^0.4.10",
+    "@freik/fluentui-tools": "^1.2.10",
+    "@freik/react-tools": "^0.3.11",
+    "@freik/typechk": "^0.9.6",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "java-parser": "^3.0.1",
-    "jotai": "^2.18.0",
-    "jotai-family": "^1.0.1",
+    "jotai": "^2.20.2",
+    "jotai-family": "^1.0.2",
     "jotai-optics": "^0.4.0",
-    "prettier": "^3.8.1",
-    "prettier-plugin-java": "^2.8.1",
-    "prettier-plugin-organize-imports": "^4.3.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "typescript": "^5.9.3"
+    "prettier": "^3.9.5",
+    "prettier-plugin-java": "^2.10.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-resizable-panels": "^4.12.2",
+    "typescript": "^7.0.2"
   },
   "devDependencies": {
-    "@happy-dom/global-registrator": "^20.8.3",
+    "@happy-dom/global-registrator": "^20.11.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@types/bun": "1.3.10",
-    "@types/react": "^19.2.14",
+    "@types/bun": "1.3.14",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3"
   },
-  "private": true
+  "prettier": {
+    "printWidth": 80,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "proseWrap": "always",
+    "tabWidth": 2,
+    "useTabs": false,
+    "bracketSameLine": true,
+    "arrowParens": "always",
+    "plugins": [
+      "@ianvs/prettier-plugin-sort-imports"
+    ],
+    "importOrder": [
+      "^react$",
+      "^react-dom$",
+      "^react-dom/client$",
+      "^.*jotai.*$",
+      "",
+      "<THIRD_PARTY_MODULES>",
+      "^@freik/.*$",
+      "",
+      "^(?!.*[.]css$)[./].*$",
+      "",
+      ".css$"
+    ]
+  }
 }

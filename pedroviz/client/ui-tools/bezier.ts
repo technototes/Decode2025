@@ -11,12 +11,12 @@ export function deCasteljau(controlPoints: Point[], t: number): Point {
   for (let r = 1; r < points.length; r++) {
     for (let i = 0; i < points.length - r; i++) {
       points[i] = {
-        x: (1 - t) * points[i].x + t * points[i + 1].x,
-        y: (1 - t) * points[i].y + t * points[i + 1].y,
+        x: (1 - t) * points[i]!.x + t * points[i + 1]!.x,
+        y: (1 - t) * points[i]!.y + t * points[i + 1]!.y,
       };
     }
   }
-  return points[0];
+  return points[0]!;
 }
 
 // Compute derivative control points (2D)
@@ -26,8 +26,8 @@ function derivativeControlPoints(controlPoints: Point[]): Point[] {
 
   for (let i = 0; i < d; i++) {
     result.push({
-      x: d * (controlPoints[i + 1].x - controlPoints[i].x),
-      y: d * (controlPoints[i + 1].y - controlPoints[i].y),
+      x: d * (controlPoints[i + 1]!.x - controlPoints[i]!.x),
+      y: d * (controlPoints[i + 1]!.y - controlPoints[i]!.y),
     });
   }
   return result;
