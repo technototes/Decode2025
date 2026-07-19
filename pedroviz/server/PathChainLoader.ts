@@ -7,6 +7,7 @@ import {
   ExpressionCstNode,
   FieldDeclarationCtx,
   FqnOrRefTypeCstNode,
+  FqnOrRefTypePartRestCstNode,
   IToken,
   parse,
   PrimaryCtx,
@@ -33,6 +34,7 @@ import {
   HeadingType,
   isAnonymousValue,
   isRadiansRef,
+  isRef,
   NamedBezier,
   NamedPathChain,
   NamedPose,
@@ -254,10 +256,25 @@ function getNumericConstant(
 }
 
 function getRefTypeName(fqn: FqnOrRefTypeCstNode[]): string | undefined {
-  return nameOf(
+  let name = nameOf(
     child(child(child(fqn)?.fqnOrRefTypePartFirst)?.fqnOrRefTypePartCommon)
       ?.Identifier,
   );
+  if (isUndefined(name)) {
+    return;
+  }
+  const rest = child(fqn)?.fqnOrRefTypePartRest;
+  if (isDefined(rest)) {
+    for (const item of rest.map(
+      (fqnRest) => fqnRest.children.fqnOrRefTypePartCommon,
+    )) {
+      const next = nameOf(descend(item)?.children.Identifier);
+      if (isDefined(next)) {
+        name = name + '.' + next;
+      }
+    }
+  }
+  return name;
 }
 
 function getRef(expr: ExpressionCstNode): string | undefined {
@@ -282,21 +299,12 @@ function getRefOr<Str, T>(
   return isString(ref) ? (ref as Str) : getOr(expr);
 }
 
-function getMethodInvoke(primary: PrimaryCtx): [string, string] | undefined {
+function getMethodInvoke(primary: PrimaryCtx): string | undefined {
   const methodInvoke = child(primary.primaryPrefix)?.fqnOrRefType;
   if (isUndefined(methodInvoke)) {
     return;
   }
-  const objName = getRefTypeName(methodInvoke);
-  if (isUndefined(objName)) {
-    return;
-  }
-  let methodName = nameOf(
-    child(
-      child(child(methodInvoke)?.fqnOrRefTypePartRest)?.fqnOrRefTypePartCommon,
-    )?.Identifier,
-  );
-  return isDefined(methodName) ? [objName, methodName] : undefined;
+  return getRefTypeName(methodInvoke);
 }
 
 function getToRadians(
@@ -314,8 +322,7 @@ function getToRadians(
   const maybeMathToRad = getMethodInvoke(maybeMethod);
   if (
     isUndefined(maybeMathToRad) ||
-    maybeMathToRad[0] !== 'Math' ||
-    maybeMathToRad[1] !== 'toRadians' ||
+    maybeMathToRad !== 'Math.toRadians' ||
     isUndefined(expr.children.conditionalExpression)
   ) {
     return;
@@ -540,14 +547,14 @@ function getHeadingRef(
   arg: ExpressionCstNode | undefined,
   poseAllowed: boolean = false,
 ): HeadingRef | undefined {
-  if (poseAllowed) {
-    // TODO:
-    // Check for a <ref>.getHeading() expression
-    // As it currently stands, this just gets the name of the ref, which is the end result
-    // we're looking for, but it doesn't do any validation that it's also a "foo.getHeading()"
-    // for names refer to poses.
+  const valRef = getValueRef(arg);
+  if (isDefined(valRef) && poseAllowed) {
+    // Check for a <ref>.getHeading() expression, which turns into a simple PoseName
+    if (isRef(valRef) && valRef.endsWith('.getHeading')) {
+      return valRef.substring(0, valRef.length - 11) as PoseName;
+    }
   }
-  return getValueRef(arg);
+  return valRef;
 }
 
 function getBezierRef(
@@ -593,11 +600,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
     return;
   }
   const objInvoke = getMethodInvoke(builder);
-  if (
-    isUndefined(objInvoke) ||
-    objInvoke[0] !== 'follower' ||
-    objInvoke[1] !== 'pathBuilder'
-  ) {
+  if (isUndefined(objInvoke) || objInvoke !== 'follower.pathBuilder') {
     return;
   }
   const methods = builder.primarySuffix;
@@ -718,7 +721,7 @@ function getPathChainHelper(
   }
   const typeName = nameOf(lclType);
   const varName = getLValueName(lclVal);
-  if (isUndefined(varName)) {
+  if (isUndefined(varName) || isUndefined(typeName)) {
     return;
   }
   const newExpr = child(
@@ -796,6 +799,7 @@ export async function MakePathChainFile(
   return isString(res) ? res : loader.info;
 }
 
+// This is for quick debugging:
 if (import.meta.main) {
   // This code runs only when you execute the file directly
   // e.g., `bun run my-file.ts`
