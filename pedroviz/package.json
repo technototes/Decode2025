@@ -29,7 +29,7 @@
     "jotai-family": "^1.0.2",
     "jotai-optics": "^0.4.0",
     "prettier": "^3.9.5",
-    "prettier-plugin-java": "^2.10.2",
+    "prettier-plugin-java": "^2.10.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-resizable-panels": "^4.12.2",

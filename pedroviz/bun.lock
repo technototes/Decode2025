@@ -17,7 +17,7 @@
         "jotai-family": "^1.0.2",
         "jotai-optics": "^0.4.0",
         "prettier": "^3.9.5",
-        "prettier-plugin-java": "^2.10.2",
+        "prettier-plugin-java": "^2.10.3",
         "react": "^19.2.7",
         "react-dom": "^19.2.7",
         "react-resizable-panels": "^4.12.2",
@@ -404,7 +404,7 @@
 
     "prettier": ["prettier@3.9.5", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-/FVl766LpUfB5vXgCYOYa0MeV/441Ia99AeICQIQFTY/Nw0roZwULcXpku5i1/m5kt/baz+s4Zogspd839HSMg=="],
 
-    "prettier-plugin-java": ["prettier-plugin-java@2.10.2", "", { "dependencies": { "web-tree-sitter": "0.26.9" }, "peerDependencies": { "prettier": "^3.0.0" } }, "sha512-oOXUBqb0BKfL//ZeYFcsRtbm4h8jdicg1axbBrXh2tnUcAcKAyFCl3gUL7bN7kwDwFRraQop1RF9BZk+K6pmoQ=="],
+    "prettier-plugin-java": ["prettier-plugin-java@2.10.3", "", { "dependencies": { "web-tree-sitter": "0.26.11" }, "peerDependencies": { "prettier": "^3.0.0" } }, "sha512-/g52mTbsN2ee8JjLRpBWGGmcmRhdv2zRWyj4QbsL9CQ+nKR022GRJhebwEpRyaCc8hLV6aO3JPGNQyXp1DPrCA=="],
 
     "pretty-format": ["pretty-format@27.5.1", "", { "dependencies": { "ansi-regex": "^5.0.1", "ansi-styles": "^5.0.0", "react-is": "^17.0.1" } }, "sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ=="],
 
@@ -438,7 +438,7 @@
 
     "use-sync-external-store": ["use-sync-external-store@1.6.0", "", { "peerDependencies": { "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w=="],
 
-    "web-tree-sitter": ["web-tree-sitter@0.26.9", "", {}, "sha512-YJwSHANl6XFgeEjB8nitgj0qZYt5gkIesJ4w2srS2wcLB4GUa4xcOkM0YaMsU6WNR53YVIkDSY7Ej4pf3IXtCA=="],
+    "web-tree-sitter": ["web-tree-sitter@0.26.11", "", {}, "sha512-Q5Dm3YTIXSXuH6FxX6RuzX2Qwpc4DPGiYMU87Wg5Z8OIStiQFiUex4zMDc0vBTw78EphaYJacncJghCHzbZptg=="],
 
     "whatwg-mimetype": ["whatwg-mimetype@3.0.0", "", {}, "sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q=="],
 

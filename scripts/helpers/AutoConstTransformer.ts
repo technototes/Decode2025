@@ -1,12 +1,3 @@
-import { MakeStack } from '@freik/containers';
-import {
-  chkAllOf,
-  chkFieldType,
-  hasFieldType,
-  isArray,
-  isNonNullable,
-  isNumber,
-} from '@freik/typechk';
 import {
   ArgumentListCtx,
   BaseJavaCstVisitorWithDefaults,
@@ -42,6 +33,15 @@ import {
   VariableDeclaratorListCtx,
   VariableInitializerCtx,
 } from 'java-parser';
+import { MakeStack } from '@freik/containers';
+import {
+  chkAllOf,
+  chkFieldType,
+  hasFieldType,
+  isArray,
+  isNonNullable,
+  isNumber,
+} from '@freik/typechk';
 
 /*** BEGIN CONFIGURATION STUFF ***/
 // These are types the parser is transforming:

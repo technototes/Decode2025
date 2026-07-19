@@ -1,6 +1,7 @@
 import { existsSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+
 import { MakeAutoConstantsTransformer } from './helpers/AutoConstTransformer.js';
 import { removeComments } from './helpers/removeComments.js';
 
