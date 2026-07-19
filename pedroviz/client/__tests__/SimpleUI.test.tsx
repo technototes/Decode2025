@@ -1,16 +1,14 @@
 /// <reference lib="dom" />
 
+import { beforeEach, describe, expect, test } from 'bun:test';
+import { ReactElement } from 'react';
+import { Provider, useAtom } from 'jotai';
+
 import {
   FluentProvider,
   webDarkTheme,
   webLightTheme,
 } from '@fluentui/react-components';
-
-import '@testing-library/jest-dom';
-
-import { ReactElement } from 'react';
-import { Provider, useAtom } from 'jotai';
-
 import {
   act,
   fireEvent,
@@ -18,7 +16,8 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { beforeEach, describe, expect, test } from 'bun:test';
+
+import '@testing-library/jest-dom';
 
 import {
   AnonymousBezier,
@@ -63,6 +62,7 @@ const testPathChainFile: PathChainFile = {
   values: [],
   poses: [],
   beziers: [],
+  pathChainHelpers: [],
   pathChains: [],
   name: 'path1.java',
 };
@@ -117,6 +117,8 @@ const fullPathChainFile: PathChainFile = {
       points: simpleBez,
     },
   ],
+  // TODO
+  pathChainHelpers: [],
   pathChains: [
     {
       name: 'pc1' as PathChainName,

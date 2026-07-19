@@ -1,6 +1,5 @@
-import path from 'path';
-
 import { expect, test } from 'bun:test';
+import path from 'path';
 
 import {
   GetPathFileNames,
@@ -45,7 +44,7 @@ test('getTeamDirectories finds team directories', async () => {
 test('getPathFiles finds path files', async () => {
   const repoRoot = await getTestRepoPath();
   const pathFiles = await getPathFiles(repoRoot, 'TeamA');
-  expect(pathFiles.length).toBe(2);
+  expect(pathFiles.length).toBe(3);
   expect(pathFiles).toContain('TeamTestPaths.java' as Path);
   expect(pathFiles).toContain(
     path.join('subdir', 'PathsLiveHere.java') as Path,

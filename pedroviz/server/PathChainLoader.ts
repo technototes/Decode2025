@@ -141,8 +141,9 @@ function child<T extends { children: any }>(
   return descend(ctx)?.children;
 }
 
-function nameOf(ctx: IToken[] | undefined): string | undefined {
-  return descend(ctx)?.image;
+function nameOf(ctx: IToken[] | IToken | undefined): string | undefined {
+  if (isArray(ctx)) return ctx.map((tok) => tok.image).join('.');
+  else return ctx?.image;
 }
 
 function getBType(className: string): 'line' | 'curve' | undefined {
@@ -692,47 +693,73 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
 function getPathChainHelper(
   node: BlockStatementCstNode,
 ): PathChainHelper | undefined {
+  const varDecl = child(
+    child(node.children.localVariableDeclarationStatement)
+      ?.localVariableDeclaration,
+  );
+  if (isUndefined(varDecl)) {
+    return;
+  }
   const lclType = child(
     child(
-      child(node.children.localVariableDeclarationStatement)
-        ?.localVariableDeclaration,
-    )?.localVariableType,
-  );
-
-  if (isUndefined(stmt) || isUndefined(stmt.unaryExpression)) {
+      child(
+        child(child(varDecl.localVariableType)?.unannType)?.unannReferenceType,
+      )?.unannClassOrInterfaceType,
+    )?.unannClassType,
+  )?.Identifier;
+  if (isUndefined(lclType) || lclType.length === 0) {
     return;
   }
-  const maybeFqnOrRef = child(
-    child(child(stmt.unaryExpression)?.primary)?.primaryPrefix,
+  const lclVal = child(
+    child(varDecl.variableDeclaratorList)?.variableDeclarator,
   );
-  if (isUndefined(maybeFqnOrRef) || isUndefined(maybeFqnOrRef.fqnOrRefType)) {
+  if (isUndefined(lclVal)) {
     return;
   }
-  const fieldName = getRefTypeName(maybeFqnOrRef.fqnOrRefType);
-  // TODO: make sure the field name is in the list of fields
-  const builder = child(
+  const typeName = nameOf(lclType);
+  const varName = getLValueName(lclVal);
+  if (isUndefined(varName)) {
+    return;
+  }
+  const newExpr = child(
     child(
       child(
-        child(child(stmt.expression)?.conditionalExpression)?.binaryExpression,
-      )?.unaryExpression,
-    )?.primary,
+        child(
+          child(
+            child(
+              child(
+                child(child(lclVal.variableInitializer)?.expression)
+                  ?.conditionalExpression,
+              )?.binaryExpression,
+            )?.unaryExpression,
+          )?.primary,
+        )?.primaryPrefix,
+      )?.newExpression,
+    )?.unqualifiedClassInstanceCreationExpression,
   );
-  if (isUndefined(builder)) {
+  if (isUndefined(newExpr)) {
     return;
   }
-  const objInvoke = getMethodInvoke(builder);
+  const ctorClass = child(
+    newExpr.classOrInterfaceTypeToInstantiate,
+  )?.Identifier;
+  if (isUndefined(ctorClass)) {
+    return;
+  }
+  const ctorName = nameOf(ctorClass);
+  if (ctorName !== typeName) {
+    // This is being picky, but tough luck: I'm picky..
+    return;
+  }
   if (
-    isUndefined(objInvoke) ||
-    objInvoke[0] !== 'follower' ||
-    objInvoke[1] !== 'pathBuilder'
+    isDefined(newExpr.argumentList) ||
+    isDefined(newExpr.classBody) ||
+    isDefined(newExpr.typeArguments)
   ) {
     return;
   }
-  const methods = builder.primarySuffix;
-  if (isUndefined(methods) || methods.length < 5) {
-    return;
-  }
-  return;
+  // TODO: Read the file's package and make the names fully qualified
+  return { name: varName, staticType: typeName };
 }
 
 function getPathChainHelpers(

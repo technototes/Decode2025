@@ -1,12 +1,11 @@
-import { BoolState } from '@freik/react-tools';
-import { PrimitiveAtom, WritableAtom, useAtom } from 'jotai';
+import { PrimitiveAtom, useAtom, WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai-family';
 import { RESET } from 'jotai/utils';
 
+import { BoolState } from '@freik/react-tools';
+
 export type SetStateActionWithReset<T> =
-  | T
-  | typeof RESET
-  | ((prev: T) => T | typeof RESET);
+  T | typeof RESET | ((prev: T) => T | typeof RESET);
 
 export type SetStateAction<T> = T | ((prev: T) => T);
 

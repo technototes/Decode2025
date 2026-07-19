@@ -1,6 +1,8 @@
-import { act, renderHook } from '@testing-library/react';
 import { describe, expect, test } from 'bun:test';
 import { useAtom, useAtomValue } from 'jotai';
+
+import { act, renderHook } from '@testing-library/react';
+
 import { SelectedFileAtom, SelectedTeamAtom, TeamsAtom } from '../state/Atoms';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;

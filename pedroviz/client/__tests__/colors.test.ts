@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test';
+
 import { darkOnWhite, GenerateColors, lightOnBlack } from '../ui-tools/Colors';
 
 test('Color generation', () => {

@@ -1,13 +1,12 @@
 /// <reference lib="dom" />
 
-import { FluentProvider, webLightTheme } from '@fluentui/react-components';
-
-import '@testing-library/jest-dom';
-
+import { describe, expect, mock, test } from 'bun:test';
 import { act } from 'react';
 
+import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, mock, test } from 'bun:test';
+
+import '@testing-library/jest-dom';
 
 import { AutoSelector } from '../ui-tools/AutoSelector';
 

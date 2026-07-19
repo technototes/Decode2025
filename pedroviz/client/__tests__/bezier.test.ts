@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test';
+
 import { Point } from '../types';
 import {
   bezierDerivative,

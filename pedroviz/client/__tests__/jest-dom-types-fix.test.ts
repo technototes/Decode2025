@@ -1,6 +1,7 @@
+import { expect, Matchers } from 'bun:test';
+
 import { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
 import * as matchers from '@testing-library/jest-dom/matchers';
-import { expect, Matchers } from 'bun:test';
 
 expect.extend(matchers as any);
 

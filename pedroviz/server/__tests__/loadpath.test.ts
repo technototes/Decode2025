@@ -1,6 +1,6 @@
+import { expect, test } from 'bun:test';
 import path from 'path';
 
-import { expect, test } from 'bun:test';
 import { isString } from '@freik/typechk';
 
 import { LoadPath, loadPathChainsFromFile } from '../loadpath';

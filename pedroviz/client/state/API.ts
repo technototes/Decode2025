@@ -81,7 +81,7 @@ export async function LoadAndIndexFile(
   if (isError(indexFile)) {
     return makeError(
       indexFile,
-      `Loaded file ${team}/${file} has dangling references: Maybe open other files first. (TODO: KEVIN, FIX THIS!)`,
+      `Loaded file ${team}/${file} has dangling references.`,
     );
   } else {
     // TODO: This shouldn't be manual. If you have dangling references, you should evaluate the other files...

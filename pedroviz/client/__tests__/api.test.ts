@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+
 import { isNumber, isString } from '@freik/typechk';
 
 import {
@@ -147,6 +148,8 @@ const fullPathChainFile: PathChainFile = {
     mkNmBez('bez1', mkBez('line', mkPoseNm('pose1'), mkPoseNm('pose2'))),
     mkNmBez('bez2', simpleBez),
   ],
+  // TODO:
+  pathChainHelpers: [],
   pathChains: [
     {
       name: 'pc1' as PathChainName,
@@ -208,6 +211,8 @@ const danglingPCF: PathChainFile = {
       mkBez('line', mkPose('val1', 'val2', mkValNm('zip'))),
     ),
   ],
+  // TODO
+  pathChainHelpers: [],
   pathChains: [
     ...fullPathChainFile.pathChains,
     {
