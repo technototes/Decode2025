@@ -12,6 +12,8 @@ import {
   typecheck,
 } from '@freik/typechk';
 
+// This is a Typescript mechanism to allow strings to be constrained a bit more.
+// I'm not sure if it's worth the trouble or not...
 declare const brand: unique symbol;
 export type Nominal<T, Brand extends string> = T & { readonly [brand]: Brand };
 
@@ -105,20 +107,27 @@ export type NamedPathChain = {
   heading: HeadingType;
 };
 
+export type PathChainHelper = {
+  name: string; // This should just be a simple variable name
+  staticType: string; // This should be the package-local type being assigned
+};
+
 export type PathChainFile = {
   name: string;
   values: NamedValue[];
   poses: NamedPose[];
   beziers: NamedBezier[];
   pathChains: NamedPathChain[];
+  pathChainHelpers: PathChainHelper[];
 };
 
-export const EmptyPathChainFile = {
+export const EmptyPathChainFile: PathChainFile = {
   name: '',
   values: [],
   poses: [],
   beziers: [],
   pathChains: [],
+  pathChainHelpers: [],
 };
 
 export type MaybePathFile = ErrorOr<PathChainFile>;
@@ -222,12 +231,18 @@ export const isNamedPathChain = chkObjectOfExactType<NamedPathChain>({
   heading: isHeadingType,
 });
 
+export const isPathChainHelper = chkObjectOfExactType<PathChainHelper>({
+  name: isString,
+  staticType: isString,
+});
+
 export const chkPathChainFile = chkObjectOfExactType<PathChainFile>({
   name: isString,
   values: chkArrayOf(isNamedValue),
   poses: chkArrayOf(isNamedPose),
   beziers: chkArrayOf(isNamedBezier),
   pathChains: chkArrayOf(isNamedPathChain),
+  pathChainHelpers: chkArrayOf(isPathChainHelper),
 });
 
 // Not used yet, but these are the results of evaluating the various types

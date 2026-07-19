@@ -8,6 +8,7 @@ import {
   ErrorOr,
   isError,
   makeError,
+  Path,
   PathChainFile,
   Team,
   TeamPaths,
@@ -23,6 +24,7 @@ export type ValidRes = ErrorOr<true>;
 const colorLookup: Map<string, number> = new Map();
 let colorCount = 0;
 
+// This provides a consistent color for a given curve/pose
 export function getColorFor(
   item: string | AnonymousBezier | AnonymousPose,
 ): number {
@@ -35,6 +37,7 @@ export function getColorFor(
   return getColorFor(JSON.stringify(item));
 }
 
+// Returns the list of available files for all teams
 export async function GetPaths(): Promise<TeamPaths> {
   const teamFileList = await fetchApi('getpaths', chkTeamPaths, {});
   for (const i of Object.keys(teamFileList) as Team[]) {
@@ -49,6 +52,8 @@ const lastLoadedIndexFile = {
   file: '',
   data: null as null | MappedIndex,
 };
+const indexedFiles: Map<[Team, Path], MappedIndex> = new Map();
+
 export async function LoadAndIndexFile(
   team: string,
   file: string,
@@ -72,12 +77,15 @@ export async function LoadAndIndexFile(
   if (isString(pcf)) {
     return makeError(pcf);
   }
-  const indexFile = MakeMappedIndex(pcf);
+  const indexFile = await MakeMappedIndex(pcf, indexedFiles);
   if (isError(indexFile)) {
     return makeError(
       indexFile,
-      `Loaded file ${team}/${file} has dangling references.`,
+      `Loaded file ${team}/${file} has dangling references: Maybe open other files first. (TODO: KEVIN, FIX THIS!)`,
     );
+  } else {
+    // TODO: This shouldn't be manual. If you have dangling references, you should evaluate the other files...
+    indexedFiles.set([team as Team, file as Path], indexFile);
   }
   lastLoadedIndexFile.data = indexFile;
   return indexFile;

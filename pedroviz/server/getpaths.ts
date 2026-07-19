@@ -21,7 +21,7 @@ export async function GetPathFileNames(): Promise<Response> {
   return Response.json(filePaths);
 }
 
-const pathNameMatch = /Path[^\/\\]*\.java$/;
+const pathNameMatch = /[^\/\\]*(Path|Pose)[^\/\\]*\.java$/;
 
 // Find all the files in the team directory that look like good Path files
 export async function getPathFiles(
@@ -52,12 +52,12 @@ export async function getPathFiles(
   return pathFiles;
 }
 
-// The imports we're looking for in a Path*.java file:
+// The *only* imports we're looking for in a Path*.java file. This is probably too strict.
 const imports = [
   /^\s*import\s+com\.pedropathing\.follower\.Follower\s*;/,
-  /^\s*import\s+com\.pedropathing\.geometry\.Bezier[A-Za-z]+\s*;/,
-  /^\s*import\s+com\.pedropathing\.geometry\.Pose\s*;/,
-  /^\s*import\s+com\.pedropathing\.paths\.PathChain\s*;/,
+  /^\s*import\s+com\.pedropathing\.geometry\.(Bezier[A-Za-z]+|Pose)\s*;/,
+  /^\s*import\s+com\.pedropathing\.paths\.(HeadingInterpolator|PathChain)\s*;/,
+  /^\s*import\s+com\.bylazar\.configurables\.annotations\.Configurable\s*;/,
 ];
 
 async function isPathFile(entry: fs.Dirent): Promise<boolean> {
@@ -75,8 +75,7 @@ async function isPathFile(entry: fs.Dirent): Promise<boolean> {
     }
     return false;
   });
-  // console.log(`File ${filePath} has ${matches.length} relevant import lines.`, matches);
-  return matches.length >= 4;
+  return matches.length !== 0;
 }
 
 export async function getRelativeRepoRoot(

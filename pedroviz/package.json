@@ -5,7 +5,7 @@
   "license": "CC0-1.0",
   "type": "module",
   "scripts": {
-    "format": "prettier -w \"*.ts*\" \"client/**/*.tsx\" \"server/**/*.ts\" \"*.md\" \"*.json\" \"*.html\"",
+    "format": "prettier -w \"*.ts*\" \"client/**/*.tsx\"  \"client/**/*.ts\" \"server/**/*.ts\" \"*.md\" \"*.json\" \"*.html\"",
     "open": "bun run os open",
     "open:win": "cmd /c start \"\"",
     "open:mac": "open",

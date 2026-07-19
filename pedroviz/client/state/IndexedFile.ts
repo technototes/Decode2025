@@ -18,18 +18,23 @@ import {
   isRadiansRef,
   isRef,
   makeError,
+  Path,
   PathChainFile,
   PathChainName,
   PoseName,
   PoseRef,
   RadiansRef,
+  Team,
   ValueName,
   ValueRef,
 } from '../../server/types';
 import { AnonymousPathChain, MappedIndex, Point } from '../types';
 import { ValidRes } from './API';
 
-export function MakeMappedIndex(pcf: PathChainFile): ErrorOr<MappedIndex> {
+export function MakeMappedIndex(
+  pcf: PathChainFile,
+  otherFiles: Map<[Team, Path], MappedIndex>,
+): ErrorOr<MappedIndex> {
   const namedValues = new Map<ValueName, ValueRef | RadiansRef>(
     pcf.values.map((nv) => [nv.name, nv.value]),
   );
@@ -49,6 +54,7 @@ export function MakeMappedIndex(pcf: PathChainFile): ErrorOr<MappedIndex> {
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
     if (isRef(vr)) {
       if (!namedValues.has(vr)) {
+        // TODO: This should trigger cross file lookup
         return makeError(
           `${id}'s "${vr}" value reference appears to be undefined.`,
         );
@@ -83,7 +89,8 @@ export function MakeMappedIndex(pcf: PathChainFile): ErrorOr<MappedIndex> {
     if (isRef(pr)) {
       return namedPoses.has(pr)
         ? true
-        : makeError(`${id}'s "${pr}" pose reference appears to be undefined`);
+        : // TODO: This should trigger cross file lookup
+          makeError(`${id}'s "${pr}" pose reference appears to be undefined`);
     }
     return checkAnonymousPose(pr, id);
   }
@@ -108,7 +115,8 @@ export function MakeMappedIndex(pcf: PathChainFile): ErrorOr<MappedIndex> {
     if (isRef(br)) {
       return namedBeziers.has(br)
         ? true
-        : makeError(`${id}'s bezier reference appears to be undefined`);
+        : // TODO: This should trigger cross file lookup
+          makeError(`${id}'s bezier reference appears to be undefined`);
     }
     return checkAnonymousBezier(br, id);
   }

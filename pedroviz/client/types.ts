@@ -5,6 +5,7 @@ import {
   isNumber,
   typecheck,
 } from '@freik/typechk';
+
 import {
   BezierName,
   BezierRef,
@@ -76,20 +77,27 @@ export type HasKeys<T> = HasItem<T> & {
 
 export type ValidationState = 'error' | 'warning' | 'success' | 'none';
 export type ValidationData = {
-  message: string,
+  message: string;
   state: ValidationState;
 };
-export const ValidData: ValidationData = Object.freeze({ message: '', state: 'none' });
-export function ValidationResult(message: string, state: ValidationState): ValidationData {
+export const ValidData: ValidationData = Object.freeze({
+  message: '',
+  state: 'none',
+});
+export function ValidationResult(
+  message: string,
+  state: ValidationState,
+): ValidationData {
   return { message, state };
 }
 
 export function GetValueAsString(vr: ValueRef): string {
-  if (isValueName(vr))  {
+  if (isValueName(vr)) {
     return vr;
   }
   if (isIntValue(vr)) {
     return vr.int.toFixed(0);
   }
+  // Even in *radians* this is about .57 of a degree, so 2 decimal places seems good enough
   return vr.double.toFixed(2);
 }

@@ -38,6 +38,7 @@ import {
   NamedPose,
   NamedValue,
   PathChainFile,
+  PathChainHelper,
   PathChainName,
   PoseName,
   PoseRef,
@@ -56,6 +57,7 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     poses: [], // NamedPose[];
     beziers: [], // Bezier[];
     pathChains: [], // PathChain[];
+    pathChainHelpers: [], // PathChainHelpers[]
   };
 
   constructor() {
@@ -120,6 +122,7 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
   }
 
   override constructorDeclaration(ctx: ConstructorDeclarationCtx) {
+    this.info.pathChainHelpers.push(...getPathChainHelpers(ctx));
     this.info.pathChains.push(...getPathChainFactories(ctx));
     return super.constructorDeclaration(ctx);
   }
@@ -686,6 +689,66 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
   return { name: fieldName as PathChainName, paths: chain, heading };
 }
 
+function getPathChainHelper(
+  node: BlockStatementCstNode,
+): PathChainHelper | undefined {
+  const lclType = child(
+    child(
+      child(node.children.localVariableDeclarationStatement)
+        ?.localVariableDeclaration,
+    )?.localVariableType,
+  );
+
+  if (isUndefined(stmt) || isUndefined(stmt.unaryExpression)) {
+    return;
+  }
+  const maybeFqnOrRef = child(
+    child(child(stmt.unaryExpression)?.primary)?.primaryPrefix,
+  );
+  if (isUndefined(maybeFqnOrRef) || isUndefined(maybeFqnOrRef.fqnOrRefType)) {
+    return;
+  }
+  const fieldName = getRefTypeName(maybeFqnOrRef.fqnOrRefType);
+  // TODO: make sure the field name is in the list of fields
+  const builder = child(
+    child(
+      child(
+        child(child(stmt.expression)?.conditionalExpression)?.binaryExpression,
+      )?.unaryExpression,
+    )?.primary,
+  );
+  if (isUndefined(builder)) {
+    return;
+  }
+  const objInvoke = getMethodInvoke(builder);
+  if (
+    isUndefined(objInvoke) ||
+    objInvoke[0] !== 'follower' ||
+    objInvoke[1] !== 'pathBuilder'
+  ) {
+    return;
+  }
+  const methods = builder.primarySuffix;
+  if (isUndefined(methods) || methods.length < 5) {
+    return;
+  }
+  return;
+}
+
+function getPathChainHelpers(
+  ctx: ConstructorDeclarationCtx,
+): PathChainHelper[] {
+  const statements = child(
+    child(ctx.constructorBody)?.blockStatements,
+  )?.blockStatement;
+  if (isUndefined(statements)) {
+    return [];
+  }
+  return statements
+    .map(getPathChainHelper)
+    .filter(isDefined) as PathChainHelper[];
+}
+
 function getPathChainFactories(
   ctx: ConstructorDeclarationCtx,
 ): NamedPathChain[] {
@@ -704,4 +767,14 @@ export async function MakePathChainFile(
   const loader = new PathChainLoader();
   const res = await loader.loadFile(filename);
   return isString(res) ? res : loader.info;
+}
+
+if (import.meta.main) {
+  // This code runs only when you execute the file directly
+  // e.g., `bun run my-file.ts`
+  MakePathChainFile(
+    '../Sixteen750/src/main/java/org/firstinspires/ftc/sixteen750/commands/auto/RPaths.java',
+  )
+    .then((strOrPcf) => console.log(strOrPcf))
+    .catch((err) => console.error(err));
 }
