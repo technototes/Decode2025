@@ -8,14 +8,14 @@ import {
   AnonymousValue,
   BezierName,
   BezierRef,
-  EmptyPathChainFile,
+  EmptyPathChainClass,
   HeadingRef,
   isError,
   NamedBezier,
   NamedPose,
   NamedValue,
   Path,
-  PathChainFile,
+  PathChainClass,
   PathChainName,
   PoseName,
   PoseRef,
@@ -102,8 +102,8 @@ const badTeamPaths: unknown = {
   team2: { path3: 'path3.java' },
 };
 
-const testPathChainFile: PathChainFile = {
-  ...EmptyPathChainFile,
+const testPathChainFile: PathChainClass = {
+  ...EmptyPathChainClass,
 };
 testPathChainFile.values.push({
   name: 'item1' as ValueName,
@@ -123,7 +123,7 @@ const simpleBez: AnonymousBezier = {
   ],
 };
 
-const fullPathChainFile: PathChainFile = {
+const fullPathChainFile: PathChainClass = {
   name: 'path3.java',
   values: [
     mkNmVal('val1', mkVal('int', 1)),
@@ -148,13 +148,11 @@ const fullPathChainFile: PathChainFile = {
     mkNmBez('bez1', mkBez('line', mkPoseNm('pose1'), mkPoseNm('pose2'))),
     mkNmBez('bez2', simpleBez),
   ],
-  // TODO:
-  pathChainHelpers: [],
   pathChains: [
     {
       name: 'pc1' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      heading: { type: 'tangent' },
+      pathHeading: { type: 'tangent' },
     },
     {
       name: 'pc2' as PathChainName,
@@ -162,7 +160,7 @@ const fullPathChainFile: PathChainFile = {
         'bez2' as BezierName,
         { type: 'line', points: ['pose1' as PoseName, 'pose3' as PoseName] },
       ],
-      heading: { type: 'constant', heading: 'pose3' as PoseName },
+      pathHeading: { type: 'constant', heading: 'pose3' as PoseName },
     },
     {
       name: 'pc3' as PathChainName,
@@ -177,15 +175,20 @@ const fullPathChainFile: PathChainFile = {
           ],
         },
       ],
-      heading: {
-        type: 'interpolated',
-        headings: ['pose2' as PoseName, { radians: { int: 135 } }],
+      pathHeading: {
+        type: 'linear',
+        start: 'pose2' as PoseName,
+        end: { radians: { int: 135 } },
       },
     },
   ],
+  // TODO:
+  pathChainHelpers: [],
+  container: { fileName: '' },
+  children: {},
 };
 
-const danglingPCF: PathChainFile = {
+const danglingPCF: PathChainClass = {
   name: 'dangling.java',
   values: [...fullPathChainFile.values],
   poses: [
@@ -211,24 +214,26 @@ const danglingPCF: PathChainFile = {
       mkBez('line', mkPose('val1', 'val2', mkValNm('zip'))),
     ),
   ],
-  // TODO
-  pathChainHelpers: [],
   pathChains: [
     ...fullPathChainFile.pathChains,
     {
       name: 'danglingBezRef' as PathChainName,
       paths: ['noBez' as BezierName],
-      heading: { type: 'constant', heading: 'noHeading' as ValueName },
+      pathHeading: { type: 'constant', heading: 'noHeading' as ValueName },
     },
     {
       name: 'danglingBezRef2' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      heading: {
+      pathHeading: {
         type: 'constant',
         heading: { radians: 'nospot' as ValueName },
       },
     },
   ],
+  // TODO
+  pathChainHelpers: [],
+  container: { fileName: '' },
+  children: {},
 };
 
 let bad = false;

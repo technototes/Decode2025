@@ -3,13 +3,13 @@ import { expect, test } from 'bun:test';
 import {
   chkTeamPaths,
   isAnonymousBezier,
+  isAnonymousFacing,
   isAnonymousPose,
   isAnonymousValue,
   isBezierRef,
-  isConstantHeading,
+  isConstantFacing,
   isHeadingRef,
-  isHeadingType,
-  isInterpolatedHeading,
+  isLinearFacing,
   isNamedBezier,
   isNamedPathChain,
   isNamedPose,
@@ -17,7 +17,7 @@ import {
   isPoseRef,
   isRadiansRef,
   isRef,
-  isTangentHeading,
+  isTangentFacing,
   isValueRef,
 } from '../types';
 
@@ -83,22 +83,27 @@ test('Parsed file types validation', () => {
   const tangHead = { type: 'tangent' };
   const constHead = { type: 'constant', heading: 'heading' };
   const linHead = {
-    type: 'interpolated',
-    headings: [{ radians: 'ref' }, anonValI],
+    type: 'linear',
+    start: { radians: 'ref' },
+    end: anonValI,
   };
-  expect(isTangentHeading(tangHead)).toBeTrue();
-  expect(isConstantHeading(tangHead)).toBeFalse();
-  expect(isInterpolatedHeading(tangHead)).toBeFalse();
-  expect(isTangentHeading(constHead)).toBeFalse();
-  expect(isConstantHeading(constHead)).toBeTrue();
-  expect(isInterpolatedHeading(constHead)).toBeFalse();
-  expect(isTangentHeading(linHead)).toBeFalse();
-  expect(isConstantHeading(linHead)).toBeFalse();
-  expect(isInterpolatedHeading(linHead)).toBeTrue();
-  expect(isHeadingType(tangHead)).toBeTrue();
-  expect(isHeadingType(constHead)).toBeTrue();
-  expect(isHeadingType(linHead)).toBeTrue();
-  const npc = { name: 'path1', paths: [anonBezC, 'bezRef'], heading: tangHead };
+  expect(isTangentFacing(tangHead)).toBeTrue();
+  expect(isConstantFacing(tangHead)).toBeFalse();
+  expect(isLinearFacing(tangHead)).toBeFalse();
+  expect(isTangentFacing(constHead)).toBeFalse();
+  expect(isConstantFacing(constHead)).toBeTrue();
+  expect(isLinearFacing(constHead)).toBeFalse();
+  expect(isTangentFacing(linHead)).toBeFalse();
+  expect(isConstantFacing(linHead)).toBeFalse();
+  expect(isLinearFacing(linHead)).toBeTrue();
+  expect(isAnonymousFacing(tangHead)).toBeTrue();
+  expect(isAnonymousFacing(constHead)).toBeTrue();
+  expect(isAnonymousFacing(linHead)).toBeTrue();
+  const npc = {
+    name: 'path1',
+    paths: [anonBezC, 'bezRef'],
+    pathHeading: tangHead,
+  };
   expect(isNamedPathChain(npc)).toBeTrue();
   expect(isNamedPathChain({ ...npc, headings: [1] })).toBeFalse();
 });

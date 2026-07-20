@@ -7,9 +7,9 @@ import {
 } from '@freik/typechk';
 
 import {
+  AnonymousFacing,
   BezierName,
   BezierRef,
-  HeadingType,
   isIntValue,
   isValueName,
   PathChainName,
@@ -22,7 +22,7 @@ import {
 
 export type AnonymousPathChain = {
   paths: BezierRef[];
-  heading: HeadingType;
+  heading: AnonymousFacing;
 };
 
 export type ConcreteTangentHeading = { htype: 'T' };

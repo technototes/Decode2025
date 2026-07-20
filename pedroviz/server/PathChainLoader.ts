@@ -3,11 +3,11 @@ import { promises as fsp } from 'node:fs';
 import {
   BaseJavaCstVisitorWithDefaults,
   BlockStatementCstNode,
+  ClassDeclarationCtx,
   ConstructorDeclarationCtx,
   ExpressionCstNode,
   FieldDeclarationCtx,
   FqnOrRefTypeCstNode,
-  FqnOrRefTypePartRestCstNode,
   IToken,
   parse,
   PrimaryCtx,
@@ -26,12 +26,13 @@ import {
 
 import {
   AnonymousBezier,
+  AnonymousFacing,
   AnonymousPose,
   AnonymousValue,
   BezierName,
   BezierRef,
+  EmptyPathChainClass,
   HeadingRef,
-  HeadingType,
   isAnonymousValue,
   isRadiansRef,
   isRef,
@@ -39,7 +40,7 @@ import {
   NamedPathChain,
   NamedPose,
   NamedValue,
-  PathChainFile,
+  PathChainClass,
   PathChainHelper,
   PathChainName,
   PoseName,
@@ -49,17 +50,19 @@ import {
   ValueRef,
 } from './types';
 
+type PCCContext = { pathChainFields: string[] };
+type PCCInfo = PCCContext & PathChainClass;
+type OptPCCInfo = Partial<PCCContext> & PathChainClass;
+
 class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
   content: string = '';
   parsed: ReturnType<typeof parse> | null = null;
-  pathChainFields: string[] = [];
-  info: PathChainFile = {
-    name: '',
-    values: [], // NamedValue[];
-    poses: [], // NamedPose[];
-    beziers: [], // Bezier[];
-    pathChains: [], // PathChain[];
-    pathChainHelpers: [], // PathChainHelpers[]
+
+  contextStack: PCCInfo[] = [];
+
+  info: PCCInfo = {
+    ...structuredClone(EmptyPathChainClass),
+    pathChainFields: [],
   };
 
   constructor() {
@@ -67,14 +70,14 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     this.validateVisitor();
   }
 
-  async loadFile(filename: string): Promise<string | true> {
+  async loadFile(fileName: string): Promise<string | true> {
     // Read the contents fo the file and parse it:
-    this.info.name = filename;
+    this.info.container = { fileName };
     try {
-      const content = await fsp.readFile(filename, 'utf-8');
+      const content = await fsp.readFile(fileName, 'utf-8');
       return this.parseContent(content);
     } catch (e) {
-      return `Could not read file: ${filename} - ${e}`;
+      return `Could not read file: ${fileName} - ${e}`;
     }
   }
 
@@ -118,7 +121,7 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     }
     const maybePathChainField = tryMatchingPathChainFields(ctx);
     if (isDefined(maybePathChainField)) {
-      this.pathChainFields.push(maybePathChainField);
+      this.info.pathChainFields.push(maybePathChainField);
     }
     return super.fieldDeclaration(ctx);
   }
@@ -127,6 +130,41 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     this.info.pathChainHelpers.push(...getPathChainHelpers(ctx));
     this.info.pathChains.push(...getPathChainFactories(ctx));
     return super.constructorDeclaration(ctx);
+  }
+
+  // I need to handle nested classes.
+  // I should probably make sure they're static if they're nested
+  override classDeclaration(ctx: ClassDeclarationCtx, param?: any) {
+    const theClassName = nameOf(
+      child(child(ctx?.normalClassDeclaration)?.typeIdentifier)?.Identifier,
+    );
+    if (isUndefined(theClassName)) {
+      return;
+    }
+    // If the stack is empty, we just push the current PCC.
+    // If the stack *isn't* empty, we need to create a new PathChainClass (and push it).
+    if (this.contextStack.length !== 0) {
+      const parent = this.info;
+      this.info = {
+        ...structuredClone(EmptyPathChainClass),
+        container: { className: parent.name },
+        pathChainFields: [],
+      };
+      parent.children[theClassName] = this.info;
+    }
+    this.info.name = theClassName;
+    this.contextStack.push(this.info);
+
+    const res = super.classDeclaration(ctx, param);
+
+    const popped = this.contextStack.pop();
+    if (theClassName !== popped?.name) {
+      throw new Error('VERY BAD THINGS: ' + theClassName);
+    }
+    if (this.contextStack.length > 0) {
+      this.info = this.contextStack[this.contextStack.length - 1]!;
+    }
+    return res;
   }
 }
 
@@ -563,6 +601,13 @@ function getBezierRef(
   return getRefOr(arg, getAnonymousBezier);
 }
 
+function getHeadingInterpolation(
+  method: PrimarySuffixCstNode,
+): AnonymousFacing | undefined {
+  // TODO: Fix this, cuz it's *very* wrong
+  return { type: 'piecewise', pieces: [] };
+}
+
 function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
   const stmt = child(
     child(
@@ -610,7 +655,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
   // Okay, remove the '.pathBuilder()' prefix, and the
   // '.build();' suffix.
   let chain: BezierRef[] = [];
-  let heading: HeadingType | null = null;
+  let pathHeading: AnonymousFacing | null = null;
   let lastMethodName: string | undefined = 'pathBuilder';
   for (let index = 0; index < methods.length; index++) {
     const method = methods[index]!;
@@ -626,6 +671,8 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
         case 'setTangentHeadingInterpolation':
         case 'setLinearHeadingInterpolation':
         case 'setConstantHeadingInterpolation':
+        case 'setHeadingInterpolation':
+        case 'setReversed':
         case 'build':
           continue;
         default:
@@ -643,7 +690,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (isDefined(getArgList(method))) {
             return;
           }
-          heading = { type: 'tangent' };
+          pathHeading = { type: 'tangent' };
           continue;
         case 'setLinearHeadingInterpolation':
           const linearArgs = getArgList(method);
@@ -655,9 +702,10 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (isUndefined(startHeading) || isUndefined(endHeading)) {
             return;
           }
-          heading = {
-            type: 'interpolated',
-            headings: [startHeading, endHeading],
+          pathHeading = {
+            type: 'linear',
+            start: startHeading,
+            end: endHeading,
           };
           continue;
         case 'setConstantHeadingInterpolation':
@@ -669,8 +717,24 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (isUndefined(headingRef)) {
             return;
           }
-          heading = { type: 'constant', heading: headingRef };
+          pathHeading = { type: 'constant', heading: headingRef };
           continue;
+        case 'setReversed':
+          if (pathHeading === null) {
+            return;
+          }
+          pathHeading = { type: 'reversed', facing: pathHeading };
+          continue;
+
+        case 'setHeadingInterpolation':
+          // TODO: This is *very* not working
+          const interp = getHeadingInterpolation(method);
+          if (isUndefined(interp)) {
+            return;
+          }
+
+          continue;
+
         case 'addPath':
           const pathArgs = getArgList(method);
           if (pathArgs?.length !== 1) {
@@ -687,10 +751,10 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
       }
     }
   }
-  if (heading === null) {
+  if (pathHeading === null) {
     return;
   }
-  return { name: fieldName as PathChainName, paths: chain, heading };
+  return { name: fieldName as PathChainName, paths: chain, pathHeading };
 }
 
 function getPathChainHelper(
@@ -793,10 +857,15 @@ function getPathChainFactories(
 
 export async function MakePathChainFile(
   filename: string,
-): Promise<PathChainFile | string> {
+): Promise<PathChainClass | string> {
   const loader = new PathChainLoader();
   const res = await loader.loadFile(filename);
-  return isString(res) ? res : loader.info;
+  if (isString(res)) {
+    return res;
+  }
+  let pcc: OptPCCInfo = { ...loader.info };
+  delete pcc.pathChainFields;
+  return pcc;
 }
 
 // This is for quick debugging:
@@ -804,7 +873,20 @@ if (import.meta.main) {
   // This code runs only when you execute the file directly
   // e.g., `bun run my-file.ts`
   MakePathChainFile(
-    '../Sixteen750/src/main/java/org/firstinspires/ftc/sixteen750/commands/auto/RPaths.java',
+    [
+      '..',
+      'Sixteen750',
+      'src',
+      'main',
+      'java',
+      'org',
+      'firstinspires',
+      'ftc',
+      'sixteen750',
+      'commands',
+      'auto',
+      'Poses.java',
+    ].join('/'),
   )
     .then((strOrPcf) => console.log(strOrPcf))
     .catch((err) => console.error(err));

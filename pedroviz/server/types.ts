@@ -1,8 +1,13 @@
 import {
   chkAnyOf,
   chkArrayOf,
+  chkFieldOf,
+  chkMapOf,
   chkObjectOfExactType,
-  chkTupleOf,
+  chkRecordOf,
+  hasFieldOf,
+  hasFieldType,
+  hasStrField,
   isArrayOfString,
   isDefined,
   isFunction,
@@ -62,6 +67,8 @@ export function accError<T>(maybe: ErrorOr<T>, prev: ErrorOr<T>): ErrorOr<T> {
 export type Team = Nominal<string, 'Team'>;
 export type Path = Nominal<string, 'Path'>;
 export type TeamPaths = Record<Team, Path[]>;
+
+// Values
 export type IntValue = { int: number };
 export type DoubleValue = { double: number };
 export type AnonymousValue = IntValue | DoubleValue;
@@ -71,32 +78,43 @@ export type ValueRef = AnonymousValue | ValueName;
 export type RadiansRef = { radians: ValueRef };
 export type HeadingRef = RadiansRef | ValueRef | PoseName;
 
+// Poses
 export type PoseName = Nominal<string, 'Pose'>;
 export type AnonymousPose = { x: ValueRef; y: ValueRef; heading?: HeadingRef };
 export type NamedPose = { name: PoseName; pose: PoseRef };
 export type PoseRef = AnonymousPose | PoseName;
 
+// Beziers
 export type BezierName = Nominal<string, 'Bezier'>;
 export type AnonymousBezier = { type: 'line' | 'curve'; points: PoseRef[] };
 export type NamedBezier = { name: BezierName; points: BezierRef };
 export type BezierRef = AnonymousBezier | BezierName;
 
-// Reversed headings are not yet handled
-export type ReversedHeading = { reversed?: boolean };
-// Heading timing isn't yet handled
-export type HeadingTiming = { start?: ValueRef; end?: ValueRef };
-// FacingPoint heading's are yet handled, either...
-export type FacingHeading = { type: 'facing'; facing: PoseRef };
-
-export type TangentHeading = { type: 'tangent' };
-export type ConstantHeading = { type: 'constant'; heading: HeadingRef };
-export type InterpolatedHeading = {
-  type: 'interpolated';
-  headings: [HeadingRef, HeadingRef];
+// Facing (path heading interpolators)
+// NYI: Offset; works like reverse, but shifts the bot from the target by a
+// fixed amount. Reverse is *mostly* "offset 180" (not for linear)
+export type FacingTiming = { start: ValueRef; end: ValueRef };
+export type FacingReversed = { type: 'reversed'; facing: FacingRef };
+export type FacingTangent = { type: 'tangent' };
+export type FacingConstant = { type: 'constant'; heading: HeadingRef };
+export type FacingPoint = { type: 'point'; point: PoseRef };
+export type FacingLinear = {
+  type: 'linear';
+  start: HeadingRef;
+  end: HeadingRef;
 };
-export type HeadingType =
-  // ReversedHeading & HeadingTiming ( FacingHeading | ...
-  TangentHeading | ConstantHeading | InterpolatedHeading;
+export type FacingPiece = { timing: FacingTiming; heading: FacingRef };
+export type FacingPieceWise = { type: 'piecewise'; pieces: FacingPiece[] };
+export type FacingName = Nominal<string, 'Facing'>;
+export type AnonymousFacing =
+  | FacingTangent
+  | FacingConstant
+  | FacingLinear
+  | FacingPoint
+  | FacingPieceWise
+  | FacingReversed;
+export type NamedFacing = { name: FacingName; heading: AnonymousFacing };
+export type FacingRef = AnonymousFacing | FacingName;
 
 // No such thing as an anonymous PathChain
 export type PathChainName = Nominal<string, 'PathChain'>;
@@ -104,7 +122,7 @@ export type PathChainName = Nominal<string, 'PathChain'>;
 export type NamedPathChain = {
   name: PathChainName;
   paths: BezierRef[];
-  heading: HeadingType;
+  pathHeading: AnonymousFacing;
 };
 
 export type PathChainHelper = {
@@ -112,8 +130,12 @@ export type PathChainHelper = {
   staticType: string; // This should be the package-local type being assigned
 };
 
-export type PathChainFile = {
+export type ClassContainer = { fileName: string } | { className: string };
+
+export type PathChainClass = {
   name: string;
+  container: ClassContainer;
+  children: Record<string, PathChainClass>;
   values: NamedValue[];
   poses: NamedPose[];
   beziers: NamedBezier[];
@@ -121,8 +143,10 @@ export type PathChainFile = {
   pathChainHelpers: PathChainHelper[];
 };
 
-export const EmptyPathChainFile: PathChainFile = {
+export const EmptyPathChainClass: PathChainClass = {
   name: '',
+  container: { fileName: '' },
+  children: {},
   values: [],
   poses: [],
   beziers: [],
@@ -130,7 +154,7 @@ export const EmptyPathChainFile: PathChainFile = {
   pathChainHelpers: [],
 };
 
-export type MaybePathFile = ErrorOr<PathChainFile>;
+export type MaybePathFile = ErrorOr<PathChainClass>;
 
 export function chkTeamPaths(t: unknown): t is TeamPaths {
   return isRecordOf(t, isString, isArrayOfString);
@@ -199,36 +223,75 @@ export const isBezierRef: typecheck<BezierRef> = chkAnyOf(
   isAnonymousBezier,
 );
 
-function isTangentHeadingType(type: unknown): type is 'tangent' {
+function isTangentFacingType(type: unknown): type is 'tangent' {
   return type === 'tangent';
 }
-function isConstantHeadingType(type: unknown): type is 'constant' {
+function isConstantFacingType(type: unknown): type is 'constant' {
   return type === 'constant';
 }
-function isInterpolatedHeadingType(type: unknown): type is 'interpolated' {
-  return type === 'interpolated';
+function isLinearFacingType(type: unknown): type is 'linear' {
+  return type === 'linear';
 }
-export const isTangentHeading = chkObjectOfExactType<TangentHeading>({
-  type: isTangentHeadingType,
+function isPointFacingType(type: unknown): type is 'point' {
+  return type === 'point';
+}
+function isReversedFacingType(type: unknown): type is 'reversed' {
+  return type === 'reversed';
+}
+function isPiecewiseFacingType(type: unknown): type is 'piecewise' {
+  return type === 'piecewise';
+}
+
+export const isTangentFacing = chkObjectOfExactType<FacingTangent>({
+  type: isTangentFacingType,
 });
-export const isConstantHeading = chkObjectOfExactType<ConstantHeading>({
-  type: isConstantHeadingType,
+export const isConstantFacing = chkObjectOfExactType<FacingConstant>({
+  type: isConstantFacingType,
   heading: isHeadingRef,
 });
-export const isInterpolatedHeading = chkObjectOfExactType<InterpolatedHeading>({
-  type: isInterpolatedHeadingType,
-  headings: chkTupleOf(isHeadingRef, isHeadingRef),
+export const isLinearFacing = chkObjectOfExactType<FacingLinear>({
+  type: isLinearFacingType,
+  start: isHeadingRef,
+  end: isHeadingRef,
 });
-export const isHeadingType = chkAnyOf(
-  isTangentHeading,
-  isConstantHeading,
-  isInterpolatedHeading,
+export const isPointFacing = chkObjectOfExactType<FacingPoint>({
+  type: isPointFacingType,
+  point: isPoseRef,
+});
+export const isFacingTiming = chkObjectOfExactType<FacingTiming>({
+  start: isValueRef,
+  end: isValueRef,
+});
+export const isPiecewiseEntry: typecheck<FacingPiece> =
+  chkObjectOfExactType<FacingPiece>({
+    timing: isFacingTiming,
+    heading: isFacingRef,
+  });
+export const isPiecewiseFacing = chkObjectOfExactType<FacingPieceWise>({
+  type: isPiecewiseFacingType,
+  pieces: chkArrayOf(isPiecewiseEntry),
+});
+export const isReversedFacing: typecheck<FacingReversed> =
+  chkObjectOfExactType<FacingReversed>({
+    type: isReversedFacingType,
+    facing: isFacingRef,
+  });
+export const isAnonymousFacing: typecheck<AnonymousFacing> = chkAnyOf(
+  isTangentFacing,
+  isConstantFacing,
+  isLinearFacing,
+  isPointFacing,
+  isPiecewiseFacing,
+  isReversedFacing,
 );
+export function isFacingRef(obj: unknown): obj is FacingRef {
+  return chkAnyOf(isAnonymousFacing, isString)(obj);
+}
 
 export const isNamedPathChain = chkObjectOfExactType<NamedPathChain>({
   name: isString,
   paths: chkArrayOf(isBezierRef),
-  heading: isHeadingType,
+  pathHeading: isAnonymousFacing,
 });
 
 export const isPathChainHelper = chkObjectOfExactType<PathChainHelper>({
@@ -236,26 +299,23 @@ export const isPathChainHelper = chkObjectOfExactType<PathChainHelper>({
   staticType: isString,
 });
 
-export const chkPathChainFile = chkObjectOfExactType<PathChainFile>({
-  name: isString,
-  values: chkArrayOf(isNamedValue),
-  poses: chkArrayOf(isNamedPose),
-  beziers: chkArrayOf(isNamedBezier),
-  pathChains: chkArrayOf(isNamedPathChain),
-  pathChainHelpers: chkArrayOf(isPathChainHelper),
-});
+export const isClassContainer: typecheck<ClassContainer> = chkAnyOf(
+  chkFieldOf('fileName', isString),
+  chkFieldOf('className', isString),
+);
 
-// Not used yet, but these are the results of evaluating the various types
-export type RealValue = Nominal<number, 'Value'>;
-export type RealPoint = { x: RealValue; y: RealValue };
-export type RealBezier = RealPoint[];
-export type RealPathChain = {
-  paths: RealBezier[];
-  // Tangent, Constant, Linear, FacingPoint:
-  heading: 'tangent' | RealValue | [RealValue, RealValue] | RealPoint;
-};
-
-export const MakeRealValue = (n: number) => n as RealValue;
-export function MakeRealPoint(x: RealValue, y: RealValue): RealPoint {
-  return { x, y };
+// Can't use chkObjOfExactType because recursion...
+export function chkPathChainClass(val: unknown): val is PathChainClass {
+  let res = hasStrField(val, 'name');
+  res = res && hasFieldOf(val, 'container', isClassContainer);
+  res = res && hasFieldOf(val, 'values', chkArrayOf(isNamedValue));
+  res = res && hasFieldOf(val, 'poses', chkArrayOf(isNamedPose));
+  res = res && hasFieldOf(val, 'beziers', chkArrayOf(isNamedBezier));
+  res = res && hasFieldOf(val, 'pathChains', chkArrayOf(isNamedPathChain));
+  res =
+    res && hasFieldOf(val, 'pathChainHelpers', chkArrayOf(isPathChainHelper));
+  res =
+    res &&
+    hasFieldType(val, 'children', chkRecordOf(isString, chkPathChainClass));
+  return res;
 }

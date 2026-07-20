@@ -5,8 +5,8 @@ import { Button, Text } from '@fluentui/react-components';
 import { isDefined } from '@freik/typechk';
 
 import {
+  AnonymousFacing,
   HeadingRef,
-  HeadingType,
   isRadiansRef,
   isRef,
   PoseName,
@@ -164,7 +164,7 @@ function HeadingTypeDisplay({
   heading,
   ...props
 }: {
-  heading: HeadingType;
+  heading: AnonymousFacing;
   style?: CSSProperties;
 }): ReactElement {
   switch (heading.type) {
@@ -182,17 +182,30 @@ function HeadingTypeDisplay({
           <span>&nbsp;</span>
         </>
       );
-    case 'interpolated':
+    case 'linear':
       return (
         <>
           <Text {...props}>Linear heading</Text>
           <span {...props}>
-            <HeadingRefDisplay item={heading.headings[0]} />
+            <HeadingRefDisplay item={heading.start} />
             <Text> to </Text>
-            <HeadingRefDisplay item={heading.headings[1]} />
+            <HeadingRefDisplay item={heading.end} />
           </span>
         </>
       );
+    case 'point':
+      return (
+        <>
+          <Text {...props}>Point heading</Text>
+          <span {...props}>
+            <InlinePoseRefDisplay pose={heading.point} />
+          </span>
+        </>
+      );
+    case 'reversed':
+      return <Text {...props}>Reversed...[TODO!]</Text>;
+    case 'piecewise':
+      return <Text {...props}>Piecewised [TODO!]</Text>;
   }
 }
 

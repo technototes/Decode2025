@@ -168,9 +168,10 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
   expect(paths.pathChains[0]).toEqual({
     name: 'Path1' as PathChainName,
     paths: ['start_to_step1' as BezierName],
-    heading: {
-      type: 'interpolated',
-      headings: ['start' as PoseName, 'step1' as PoseName],
+    pathHeading: {
+      type: 'linear',
+      start: 'start' as PoseName,
+      end: 'step1' as PoseName,
     },
   });
   expect(paths.pathChains[1]).toEqual({
@@ -178,22 +179,21 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     paths: [
       { type: 'curve', points: ['step1' as PoseName, 'step2' as PoseName] },
     ],
-    heading: {
-      type: 'interpolated',
-      headings: [
-        {
-          radians: { int: 90 },
-        },
-        { radians: 'step_mid' as ValueName },
-      ],
+    pathHeading: {
+      type: 'linear',
+      start: {
+        radians: { int: 90 },
+      },
+      end: { radians: 'step_mid' as ValueName },
     },
   });
   expect(paths.pathChains[2]).toEqual({
     name: 'Path3' as PathChainName,
     paths: ['step2_to_step3' as BezierName],
-    heading: {
-      type: 'interpolated',
-      headings: ['step_mid' as PoseName, 'step3' as PoseName],
+    pathHeading: {
+      type: 'linear',
+      start: 'step_mid' as PoseName,
+      end: 'step3' as PoseName,
     },
   });
   expect(paths.pathChains[3]).toEqual({
@@ -201,7 +201,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     paths: [
       { type: 'line', points: ['step3' as PoseName, 'step4' as PoseName] },
     ],
-    heading: { type: 'constant', heading: 'one80' as ValueName },
+    pathHeading: { type: 'constant', heading: 'one80' as ValueName },
   });
   expect(paths.pathChains[4]).toEqual({
     name: 'AnotherPath' as PathChainName,
@@ -224,9 +224,10 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
       },
       'step4_to_start' as BezierName,
     ],
-    heading: {
-      type: 'interpolated',
-      headings: [{ radians: 'step' as ValueName }, 'radRef' as PoseName],
+    pathHeading: {
+      type: 'linear',
+      start: { radians: 'step' as ValueName },
+      end: 'radRef' as PoseName,
     },
   });
 });

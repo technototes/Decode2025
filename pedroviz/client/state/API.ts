@@ -3,13 +3,13 @@ import { chkAnyOf, isString } from '@freik/typechk';
 import {
   AnonymousBezier,
   AnonymousPose,
-  chkPathChainFile,
+  chkPathChainClass,
   chkTeamPaths,
   ErrorOr,
   isError,
   makeError,
   Path,
-  PathChainFile,
+  PathChainClass,
   Team,
   TeamPaths,
 } from '../../server/types';
@@ -71,7 +71,7 @@ export async function LoadAndIndexFile(
   lastLoadedIndexFile.data = null;
   const pcf = await fetchApi(
     `loadpath/${encodeURIComponent(team)}/${encodeURIComponent(file)}`,
-    chkAnyOf(chkPathChainFile, isString),
+    chkAnyOf(chkPathChainClass, isString),
     'Invalid PathChainFile loaded from server',
   );
   if (isString(pcf)) {
@@ -100,7 +100,7 @@ export function UpdateIndexFile(team: string, file: string, data: MappedIndex) {
 export async function SavePath(
   team: string,
   path: string,
-  data: PathChainFile,
+  data: PathChainClass,
 ): Promise<undefined | string> {
   // NYI on the server, either :D
   return 'NYI';

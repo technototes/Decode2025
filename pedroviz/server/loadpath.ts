@@ -1,7 +1,7 @@
 import { isString } from '@freik/typechk';
 
 import { MakePathChainFile } from './PathChainLoader';
-import { PathChainFile } from './types';
+import { PathChainClass } from './types';
 import { getProjectFilePath } from './utility';
 
 export async function LoadPath(
@@ -18,6 +18,6 @@ export async function LoadPath(
 
 export async function loadPathChainsFromFile(
   filePath: string,
-): Promise<PathChainFile | string> {
+): Promise<PathChainClass | string> {
   return MakePathChainFile(filePath);
 }

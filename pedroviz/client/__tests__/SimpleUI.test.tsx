@@ -23,7 +23,7 @@ import {
   AnonymousBezier,
   BezierName,
   Path,
-  PathChainFile,
+  PathChainClass,
   PathChainName,
   PoseName,
   Team,
@@ -58,12 +58,14 @@ const teamPaths: TeamPaths = {
   ['team2' as Team]: ['path3.java' as Path, 'path4.java' as Path],
 };
 
-const testPathChainFile: PathChainFile = {
+const testPathChainFile: PathChainClass = {
   values: [],
   poses: [],
   beziers: [],
   pathChainHelpers: [],
   pathChains: [],
+  container: { fileName: '' },
+  children: {},
   name: 'path1.java',
 };
 
@@ -75,7 +77,7 @@ const simpleBez: AnonymousBezier = {
     'pose2' as PoseName,
   ],
 };
-const fullPathChainFile: PathChainFile = {
+const fullPathChainFile: PathChainClass = {
   name: 'path3.java',
   values: [
     { name: 'val1' as ValueName, value: { int: 1 } },
@@ -117,13 +119,11 @@ const fullPathChainFile: PathChainFile = {
       points: simpleBez,
     },
   ],
-  // TODO
-  pathChainHelpers: [],
   pathChains: [
     {
       name: 'pc1' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      heading: { type: 'tangent' },
+      pathHeading: { type: 'tangent' },
     },
     {
       name: 'pc2' as PathChainName,
@@ -131,7 +131,7 @@ const fullPathChainFile: PathChainFile = {
         'bez2' as BezierName,
         { type: 'line', points: ['pose1' as PoseName, 'pose3' as PoseName] },
       ],
-      heading: { type: 'constant', heading: 'pose3' as PoseName },
+      pathHeading: { type: 'constant', heading: 'pose3' as PoseName },
     },
     {
       name: 'pc3' as PathChainName,
@@ -146,12 +146,17 @@ const fullPathChainFile: PathChainFile = {
           ],
         },
       ],
-      heading: {
-        type: 'interpolated',
-        headings: ['pose2' as PoseName, { radians: { int: 135 } }],
+      pathHeading: {
+        type: 'linear',
+        start: 'pose2' as PoseName,
+        end: { radians: { int: 135 } },
       },
     },
   ],
+  // TODO
+  container: { fileName: '' },
+  children: {},
+  pathChainHelpers: [],
 };
 
 const status = {

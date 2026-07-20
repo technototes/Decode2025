@@ -10,16 +10,16 @@ import {
   ErrorOr,
   HeadingRef,
   isAnonymousValue,
-  isConstantHeading,
+  isConstantFacing,
   isDoubleValue,
   isError,
-  isInterpolatedHeading,
   isIntValue,
+  isLinearFacing,
   isRadiansRef,
   isRef,
   makeError,
   Path,
-  PathChainFile,
+  PathChainClass,
   PathChainName,
   PoseName,
   PoseRef,
@@ -32,7 +32,7 @@ import { AnonymousPathChain, MappedIndex, Point } from '../types';
 import { ValidRes } from './API';
 
 export function MakeMappedIndex(
-  pcf: PathChainFile,
+  pcf: PathChainClass,
   otherFiles: Map<[Team, Path], MappedIndex>,
 ): ErrorOr<MappedIndex> {
   const namedValues = new Map<ValueName, ValueRef | RadiansRef>(
@@ -47,7 +47,7 @@ export function MakeMappedIndex(
   const namedPathChains = new Map<PathChainName, AnonymousPathChain>(
     pcf.pathChains.map((npc) => [
       npc.name,
-      { paths: npc.paths, heading: npc.heading },
+      { paths: npc.paths, heading: npc.pathHeading },
     ]),
   );
 
@@ -126,19 +126,21 @@ export function MakeMappedIndex(
     id: string,
   ): ValidRes {
     let res: ValidRes = true;
-    if (isConstantHeading(apc.heading)) {
+    if (isConstantFacing(apc.heading)) {
       res = checkHeadingRef(
         apc.heading.heading,
         `${id}'s constant heading ref`,
       );
-    } else if (isInterpolatedHeading(apc.heading)) {
-      res = checkHeadingRef(
-        apc.heading.headings[0],
-        `${id}'s start heading ref`,
-      );
+    } else if (isLinearFacing(apc.heading)) {
+      res = checkHeadingRef(apc.heading.start, `${id}'s start heading ref`);
       res = accError(
-        checkHeadingRef(apc.heading.headings[1], `${id}'s end heading ref`),
+        checkHeadingRef(apc.heading.end, `${id}'s end heading ref`),
         res,
+      );
+    } else {
+      // TODO: Handing tangent, reverse, point, and piecewise
+      console.error(
+        'NYI: Not checking the heading interpolator used by this pathc chain!',
       );
     }
     apc.paths.forEach((br, index) => {
@@ -341,6 +343,7 @@ export function calcValue(
     return (Math.PI * calcValueRef(idx, av.radians, circ)) / 180.0;
   }
 }
+
 export const EmptyMappedFile: MappedIndex = {
   namedValues: new Map(),
   namedPoses: new Map(),
