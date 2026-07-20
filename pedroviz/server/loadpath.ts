@@ -1,4 +1,4 @@
-import { isString } from '@freik/typechk';
+import { hasField, isString, isUndefined } from '@freik/typechk';
 
 import { MakePathChainFile } from './PathChainLoader';
 import { PathChainClass } from './types';
@@ -20,4 +20,22 @@ export async function loadPathChainsFromFile(
   filePath: string,
 ): Promise<PathChainClass | string> {
   return MakePathChainFile(filePath);
+}
+
+export async function LoadClassList(filepath: string): Promise<Response> {
+  const pcc = await loadPathChainsFromFile(filepath);
+  if (isString(pcc)) {
+    return Response.json({ error: pcc });
+  }
+  const list = [];
+  const work = [pcc];
+  while (work.length > 0) {
+    const item = work.pop();
+    if (isUndefined(item)) {
+      break;
+    }
+    list.push(item.name);
+    work.push(...Object.values(pcc.children));
+  }
+  return Response.json(list);
 }

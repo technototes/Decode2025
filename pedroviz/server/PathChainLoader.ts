@@ -157,10 +157,9 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
 
     const res = super.classDeclaration(ctx, param);
 
-    const popped = this.contextStack.pop();
-    if (theClassName !== popped?.name) {
-      throw new Error('VERY BAD THINGS: ' + theClassName);
-    }
+    // Let's make the name the fully qualified name, now
+    this.info.name = this.contextStack.map((pcc) => pcc.name).join('.');
+    this.contextStack.pop();
     if (this.contextStack.length > 0) {
       this.info = this.contextStack[this.contextStack.length - 1]!;
     }

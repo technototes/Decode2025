@@ -16,6 +16,12 @@ const server = serve({
         decodeURIComponent(req.params.team),
         decodeURIComponent(req.params.path),
       ),
+    '/api/loadclass/:team/:path/:file': async (req) =>
+      LoadClassList(
+        decodeURIComponent(req.params.team),
+        decodeURIComponent(req.params.path),
+        decodeURIComponent(req.params.file),
+      ),
     '/api/savepath/:team/:path/:data': async (req) =>
       SavePath(
         decodeURIComponent(req.params.team),

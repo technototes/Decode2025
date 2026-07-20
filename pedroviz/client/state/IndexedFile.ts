@@ -17,6 +17,7 @@ import {
   isLinearFacing,
   isRadiansRef,
   isRef,
+  isTangentFacing,
   makeError,
   Path,
   PathChainClass,
@@ -137,10 +138,13 @@ export function MakeMappedIndex(
         checkHeadingRef(apc.heading.end, `${id}'s end heading ref`),
         res,
       );
+    } else if (isTangentFacing(apc.heading)) {
+      // Nothing to see here...
     } else {
-      // TODO: Handing tangent, reverse, point, and piecewise
+      // TODO: Handing reverse, point, and piecewise
       console.error(
-        'NYI: Not checking the heading interpolator used by this pathc chain!',
+        'NYI: Not checking the heading interpolator used by this path chain!',
+        apc.heading,
       );
     }
     apc.paths.forEach((br, index) => {
