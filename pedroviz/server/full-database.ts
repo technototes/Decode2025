@@ -17,11 +17,11 @@ import {
 const teampaths: Map<Team, Path[]> = new Map();
 const database: PathDatabase = new Map();
 
-function makeKey(team: Team, path: Path): PathDBKey {
+export function makeKey(team: Team, path: Path): PathDBKey {
   return `${team}*${path}` as PathDBKey;
 }
 
-function getTeamPath(dbKey: PathDBKey): [Team, Path] {
+export function getTeamPath(dbKey: PathDBKey): [Team, Path] {
   const items = dbKey.split('*');
   if (items.length === 2) {
     return items as [Team, Path];
@@ -91,14 +91,6 @@ export function GetAllIndexContent(): [Team, Path, string[]][] {
   });
 }
 
-export function GetFullPathChain(
-  team: Team,
-  path: Path,
-): PathChainClass | undefined {
-  const entry = database.get(makeKey(team, path));
-  return entry && entry[1];
-}
-
 export function GetDatabase(): PathDatabase {
   return database;
 }
@@ -111,8 +103,7 @@ export function WebGetPathChainClassList(
 ): ErrorOr<string[]> {
   const res = database.get(makeKey(team, path));
   if (isUndefined(res)) {
-    console.log(database);
-    return makeError(`${team}:${path} no Pedro pathing classes found`);
+    return makeError(`List: ${team}:${path} no Pedro pathing classes found`);
   }
   return res[0];
 }
@@ -123,17 +114,9 @@ export function WebGetPathChainClassRoot(
 ): ErrorOr<PathChainClass> {
   const res = database.get(makeKey(team, path));
   if (isUndefined(res)) {
-    return makeError(`${team}:${path} no Pedro pathing classes found`);
+    return makeError(`Root: ${team}:${path} no Pedro pathing classes found`);
   }
   return res[1];
-}
-
-export function WebGetTeamPaths(): TeamPaths {
-  const teamPaths: TeamPaths = {};
-  teampaths.forEach((paths, team) => {
-    teamPaths[team] = paths;
-  });
-  return teamPaths;
 }
 
 /*

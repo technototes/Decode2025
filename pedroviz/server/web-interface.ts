@@ -1,21 +1,14 @@
-import { isString, Pickle } from '@freik/typechk';
+import { Pickle } from '@freik/typechk';
 
 import {
   GetDatabase,
   WebGetPathChainClassList,
   WebGetPathChainClassRoot,
-  WebGetTeamPaths,
 } from './full-database';
-import { GetTeamPaths } from './getpaths';
 import { isError, Path, Team } from './types';
 
 // Send the list of TeamPaths to the client
 
-export async function GetPathFileNames(): Promise<Response> {
-  // First, get the path to the root of the repository:
-  // console.log('Found the following paths:', filePaths);
-  return Response.json(WebGetTeamPaths());
-}
 export async function LoadClassList(
   team: string,
   path: string,

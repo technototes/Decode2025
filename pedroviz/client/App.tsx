@@ -8,6 +8,7 @@ import {
 } from '@fluentui/react-components';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 
+import { Strings } from './constants';
 import { PathsDataDisplay } from './PathsDataDisplay';
 import { PathSelector } from './PathSelector';
 import { Settings } from './Settings';
@@ -24,7 +25,7 @@ export function MyApp(): ReactElement {
         <div className="header-left">
           <PathSelector />
         </div>
-        <div className="header-center">Viz4Pedro</div>
+        <div className="header-center">{Strings.Viz4Pedro}</div>
         <div className="header-right">
           <Settings />
         </div>

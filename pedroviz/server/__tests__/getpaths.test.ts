@@ -7,7 +7,6 @@ import {
   getTeamDirectories,
 } from '../getpaths';
 import { Path, Team } from '../types';
-import { GetPathFileNames } from '../web-interface';
 
 function getTestRepoPath(): string {
   return path.resolve(__dirname, 'test-repo-root');
@@ -55,13 +54,4 @@ test('getPathFiles finds no path files', async () => {
   const repoRoot = await getTestRepoPath();
   const pathFiles = await getPathFiles(repoRoot, 'TeamB');
   expect(pathFiles).toEqual([]);
-});
-
-test('raw endpoint invocation', async () => {
-  const res: Response = await GetPathFileNames();
-  expect(res).toHaveProperty('ok', true);
-  expect(res).toHaveProperty('status', 200);
-  expect(res).toHaveProperty('headers');
-  const data = await res.json();
-  expect(data).toBeDefined();
 });

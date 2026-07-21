@@ -1,12 +1,14 @@
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
 
-import { select_a_bot, select_a_file } from './constants';
+import { Strings } from './constants';
 import {
   BlurAtom,
-  FilesForSelectedTeam,
+  ClassesForSelectedFileAtom,
+  FilesForSelectedTeamAtom,
+  SelectedClassAtom,
   SelectedFileAtom,
   SelectedTeamAtom,
   TeamsAtom,
@@ -18,7 +20,7 @@ export function TeamSelector(): ReactElement {
   const [team, setTeam] = useAtom(SelectedTeamAtom);
   return (
     <AutoSelector
-      prompt={select_a_bot}
+      prompt={Strings.select_a_bot}
       items={teams}
       selected={team}
       setSelected={setTeam}
@@ -30,11 +32,11 @@ export function TeamSelector(): ReactElement {
 
 export function FileSelector(): ReactElement {
   // TODO: get the atom from Jotai for the files
-  const files = useAtomValue(FilesForSelectedTeam); // ['Path1.java', 'MyPaths.java'];
+  const files = useAtomValue(FilesForSelectedTeamAtom); // ['Path1.java', 'MyPaths.java'];
   const [file, setFile] = useAtom(SelectedFileAtom);
   return (
     <AutoSelector
-      prompt={select_a_file}
+      prompt={Strings.select_a_file}
       items={files}
       selected={file}
       setSelected={setFile}
@@ -42,13 +44,18 @@ export function FileSelector(): ReactElement {
   );
 }
 
-/*
 export function ClassSelector(): ReactElement {
-  const classes = useAtomValue(ClassesForSelectedFile);
+  const classes = useAtomValue(ClassesForSelectedFileAtom);
   const [classSel, setClass] = useAtom(SelectedClassAtom);
-  return <></>;
+  return (
+    <AutoSelector
+      prompt={Strings.select_a_class}
+      items={classes}
+      selected={classSel}
+      setSelected={setClass}
+    />
+  );
 }
-*/
 
 export function PathSelector(): ReactElement {
   const blur = useAtomValue(BlurAtom);
@@ -57,6 +64,8 @@ export function PathSelector(): ReactElement {
       <TeamSelector />
       &nbsp;
       <FileSelector />
+      &nbsp;
+      <ClassSelector />
       &nbsp;
       <Text>{blur}</Text>
     </>

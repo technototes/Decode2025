@@ -5,6 +5,7 @@ import {
   chkMapOf,
   chkObjectOfExactType,
   chkRecordOf,
+  chkTupleOf,
   hasFieldOf,
   hasFieldType,
   hasStrField,
@@ -158,6 +159,22 @@ export type MaybePathFile = ErrorOr<PathChainClass>;
 export type PathDBKey = Nominal<string, 'DBKey'>;
 export type PathDBValue = [string[], PathChainClass];
 export type PathDatabase = Map<PathDBKey, PathDBValue>;
+
+export function chkPathDBKey(obj: unknown): obj is PathDBKey {
+  if (!isString(obj)) {
+    return false;
+  }
+  const pieces = obj.split('*');
+  return pieces.length === 2;
+}
+export const chkPathDBValue: typecheck<PathDBValue> = chkTupleOf(
+  isArrayOfString,
+  chkPathChainClass,
+);
+export const chkPathDatabase: typecheck<PathDatabase> = chkMapOf(
+  chkPathDBKey,
+  chkPathDBValue,
+);
 
 export function chkTeamPaths(t: unknown): t is TeamPaths {
   return isRecordOf(t, isString, isArrayOfString);

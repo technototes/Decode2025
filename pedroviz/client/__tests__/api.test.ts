@@ -14,17 +14,14 @@ import {
   NamedBezier,
   NamedPose,
   NamedValue,
-  Path,
   PathChainClass,
   PathChainName,
   PoseName,
   PoseRef,
-  Team,
-  TeamPaths,
   ValueName,
   ValueRef,
 } from '../../server/types';
-import { GetPaths, LoadAndIndexFile, SavePath } from '../state/API';
+import { LoadAndIndexFile, SavePath } from '../state/API';
 import {
   calcBezierRef,
   calcHeadingRef,
@@ -92,15 +89,6 @@ function mkPCNm(name: string): PathChainName {
 }
 
 // Mocks & phony data for my tests:
-const teamPaths: TeamPaths = {
-  ['team1' as Team]: ['path1.java' as Path, 'path2.java' as Path],
-  ['team2' as Team]: ['path3.java' as Path, 'path4.java' as Path],
-};
-
-const badTeamPaths: unknown = {
-  team1: ['path1.java', 'path2.java'],
-  team2: { path3: 'path3.java' },
-};
 
 const testPathChainFile: PathChainClass = {
   ...EmptyPathChainClass,
@@ -247,10 +235,6 @@ async function MyFetchFunc(
   init?: RequestInit,
 ): Promise<Response> {
   switch (key) {
-    case '/api/getpaths': {
-      const body = JSON.stringify(bad ? badTeamPaths : teamPaths);
-      return new Response(body, status);
-    }
     case '/api/loadpath/team1/path1.java': {
       const body = JSON.stringify({ a: 'b' });
       return new Response(body, status);
@@ -273,15 +257,6 @@ async function MyFetchFunc(
 MyFetchFunc.preconnect = () => {};
 
 describe('API validation', () => {
-  test('GetPaths', async () => {
-    globalThis.fetch = MyFetchFunc;
-    bad = true;
-    const res2 = await GetPaths();
-    expect(res2).toEqual({});
-    bad = false;
-    const res = await GetPaths();
-    expect(res).toEqual(teamPaths);
-  });
   test('LoadPaths', async () => {
     globalThis.fetch = MyFetchFunc;
     const res2 = await LoadAndIndexFile('team1', 'path1.java');

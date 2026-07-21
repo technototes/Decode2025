@@ -3,19 +3,12 @@ import { serve } from 'bun';
 import index from './index.html';
 import { main } from './server/main';
 import { SavePath } from './server/savepath';
-import {
-  GetPathFileNames,
-  LoadClassList,
-  LoadDatabase,
-  LoadPath,
-} from './server/web-interface';
+import { LoadClassList, LoadDatabase, LoadPath } from './server/web-interface';
 
 const server = serve({
   routes: {
     // Serve index.html for all unmatched routes.
     '/*': index,
-    // Get the different robot path files
-    '/api/getpaths': async (req) => GetPathFileNames(),
     '/api/loadpath/:team/:path': async (req) =>
       LoadPath(
         decodeURIComponent(req.params.team),
@@ -32,7 +25,7 @@ const server = serve({
         decodeURIComponent(req.params.path),
         decodeURIComponent(req.params.data),
       ),
-    '/apii/fulldb': async (req) => LoadDatabase(),
+    '/api/db': async (req) => LoadDatabase(),
   },
 
   development: process.env.NODE_ENV !== 'production' && {

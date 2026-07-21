@@ -16,27 +16,33 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import { Pickle } from '@freik/typechk';
 
 import '@testing-library/jest-dom';
 
+import { makeKey } from '../../server/full-database';
 import {
   AnonymousBezier,
   BezierName,
+  EmptyPathChainClass,
   Path,
   PathChainClass,
   PathChainName,
+  PathDBKey,
+  PathDBValue,
   PoseName,
   Team,
   TeamPaths,
   ValueName,
 } from '../../server/types';
-import { select_a_bot, select_a_file } from '../constants';
+import { Strings } from '../constants';
 import { PathsDataDisplay } from '../PathsDataDisplay';
 import { PathSelector } from '../PathSelector';
 import {
+  ClearCache,
   ColorForNumber,
   ColorsAtom,
-  FilesForSelectedTeam,
+  FilesForSelectedTeamAtom,
   MappedBeziersAtom,
   MappedPathChainsAtom,
   MappedPosesAtom,
@@ -164,15 +170,18 @@ const status = {
   headers: { 'Content-Type': 'application/json' },
 };
 
+const database = new Map<PathDBKey, PathDBValue>([
+  [makeKey('team1' as Team, 'path1.java' as Path), [[], EmptyPathChainClass]],
+  [makeKey('team1' as Team, 'path2.java' as Path), [[], EmptyPathChainClass]],
+  [makeKey('team2' as Team, 'path3.java' as Path), [[], fullPathChainFile]],
+  [makeKey('team2' as Team, 'path4.java' as Path), [[], EmptyPathChainClass]],
+]);
+
 async function MyFetchFunc(
   key: string | URL | Request,
   init?: RequestInit,
 ): Promise<Response> {
   switch (key) {
-    case '/api/getpaths': {
-      const body = JSON.stringify(teamPaths);
-      return new Response(body, status);
-    }
     case '/api/loadpath/team1/path2.java': {
       const body = JSON.stringify(testPathChainFile);
       return new Response(body, status);
@@ -181,8 +190,12 @@ async function MyFetchFunc(
       const body = JSON.stringify(fullPathChainFile);
       return new Response(body, status);
     }
+    case '/api/db': {
+      const body = Pickle(database);
+      return new Response(body, status);
+    }
   }
-  return new Response('ERROR', { status: 404 });
+  throw new Error(`Unknown key: ${key}`);
 }
 MyFetchFunc.preconnect = () => {};
 
@@ -220,6 +233,7 @@ beforeEach(async () => {
   // Execute the localStorage clear function within the test environment
   // This approach is common when using test runners that control a browser context
   await window.localStorage.clear();
+  ClearCache();
 });
 
 describe('Simplest UI validation', () => {
@@ -261,19 +275,19 @@ describe('Simplest UI validation', () => {
       );
     });
     // Need to cover Paths & Teams atoms
-    let open = screen.getByText(select_a_bot);
+    let open = screen.getByText(Strings.select_a_bot);
     expect(open).toBeEnabled();
-    let path = screen.getByText(select_a_file);
+    let path = screen.getByText(Strings.select_a_file);
     expect(path).toBeDisabled();
     await act(async () => fireEvent.click(open));
     let select = screen.getByText('team2');
     expect(select).toBeEnabled();
     await act(async () => fireEvent.click(select));
     await waitFor(async () => {
-      expect(await store.get(SelectedTeamAtom)).toBe('team2');
+      expect(await store.get(SelectedTeamAtom)).toBe('team2' as Team);
     });
     await waitFor(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('');
+      expect(await store.get(SelectedFileAtom)).toBe('' as Path);
     });
     // The second menu should now be enabled
     expect(path).toBeEnabled();
@@ -284,13 +298,13 @@ describe('Simplest UI validation', () => {
     expect(selectFile).toBeEnabled();
     await act(async () => fireEvent.click(selectFile));
     await waitFor(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('path3.java');
+      expect(await store.get(SelectedFileAtom)).toBe('path3.java' as Path);
     });
     await act(async () => {
       await store.set(SelectedTeamAtom, 'team3');
     });
     await act(async () => {
-      expect(await store.get(FilesForSelectedTeam)).toEqual([]);
+      expect(await store.get(FilesForSelectedTeamAtom)).toEqual([]);
     });
   });
 });
@@ -311,7 +325,7 @@ describe('SchemaAtom tests', () => {
       await store.set(SelectedFileAtom, 'path3.java');
     });
     await act(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('path3.java');
+      expect(await store.get(SelectedFileAtom)).toBe('path3.java' as Path);
     });
     expect(await store.get(MappedValuesAtom)).toBeDefined();
     expect(await store.get(MappedPosesAtom)).toBeDefined();

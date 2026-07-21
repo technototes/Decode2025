@@ -12,16 +12,18 @@ import {
   isError,
   Path,
   PathChainName,
+  PathDatabase,
+  PathDBKey,
   PoseName,
   PoseRef,
   RadiansRef,
-  TeamPaths,
+  Team,
   ValueName,
   ValueRef,
 } from '../../server/types';
 import { AnonymousPathChain, MappedIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
-import { GetPaths, LoadAndIndexFile, UpdateIndexFile } from './API';
+import { GetFullDb, LoadAndIndexFile, UpdateIndexFile } from './API';
 import { EmptyMappedFile } from './IndexedFile';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
@@ -42,57 +44,90 @@ export const ColorForNumber = atomFamily((index: number) =>
 );
 
 export const BlurAtom = atom('');
-
-export const PathsAtom = atom(async () => GetPaths());
-
-export const TeamsAtom = atom(async (get) => {
-  const paths = await get(PathsAtom);
-  return Object.keys(paths).sort();
+let dbCache: PathDatabase | null = null;
+export const FullDatabaseAtom = atom(async () => {
+  if (dbCache === null) {
+    dbCache = await GetFullDb();
+  }
+  return dbCache;
 });
 
-export const SelectedTeamBackingAtom = atomWithStorage<string>(
+export function ClearCache() {
+  dbCache = null;
+}
+
+export const TeamsAtom = atom(async (get): Promise<Team[]> => {
+  const db = await get(FullDatabaseAtom);
+  return [
+    ...new Set([...db.keys()].map((dbkey) => dbkey.split('*')[0]!)),
+  ] as Team[];
+});
+
+export const SelectedTeamBacking = atomWithStorage<Team>(
   'selectedTeam',
-  '',
+  '' as Team,
   undefined,
   { getOnInit: true },
 );
+
 export const SelectedTeamAtom = atom(
-  async (get) => get(SelectedTeamBackingAtom),
-  async (get, set, val: string) => {
-    const cur = get(SelectedTeamBackingAtom);
+  async (get) => get(SelectedTeamBacking),
+  async (get, set, val: string | Team) => {
+    const cur = await get(SelectedTeamBacking);
     // Clear the selected file when the team is changed
     if (cur !== val) {
-      const curPath = await get(SelectedFileAtom);
-      if (curPath !== '') {
-        const paths = await get(PathsAtom);
-        if (hasField(paths, val)) {
-          const files = paths[val] as Path;
-          if (!files.includes(curPath)) {
-            set(SelectedFileAtom, '');
-          } else {
-            set(SelectedFileAtom, curPath);
-          }
-        }
-      }
+      set(SelectedFileAtom, '' as Path);
     }
-    set(SelectedTeamBackingAtom, val);
+    set(SelectedTeamBacking, val as Team);
   },
 );
 
-export const FilesForSelectedTeam = atom(async (get): Promise<Path[]> => {
+export const FilesForSelectedTeamAtom = atom(async (get): Promise<Path[]> => {
+  const db = await get(FullDatabaseAtom);
   const selTeam = await get(SelectedTeamAtom);
-  const thePaths = await get(PathsAtom);
-  if (selTeam === '') {
-    return [] as Path[];
-  }
-  if (hasField(thePaths, selTeam)) {
-    return thePaths[selTeam] as Path[];
+  if (selTeam.length > 0) {
+    return [...db.keys()]
+      .filter((key) => key.startsWith(`${selTeam}*`))
+      .map((val) => val.split('*')[1] as Path);
   }
   return [] as Path[];
 });
 
-export const SelectedFileAtom = atomWithStorage<string>(
+export const SelectedFileBacking = atomWithStorage<Path>(
   'selectedPath',
+  '' as Path,
+  undefined,
+  { getOnInit: true },
+);
+
+export const SelectedFileAtom = atom(
+  async (get) => get(SelectedFileBacking),
+  async (get, set, val: string | Path) => {
+    const cur = await get(SelectedFileAtom);
+    // Clear the selected class when the file is changed
+    if (cur !== val) {
+      set(SelectedClassAtom, '');
+    }
+    set(SelectedFileBacking, val as Path);
+  },
+);
+
+export const SelectedDBKeyAtom = atom(async (get): Promise<PathDBKey> => {
+  const team = await get(SelectedTeamAtom);
+  const file = await get(SelectedFileAtom);
+  return `${team}*${file}` as PathDBKey;
+});
+
+export const ClassesForSelectedFileAtom = atom(
+  async (get): Promise<string[]> => {
+    const db = await get(FullDatabaseAtom);
+    const key = await get(SelectedDBKeyAtom);
+    return (db.get(key) || [[]])[0];
+  },
+);
+
+export const SelectedClassAtom = atomWithStorage(
+  'selectedClass',
   '',
   undefined,
   { getOnInit: true },

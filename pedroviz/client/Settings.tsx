@@ -4,6 +4,7 @@ import { useAtom } from 'jotai';
 import { Button, Switch } from '@fluentui/react-components';
 import { WeatherMoonFilled, WeatherSunnyRegular } from '@fluentui/react-icons';
 
+import { Strings } from './constants';
 import { ThemeAtom } from './state/Atoms';
 
 export function Settings(): ReactElement {
@@ -15,7 +16,7 @@ export function Settings(): ReactElement {
           localStorage.clear();
           window.location.reload();
         }}>
-        Reset
+        {Strings.Reset}
       </Button>
       <span style={{ width: '10px' }} />
       <WeatherSunnyRegular />

@@ -4,14 +4,14 @@ import {
   AnonymousBezier,
   AnonymousPose,
   chkPathChainClass,
-  chkTeamPaths,
+  chkPathDatabase,
   ErrorOr,
   isError,
   makeError,
   Path,
   PathChainClass,
+  PathDatabase,
   Team,
-  TeamPaths,
 } from '../../server/types';
 import { MappedIndex } from '../types';
 import { MakeMappedIndex } from './IndexedFile';
@@ -37,13 +37,9 @@ export function getColorFor(
   return getColorFor(JSON.stringify(item));
 }
 
-// Returns the list of available files for all teams
-export async function GetPaths(): Promise<TeamPaths> {
-  const teamFileList = await fetchApi('getpaths', chkTeamPaths, {});
-  for (const i of Object.keys(teamFileList) as Team[]) {
-    teamFileList[i]!.sort();
-  }
-  return teamFileList;
+// Get the entire Database from the server
+export async function GetFullDb(): Promise<PathDatabase> {
+  return await fetchApi('db', chkPathDatabase, new Map());
 }
 
 // last loaded file, I guess?
