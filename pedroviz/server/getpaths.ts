@@ -4,9 +4,7 @@ import path from 'node:path';
 import { Path, Team, TeamPaths } from './types';
 import { firstFtcSrc, isDirectory } from './utility';
 
-// Send the list of TeamPaths to the client
-export async function GetPathFileNames(): Promise<Response> {
-  // First, get the path to the root of the repository:
+export async function GetTeamPaths() {
   const repoRoot = await getRelativeRepoRoot(
     Bun.fileURLToPath(new URL('.', import.meta.url)),
   );
@@ -17,8 +15,7 @@ export async function GetPathFileNames(): Promise<Response> {
   for (const teamName of teamDirs) {
     filePaths[teamName] = await getPathFiles(repoRoot, teamName);
   }
-  // console.log('Found the following paths:', filePaths);
-  return Response.json(filePaths);
+  return filePaths;
 }
 
 const pathNameMatch = /[^\/\\]*(Path|Pose)[^\/\\]*\.java$/;

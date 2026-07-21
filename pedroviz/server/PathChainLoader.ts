@@ -32,10 +32,12 @@ import {
   BezierName,
   BezierRef,
   EmptyPathChainClass,
+  ErrorOr,
   HeadingRef,
   isAnonymousValue,
   isRadiansRef,
   isRef,
+  makeError,
   NamedBezier,
   NamedPathChain,
   NamedPose,
@@ -856,37 +858,22 @@ function getPathChainFactories(
 
 export async function MakePathChainFile(
   filename: string,
-): Promise<PathChainClass | string> {
+): Promise<ErrorOr<PathChainClass>> {
   const loader = new PathChainLoader();
   const res = await loader.loadFile(filename);
   if (isString(res)) {
-    return res;
+    return makeError(res);
   }
   let pcc: OptPCCInfo = { ...loader.info };
   delete pcc.pathChainFields;
   return pcc;
 }
 
-// This is for quick debugging:
+/*
 if (import.meta.main) {
-  // This code runs only when you execute the file directly
-  // e.g., `bun run my-file.ts`
   MakePathChainFile(
-    [
-      '..',
-      'Sixteen750',
-      'src',
-      'main',
-      'java',
-      'org',
-      'firstinspires',
-      'ftc',
-      'sixteen750',
-      'commands',
-      'auto',
-      'Poses.java',
-    ].join('/'),
-  )
+    ['..', 'Sixteen750', 'src', 'main', 'java', 'org', 'firstinspires', 'ftc', 'sixteen750', 'commands', 'auto', 'Poses.java',].join('/'))
     .then((strOrPcf) => console.log(strOrPcf))
     .catch((err) => console.error(err));
 }
+*/

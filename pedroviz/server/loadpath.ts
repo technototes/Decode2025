@@ -1,31 +1,17 @@
 import { hasField, isString, isUndefined } from '@freik/typechk';
 
 import { MakePathChainFile } from './PathChainLoader';
-import { PathChainClass } from './types';
+import { ErrorOr, isError, makeError, PathChainClass } from './types';
 import { getProjectFilePath } from './utility';
 
-export async function LoadPath(
+export async function GetPathChainIndex(
   team: string,
-  filename: string,
-): Promise<Response> {
-  const filePath = getProjectFilePath(team, filename);
-  const paths = await loadPathChainsFromFile(filePath);
-  if (isString(paths)) {
-    return Response.json({ error: paths });
-  }
-  return Response.json(paths);
-}
-
-export async function loadPathChainsFromFile(
-  filePath: string,
-): Promise<PathChainClass | string> {
-  return MakePathChainFile(filePath);
-}
-
-export async function LoadClassList(filepath: string): Promise<Response> {
-  const pcc = await loadPathChainsFromFile(filepath);
-  if (isString(pcc)) {
-    return Response.json({ error: pcc });
+  file: string,
+): Promise<ErrorOr<[string[], PathChainClass]>> {
+  const filepath = getProjectFilePath(team, file);
+  const pcc = await MakePathChainFile(filepath);
+  if (isError(pcc)) {
+    return pcc;
   }
   const list = [];
   const work = [pcc];
@@ -35,7 +21,7 @@ export async function LoadClassList(filepath: string): Promise<Response> {
       break;
     }
     list.push(item.name);
-    work.push(...Object.values(pcc.children));
+    work.push(...Object.values(item.children));
   }
-  return Response.json(list);
+  return [list, pcc];
 }

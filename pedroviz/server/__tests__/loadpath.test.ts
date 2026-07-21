@@ -3,9 +3,16 @@ import path from 'path';
 
 import { isString } from '@freik/typechk';
 
-import { LoadPath, loadPathChainsFromFile } from '../loadpath';
-import { BezierName, PathChainName, PoseName, ValueName } from '../types';
+import { MakePathChainFile } from '../PathChainLoader';
+import {
+  BezierName,
+  isError,
+  PathChainName,
+  PoseName,
+  ValueName,
+} from '../types';
 import { firstFtcSrc, getProjectFilePath } from '../utility';
+import { LoadPath } from '../web-interface';
 
 function getTestRepoPath(): string {
   return path.resolve(__dirname, 'test-repo-root');
@@ -29,13 +36,13 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     'FtcRobotController',
     testPath,
   );
-  const paths = await loadPathChainsFromFile(repoPathToFile);
+  const paths = await MakePathChainFile(repoPathToFile);
   expect(paths).toBeDefined();
-  if (isString(paths)) {
-    console.error(paths);
+  if (isError(paths)) {
+    console.error(paths.errors());
   }
-  expect(isString(paths)).toBeFalse();
-  if (isString(paths)) {
+  expect(isError(paths)).toBeFalse();
+  if (isError(paths)) {
     return;
   }
   // This currently failing, as I haven't implemented the parsing yet.
