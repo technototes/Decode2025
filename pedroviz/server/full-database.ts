@@ -9,12 +9,26 @@ import {
   Path,
   PathChainClass,
   PathDatabase,
+  PathDBKey,
   Team,
   TeamPaths,
 } from './types';
 
 const teampaths: Map<Team, Path[]> = new Map();
 const database: PathDatabase = new Map();
+
+function makeKey(team: Team, path: Path): PathDBKey {
+  return `${team}*${path}` as PathDBKey;
+}
+
+function getTeamPath(dbKey: PathDBKey): [Team, Path] {
+  const items = dbKey.split('*');
+  if (items.length === 2) {
+    return items as [Team, Path];
+  }
+  console.error('Invalid key provided: ', dbKey);
+  return ['team', 'path'] as [Team, Path];
+}
 
 // Returns true if that file has *any* items we care about in it.
 // This does wind up triggering for something that just has a static int/double,
@@ -55,7 +69,7 @@ function RegisterPathChainIndex(
   } else {
     teampaths.set(team, [path]);
   }
-  database.set([team, path], [classList, pcc]);
+  database.set(makeKey(team, path), [classList, pcc]);
 }
 
 export async function PopulateDatabase() {
@@ -71,18 +85,17 @@ export async function PopulateDatabase() {
 }
 
 export function GetAllIndexContent(): [Team, Path, string[]][] {
-  return [...database.entries()].map(([[team, path], [classes, pcc]]) => [
-    team,
-    path,
-    classes,
-  ]);
+  return [...database.entries()].map(([key, [classes, pcc]]) => {
+    const [team, path] = getTeamPath(key);
+    return [team, path, classes];
+  });
 }
 
 export function GetFullPathChain(
   team: Team,
   path: Path,
 ): PathChainClass | undefined {
-  const entry = database.get([team, path]);
+  const entry = database.get(makeKey(team, path));
   return entry && entry[1];
 }
 
@@ -96,8 +109,9 @@ export function WebGetPathChainClassList(
   team: Team,
   path: Path,
 ): ErrorOr<string[]> {
-  const res = database.get([team, path]);
+  const res = database.get(makeKey(team, path));
   if (isUndefined(res)) {
+    console.log(database);
     return makeError(`${team}:${path} no Pedro pathing classes found`);
   }
   return res[0];
@@ -107,7 +121,7 @@ export function WebGetPathChainClassRoot(
   team: Team,
   path: Path,
 ): ErrorOr<PathChainClass> {
-  const res = database.get([team, path]);
+  const res = database.get(makeKey(team, path));
   if (isUndefined(res)) {
     return makeError(`${team}:${path} no Pedro pathing classes found`);
   }

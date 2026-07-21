@@ -42,11 +42,13 @@ export function FileSelector(): ReactElement {
   );
 }
 
+/*
 export function ClassSelector(): ReactElement {
   const classes = useAtomValue(ClassesForSelectedFile);
   const [classSel, setClass] = useAtom(SelectedClassAtom);
   return <></>;
 }
+*/
 
 export function PathSelector(): ReactElement {
   const blur = useAtomValue(BlurAtom);

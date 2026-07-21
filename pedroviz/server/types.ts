@@ -155,7 +155,7 @@ export const EmptyPathChainClass: PathChainClass = {
 };
 
 export type MaybePathFile = ErrorOr<PathChainClass>;
-export type PathDBKey = [Team, Path];
+export type PathDBKey = Nominal<string, 'DBKey'>;
 export type PathDBValue = [string[], PathChainClass];
 export type PathDatabase = Map<PathDBKey, PathDBValue>;
 

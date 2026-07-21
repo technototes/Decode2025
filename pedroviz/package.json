@@ -6,14 +6,9 @@
   "type": "module",
   "scripts": {
     "format": "prettier -w \"*.ts*\" \"client/**/*.tsx\"  \"client/**/*.ts\" \"server/**/*.ts\" \"*.md\" \"*.json\" \"*.html\"",
-    "open": "bun run os open",
-    "open:win": "cmd /c start \"\"",
-    "open:mac": "open",
-    "open:lin": "xdg-open",
-    "os": "bun run scripts/os.ts",
-    "types": "tsc --noEmit -p pv-tsconfig.json",
+    "types": "tsc --noEmit",
     "pvdev": "bun --hot index.tsx",
-    "pvbuild": "bun build ./index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
+    "pvbld": "bun build ./index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
     "pvstart": "NODE_ENV=production bun index.tsx"
   },
   "dependencies": {

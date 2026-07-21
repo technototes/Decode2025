@@ -1,8 +1,10 @@
 import { ReactElement } from 'react';
 
 import {
+  Button,
   Menu,
   MenuButton,
+  MenuItem,
   MenuItemRadio,
   MenuList,
   MenuPopover,
@@ -10,6 +12,7 @@ import {
   MenuTrigger,
   useId,
 } from '@fluentui/react-components';
+import { ChevronDown16Regular } from '@fluentui/react-icons';
 import { isString } from '@freik/typechk';
 
 // Show a selection, unless there are no items, then disable the selector entirely
@@ -27,11 +30,13 @@ export function AutoSelector({
   default?: string;
 }): ReactElement {
   const id = useId('ADS');
+  /*
   const onChange: MenuProps['onCheckedValueChange'] = (_, { checkedItems }) => {
     if (checkedItems.length >= 1) {
       setSelected(checkedItems[0]!);
     }
   };
+  */
   let selectedItem = selected.length === 0 ? prompt : selected;
   if (items.length === 1 && selected !== items[0]) {
     // If we only have 1 item go ahead & select it, but schedule it in the future
@@ -48,18 +53,18 @@ export function AutoSelector({
   return (
     <Menu>
       <MenuTrigger>
-        <MenuButton disabled={items.length === 0}>{selectedItem}</MenuButton>
+        <Button disabled={items.length === 0}>
+          {selectedItem}&nbsp;
+          <ChevronDown16Regular />
+        </Button>
       </MenuTrigger>
       <MenuPopover>
-        <MenuList onCheckedValueChange={onChange}>
+        <MenuList>
+          {/*  onCheckedValueChange={onChange} */}
           {items.map((val) => (
-            <MenuItemRadio
-              key={`${id}:${val}`}
-              name={`${id}`}
-              onSelect={() => setSelected(val)}
-              value={val}>
+            <MenuItem key={`${id}:${val}`} onClick={() => setSelected(val)}>
               {val}
-            </MenuItemRadio>
+            </MenuItem>
           ))}
         </MenuList>
       </MenuPopover>
