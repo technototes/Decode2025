@@ -13,8 +13,8 @@ import {
   PathDatabase,
   Team,
 } from '../../server/types';
-import { MappedIndex } from '../types';
-import { MakeMappedIndex } from './IndexedFile';
+import { FileIndex, NameLookup } from '../types';
+import { MakeFileIndex, MakeNameLookup, ValidateIndex } from './IndexedFile';
 import { fetchApi } from './Storage';
 
 export type ValidRes = ErrorOr<true>;
@@ -46,14 +46,14 @@ export async function GetFullDb(): Promise<PathDatabase> {
 const lastLoadedIndexFile = {
   team: '',
   file: '',
-  data: null as null | MappedIndex,
+  data: null as null | FileIndex,
 };
-const indexedFiles: Map<[Team, Path], MappedIndex> = new Map();
+const indexedFiles: Map<[Team, Path], FileIndex> = new Map();
 
 export async function LoadAndIndexFile(
   team: string,
   file: string,
-): Promise<ErrorOr<MappedIndex>> {
+): Promise<ErrorOr<FileIndex>> {
   if (
     lastLoadedIndexFile.team === team &&
     lastLoadedIndexFile.file === file &&
@@ -73,10 +73,13 @@ export async function LoadAndIndexFile(
   if (isString(pcf)) {
     return makeError(pcf);
   }
-  const indexFile = await MakeMappedIndex(pcf, indexedFiles);
-  if (isError(indexFile)) {
+  const indexFile = await MakeFileIndex(pcf);
+  const lookup: NameLookup = MakeNameLookup();
+  lookup.registerIndex(indexFile);
+  const validate = ValidateIndex(indexFile, lookup);
+  if (isError(validate)) {
     return makeError(
-      indexFile,
+      validate,
       `Loaded file ${team}/${file} has dangling references.`,
     );
   } else {
@@ -87,7 +90,7 @@ export async function LoadAndIndexFile(
   return indexFile;
 }
 
-export function UpdateIndexFile(team: string, file: string, data: MappedIndex) {
+export function UpdateIndexFile(team: string, file: string, data: FileIndex) {
   lastLoadedIndexFile.team = team;
   lastLoadedIndexFile.file = file;
   lastLoadedIndexFile.data = data;

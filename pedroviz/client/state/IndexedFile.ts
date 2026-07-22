@@ -19,21 +19,18 @@ import {
   isRef,
   isTangentFacing,
   makeError,
-  Path,
   PathChainClass,
   PathChainName,
-  PathDBKey,
   PoseName,
   PoseRef,
   RadiansRef,
-  Team,
   ValueName,
   ValueRef,
 } from '../../server/types';
-import { AnonymousPathChain, MappedIndex, Point } from '../types';
+import { AnonymousPathChain, FileIndex, NameLookup, Point } from '../types';
 import { ValidRes } from './API';
 
-export function MakeMappedIndex(pcf: PathChainClass): ErrorOr<MappedIndex> {
+export function MakeFileIndex(pcf: PathChainClass): FileIndex {
   const namedValues = new Map<ValueName, ValueRef | RadiansRef>(
     pcf.values.map((nv) => [nv.name, nv.value]),
   );
@@ -49,10 +46,37 @@ export function MakeMappedIndex(pcf: PathChainClass): ErrorOr<MappedIndex> {
       { paths: npc.paths, heading: npc.pathHeading },
     ]),
   );
+  return { namedValues, namedBeziers, namedPoses, namedPathChains };
+}
 
+// Make a thing that can accumulate indexes (*can* in the *future*)
+export function MakeNameLookup(): NameLookup {
+  let indexMap: FileIndex | null = null;
+  const registerIndex = (index: FileIndex) => {
+    indexMap = index;
+  };
+  const findValue = (val: ValueName): ValueRef | RadiansRef | undefined => {
+    return indexMap ? indexMap.namedValues.get(val) : undefined;
+  };
+  const findPose = (val: PoseName): PoseRef | undefined => {
+    return indexMap ? indexMap.namedPoses.get(val) : undefined;
+  };
+  const findBezier = (val: BezierName): BezierRef | undefined => {
+    return indexMap ? indexMap.namedBeziers.get(val) : undefined;
+  };
+  const findPath = (val: PathChainName): AnonymousPathChain | undefined => {
+    return indexMap ? indexMap.namedPathChains.get(val) : undefined;
+  };
+  return { registerIndex, findBezier, findPath, findPose, findValue };
+}
+
+export function ValidateIndex(
+  fileIndex: FileIndex,
+  lkup: NameLookup,
+): ErrorOr<true> {
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
     if (isRef(vr)) {
-      if (!namedValues.has(vr)) {
+      if (!lkup.findValue(vr)) {
         // TODO: This should trigger cross file lookup
         return makeError(
           `${id}'s "${vr}" value reference appears to be undefined.`,
@@ -86,7 +110,7 @@ export function MakeMappedIndex(pcf: PathChainClass): ErrorOr<MappedIndex> {
 
   function checkPoseRef(pr: PoseRef, id: string): ValidRes {
     if (isRef(pr)) {
-      return namedPoses.has(pr)
+      return lkup.findPose(pr)
         ? true
         : // TODO: This should trigger cross file lookup
           makeError(`${id}'s "${pr}" pose reference appears to be undefined`);
@@ -112,7 +136,7 @@ export function MakeMappedIndex(pcf: PathChainClass): ErrorOr<MappedIndex> {
 
   function checkBezierRef(br: BezierRef, id: string): ValidRes {
     if (isRef(br)) {
-      return namedBeziers.has(br)
+      return lkup.findBezier(br)
         ? true
         : // TODO: This should trigger cross file lookup
           makeError(`${id}'s bezier reference appears to be undefined`);
@@ -153,17 +177,17 @@ export function MakeMappedIndex(pcf: PathChainClass): ErrorOr<MappedIndex> {
 
   function validateUniqueNames(): ValidRes {
     const allNames = new Set<string>([
-      ...namedValues.keys(),
-      ...namedPoses.keys(),
-      ...namedBeziers.keys(),
-      ...namedPathChains.keys(),
+      ...fileIndex.namedValues.keys(),
+      ...fileIndex.namedPoses.keys(),
+      ...fileIndex.namedBeziers.keys(),
+      ...fileIndex.namedPathChains.keys(),
     ]);
     if (
       allNames.size !==
-      namedValues.size +
-        namedPoses.size +
-        namedBeziers.size +
-        namedPathChains.size
+      fileIndex.namedValues.size +
+        fileIndex.namedPoses.size +
+        fileIndex.namedBeziers.size +
+        fileIndex.namedPathChains.size
     ) {
       // TODO: Provide a detailed diagnostic of which names are duplicated
       return makeError(
@@ -175,13 +199,13 @@ export function MakeMappedIndex(pcf: PathChainClass): ErrorOr<MappedIndex> {
 
   function validatePathChainIndex(): ErrorOr<true> {
     let good: ValidRes = true;
-    namedPoses.forEach((pr, name) => {
+    fileIndex.namedPoses.forEach((pr, name) => {
       good = accError(checkPoseRef(pr, name), good);
     });
-    namedBeziers.forEach((br, name) => {
+    fileIndex.namedBeziers.forEach((br, name) => {
       good = accError(checkBezierRef(br, name), good);
     });
-    namedPathChains.forEach((apc, name) => {
+    fileIndex.namedPathChains.forEach((apc, name) => {
       good = accError(checkAnonymousPathChain(apc, name), good);
     });
     good = accError(validateUniqueNames(), good);
@@ -192,8 +216,7 @@ export function MakeMappedIndex(pcf: PathChainClass): ErrorOr<MappedIndex> {
   if (isError(res)) {
     return res;
   }
-
-  return { namedValues, namedBeziers, namedPoses, namedPathChains };
+  return true;
 }
 
 function cerr(nm: string, set: Set<string>): Error {
@@ -203,7 +226,7 @@ function cerr(nm: string, set: Set<string>): Error {
 }
 
 export function calcValueRef(
-  idx: MappedIndex,
+  idx: FileIndex,
   vr: ValueRef | RadiansRef,
   circ?: Set<string>,
 ): number {
@@ -229,7 +252,7 @@ export function calcValueRef(
 }
 
 export function calcPoseRefHeading(
-  idx: MappedIndex,
+  idx: FileIndex,
   pr: PoseRef,
   circ?: Set<string>,
 ): number {
@@ -256,7 +279,7 @@ export function calcPoseRefHeading(
 }
 
 export function calcPoseRef(
-  idx: MappedIndex,
+  idx: FileIndex,
   pr: PoseRef,
   circ?: Set<string>,
 ): Point {
@@ -280,7 +303,7 @@ export function calcPoseRef(
 }
 
 export function calcBezierRef(
-  idx: MappedIndex,
+  idx: FileIndex,
   br: BezierRef,
   circ?: Set<string>,
 ): Point[] {
@@ -306,7 +329,7 @@ export function calcBezierRef(
 }
 
 export function calcHeadingRef(
-  idx: MappedIndex,
+  idx: FileIndex,
   hr: HeadingRef,
   circ?: Set<string>,
 ): number {
@@ -333,7 +356,7 @@ export function calcHeadingRef(
 
 // Evaluation from the parsed code representation:
 export function calcValue(
-  idx: MappedIndex,
+  idx: FileIndex,
   av: AnonymousValue | RadiansRef,
   circ?: Set<string>,
 ): number {
@@ -346,7 +369,7 @@ export function calcValue(
   }
 }
 
-export const EmptyMappedFile: MappedIndex = {
+export const EmptyMappedFile: FileIndex = {
   namedValues: new Map(),
   namedPoses: new Map(),
   namedBeziers: new Map(),

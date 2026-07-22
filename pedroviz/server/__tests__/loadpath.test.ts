@@ -1,6 +1,5 @@
-import path from 'path';
-
 import { expect, test } from 'bun:test';
+import path from 'path';
 
 import { MakePathChainFile } from '../PathChainLoader';
 import {

@@ -58,11 +58,19 @@ export const chkConcreteHeadingType: typecheck<ConcreteHeadingType> = chkAnyOf(
   chkConcreteInterpolatedHeading,
 );
 
-export type MappedIndex = {
+export type FileIndex = {
   namedValues: Map<ValueName, ValueRef | RadiansRef>;
   namedPoses: Map<PoseName, PoseRef>;
   namedBeziers: Map<BezierName, BezierRef>;
   namedPathChains: Map<PathChainName, AnonymousPathChain>;
+};
+
+export type NameLookup = {
+  registerIndex: (index: FileIndex) => void;
+  findValue: (val: ValueName) => ValueRef | RadiansRef | undefined;
+  findPose: (pose: PoseName) => PoseRef | undefined;
+  findBezier: (bez: BezierName) => BezierRef | undefined;
+  findPath: (pc: PathChainName) => AnonymousPathChain | undefined;
 };
 
 export type Point = { x: number; y: number };
