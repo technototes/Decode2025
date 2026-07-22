@@ -1,7 +1,7 @@
 import { isDefined, isUndefined } from '@freik/typechk';
 
 import { GetTeamPaths } from './getpaths';
-import { GetPathChainIndex } from './loadpath';
+import { MakePathChainFile } from './PathChainLoader';
 import {
   ErrorOr,
   isError,
@@ -13,6 +13,7 @@ import {
   Team,
   TeamPaths,
 } from './types';
+import { getProjectFilePath } from './utility';
 
 const teampaths: Map<Team, Path[]> = new Map();
 const database: PathDatabase = new Map();
@@ -28,6 +29,28 @@ export function getTeamPath(dbKey: PathDBKey): [Team, Path] {
   }
   console.error('Invalid key provided: ', dbKey);
   return ['team', 'path'] as [Team, Path];
+}
+
+async function GetPathChainIndex(
+  team: string,
+  file: string,
+): Promise<ErrorOr<[string[], PathChainClass]>> {
+  const filepath = getProjectFilePath(team, file);
+  const pcc = await MakePathChainFile(filepath);
+  if (isError(pcc)) {
+    return pcc;
+  }
+  const list = [];
+  const work = [pcc];
+  while (work.length > 0) {
+    const item = work.pop();
+    if (isUndefined(item)) {
+      break;
+    }
+    list.push(item.name);
+    work.push(...Object.values(item.children));
+  }
+  return [list, pcc];
 }
 
 // Returns true if that file has *any* items we care about in it.

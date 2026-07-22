@@ -19,6 +19,7 @@ export async function LoadClassList(
   }
   return Response.json(res);
 }
+
 export async function LoadPath(team: string, path: string): Promise<Response> {
   const pcc = WebGetPathChainClassRoot(team as Team, path as Path);
   if (isError(pcc)) {

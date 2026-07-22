@@ -1,8 +1,6 @@
 import { expect, test } from 'bun:test';
 import path from 'path';
 
-import { isString } from '@freik/typechk';
-
 import { MakePathChainFile } from '../PathChainLoader';
 import {
   BezierName,
