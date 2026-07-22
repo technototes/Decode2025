@@ -11,6 +11,7 @@ import {
   ErrorOr,
   isError,
   Path,
+  PathChainClass,
   PathChainName,
   PathDatabase,
   PathDBKey,
@@ -131,6 +132,30 @@ export const SelectedClassAtom = atomWithStorage(
   '',
   undefined,
   { getOnInit: true },
+);
+
+export const SelectedPathChainClassAtom = atom(
+  async (get): Promise<undefined | PathChainClass> => {
+    const db = await get(FullDatabaseAtom);
+    const key = await get(SelectedDBKeyAtom);
+    const className = await get(SelectedClassAtom);
+    const val = db.get(key);
+    if (!val) {
+      return;
+    }
+    const which = val[0].indexOf(className);
+    if (which < 0) {
+      return;
+    }
+    // Scan the DAG of PathChainClasses to find the selected one.
+    const work = [val[1]];
+    while (work.length !== 0) {
+      const item = work.pop()!;
+      if (item.name === className) {
+        return item;
+      }
+    }
+  },
 );
 
 const MappedFileBackingAtom = atom(0);

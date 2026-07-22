@@ -2,7 +2,7 @@ import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Button, Text } from '@fluentui/react-components';
-import { isDefined } from '@freik/typechk';
+import { isDefined, isUndefined } from '@freik/typechk';
 
 import {
   AnonymousFacing,
@@ -25,7 +25,9 @@ import {
   ColorsAtom,
   MappedBeziersAtom,
   MappedPathChainsAtom,
+  SelectedClassAtom,
   SelectedFileAtom,
+  SelectedPathChainClassAtom,
 } from './state/Atoms';
 import { AnonymousPathChain } from './types';
 import { Expando } from './ui-tools/Expando';
@@ -314,17 +316,27 @@ export function PathChainList(): ReactElement {
   );
 }
 
+function FileInfo() {
+  const pcc = useAtomValue(SelectedPathChainClassAtom);
+  if (isUndefined(pcc)) {
+    return <></>;
+  }
+  return <span>Class:&nbsp;{pcc.fullName}</span>;
+}
+
 export function PathsDataDisplay({
   expand,
 }: {
   expand?: boolean;
 }): ReactElement {
   const selFile = useAtomValue(SelectedFileAtom);
-  if (selFile.length === 0) {
-    return <div>Please select a file to view.</div>;
+  const selClass = useAtomValue(SelectedClassAtom);
+  if (selFile.length === 0 || selClass.length === 0) {
+    return <div>Please select a file & class to view.</div>;
   }
   return (
     <>
+      <FileInfo />
       <Expando label="Values" indent={20} size={500}>
         <NamedValueList />
         <NewValue />

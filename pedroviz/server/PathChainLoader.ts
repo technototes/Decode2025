@@ -896,7 +896,15 @@ export async function MakePathChainFile(
       if (isUndefined(item)) {
         break;
       }
-      item.imports = imports;
+      // Make a fake import for the parent package, because I *think* that's
+      // home Java name resolution works.
+      const newImports = [...imports];
+      if (hasField(item.container, 'className')) {
+        newImports.push(loader.package + '.' + item.container.className);
+      } else {
+        newImports.push(loader.package);
+      }
+      item.imports = newImports;
       item.fullName = `${loader.package}.${item.name}`;
     }
   }
