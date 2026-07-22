@@ -73,6 +73,8 @@ const testPathChainFile: PathChainClass = {
   container: { fileName: '' },
   children: {},
   name: 'path1.java',
+  fullName: 'test.path1',
+  imports: [],
 };
 
 const simpleBez: AnonymousBezier = {
@@ -85,6 +87,8 @@ const simpleBez: AnonymousBezier = {
 };
 const fullPathChainFile: PathChainClass = {
   name: 'path3.java',
+  fullName: 'test.path3',
+  imports: [],
   values: [
     { name: 'val1' as ValueName, value: { int: 1 } },
     { name: 'val2' as ValueName, value: { double: 2.5 } },

@@ -8,7 +8,9 @@ import {
   ExpressionCstNode,
   FieldDeclarationCtx,
   FqnOrRefTypeCstNode,
+  ImportDeclarationCtx,
   IToken,
+  PackageDeclarationCtx,
   parse,
   PrimaryCtx,
   PrimarySuffixCstNode,
@@ -61,7 +63,8 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
   parsed: ReturnType<typeof parse> | null = null;
 
   contextStack: PCCInfo[] = [];
-
+  package: string = '';
+  imports: string[] = [];
   info: PCCInfo = {
     ...structuredClone(EmptyPathChainClass),
     pathChainFields: [],
@@ -103,6 +106,25 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
   // All the static fields we care about:
   // double's, int's, pose's, BezierCurve's, BezierLine's.
   // PathChains shouldn't be static
+
+  override packageDeclaration(ctx: PackageDeclarationCtx) {
+    this.package = nameOf(ctx.Identifier) || '';
+    super.packageDeclaration(ctx);
+  }
+
+  override importDeclaration(ctx: ImportDeclarationCtx) {
+    // console.log("IMPORt", ctx);
+    const importName = nameOf(child(ctx.packageOrTypeName)?.Identifier);
+    if (
+      isDefined(importName) &&
+      !importName.startsWith('com.pedropathing.') &&
+      !importName.startsWith('com.bylazar.') &&
+      !importName.startsWith('com.technototes.library.')
+    ) {
+      this.imports.push(importName);
+    }
+    super.importDeclaration(ctx);
+  }
 
   override fieldDeclaration(ctx: FieldDeclarationCtx) {
     // We're looking for public static double/int name = value;
@@ -866,7 +888,42 @@ export async function MakePathChainFile(
   }
   let pcc: OptPCCInfo = { ...loader.info };
   delete pcc.pathChainFields;
+  if (anyItems(pcc)) {
+    const imports = [...loader.imports];
+    const work = [pcc];
+    while (work.length > 0) {
+      const item = work.pop();
+      if (isUndefined(item)) {
+        break;
+      }
+      item.imports = imports;
+      item.fullName = `${loader.package}.${item.name}`;
+    }
+  }
   return pcc;
+}
+
+// Returns true if that file has *any* items we care about in it.
+// This does wind up triggering for something that just has a static int/double,
+// but that's okay (better than missing one...)
+export function anyItems(pcc: PathChainClass): boolean {
+  const work = [pcc];
+  while (work.length > 0) {
+    const item = work.pop();
+    if (isUndefined(item)) {
+      break;
+    }
+    if (
+      item.beziers.length ||
+      item.poses.length ||
+      item.pathChains.length ||
+      item.values.length
+    ) {
+      return true;
+    }
+    work.push(...Object.values(item.children));
+  }
+  return false;
 }
 
 /*

@@ -135,6 +135,8 @@ export type ClassContainer = { fileName: string } | { className: string };
 
 export type PathChainClass = {
   name: string;
+  fullName: string;
+  imports: string[];
   container: ClassContainer;
   children: Record<string, PathChainClass>;
   values: NamedValue[];
@@ -146,6 +148,8 @@ export type PathChainClass = {
 
 export const EmptyPathChainClass: PathChainClass = {
   name: '',
+  fullName: '',
+  imports: [],
   container: { fileName: '' },
   children: {},
   values: [],

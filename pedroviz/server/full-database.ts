@@ -1,7 +1,7 @@
 import { isDefined, isUndefined } from '@freik/typechk';
 
 import { GetTeamPaths } from './getpaths';
-import { MakePathChainFile } from './PathChainLoader';
+import { anyItems, MakePathChainFile } from './PathChainLoader';
 import {
   ErrorOr,
   isError,
@@ -53,29 +53,6 @@ async function GetPathChainIndex(
   return [list, pcc];
 }
 
-// Returns true if that file has *any* items we care about in it.
-// This does wind up triggering for something that just has a static int/double,
-// but that's okay (better than missing one...)
-function anyItems(pcc: PathChainClass): boolean {
-  const work = [pcc];
-  while (work.length > 0) {
-    const item = work.pop();
-    if (isUndefined(item)) {
-      break;
-    }
-    if (
-      item.beziers.length ||
-      item.poses.length ||
-      item.pathChains.length ||
-      item.values.length
-    ) {
-      return true;
-    }
-    work.push(...Object.values(item.children));
-  }
-  return false;
-}
-
 function RegisterPathChainIndex(
   team: Team,
   path: Path,
@@ -85,7 +62,7 @@ function RegisterPathChainIndex(
   if (!anyItems(pcc)) {
     return;
   }
-  console.log('Registering', team, path, classList);
+  console.log('Registering', team, path, classList, pcc.fullName);
   const paths = teampaths.get(team);
   if (isDefined(paths)) {
     paths.push(path);

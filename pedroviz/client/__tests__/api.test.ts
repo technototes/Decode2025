@@ -113,6 +113,8 @@ const simpleBez: AnonymousBezier = {
 
 const fullPathChainFile: PathChainClass = {
   name: 'path3.java',
+  fullName: 'test.path3',
+  imports: [],
   values: [
     mkNmVal('val1', mkVal('int', 1)),
     mkNmVal('val2', mkVal('double', 2.5)),
@@ -178,6 +180,8 @@ const fullPathChainFile: PathChainClass = {
 
 const danglingPCF: PathChainClass = {
   name: 'dangling.java',
+  fullName: 'test.dangling',
+  imports: [],
   values: [...fullPathChainFile.values],
   poses: [
     ...fullPathChainFile.poses,
