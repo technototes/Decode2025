@@ -22,6 +22,7 @@ import {
   Path,
   PathChainClass,
   PathChainName,
+  PathDBKey,
   PoseName,
   PoseRef,
   RadiansRef,
@@ -32,10 +33,7 @@ import {
 import { AnonymousPathChain, MappedIndex, Point } from '../types';
 import { ValidRes } from './API';
 
-export function MakeMappedIndex(
-  pcf: PathChainClass,
-  otherFiles: Map<[Team, Path], MappedIndex>,
-): ErrorOr<MappedIndex> {
+export function MakeMappedIndex(pcf: PathChainClass): ErrorOr<MappedIndex> {
   const namedValues = new Map<ValueName, ValueRef | RadiansRef>(
     pcf.values.map((nv) => [nv.name, nv.value]),
   );
