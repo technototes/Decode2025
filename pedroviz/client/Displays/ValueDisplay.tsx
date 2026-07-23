@@ -1,23 +1,20 @@
-import { CSSProperties, ReactElement, useState } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
+import { CSSProperties, Fragment, ReactElement } from 'react';
+import { useAtomValue } from 'jotai';
 
-import { Field, Input, InputProps, Text } from '@fluentui/react-components';
-import { isDefined } from '@freik/typechk';
+import { Text } from '@fluentui/react-components';
 
 import {
   AnonymousValue,
   isDoubleValue,
-  isIntValue,
   isRadiansRef,
-  isValueName,
+  isRef,
+  PoseName,
+  RadiansRef,
   ValueName,
   ValueRef,
 } from '../../server/types';
-import { MappedValuesAtom, ValueAtomFamily } from '../state/Atoms';
-import { HasKeys } from '../types';
+import { NamedValuesAtom } from '../state/Atoms';
 import { ItemWithStyle } from '../ui-tools/types';
-import { NumberOrNamedValue } from './NumberOrNamedValueEditor';
-import { CheckValidName, ValRefFromString } from './Validation';
 
 export function AnonymousValueDisplay({
   item,
@@ -29,6 +26,22 @@ export function AnonymousValueDisplay({
     return <Text {...props}>{item.int.toFixed(0)}</Text>;
   }
 }
+
+export function UnnamedValueDisplay({
+  item,
+  ...props
+}: ItemWithStyle<ValueRef | RadiansRef>): ReactElement {
+  return isRadiansRef(item) ? (
+    <RadiansRefDisplay item={item} />
+  ) : (
+    <>
+      <ValueRefDisplay item={item} />
+      <Text>&nbsp;</Text>
+    </>
+  );
+}
+
+/*
 
 export function EditableValueRef({
   initial,
@@ -69,7 +82,6 @@ export function EditableValueRef({
   );
 }
 
-/*
 import {
   Combobox,
   makeStyles,
@@ -88,7 +100,6 @@ const useStyles = makeStyles({
     maxWidth: "400px",
   },
 });
-*/
 
 export function EditableValueExpr({
   initial,
@@ -118,11 +129,12 @@ export function EditableValueExpr({
     />
   );
 }
+*/
 
 function getNumber(val: AnonymousValue): number {
   return isDoubleValue(val) ? val.double : val.int;
 }
-
+/*
 export function NamedValueElem({ name }: { name: ValueName }): ReactElement {
   const [item, setItem] = useAtom(ValueAtomFamily(name));
   const names = useAtomValue(MappedValuesAtom);
@@ -143,8 +155,8 @@ export function NamedValueElem({ name }: { name: ValueName }): ReactElement {
       /*<EditableValueRef
           initial={item.radians}
           setRef={(nm) => setItem({ radians: nm })}
-        />*/
-    );
+        />* //
+    
     /*    if (isRef(item.radians)) {
     } else {
       editable = (
@@ -154,7 +166,7 @@ export function NamedValueElem({ name }: { name: ValueName }): ReactElement {
           precision={1}
         />
       );
-    }*/
+    }* //
   } else if (isDefined(item)) {
     //    editable = <EditableOnlyValueRef ref={item} setRef={setItem} />;
     editable = (
@@ -198,10 +210,47 @@ export function EditableOnlyValueRef({
   }
   return editable;
 }
+*/
+
+export function GeneralRefDisplay({
+  item,
+  ...props
+}: ItemWithStyle<ValueName | PoseName>) {
+  return <Text {...props}>{item}</Text>;
+}
+
+export function ValueRefDisplay({
+  item,
+  ...props
+}: ItemWithStyle<ValueRef>): ReactElement {
+  return isRef(item) ? (
+    <GeneralRefDisplay item={item} {...props} />
+  ) : (
+    <AnonymousValueDisplay item={item} {...props} />
+  );
+}
+
+function MathToRadianDisplay({
+  item,
+  ...props
+}: ItemWithStyle<ValueRef>): ReactElement {
+  return (
+    <>
+      <ValueRefDisplay item={item} {...props} />
+      <Text {...props}> degrees</Text>
+    </>
+  );
+}
+
+export function RadiansRefDisplay({
+  item,
+  ...props
+}: ItemWithStyle<RadiansRef>): ReactElement {
+  return <MathToRadianDisplay item={item.radians} {...props} />;
+}
 
 export function NamedValueList(): ReactElement {
-  const items = useAtomValue(MappedValuesAtom);
-  const names = [...items.keys()];
+  const items = useAtomValue(NamedValuesAtom);
   const gridStyle: CSSProperties = {
     display: 'grid',
     columnGap: '10pt',
@@ -213,11 +262,14 @@ export function NamedValueList(): ReactElement {
 
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name {names.length}</Text>
+      <Text size={400}>Name {items.length}</Text>
       <Text size={400}>Value</Text>
       <Text size={400}>Units</Text>
-      {names.map((val) => (
-        <NamedValueElem key={val} name={val} />
+      {items.map((val) => (
+        <Fragment key={val.name}>
+          <Text>{val.name}</Text>
+          <UnnamedValueDisplay key={val.name} item={val.value} />
+        </Fragment>
       ))}
     </div>
   );

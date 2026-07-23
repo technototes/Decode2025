@@ -9,17 +9,18 @@ import {
   HeadingRef,
   isRadiansRef,
   isRef,
-  PoseName,
   PoseRef,
-  RadiansRef,
-  ValueName,
-  ValueRef,
 } from '../server/types';
-// import { getBezier, getColorFor, getPose } from './state/API';
 import { NewPose } from './Displays/NewPose';
 import { NewValue } from './Displays/NewValue';
 import { NamedPoseList } from './Displays/PoseDisplay';
-import { AnonymousValueDisplay, NamedValueList } from './Displays/ValueDisplay';
+import {
+  AnonymousValueDisplay,
+  GeneralRefDisplay,
+  NamedValueList,
+  RadiansRefDisplay,
+  ValueRefDisplay,
+} from './Displays/ValueDisplay';
 import { getColorFor } from './state/API';
 import {
   ColorsAtom,
@@ -32,42 +33,6 @@ import {
 import { AnonymousPathChain } from './types';
 import { Expando } from './ui-tools/Expando';
 import { ItemWithStyle } from './ui-tools/types';
-
-function MathToRadianDisplay({
-  item,
-  ...props
-}: ItemWithStyle<ValueRef>): ReactElement {
-  return (
-    <span>
-      <ValueRefDisplay item={item} {...props} />
-      <Text {...props}> degrees</Text>
-    </span>
-  );
-}
-
-export function GeneralRefDisplay({
-  item,
-  ...props
-}: ItemWithStyle<ValueName | PoseName>) {
-  return <Text {...props}>{item}</Text>;
-}
-export function ValueRefDisplay({
-  item,
-  ...props
-}: ItemWithStyle<ValueRef>): ReactElement {
-  return isRef(item) ? (
-    <GeneralRefDisplay item={item} {...props} />
-  ) : (
-    <AnonymousValueDisplay item={item} {...props} />
-  );
-}
-
-function RadiansRefDisplay({
-  item,
-  ...props
-}: ItemWithStyle<RadiansRef>): ReactElement {
-  return <MathToRadianDisplay item={item.radians} {...props} />;
-}
 
 export function HeadingRefDisplay({
   item,
@@ -345,13 +310,17 @@ export function PathsDataDisplay({
         <NamedPoseList />
         <NewPose />
       </Expando>
-      <Expando label="Bezier Lines/Curves" indent={20} size={500}>
+      <Expando label="Curves" indent={20} size={500}>
         <NamedBezierList />
-        <Button style={{ margin: 10 }}>New Bezier</Button>
+        <Button style={{ margin: 10 }} disabled>
+          New Curve
+        </Button>
       </Expando>
-      <Expando label="PathChains" indent={20} size={500}>
+      <Expando label="Paths" indent={20} size={500}>
         <PathChainList />
-        <Button style={{ margin: 10 }}>New PathChain</Button>
+        <Button style={{ margin: 10 }} disabled>
+          New Path
+        </Button>
       </Expando>
     </>
   );

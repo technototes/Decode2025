@@ -3,13 +3,15 @@ import { atomFamily } from 'jotai-family';
 import { focusAtom } from 'jotai-optics';
 import { atomWithStorage } from 'jotai/utils';
 
-import { hasField } from '@freik/typechk';
+import { hasField, isDefined } from '@freik/typechk';
 
 import {
   BezierName,
   BezierRef,
   ErrorOr,
   isError,
+  NamedPose,
+  NamedValue,
   Path,
   PathChainClass,
   PathChainName,
@@ -184,8 +186,27 @@ export const MappedFileAtom = atom(
 
 type MapAtom<Str, T> = WritableAtom<Promise<Map<Str, T>>, [Map<Str, T>], void>;
 
+export const NamedValuesAtom = atom(async (get): Promise<NamedValue[]> => {
+  const index = await get(SelectedPathChainClassAtom);
+  if (index) {
+    console.log('Making mapped values', index.fullName);
+  }
+  return index ? index.values : [];
+  // isDefined(index) ? new Map(index.values.map((nv) => [nv.name, nv.value])) : new Map();
+});
+
 export const MappedValuesAtom: MapAtom<ValueName, ValueRef | RadiansRef> =
   focusAtom(MappedFileAtom, (optic) => optic.prop('namedValues'));
+
+export const NamedPosesAtom = atom(async (get): Promise<NamedPose[]> => {
+  const index = await get(SelectedPathChainClassAtom);
+  if (index) {
+    console.log('Making mapped poses', index.fullName);
+  }
+  return index ? index.poses : [];
+  // isDefined(index) ? new Map(index.values.map((nv) => [nv.name, nv.value])) : new Map();
+});
+
 export const MappedPosesAtom: MapAtom<PoseName, PoseRef> = focusAtom(
   MappedFileAtom,
   (optic) => optic.prop('namedPoses'),
