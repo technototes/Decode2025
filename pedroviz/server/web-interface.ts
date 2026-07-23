@@ -1,11 +1,11 @@
-import { Pickle } from '@freik/typechk';
+import { isError, Pickle } from '@freik/typechk';
 
 import {
   GetDatabase,
   WebGetPathChainClassList,
   WebGetPathChainClassRoot,
 } from './full-database';
-import { isError, Path, Team } from './types';
+import { Path, Team } from './types';
 
 // Send the list of TeamPaths to the client
 

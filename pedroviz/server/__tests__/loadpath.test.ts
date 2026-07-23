@@ -1,14 +1,10 @@
-import { expect, test } from 'bun:test';
 import path from 'path';
 
+import { expect, test } from 'bun:test';
+import { isError } from 'node_modules/@freik/typechk/lib/esm';
+
 import { MakePathChainFile } from '../PathChainLoader';
-import {
-  BezierName,
-  isError,
-  PathChainName,
-  PoseName,
-  ValueName,
-} from '../types';
+import { BezierName, PathChainName, PoseName, ValueName } from '../types';
 import { firstFtcSrc, getProjectFilePath } from '../utility';
 import { LoadPath } from '../web-interface';
 

@@ -1,11 +1,14 @@
-import { isDefined, isUndefined } from '@freik/typechk';
+import {
+  ErrorOr,
+  isDefined,
+  isError,
+  isUndefined,
+  MakeError,
+} from '@freik/typechk';
 
 import { GetTeamPaths } from './getpaths';
 import { anyItems, MakePathChainFile } from './PathChainLoader';
 import {
-  ErrorOr,
-  isError,
-  makeError,
   Path,
   PathChainClass,
   PathDatabase,
@@ -103,7 +106,7 @@ export function WebGetPathChainClassList(
 ): ErrorOr<string[]> {
   const res = database.get(makeKey(team, path));
   if (isUndefined(res)) {
-    return makeError(`List: ${team}:${path} no Pedro pathing classes found`);
+    return MakeError(`List: ${team}:${path} no Pedro pathing classes found`);
   }
   return res[0];
 }
@@ -114,7 +117,7 @@ export function WebGetPathChainClassRoot(
 ): ErrorOr<PathChainClass> {
   const res = database.get(makeKey(team, path));
   if (isUndefined(res)) {
-    return makeError(`Root: ${team}:${path} no Pedro pathing classes found`);
+    return MakeError(`Root: ${team}:${path} no Pedro pathing classes found`);
   }
   return res[1];
 }

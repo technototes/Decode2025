@@ -6,12 +6,11 @@ import {
   chkObjectOfExactType,
   chkRecordOf,
   chkTupleOf,
+  ErrorOr,
   hasFieldOf,
   hasFieldType,
   hasStrField,
   isArrayOfString,
-  isDefined,
-  isFunction,
   isNumber,
   isRecordOf,
   isString,
@@ -22,48 +21,6 @@ import {
 // I'm not sure if it's worth the trouble or not...
 declare const brand: unique symbol;
 export type Nominal<T, Brand extends string> = T & { readonly [brand]: Brand };
-
-export type ErrorVal = {
-  errors: () => string[];
-  [Symbol.toPrimitive]: (hint: string) => unknown;
-};
-export type ErrorOr<T> = T | ErrorVal;
-
-export const isError = chkObjectOfExactType<ErrorVal>({
-  errors: isFunction,
-  [Symbol.toPrimitive]: isFunction,
-});
-export function makeError(
-  error: string | string[] | ErrorVal,
-  more?: string | string[] | ErrorVal,
-): ErrorVal {
-  const errors: string[] = [];
-  errors.push(
-    ...(isString(error) ? [error] : isError(error) ? error.errors() : error),
-  );
-  if (isDefined(more)) {
-    errors.push(
-      ...(isString(more) ? [more] : isError(more) ? more.errors() : more),
-    );
-  }
-  return {
-    errors: () => errors,
-    [Symbol.toPrimitive]: (hint: string) =>
-      hint === 'string' ? errors.join('\n') : null,
-  };
-}
-export function addError<T>(
-  maybeErr: ErrorOr<T>,
-  moreErrors: string | string[] | ErrorVal,
-): ErrorVal {
-  if (isError(maybeErr)) {
-    return makeError(maybeErr, moreErrors);
-  }
-  return makeError(moreErrors);
-}
-export function accError<T>(maybe: ErrorOr<T>, prev: ErrorOr<T>): ErrorOr<T> {
-  return isError(prev) ? addError(maybe, prev) : maybe;
-}
 
 export type Team = Nominal<string, 'Team'>;
 export type Path = Nominal<string, 'Path'>;

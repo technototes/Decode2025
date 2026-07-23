@@ -19,11 +19,13 @@ import {
   VariableDeclaratorCtx,
 } from 'java-parser';
 import {
+  ErrorOr,
   hasField,
   isArray,
   isDefined,
   isString,
   isUndefined,
+  MakeError,
 } from '@freik/typechk';
 
 import {
@@ -34,12 +36,10 @@ import {
   BezierName,
   BezierRef,
   EmptyPathChainClass,
-  ErrorOr,
   HeadingRef,
   isAnonymousValue,
   isRadiansRef,
   isRef,
-  makeError,
   NamedBezier,
   NamedPathChain,
   NamedPose,
@@ -884,7 +884,7 @@ export async function MakePathChainFile(
   const loader = new PathChainLoader();
   const res = await loader.loadFile(filename);
   if (isString(res)) {
-    return makeError(res);
+    return MakeError(res);
   }
   let pcc: OptPCCInfo = { ...loader.info };
   delete pcc.pathChainFields;

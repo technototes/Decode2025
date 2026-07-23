@@ -1,13 +1,16 @@
-import { chkAnyOf, isString } from '@freik/typechk';
+import {
+  chkAnyOf,
+  ErrorOr,
+  isError,
+  isString,
+  MakeError,
+} from '@freik/typechk';
 
 import {
   AnonymousBezier,
   AnonymousPose,
   chkPathChainClass,
   chkPathDatabase,
-  ErrorOr,
-  isError,
-  makeError,
   Path,
   PathChainClass,
   PathDatabase,
@@ -71,14 +74,14 @@ export async function LoadAndIndexFile(
     'Invalid PathChainFile loaded from server',
   );
   if (isString(pcf)) {
-    return makeError(pcf);
+    return MakeError(pcf);
   }
   const indexFile = await MakeFileIndex(pcf);
   const lookup: NameLookup = MakeNameLookup();
   lookup.registerIndex(indexFile);
   const validate = ValidateIndex(indexFile, lookup);
   if (isError(validate)) {
-    return makeError(
+    return MakeError(
       validate,
       `Loaded file ${team}/${file} has dangling references.`,
     );

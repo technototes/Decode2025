@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-
-import { isNumber, isString } from '@freik/typechk';
+import { isError, isNumber, isString } from '@freik/typechk';
 
 import {
   AnonymousBezier,
@@ -10,7 +9,6 @@ import {
   BezierRef,
   EmptyPathChainClass,
   HeadingRef,
-  isError,
   NamedBezier,
   NamedPose,
   NamedValue,

@@ -1,24 +1,27 @@
-import { isDefined, isUndefined } from '@freik/typechk';
+import {
+  AccError,
+  ErrorOr,
+  isDefined,
+  isError,
+  isUndefined,
+  MakeError,
+} from '@freik/typechk';
 
 import {
-  accError,
   AnonymousBezier,
   AnonymousPose,
   AnonymousValue,
   BezierName,
   BezierRef,
-  ErrorOr,
   HeadingRef,
   isAnonymousValue,
   isConstantFacing,
   isDoubleValue,
-  isError,
   isIntValue,
   isLinearFacing,
   isRadiansRef,
   isRef,
   isTangentFacing,
-  makeError,
   PathChainClass,
   PathChainName,
   PoseName,
@@ -78,7 +81,7 @@ export function ValidateIndex(
     if (isRef(vr)) {
       if (!lkup.findValue(vr)) {
         // TODO: This should trigger cross file lookup
-        return makeError(
+        return MakeError(
           `${id}'s "${vr}" value reference appears to be undefined.`,
         );
       }
@@ -104,8 +107,8 @@ export function ValidateIndex(
     if (pose.heading) {
       res = checkHeadingRef(pose.heading, `${id}'s heading`);
     }
-    res = accError(checkValueRef(pose.x, `${id}'s x coordinate`), res);
-    return accError(checkValueRef(pose.y, `${id}'s y coordinate`), res);
+    res = AccError(checkValueRef(pose.x, `${id}'s x coordinate`), res);
+    return AccError(checkValueRef(pose.y, `${id}'s y coordinate`), res);
   }
 
   function checkPoseRef(pr: PoseRef, id: string): ValidRes {
@@ -113,7 +116,7 @@ export function ValidateIndex(
       return lkup.findPose(pr)
         ? true
         : // TODO: This should trigger cross file lookup
-          makeError(`${id}'s "${pr}" pose reference appears to be undefined`);
+          MakeError(`${id}'s "${pr}" pose reference appears to be undefined`);
     }
     return checkAnonymousPose(pr, id);
   }
@@ -121,14 +124,14 @@ export function ValidateIndex(
   function checkAnonymousBezier(curve: AnonymousBezier, id: string): ValidRes {
     let res: ValidRes = true;
     curve.points.forEach((pr, index) => {
-      res = accError(checkPoseRef(pr, `${id}'s element ${index}`), res);
+      res = AccError(checkPoseRef(pr, `${id}'s element ${index}`), res);
     });
     if (curve.type === 'line' && curve.points.length !== 2) {
-      return accError(res, makeError(`${id}'s line doesn't have 2 points`));
+      return AccError(res, MakeError(`${id}'s line doesn't have 2 points`));
     } else if (curve.type === 'curve' && curve.points.length < 2) {
-      return accError(
+      return AccError(
         res,
-        makeError(`${id}'s line doesn't have enough points`),
+        MakeError(`${id}'s line doesn't have enough points`),
       );
     }
     return res;
@@ -139,7 +142,7 @@ export function ValidateIndex(
       return lkup.findBezier(br)
         ? true
         : // TODO: This should trigger cross file lookup
-          makeError(`${id}'s bezier reference appears to be undefined`);
+          MakeError(`${id}'s bezier reference appears to be undefined`);
     }
     return checkAnonymousBezier(br, id);
   }
@@ -156,7 +159,7 @@ export function ValidateIndex(
       );
     } else if (isLinearFacing(apc.heading)) {
       res = checkHeadingRef(apc.heading.start, `${id}'s start heading ref`);
-      res = accError(
+      res = AccError(
         checkHeadingRef(apc.heading.end, `${id}'s end heading ref`),
         res,
       );
@@ -170,7 +173,7 @@ export function ValidateIndex(
       );
     }
     apc.paths.forEach((br, index) => {
-      res = accError(checkBezierRef(br, `${id}'s path element ${index}`), res);
+      res = AccError(checkBezierRef(br, `${id}'s path element ${index}`), res);
     });
     return res;
   }
@@ -190,7 +193,7 @@ export function ValidateIndex(
         fileIndex.namedPathChains.size
     ) {
       // TODO: Provide a detailed diagnostic of which names are duplicated
-      return makeError(
+      return MakeError(
         'Duplicate names found between values, points, beziers, and path chains.',
       );
     }
@@ -200,15 +203,15 @@ export function ValidateIndex(
   function validatePathChainIndex(): ErrorOr<true> {
     let good: ValidRes = true;
     fileIndex.namedPoses.forEach((pr, name) => {
-      good = accError(checkPoseRef(pr, name), good);
+      good = AccError(checkPoseRef(pr, name), good);
     });
     fileIndex.namedBeziers.forEach((br, name) => {
-      good = accError(checkBezierRef(br, name), good);
+      good = AccError(checkBezierRef(br, name), good);
     });
     fileIndex.namedPathChains.forEach((apc, name) => {
-      good = accError(checkAnonymousPathChain(apc, name), good);
+      good = AccError(checkAnonymousPathChain(apc, name), good);
     });
-    good = accError(validateUniqueNames(), good);
+    good = AccError(validateUniqueNames(), good);
     return isError(good) ? good : true;
   }
 

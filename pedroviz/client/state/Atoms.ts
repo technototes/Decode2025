@@ -3,13 +3,11 @@ import { atomFamily } from 'jotai-family';
 import { focusAtom } from 'jotai-optics';
 import { atomWithStorage } from 'jotai/utils';
 
-import { hasField, isDefined } from '@freik/typechk';
+import { ErrorOr, isError } from '@freik/typechk';
 
 import {
   BezierName,
   BezierRef,
-  ErrorOr,
-  isError,
   NamedPose,
   NamedValue,
   Path,
