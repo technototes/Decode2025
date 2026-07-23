@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+
 import { chkFieldOf, isNumber, isString } from '@freik/typechk';
 
 import { fetchApi, getStore } from '../state/Storage';

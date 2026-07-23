@@ -1,6 +1,6 @@
+import { expect, test } from 'bun:test';
 import path from 'path';
 
-import { expect, test } from 'bun:test';
 import { isError } from 'node_modules/@freik/typechk/lib/esm';
 
 import { MakePathChainFile } from '../PathChainLoader';

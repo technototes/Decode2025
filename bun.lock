@@ -6,11 +6,11 @@
       "name": "ftc-maintenance-sripts",
       "dependencies": {
         "@freik/containers": "^0.4.10",
-        "@freik/typechk": "^0.9.6",
+        "@freik/typechk": "^0.10.0",
         "@freik/workspace": "^0.8.1",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-        "prettier": "^3.9.5",
-        "prettier-plugin-java": "^2.10.2",
+        "prettier": "^3.9.6",
+        "prettier-plugin-java": "^2.10.3",
         "pretty-quick": "^4.2.2",
         "simple-git": "^3.36.0",
         "simple-git-hooks": "^2.13.1",
@@ -92,7 +92,7 @@
 
     "@freik/helpers": ["@freik/helpers@0.5.9", "", { "dependencies": { "@freik/typechk": "0.9.5" } }, "sha512-bZJETAJ8UdSgb4/rknQQ6sUdM8ogaYFLOKi3HvG7Otcgj2JC+IMz1EEAMvutMMoyyjWjyW/S/BKzvCv3T7gecw=="],
 
-    "@freik/typechk": ["@freik/typechk@0.9.6", "", {}, "sha512-xG9FZr5q6GBMiE0p3tfPnGpDfAgLseNt7YlwpvTULEAryEWNr0leReyNF3nJV23WzqIHdxvqAT3ToZNcceJxYg=="],
+    "@freik/typechk": ["@freik/typechk@0.10.0", "", {}, "sha512-OV3GVWbxNY8A2xebggGqmq1jgcFDMEKLuwkMAlF4XU/A8QlTH4w+Cry235c6Wh5P9E/URvzGns4aXG5mWBAc4w=="],
 
     "@freik/workspace": ["@freik/workspace@0.8.1", "", { "peerDependencies": { "esbuild": "^0.28.0", "prettier": "^3.8.3", "typescript": "^6.0.3" }, "bin": { "tools": "lib/tools.js" } }, "sha512-h0h9B+PUP4DDw09Cbui1rViay9szvaEKsgH/KVrO8g2qpeoXGl+/gKD5XJSsfiTocJv0dieGtINuBZTJyzBdHg=="],
 
@@ -180,9 +180,9 @@
 
     "picomatch": ["picomatch@4.0.3", "", {}, "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q=="],
 
-    "prettier": ["prettier@3.9.5", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-/FVl766LpUfB5vXgCYOYa0MeV/441Ia99AeICQIQFTY/Nw0roZwULcXpku5i1/m5kt/baz+s4Zogspd839HSMg=="],
+    "prettier": ["prettier@3.9.6", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g=="],
 
-    "prettier-plugin-java": ["prettier-plugin-java@2.10.2", "", { "dependencies": { "web-tree-sitter": "0.26.9" }, "peerDependencies": { "prettier": "^3.0.0" } }, "sha512-oOXUBqb0BKfL//ZeYFcsRtbm4h8jdicg1axbBrXh2tnUcAcKAyFCl3gUL7bN7kwDwFRraQop1RF9BZk+K6pmoQ=="],
+    "prettier-plugin-java": ["prettier-plugin-java@2.10.3", "", { "dependencies": { "web-tree-sitter": "0.26.11" }, "peerDependencies": { "prettier": "^3.0.0" } }, "sha512-/g52mTbsN2ee8JjLRpBWGGmcmRhdv2zRWyj4QbsL9CQ+nKR022GRJhebwEpRyaCc8hLV6aO3JPGNQyXp1DPrCA=="],
 
     "pretty-quick": ["pretty-quick@4.2.2", "", { "dependencies": { "@pkgr/core": "^0.2.7", "ignore": "^7.0.5", "mri": "^1.2.0", "picocolors": "^1.1.1", "picomatch": "^4.0.2", "tinyexec": "^0.3.2", "tslib": "^2.8.1" }, "peerDependencies": { "prettier": "^3.0.0" }, "bin": { "pretty-quick": "lib/cli.mjs" } }, "sha512-uAh96tBW1SsD34VhhDmWuEmqbpfYc/B3j++5MC/6b3Cb8Ow7NJsvKFhg0eoGu2xXX+o9RkahkTK6sUdd8E7g5w=="],
 
@@ -200,7 +200,7 @@
 
     "undici-types": ["undici-types@7.8.0", "", {}, "sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw=="],
 
-    "web-tree-sitter": ["web-tree-sitter@0.26.9", "", {}, "sha512-YJwSHANl6XFgeEjB8nitgj0qZYt5gkIesJ4w2srS2wcLB4GUa4xcOkM0YaMsU6WNR53YVIkDSY7Ej4pf3IXtCA=="],
+    "web-tree-sitter": ["web-tree-sitter@0.26.11", "", {}, "sha512-Q5Dm3YTIXSXuH6FxX6RuzX2Qwpc4DPGiYMU87Wg5Z8OIStiQFiUex4zMDc0vBTw78EphaYJacncJghCHzbZptg=="],
 
     "@freik/containers/@freik/typechk": ["@freik/typechk@0.9.5", "", {}, "sha512-6qnI/3UwYWJGews1How1xOrRr/M+9VisJVia5zq4JyswKsT/dCjb8+B0PaIIX5wtLNdKqubpm7yPeYe+VH84QQ=="],
 

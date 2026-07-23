@@ -65,6 +65,11 @@ body {
   opacity: 0.8;
 }
 
+.pathLabel {
+  margin-left: 10;
+  margin-right: 5;
+}
+
 /* Square canvas area */
 .field {
   aspect-ratio: 1 / 1; /* force square */

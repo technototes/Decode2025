@@ -1,16 +1,12 @@
-import { ReactElement } from 'react';
+import { ReactElement, useCallback, useEffect } from 'react';
 
 import {
   Button,
   Menu,
-  MenuButton,
   MenuItem,
-  MenuItemRadio,
   MenuList,
   MenuPopover,
-  MenuProps,
   MenuTrigger,
-  useId,
 } from '@fluentui/react-components';
 import { ChevronDown16Regular } from '@fluentui/react-icons';
 import { isString } from '@freik/typechk';
@@ -29,40 +25,32 @@ export function AutoSelector({
   setSelected: (item: string) => void;
   default?: string;
 }): ReactElement {
-  const id = useId('ADS');
-  /*
-  const onChange: MenuProps['onCheckedValueChange'] = (_, { checkedItems }) => {
-    if (checkedItems.length >= 1) {
-      setSelected(checkedItems[0]!);
-    }
-  };
-  */
   let selectedItem = selected.length === 0 ? prompt : selected;
-  if (items.length === 1 && selected !== items[0]) {
-    // If we only have 1 item go ahead & select it, but schedule it in the future
-    // so we don't screw up the render cycle in an unpredictable manner.
-    setTimeout(() => setSelected(items[0]!), 0);
-    // This *should* prevent a full visual re-render.
-    selectedItem = items[0]!;
-  } else if (selected === '' && isString(defItem) && defItem.length > 0) {
-    // If we don't have a selection, pick the default one
-    setTimeout(() => setSelected(defItem), 0);
-    // This *should* prevent a full visual re-render.
-    selectedItem = defItem;
-  }
+
+  // This may trigger a re-render, so it has to happen in an effect
+  useEffect(() => {
+    if (items.length === 1 && selected !== items[0]) {
+      // If we only have 1 item go ahead & select it.
+      setSelected(items[0]!);
+    } else if (selected === '' && isString(defItem) && defItem.length > 0) {
+      setSelected(defItem);
+    }
+  }, [items, selected, defItem, setSelected]);
   return (
     <Menu>
       <MenuTrigger>
         <Button disabled={items.length === 0}>
-          {selectedItem}&nbsp;
-          <ChevronDown16Regular />
+          {selectedItem}
+          <ChevronDown16Regular style={{ marginLeft: 10 }} />
         </Button>
       </MenuTrigger>
       <MenuPopover>
         <MenuList>
-          {/*  onCheckedValueChange={onChange} */}
           {items.map((val) => (
-            <MenuItem key={`${id}:${val}`} onClick={() => setSelected(val)}>
+            <MenuItem
+              key={`${val}`}
+              /* Needs a delay to prevent shenanigans with React & even timing */
+              onClick={() => setTimeout(() => setSelected(val), 0)}>
               {val}
             </MenuItem>
           ))}
