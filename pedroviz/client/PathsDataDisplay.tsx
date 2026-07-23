@@ -2,6 +2,7 @@ import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Button, Text } from '@fluentui/react-components';
+import { Expandable } from '@freik/fluent9-tools';
 import { isDefined, isUndefined } from '@freik/typechk';
 
 import {
@@ -31,7 +32,6 @@ import {
   SelectedPathChainClassAtom,
 } from './state/Atoms';
 import { AnonymousPathChain } from './types';
-import { Expando } from './ui-tools/Expando';
 import { ItemWithStyle } from './ui-tools/types';
 
 export function HeadingRefDisplay({
@@ -302,26 +302,26 @@ export function PathsDataDisplay({
   return (
     <>
       <FileInfo />
-      <Expando label="Values" indent={20} size={500}>
+      <Expandable label="Values" indent={20}>
         <NamedValueList />
         <NewValue />
-      </Expando>
-      <Expando label="Poses" indent={20} size={500}>
+      </Expandable>
+      <Expandable label="Poses" indent={20}>
         <NamedPoseList />
         <NewPose />
-      </Expando>
-      <Expando label="Curves" indent={20} size={500}>
+      </Expandable>
+      <Expandable label="Curves" indent={20}>
         <NamedBezierList />
         <Button style={{ margin: 10 }} disabled>
           New Curve
         </Button>
-      </Expando>
-      <Expando label="Paths" indent={20} size={500}>
+      </Expandable>
+      <Expandable label="Paths" indent={20}>
         <PathChainList />
         <Button style={{ margin: 10 }} disabled>
           New Path
         </Button>
-      </Expando>
+      </Expandable>
     </>
   );
 }

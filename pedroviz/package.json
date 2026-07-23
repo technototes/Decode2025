@@ -15,7 +15,7 @@
     "@fluentui/react-components": "^9.74.4",
     "@fluentui/react-icons": "^2.0.333",
     "@freik/containers": "^0.4.10",
-    "@freik/fluentui-tools": "^1.2.10",
+    "@freik/fluent9-tools": "^0.1.2",
     "@freik/react-tools": "^0.4.0",
     "@freik/typechk": "^0.10.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
