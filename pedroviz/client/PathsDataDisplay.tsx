@@ -281,13 +281,13 @@ export function PathChainList(): ReactElement {
   );
 }
 
-function FileInfo() {
-  const pcc = useAtomValue(SelectedPathChainClassAtom);
-  if (isUndefined(pcc)) {
-    return <></>;
-  }
-  return <span>Class:&nbsp;{pcc.fullName}</span>;
-}
+// function FileInfo() {
+//   const pcc = useAtomValue(SelectedPathChainClassAtom);
+//   if (isUndefined(pcc)) {
+//     return <></>;
+//   }
+//   return <span>Class:&nbsp;{pcc.fullName}</span>;
+// }
 
 export function PathsDataDisplay({
   expand,
@@ -301,26 +301,26 @@ export function PathsDataDisplay({
   }
   return (
     <>
-      <FileInfo />
+      {/* <FileInfo /> */}
       <Expandable label="Values" indent={20}>
         <NamedValueList />
-        <NewValue />
+        {/* <NewValue /> */}
       </Expandable>
       <Expandable label="Poses" indent={20}>
         <NamedPoseList />
-        <NewPose />
+        {/* <NewPose /> */}
       </Expandable>
       <Expandable label="Curves" indent={20}>
         <NamedBezierList />
-        <Button style={{ margin: 10 }} disabled>
+        {/* <Button style={{ margin: 10 }} disabled>
           New Curve
-        </Button>
+        </Button> */}
       </Expandable>
       <Expandable label="Paths" indent={20}>
         <PathChainList />
-        <Button style={{ margin: 10 }} disabled>
+        {/* <Button style={{ margin: 10 }} disabled>
           New Path
-        </Button>
+        </Button> */}
       </Expandable>
     </>
   );

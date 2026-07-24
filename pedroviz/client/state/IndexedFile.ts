@@ -13,6 +13,7 @@ import {
   AnonymousValue,
   BezierName,
   BezierRef,
+  EmptyPathChainClass,
   HeadingRef,
   isAnonymousValue,
   isConstantFacing,
@@ -49,37 +50,61 @@ export function MakeFileIndex(pcf: PathChainClass): FileIndex {
       { paths: npc.paths, heading: npc.pathHeading },
     ]),
   );
-  return { namedValues, namedBeziers, namedPoses, namedPathChains };
+  return {
+    container: pcf,
+    namedValues,
+    namedBeziers,
+    namedPoses,
+    namedPathChains,
+  };
 }
 
 // Make a thing that can accumulate indexes (*can* in the *future*)
-export function MakeNameLookup(): NameLookup {
+function MakeNameLookup(): NameLookup {
   let indexMap: FileIndex | null = null;
   const registerIndex = (index: FileIndex) => {
     indexMap = index;
   };
-  const findValue = (val: ValueName): ValueRef | RadiansRef | undefined => {
+  const findValue = (
+    val: ValueName,
+    context: PathChainClass,
+  ): ValueRef | RadiansRef | undefined => {
     return indexMap ? indexMap.namedValues.get(val) : undefined;
   };
-  const findPose = (val: PoseName): PoseRef | undefined => {
+  const findPose = (
+    val: PoseName,
+    context: PathChainClass,
+  ): PoseRef | undefined => {
     return indexMap ? indexMap.namedPoses.get(val) : undefined;
   };
-  const findBezier = (val: BezierName): BezierRef | undefined => {
+  const findBezier = (
+    val: BezierName,
+    context: PathChainClass,
+  ): BezierRef | undefined => {
     return indexMap ? indexMap.namedBeziers.get(val) : undefined;
   };
-  const findPath = (val: PathChainName): AnonymousPathChain | undefined => {
+  const findPath = (
+    val: PathChainName,
+    context: PathChainClass,
+  ): AnonymousPathChain | undefined => {
     return indexMap ? indexMap.namedPathChains.get(val) : undefined;
   };
   return { registerIndex, findBezier, findPath, findPose, findValue };
 }
 
+const nameLookup = MakeNameLookup();
+export function GetNameLookup(): NameLookup {
+  return nameLookup;
+}
+
 export function ValidateIndex(
   fileIndex: FileIndex,
   lkup: NameLookup,
+  context: PathChainClass,
 ): ErrorOr<true> {
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
     if (isRef(vr)) {
-      if (!lkup.findValue(vr)) {
+      if (!lkup.findValue(vr, context)) {
         // TODO: This should trigger cross file lookup
         return MakeError(
           `${id}'s "${vr}" value reference appears to be undefined.`,
@@ -113,7 +138,7 @@ export function ValidateIndex(
 
   function checkPoseRef(pr: PoseRef, id: string): ValidRes {
     if (isRef(pr)) {
-      return lkup.findPose(pr)
+      return lkup.findPose(pr, context)
         ? true
         : // TODO: This should trigger cross file lookup
           MakeError(`${id}'s "${pr}" pose reference appears to be undefined`);
@@ -139,7 +164,7 @@ export function ValidateIndex(
 
   function checkBezierRef(br: BezierRef, id: string): ValidRes {
     if (isRef(br)) {
-      return lkup.findBezier(br)
+      return lkup.findBezier(br, context)
         ? true
         : // TODO: This should trigger cross file lookup
           MakeError(`${id}'s bezier reference appears to be undefined`);
@@ -373,6 +398,7 @@ export function calcValue(
 }
 
 export const EmptyMappedFile: FileIndex = {
+  container: EmptyPathChainClass,
   namedValues: new Map(),
   namedPoses: new Map(),
   namedBeziers: new Map(),

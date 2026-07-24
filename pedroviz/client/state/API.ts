@@ -17,7 +17,7 @@ import {
   Team,
 } from '../../server/types';
 import { FileIndex, NameLookup } from '../types';
-import { MakeFileIndex, MakeNameLookup, ValidateIndex } from './IndexedFile';
+import { GetNameLookup, MakeFileIndex, ValidateIndex } from './IndexedFile';
 import { fetchApi } from './Storage';
 
 export type ValidRes = ErrorOr<true>;
@@ -77,9 +77,9 @@ export async function LoadAndIndexFile(
     return MakeError(pcf);
   }
   const indexFile = await MakeFileIndex(pcf);
-  const lookup: NameLookup = MakeNameLookup();
+  const lookup: NameLookup = GetNameLookup();
   lookup.registerIndex(indexFile);
-  const validate = ValidateIndex(indexFile, lookup);
+  const validate = ValidateIndex(indexFile, lookup, pcf);
   if (isError(validate)) {
     return MakeError(
       validate,
