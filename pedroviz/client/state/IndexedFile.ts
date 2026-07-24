@@ -14,7 +14,7 @@ import {
   AnonymousValue,
   BezierName,
   BezierRef,
-  EmptyPathChainClass,
+  EmptyParsedClass,
   HeadingRef,
   isAnonymousValue,
   isConstantFacing,
@@ -24,8 +24,7 @@ import {
   isRadiansRef,
   isRef,
   isTangentFacing,
-  PathChainClass,
-  PathChainHelper,
+  ParsedClass,
   PathChainName,
   PoseName,
   PoseRef,
@@ -36,7 +35,7 @@ import {
 import { AnonymousPathChain, FileIndex, NameLookup, Point } from '../types';
 import { ValidRes } from './API';
 
-export function MakeFileIndex(container: PathChainClass): FileIndex {
+export function MakeFileIndex(container: ParsedClass): FileIndex {
   const namedValues = new Map<ValueName, ValueRef | RadiansRef>(
     container.values.map((nv) => [nv.name, nv.value]),
   );
@@ -72,13 +71,13 @@ function MakeNameLookup(): NameLookup {
     indexMap.set(index.container.fullName, index);
   };
   // Private helper to find an index for a given full name (or parsed class)
-  const getIndex = (pcc: PathChainClass | string): FileIndex | undefined => {
-    return indexMap.get(isString(pcc) ? pcc : pcc.fullName);
+  const getIndex = (pc: ParsedClass | string): FileIndex | undefined => {
+    return indexMap.get(isString(pc) ? pc : pc.fullName);
   };
   // Private helper to look for names, including cross-class and static namespace shortcuts
   function dig<K extends string, V>(
     val: K,
-    context: PathChainClass,
+    context: ParsedClass,
     sel: (idx: FileIndex) => Map<K, V>,
   ): V | undefined {
     const index = getIndex(context);
@@ -119,25 +118,25 @@ function MakeNameLookup(): NameLookup {
   }
   const findValue = (
     val: ValueName,
-    context: PathChainClass,
+    context: ParsedClass,
   ): ValueRef | RadiansRef | undefined => {
     return dig(val, context, (idx: FileIndex) => idx.namedValues);
   };
   const findPose = (
     val: PoseName,
-    context: PathChainClass,
+    context: ParsedClass,
   ): PoseRef | undefined => {
     return dig(val, context, (idx: FileIndex) => idx.namedPoses);
   };
   const findBezier = (
     val: BezierName,
-    context: PathChainClass,
+    context: ParsedClass,
   ): BezierRef | undefined => {
     return dig(val, context, (idx: FileIndex) => idx.namedBeziers);
   };
   const findPath = (
     val: PathChainName,
-    context: PathChainClass,
+    context: ParsedClass,
   ): AnonymousPathChain | undefined => {
     return dig(val, context, (idx: FileIndex) => idx.namedPathChains);
   };
@@ -155,7 +154,7 @@ export function GetNameLookup(): NameLookup {
 export function ValidateIndex(
   fileIndex: FileIndex,
   lkup: NameLookup,
-  context: PathChainClass,
+  context: ParsedClass,
 ): ErrorOr<true> {
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
     if (isRef(vr)) {
@@ -453,7 +452,7 @@ export function calcValue(
 }
 
 export const EmptyMappedFile: FileIndex = {
-  container: EmptyPathChainClass,
+  container: EmptyParsedClass,
   namedValues: new Map(),
   namedPoses: new Map(),
   namedBeziers: new Map(),

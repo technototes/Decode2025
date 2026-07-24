@@ -90,12 +90,12 @@ export type PathChainHelper = {
 
 export type ClassContainer = { fileName: string } | { className: string };
 
-export type PathChainClass = {
+export type ParsedClass = {
   name: string;
   fullName: string;
   imports: string[];
   container: ClassContainer;
-  children: Record<string, PathChainClass>;
+  children: Record<string, ParsedClass>;
   values: NamedValue[];
   poses: NamedPose[];
   beziers: NamedBezier[];
@@ -103,7 +103,7 @@ export type PathChainClass = {
   pathChainHelpers: PathChainHelper[];
 };
 
-export const EmptyPathChainClass: PathChainClass = {
+export const EmptyParsedClass: ParsedClass = {
   name: '',
   fullName: '',
   imports: [],
@@ -116,9 +116,9 @@ export const EmptyPathChainClass: PathChainClass = {
   pathChainHelpers: [],
 };
 
-export type MaybePathFile = ErrorOr<PathChainClass>;
+export type MaybePathFile = ErrorOr<ParsedClass>;
 export type PathDBKey = Nominal<string, 'DBKey'>;
-export type PathDBValue = [string[], PathChainClass];
+export type PathDBValue = [string[], ParsedClass];
 export type PathDatabase = Map<PathDBKey, PathDBValue>;
 
 export function chkPathDBKey(obj: unknown): obj is PathDBKey {
@@ -130,7 +130,7 @@ export function chkPathDBKey(obj: unknown): obj is PathDBKey {
 }
 export const chkPathDBValue: typecheck<PathDBValue> = chkTupleOf(
   isArrayOfString,
-  chkPathChainClass,
+  chkParsedClass,
 );
 export const chkPathDatabase: typecheck<PathDatabase> = chkMapOf(
   chkPathDBKey,
@@ -286,7 +286,7 @@ export const isClassContainer: typecheck<ClassContainer> = chkAnyOf(
 );
 
 // Can't use chkObjOfExactType because recursion...
-export function chkPathChainClass(val: unknown): val is PathChainClass {
+export function chkParsedClass(val: unknown): val is ParsedClass {
   let res = hasStrField(val, 'name');
   res = res && hasFieldOf(val, 'container', isClassContainer);
   res = res && hasFieldOf(val, 'values', chkArrayOf(isNamedValue));
@@ -296,7 +296,6 @@ export function chkPathChainClass(val: unknown): val is PathChainClass {
   res =
     res && hasFieldOf(val, 'pathChainHelpers', chkArrayOf(isPathChainHelper));
   res =
-    res &&
-    hasFieldType(val, 'children', chkRecordOf(isString, chkPathChainClass));
+    res && hasFieldType(val, 'children', chkRecordOf(isString, chkParsedClass));
   return res;
 }

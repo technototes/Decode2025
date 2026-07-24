@@ -24,9 +24,9 @@ import { makeKey } from '../../server/full-database';
 import {
   AnonymousBezier,
   BezierName,
-  EmptyPathChainClass,
+  EmptyParsedClass,
+  ParsedClass,
   Path,
-  PathChainClass,
   PathChainName,
   PathDBKey,
   PathDBValue,
@@ -64,7 +64,7 @@ const teamPaths: TeamPaths = {
   ['team2' as Team]: ['path3.java' as Path, 'path4.java' as Path],
 };
 
-const testPathChainFile: PathChainClass = {
+const testParsedClass: ParsedClass = {
   values: [],
   poses: [],
   beziers: [],
@@ -85,7 +85,7 @@ const simpleBez: AnonymousBezier = {
     'pose2' as PoseName,
   ],
 };
-const fullPathChainFile: PathChainClass = {
+const fullParsedClass: ParsedClass = {
   name: 'path3.java',
   fullName: 'test.path3',
   imports: [],
@@ -175,10 +175,10 @@ const status = {
 };
 
 const database = new Map<PathDBKey, PathDBValue>([
-  [makeKey('team1' as Team, 'path1.java' as Path), [[], EmptyPathChainClass]],
-  [makeKey('team1' as Team, 'path2.java' as Path), [[], EmptyPathChainClass]],
-  [makeKey('team2' as Team, 'path3.java' as Path), [[], fullPathChainFile]],
-  [makeKey('team2' as Team, 'path4.java' as Path), [[], EmptyPathChainClass]],
+  [makeKey('team1' as Team, 'path1.java' as Path), [[], EmptyParsedClass]],
+  [makeKey('team1' as Team, 'path2.java' as Path), [[], EmptyParsedClass]],
+  [makeKey('team2' as Team, 'path3.java' as Path), [[], fullParsedClass]],
+  [makeKey('team2' as Team, 'path4.java' as Path), [[], EmptyParsedClass]],
 ]);
 
 async function MyFetchFunc(
@@ -187,11 +187,11 @@ async function MyFetchFunc(
 ): Promise<Response> {
   switch (key) {
     case '/api/loadpath/team1/path2.java': {
-      const body = JSON.stringify(testPathChainFile);
+      const body = JSON.stringify(testParsedClass);
       return new Response(body, status);
     }
     case '/api/loadpath/team2/path3.java': {
-      const body = JSON.stringify(fullPathChainFile);
+      const body = JSON.stringify(fullParsedClass);
       return new Response(body, status);
     }
     case '/api/db': {

@@ -9,10 +9,10 @@ import {
 import {
   AnonymousBezier,
   AnonymousPose,
-  chkPathChainClass,
+  chkParsedClass,
   chkPathDatabase,
+  ParsedClass,
   Path,
-  PathChainClass,
   PathDatabase,
   Team,
 } from '../../server/types';
@@ -68,18 +68,18 @@ export async function LoadAndIndexFile(
   lastLoadedIndexFile.team = team;
   lastLoadedIndexFile.file = file;
   lastLoadedIndexFile.data = null;
-  const pcf = await fetchApi(
+  const pc = await fetchApi(
     `loadpath/${encodeURIComponent(team)}/${encodeURIComponent(file)}`,
-    chkAnyOf(chkPathChainClass, isString),
-    'Invalid PathChainFile loaded from server',
+    chkAnyOf(chkParsedClass, isString),
+    'Invalid ParsedClass loaded from server',
   );
-  if (isString(pcf)) {
-    return MakeError(pcf);
+  if (isString(pc)) {
+    return MakeError(pc);
   }
-  const indexFile = await MakeFileIndex(pcf);
+  const indexFile = await MakeFileIndex(pc);
   const lookup: NameLookup = GetNameLookup();
   lookup.registerIndex(indexFile);
-  const validate = ValidateIndex(indexFile, lookup, pcf);
+  const validate = ValidateIndex(indexFile, lookup, pc);
   if (isError(validate)) {
     return MakeError(
       validate,
@@ -102,7 +102,7 @@ export function UpdateIndexFile(team: string, file: string, data: FileIndex) {
 export async function SavePath(
   team: string,
   path: string,
-  data: PathChainClass,
+  data: ParsedClass,
 ): Promise<undefined | string> {
   // NYI on the server, either :D
   return 'NYI';

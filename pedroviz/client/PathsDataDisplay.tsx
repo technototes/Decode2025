@@ -29,7 +29,7 @@ import {
   MappedPathChainsAtom,
   SelectedClassAtom,
   SelectedFileAtom,
-  SelectedPathChainClassAtom,
+  SelectedParsedClassAtom,
 } from './state/Atoms';
 import { AnonymousPathChain } from './types';
 import { ItemWithStyle } from './ui-tools/types';
@@ -282,11 +282,11 @@ export function PathChainList(): ReactElement {
 }
 
 // function FileInfo() {
-//   const pcc = useAtomValue(SelectedPathChainClassAtom);
-//   if (isUndefined(pcc)) {
+//   const pc = useAtomValue(SelectedParsedClassAtom);
+//   if (isUndefined(pc)) {
 //     return <></>;
 //   }
-//   return <span>Class:&nbsp;{pcc.fullName}</span>;
+//   return <span>Class:&nbsp;{pc.fullName}</span>;
 // }
 
 export function PathsDataDisplay({

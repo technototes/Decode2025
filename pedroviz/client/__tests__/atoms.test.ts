@@ -6,7 +6,7 @@ import { Pickle } from 'node_modules/@freik/typechk/lib/esm';
 
 import { makeKey } from '../../server/full-database';
 import {
-  EmptyPathChainClass,
+  EmptyParsedClass,
   Path,
   PathDBKey,
   PathDBValue,
@@ -30,10 +30,10 @@ const status = {
 };
 
 const database = new Map<PathDBKey, PathDBValue>([
-  [makeKey('team1' as Team, 'path1.java' as Path), [[], EmptyPathChainClass]],
-  [makeKey('team1' as Team, 'path2.java' as Path), [[], EmptyPathChainClass]],
-  [makeKey('team2' as Team, 'path3.java' as Path), [[], EmptyPathChainClass]],
-  [makeKey('team2' as Team, 'path4.java' as Path), [[], EmptyPathChainClass]],
+  [makeKey('team1' as Team, 'path1.java' as Path), [[], EmptyParsedClass]],
+  [makeKey('team1' as Team, 'path2.java' as Path), [[], EmptyParsedClass]],
+  [makeKey('team2' as Team, 'path3.java' as Path), [[], EmptyParsedClass]],
+  [makeKey('team2' as Team, 'path4.java' as Path), [[], EmptyParsedClass]],
 ]);
 
 async function MyFetchFunc(

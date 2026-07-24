@@ -3,7 +3,7 @@ import path from 'path';
 
 import { isError } from 'node_modules/@freik/typechk/lib/esm';
 
-import { MakePathChainFile } from '../PathChainLoader';
+import { MakeParsedClass } from '../PathChainLoader';
 import { BezierName, PathChainName, PoseName, ValueName } from '../types';
 import { firstFtcSrc, getProjectFilePath } from '../utility';
 import { LoadPath } from '../web-interface';
@@ -30,7 +30,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     'FtcRobotController',
     testPath,
   );
-  const paths = await MakePathChainFile(repoPathToFile);
+  const paths = await MakeParsedClass(repoPathToFile);
   expect(paths).toBeDefined();
   if (isError(paths)) {
     console.error(paths.errors());

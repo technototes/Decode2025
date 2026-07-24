@@ -7,10 +7,10 @@ import {
 } from '@freik/typechk';
 
 import { GetTeamPaths } from './getpaths';
-import { anyItems, MakePathChainFile } from './PathChainLoader';
+import { anyItems, MakeParsedClass } from './PathChainLoader';
 import {
+  ParsedClass,
   Path,
-  PathChainClass,
   PathDatabase,
   PathDBKey,
   Team,
@@ -35,8 +35,8 @@ export function getTeamPath(dbKey: PathDBKey): [Team, Path] {
 }
 
 export function ForEachPathChainIndex(
-  top: PathChainClass,
-  funcStop: (pcc: PathChainClass) => true | unknown,
+  top: ParsedClass,
+  funcStop: (pc: ParsedClass) => true | unknown,
 ): void {
   const work = [top];
   while (work.length > 0) {
@@ -51,34 +51,34 @@ export function ForEachPathChainIndex(
 async function GetPathChainIndex(
   team: string,
   file: string,
-): Promise<ErrorOr<[string[], PathChainClass]>> {
+): Promise<ErrorOr<[string[], ParsedClass]>> {
   const filepath = getProjectFilePath(team, file);
-  const pcc = await MakePathChainFile(filepath);
-  if (isError(pcc)) {
-    return pcc;
+  const pc = await MakeParsedClass(filepath);
+  if (isError(pc)) {
+    return pc;
   }
   const list: string[] = [];
-  ForEachPathChainIndex(pcc, (item) => list.push(item.name));
-  return [list, pcc];
+  ForEachPathChainIndex(pc, (item) => list.push(item.name));
+  return [list, pc];
 }
 
 function RegisterPathChainIndex(
   team: Team,
   path: Path,
   classList: string[],
-  pcc: PathChainClass,
+  pc: ParsedClass,
 ): void {
-  if (!anyItems(pcc)) {
+  if (!anyItems(pc)) {
     return;
   }
-  console.log('Registering', team, path, classList, pcc.fullName);
+  console.log('Registering', team, path, classList, pc.fullName);
   const paths = teampaths.get(team);
   if (isDefined(paths)) {
     paths.push(path);
   } else {
     teampaths.set(team, [path]);
   }
-  database.set(makeKey(team, path), [classList, pcc]);
+  database.set(makeKey(team, path), [classList, pc]);
 }
 
 export async function PopulateDatabase() {
@@ -94,7 +94,7 @@ export async function PopulateDatabase() {
 }
 
 export function GetAllIndexContent(): [Team, Path, string[]][] {
-  return [...database.entries()].map(([key, [classes, pcc]]) => {
+  return [...database.entries()].map(([key, [classes]]) => {
     const [team, path] = getTeamPath(key);
     return [team, path, classes];
   });
@@ -106,7 +106,7 @@ export function GetDatabase(): PathDatabase {
 
 // Interfaces to the web server to talk to the web client:
 
-export function WebGetPathChainClassList(
+export function WebGetParsedClassList(
   team: Team,
   path: Path,
 ): ErrorOr<string[]> {
@@ -117,10 +117,10 @@ export function WebGetPathChainClassList(
   return res[0];
 }
 
-export function WebGetPathChainClassRoot(
+export function WebGetParsedClassRoot(
   team: Team,
   path: Path,
-): ErrorOr<PathChainClass> {
+): ErrorOr<ParsedClass> {
   const res = database.get(makeKey(team, path));
   if (isUndefined(res)) {
     return MakeError(`Root: ${team}:${path} no Pedro pathing classes found`);

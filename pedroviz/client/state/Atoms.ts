@@ -12,8 +12,8 @@ import {
   NamedBezier,
   NamedPose,
   NamedValue,
+  ParsedClass,
   Path,
-  PathChainClass,
   PathChainName,
   PathDatabase,
   PathDBKey,
@@ -58,8 +58,8 @@ export const FullDatabaseAtom = atom(async () => {
 export const IndexedDatabaseAtom = atom(async (get) => {
   const db = await get(FullDatabaseAtom);
   const index = GetNameLookup();
-  for (const [, [, pcc]] of db) {
-    ForEachPathChainIndex(pcc, (file) =>
+  for (const [, [, pc]] of db) {
+    ForEachPathChainIndex(pc, (file) =>
       index.registerIndex(MakeFileIndex(file)),
     );
   }
@@ -147,8 +147,8 @@ export const SelectedClassAtom = atomWithStorage(
   { getOnInit: true },
 );
 
-export const SelectedPathChainClassAtom = atom(
-  async (get): Promise<undefined | PathChainClass> => {
+export const SelectedParsedClassAtom = atom(
+  async (get): Promise<undefined | ParsedClass> => {
     const db = await get(FullDatabaseAtom);
     const key = await get(SelectedDBKeyAtom);
     const className = await get(SelectedClassAtom);
@@ -160,11 +160,11 @@ export const SelectedPathChainClassAtom = atom(
     if (which < 0) {
       return;
     }
-    // Scan the DAG of PathChainClasses to find the selected one.
-    let res: PathChainClass | undefined;
-    ForEachPathChainIndex(val[1], (pcc) => {
-      if (pcc.name === className) {
-        res = pcc;
+    // Scan the DAG of ParsedClasses to find the selected one.
+    let res: ParsedClass | undefined;
+    ForEachPathChainIndex(val[1], (pc) => {
+      if (pc.name === className) {
+        res = pc;
         return true;
       }
     });
@@ -200,7 +200,7 @@ export const MappedFileAtom = atom(
 type MapAtom<Str, T> = WritableAtom<Promise<Map<Str, T>>, [Map<Str, T>], void>;
 
 export const NamedValuesAtom = atom(async (get): Promise<NamedValue[]> => {
-  const index = await get(SelectedPathChainClassAtom);
+  const index = await get(SelectedParsedClassAtom);
   return index ? index.values : [];
 });
 
@@ -208,7 +208,7 @@ export const MappedValuesAtom: MapAtom<ValueName, ValueRef | RadiansRef> =
   focusAtom(MappedFileAtom, (optic) => optic.prop('namedValues'));
 
 export const NamedPosesAtom = atom(async (get): Promise<NamedPose[]> => {
-  const index = await get(SelectedPathChainClassAtom);
+  const index = await get(SelectedParsedClassAtom);
   return index ? index.poses : [];
 });
 
@@ -218,7 +218,7 @@ export const MappedPosesAtom: MapAtom<PoseName, PoseRef> = focusAtom(
 );
 
 export const NamedBeziersAtom = atom(async (get): Promise<NamedBezier[]> => {
-  const index = await get(SelectedPathChainClassAtom);
+  const index = await get(SelectedParsedClassAtom);
   return index ? index.beziers : [];
 });
 

@@ -12,7 +12,7 @@ import {
   BezierRef,
   isIntValue,
   isValueName,
-  PathChainClass,
+  ParsedClass,
   PathChainName,
   PoseName,
   PoseRef,
@@ -60,7 +60,7 @@ export const chkConcreteHeadingType: typecheck<ConcreteHeadingType> = chkAnyOf(
 );
 
 export type FileIndex = {
-  container: PathChainClass;
+  container: ParsedClass;
   namedValues: Map<ValueName, ValueRef | RadiansRef>;
   namedPoses: Map<PoseName, PoseRef>;
   namedBeziers: Map<BezierName, BezierRef>;
@@ -73,16 +73,13 @@ export type NameLookup = {
   reset: () => void;
   findValue: (
     val: ValueName,
-    context: PathChainClass,
+    context: ParsedClass,
   ) => ValueRef | RadiansRef | undefined;
-  findPose: (pose: PoseName, context: PathChainClass) => PoseRef | undefined;
-  findBezier: (
-    bez: BezierName,
-    context: PathChainClass,
-  ) => BezierRef | undefined;
+  findPose: (pose: PoseName, context: ParsedClass) => PoseRef | undefined;
+  findBezier: (bez: BezierName, context: ParsedClass) => BezierRef | undefined;
   findPath: (
     pc: PathChainName,
-    context: PathChainClass,
+    context: ParsedClass,
   ) => AnonymousPathChain | undefined;
 };
 

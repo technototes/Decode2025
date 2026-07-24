@@ -2,8 +2,8 @@ import { isError, Pickle } from '@freik/typechk';
 
 import {
   GetDatabase,
-  WebGetPathChainClassList,
-  WebGetPathChainClassRoot,
+  WebGetParsedClassList,
+  WebGetParsedClassRoot,
 } from './full-database';
 import { Path, Team } from './types';
 
@@ -13,7 +13,7 @@ export async function LoadClassList(
   team: string,
   path: string,
 ): Promise<Response> {
-  const res = WebGetPathChainClassList(team as Team, path as Path);
+  const res = WebGetParsedClassList(team as Team, path as Path);
   if (isError(res)) {
     return Response.json({ error: res.errors().join('\n') });
   }
@@ -21,11 +21,11 @@ export async function LoadClassList(
 }
 
 export async function LoadPath(team: string, path: string): Promise<Response> {
-  const pcc = WebGetPathChainClassRoot(team as Team, path as Path);
-  if (isError(pcc)) {
-    return Response.json({ error: pcc.errors().join('\n') });
+  const pc = WebGetParsedClassRoot(team as Team, path as Path);
+  if (isError(pc)) {
+    return Response.json({ error: pc.errors().join('\n') });
   }
-  return Response.json(JSON.parse(Pickle(pcc)));
+  return Response.json(JSON.parse(Pickle(pc)));
 }
 
 export async function LoadDatabase(): Promise<Response> {

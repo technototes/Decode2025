@@ -36,7 +36,7 @@ import {
   AnonymousValue,
   BezierName,
   BezierRef,
-  EmptyPathChainClass,
+  EmptyParsedClass,
   HeadingRef,
   isAnonymousValue,
   isRadiansRef,
@@ -45,7 +45,7 @@ import {
   NamedPathChain,
   NamedPose,
   NamedValue,
-  PathChainClass,
+  ParsedClass,
   PathChainHelper,
   PathChainName,
   PoseName,
@@ -55,19 +55,19 @@ import {
   ValueRef,
 } from './types';
 
-type PCCContext = { pathChainFields: string[] };
-type PCCInfo = PCCContext & PathChainClass;
-type OptPCCInfo = Partial<PCCContext> & PathChainClass;
+type PCContext = { pathChainFields: string[] };
+type PCInfo = PCContext & ParsedClass;
+type OptPCInfo = Partial<PCContext> & ParsedClass;
 
 class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
   content: string = '';
   parsed: ReturnType<typeof parse> | null = null;
 
-  contextStack: PCCInfo[] = [];
+  contextStack: PCInfo[] = [];
   package: string = '';
   imports: string[] = [];
-  info: PCCInfo = {
-    ...structuredClone(EmptyPathChainClass),
+  info: PCInfo = {
+    ...structuredClone(EmptyParsedClass),
     pathChainFields: [],
   };
 
@@ -166,12 +166,12 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     if (isUndefined(theClassName)) {
       return;
     }
-    // If the stack is empty, we just push the current PCC.
-    // If the stack *isn't* empty, we need to create a new PathChainClass (and push it).
+    // If the stack is empty, we just push the current PC.
+    // If the stack *isn't* empty, we need to create a new ParsedClass (and push it).
     if (this.contextStack.length !== 0) {
       const parent = this.info;
       this.info = {
-        ...structuredClone(EmptyPathChainClass),
+        ...structuredClone(EmptyParsedClass),
         container: { className: parent.name },
         pathChainFields: [],
       };
@@ -183,7 +183,7 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     const res = super.classDeclaration(ctx, param);
 
     // Let's make the name the fully qualified name, now
-    this.info.name = this.contextStack.map((pcc) => pcc.name).join('.');
+    this.info.name = this.contextStack.map((pc) => pc.name).join('.');
     this.contextStack.pop();
     if (this.contextStack.length > 0) {
       this.info = this.contextStack[this.contextStack.length - 1]!;
@@ -879,19 +879,19 @@ function getPathChainFactories(
   return statements.map(getPathChain).filter(isDefined) as NamedPathChain[];
 }
 
-export async function MakePathChainFile(
+export async function MakeParsedClass(
   filename: string,
-): Promise<ErrorOr<PathChainClass>> {
+): Promise<ErrorOr<ParsedClass>> {
   const loader = new PathChainLoader();
   const res = await loader.loadFile(filename);
   if (isString(res)) {
     return MakeError(res);
   }
-  let pcc: OptPCCInfo = { ...loader.info };
-  delete pcc.pathChainFields;
-  if (anyItems(pcc)) {
+  let pc: OptPCInfo = { ...loader.info };
+  delete pc.pathChainFields;
+  if (anyItems(pc)) {
     const imports = [...loader.imports];
-    ForEachPathChainIndex(pcc, (item) => {
+    ForEachPathChainIndex(pc, (item) => {
       // Make a fake import for the parent package, because I *think* that's
       // how Java name resolution works.
       const newImports = [...imports];
@@ -904,15 +904,15 @@ export async function MakePathChainFile(
       item.fullName = `${loader.package}.${item.name}`;
     });
   }
-  return pcc;
+  return pc;
 }
 
 // Returns true if that file has *any* items we care about in it.
 // This does wind up triggering for something that just has a static int/double,
 // but that's okay (better than missing one...)
-export function anyItems(pcc: PathChainClass): boolean {
+export function anyItems(pc: ParsedClass): boolean {
   let anyItem = false;
-  ForEachPathChainIndex(pcc, (item) => {
+  ForEachPathChainIndex(pc, (item) => {
     if (
       item.beziers.length ||
       item.poses.length ||
@@ -928,9 +928,9 @@ export function anyItems(pcc: PathChainClass): boolean {
 
 /*
 if (import.meta.main) {
-  MakePathChainFile(
+  MakeParsedClass(
     ['..', 'Sixteen750', 'src', 'main', 'java', 'org', 'firstinspires', 'ftc', 'sixteen750', 'commands', 'auto', 'Poses.java',].join('/'))
-    .then((strOrPcf) => console.log(strOrPcf))
+    .then((strOrPc) => console.log(strOrPc))
     .catch((err) => console.error(err));
 }
 */

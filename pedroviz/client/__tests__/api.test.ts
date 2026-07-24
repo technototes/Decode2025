@@ -8,12 +8,12 @@ import {
   AnonymousValue,
   BezierName,
   BezierRef,
-  EmptyPathChainClass,
+  EmptyParsedClass,
   HeadingRef,
   NamedBezier,
   NamedPose,
   NamedValue,
-  PathChainClass,
+  ParsedClass,
   PathChainName,
   PoseName,
   PoseRef,
@@ -89,14 +89,14 @@ function mkPCNm(name: string): PathChainName {
 
 // Mocks & phony data for my tests:
 
-const testPathChainFile: PathChainClass = {
-  ...EmptyPathChainClass,
+const testParsedClass: ParsedClass = {
+  ...EmptyParsedClass,
 };
-testPathChainFile.values.push({
+testParsedClass.values.push({
   name: 'item1' as ValueName,
   value: { int: 1 },
 });
-testPathChainFile.poses.push({
+testParsedClass.poses.push({
   name: 'item1' as PoseName,
   pose: { x: { int: 1 }, y: { int: 1 } },
 });
@@ -110,7 +110,7 @@ const simpleBez: AnonymousBezier = {
   ],
 };
 
-const fullPathChainFile: PathChainClass = {
+const fullParsedClass: ParsedClass = {
   name: 'path3.java',
   fullName: 'test.path3',
   imports: [],
@@ -177,17 +177,17 @@ const fullPathChainFile: PathChainClass = {
   children: {},
 };
 
-const danglingPCF: PathChainClass = {
+const danglingPC: ParsedClass = {
   name: 'dangling.java',
   fullName: 'test.dangling',
   imports: [],
-  values: [...fullPathChainFile.values],
+  values: [...fullParsedClass.values],
   poses: [
-    ...fullPathChainFile.poses,
+    ...fullParsedClass.poses,
     mkNmPose('danglingHeader', mkPose('nope', 'val1')),
   ],
   beziers: [
-    ...fullPathChainFile.beziers,
+    ...fullParsedClass.beziers,
     mkNmBez(
       'danglingPoseRef',
       mkBez(
@@ -206,7 +206,7 @@ const danglingPCF: PathChainClass = {
     ),
   ],
   pathChains: [
-    ...fullPathChainFile.pathChains,
+    ...fullParsedClass.pathChains,
     {
       name: 'danglingBezRef' as PathChainName,
       paths: ['noBez' as BezierName],
@@ -243,15 +243,15 @@ async function MyFetchFunc(
       return new Response(body, status);
     }
     case '/api/loadpath/team1/path2.java': {
-      const body = JSON.stringify(testPathChainFile);
+      const body = JSON.stringify(testParsedClass);
       return new Response(body, status);
     }
     case '/api/loadpath/team2/path3.java': {
-      const body = JSON.stringify(fullPathChainFile);
+      const body = JSON.stringify(fullParsedClass);
       return new Response(body, status);
     }
     case '/api/loadpath/team2/path4.java': {
-      const body = JSON.stringify(danglingPCF);
+      const body = JSON.stringify(danglingPC);
       return new Response(body, status);
     }
   }
@@ -265,9 +265,7 @@ describe('API validation', () => {
     const res2 = await LoadAndIndexFile('team1', 'path1.java');
     expect(isError(res2)).toBeTrue();
     if (isError(res2)) {
-      expect(res2.errors()).toEqual([
-        'Invalid PathChainFile loaded from server',
-      ]);
+      expect(res2.errors()).toEqual(['Invalid ParsedClass loaded from server']);
     }
     const res = await LoadAndIndexFile('team1', 'path2.java');
     expect(isError(res)).toBeTrue();
@@ -278,7 +276,7 @@ describe('API validation', () => {
       ]);
     }
   });
-  test('Full PathChainFile validation, color hashing, and evaluation', async () => {
+  test('Full ParsedClass validation, color hashing, and evaluation', async () => {
     globalThis.fetch = MyFetchFunc;
     const res = await LoadAndIndexFile('team2', 'path3.java');
     if (isError(res)) {
@@ -319,7 +317,7 @@ describe('API validation', () => {
     const res2 = await LoadAndIndexFile('team2', 'path3.java');
     expect(!isError(res2)).toBeTrue();
   });
-  test('Undefined references in PathChainFile validation', async () => {
+  test('Undefined references in ParsedClass validation', async () => {
     globalThis.fetch = MyFetchFunc;
     const res = await LoadAndIndexFile('team2', 'path4.java');
     expect(isError(res)).toBeTrue();
@@ -334,7 +332,7 @@ describe('API validation', () => {
   });
   test('Need to implement a real "save" feature', async () => {
     // Probably add a test for this, yeah?
-    const res = await SavePath('teamX', 'pathY.java', fullPathChainFile);
+    const res = await SavePath('teamX', 'pathY.java', fullParsedClass);
     expect(res).toEqual('NYI');
   });
 });
