@@ -10,6 +10,7 @@ export async function main(url: URL) {
   console.log(`🚀 Server running at ${url}`);
   // Delay to let some stuff get moving. This is annoying, but
   // necessary, AFAICT.
-  await sleep(1500);
-  OpenBrowser(url.toString());
+  // TODO: Remove these line comments. It's just annoying while I'm developing
+  // await sleep(1500);
+  // OpenBrowser(url.toString());
 }

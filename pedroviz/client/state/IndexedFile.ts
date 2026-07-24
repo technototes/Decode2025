@@ -24,6 +24,7 @@ import {
   isRef,
   isTangentFacing,
   PathChainClass,
+  PathChainHelper,
   PathChainName,
   PoseName,
   PoseRef,
@@ -34,62 +35,91 @@ import {
 import { AnonymousPathChain, FileIndex, NameLookup, Point } from '../types';
 import { ValidRes } from './API';
 
-export function MakeFileIndex(pcf: PathChainClass): FileIndex {
+export function MakeFileIndex(container: PathChainClass): FileIndex {
   const namedValues = new Map<ValueName, ValueRef | RadiansRef>(
-    pcf.values.map((nv) => [nv.name, nv.value]),
+    container.values.map((nv) => [nv.name, nv.value]),
   );
   const namedPoses = new Map<PoseName, PoseRef>(
-    pcf.poses.map((np) => [np.name, np.pose]),
+    container.poses.map((np) => [np.name, np.pose]),
   );
   const namedBeziers = new Map<BezierName, BezierRef>(
-    pcf.beziers.map((nb) => [nb.name, nb.points]),
+    container.beziers.map((nb) => [nb.name, nb.points]),
   );
   const namedPathChains = new Map<PathChainName, AnonymousPathChain>(
-    pcf.pathChains.map((npc) => [
+    container.pathChains.map((npc) => [
       npc.name,
       { paths: npc.paths, heading: npc.pathHeading },
     ]),
   );
+  const staticShortcuts = new Map<string, string>(
+    container.pathChainHelpers.map((pch) => [pch.name, pch.staticType]),
+  );
   return {
-    container: pcf,
+    container,
     namedValues,
     namedBeziers,
     namedPoses,
     namedPathChains,
+    staticShortcuts,
   };
 }
 
 // Make a thing that can accumulate indexes (*can* in the *future*)
 function MakeNameLookup(): NameLookup {
-  let indexMap: FileIndex | null = null;
+  let indexMap: Map<string, FileIndex> = new Map();
   const registerIndex = (index: FileIndex) => {
-    indexMap = index;
+    indexMap.set(index.container.fullName, index);
   };
+  function dig<K, V>(
+    val: K,
+    context: PathChainClass,
+    sel: (idx: FileIndex) => Map<K, V>,
+  ): V | undefined {
+    const index = indexMap.get(context.fullName);
+    if (isUndefined(index)) {
+      console.error('Unable to find context index', context.fullName);
+      return;
+    }
+    const res = sel(index).get(val);
+    if (isDefined(res)) {
+      return res;
+    }
+    console.log(
+      'Unable to resolve name',
+      val,
+      'in the context of',
+      context.fullName,
+    );
+    // TODO: Dig around using name scopes-n-stuff
+  }
   const findValue = (
     val: ValueName,
     context: PathChainClass,
   ): ValueRef | RadiansRef | undefined => {
-    return indexMap ? indexMap.namedValues.get(val) : undefined;
+    return dig(val, context, (idx: FileIndex) => idx.namedValues);
   };
   const findPose = (
     val: PoseName,
     context: PathChainClass,
   ): PoseRef | undefined => {
-    return indexMap ? indexMap.namedPoses.get(val) : undefined;
+    return dig(val, context, (idx: FileIndex) => idx.namedPoses);
   };
   const findBezier = (
     val: BezierName,
     context: PathChainClass,
   ): BezierRef | undefined => {
-    return indexMap ? indexMap.namedBeziers.get(val) : undefined;
+    return dig(val, context, (idx: FileIndex) => idx.namedBeziers);
   };
   const findPath = (
     val: PathChainName,
     context: PathChainClass,
   ): AnonymousPathChain | undefined => {
-    return indexMap ? indexMap.namedPathChains.get(val) : undefined;
+    return dig(val, context, (idx: FileIndex) => idx.namedPathChains);
   };
-  return { registerIndex, findBezier, findPath, findPose, findValue };
+  const reset = () => {
+    indexMap.clear();
+  };
+  return { registerIndex, findBezier, findPath, findPose, findValue, reset };
 }
 
 const nameLookup = MakeNameLookup();
@@ -403,4 +433,5 @@ export const EmptyMappedFile: FileIndex = {
   namedPoses: new Map(),
   namedBeziers: new Map(),
   namedPathChains: new Map(),
+  staticShortcuts: new Map(),
 };

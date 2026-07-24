@@ -3,6 +3,7 @@ import { atomFamily } from 'jotai-family';
 import { focusAtom } from 'jotai-optics';
 import { atomWithStorage } from 'jotai/utils';
 
+import { ForEachPathChainIndex } from 'server/full-database';
 import { ErrorOr, isError } from '@freik/typechk';
 
 import {
@@ -25,7 +26,7 @@ import {
 import { AnonymousPathChain, FileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetFullDb, LoadAndIndexFile, UpdateIndexFile } from './API';
-import { EmptyMappedFile } from './IndexedFile';
+import { EmptyMappedFile, GetNameLookup, MakeFileIndex } from './IndexedFile';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
   'theme',
@@ -51,6 +52,16 @@ export const FullDatabaseAtom = atom(async () => {
     dbCache = await GetFullDb();
   }
   return dbCache;
+});
+
+export const IndexedDatabaseAtom = atom(async (get) => {
+  const db = await get(FullDatabaseAtom);
+  const index = GetNameLookup();
+  for (const [, [, pcc]] of db) {
+    const fileIndex = MakeFileIndex(pcc);
+    index.registerIndex(fileIndex);
+  }
+  return index;
 });
 
 export function ClearCache() {
@@ -148,13 +159,14 @@ export const SelectedPathChainClassAtom = atom(
       return;
     }
     // Scan the DAG of PathChainClasses to find the selected one.
-    const work = [val[1]];
-    while (work.length !== 0) {
-      const item = work.pop()!;
-      if (item.name === className) {
-        return item;
+    let res: PathChainClass | undefined;
+    ForEachPathChainIndex(val[1], (pcc) => {
+      if (pcc.name === className) {
+        res = pcc;
+        return true;
       }
-    }
+    });
+    return res;
   },
 );
 

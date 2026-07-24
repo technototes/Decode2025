@@ -65,10 +65,12 @@ export type FileIndex = {
   namedPoses: Map<PoseName, PoseRef>;
   namedBeziers: Map<BezierName, BezierRef>;
   namedPathChains: Map<PathChainName, AnonymousPathChain>;
+  staticShortcuts: Map<string, string>;
 };
 
 export type NameLookup = {
   registerIndex: (index: FileIndex) => void;
+  reset: () => void;
   findValue: (
     val: ValueName,
     context: PathChainClass,

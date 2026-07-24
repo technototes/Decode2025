@@ -28,6 +28,7 @@ import {
   MakeError,
 } from '@freik/typechk';
 
+import { ForEachPathChainIndex } from './full-database';
 import {
   AnonymousBezier,
   AnonymousFacing,
@@ -890,14 +891,9 @@ export async function MakePathChainFile(
   delete pcc.pathChainFields;
   if (anyItems(pcc)) {
     const imports = [...loader.imports];
-    const work = [pcc];
-    while (work.length > 0) {
-      const item = work.pop();
-      if (isUndefined(item)) {
-        break;
-      }
+    ForEachPathChainIndex(pcc, (item) => {
       // Make a fake import for the parent package, because I *think* that's
-      // home Java name resolution works.
+      // how Java name resolution works.
       const newImports = [...imports];
       if (hasField(item.container, 'className')) {
         newImports.push(loader.package + '.' + item.container.className);
@@ -906,7 +902,7 @@ export async function MakePathChainFile(
       }
       item.imports = newImports;
       item.fullName = `${loader.package}.${item.name}`;
-    }
+    });
   }
   return pcc;
 }
@@ -915,23 +911,19 @@ export async function MakePathChainFile(
 // This does wind up triggering for something that just has a static int/double,
 // but that's okay (better than missing one...)
 export function anyItems(pcc: PathChainClass): boolean {
-  const work = [pcc];
-  while (work.length > 0) {
-    const item = work.pop();
-    if (isUndefined(item)) {
-      break;
-    }
+  let anyItem = false;
+  ForEachPathChainIndex(pcc, (item) => {
     if (
       item.beziers.length ||
       item.poses.length ||
       item.pathChains.length ||
       item.values.length
     ) {
+      anyItem = true;
       return true;
     }
-    work.push(...Object.values(item.children));
-  }
-  return false;
+  });
+  return anyItem;
 }
 
 /*

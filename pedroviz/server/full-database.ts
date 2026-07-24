@@ -34,6 +34,20 @@ export function getTeamPath(dbKey: PathDBKey): [Team, Path] {
   return ['team', 'path'] as [Team, Path];
 }
 
+export function ForEachPathChainIndex(
+  top: PathChainClass,
+  funcStop: (pcc: PathChainClass) => true | unknown,
+): void {
+  const work = [top];
+  while (work.length > 0) {
+    const item = work.pop()!;
+    if (funcStop(item) === true) {
+      return;
+    }
+    work.push(...Object.values(item.children));
+  }
+}
+
 async function GetPathChainIndex(
   team: string,
   file: string,
@@ -43,16 +57,8 @@ async function GetPathChainIndex(
   if (isError(pcc)) {
     return pcc;
   }
-  const list = [];
-  const work = [pcc];
-  while (work.length > 0) {
-    const item = work.pop();
-    if (isUndefined(item)) {
-      break;
-    }
-    list.push(item.name);
-    work.push(...Object.values(item.children));
-  }
+  const list: string[] = [];
+  ForEachPathChainIndex(pcc, (item) => list.push(item.name));
   return [list, pcc];
 }
 
