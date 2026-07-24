@@ -9,6 +9,7 @@ import { ErrorOr, isError } from '@freik/typechk';
 import {
   BezierName,
   BezierRef,
+  NamedBezier,
   NamedPose,
   NamedValue,
   Path,
@@ -58,8 +59,9 @@ export const IndexedDatabaseAtom = atom(async (get) => {
   const db = await get(FullDatabaseAtom);
   const index = GetNameLookup();
   for (const [, [, pcc]] of db) {
-    const fileIndex = MakeFileIndex(pcc);
-    index.registerIndex(fileIndex);
+    ForEachPathChainIndex(pcc, (file) =>
+      index.registerIndex(MakeFileIndex(file)),
+    );
   }
   return index;
 });
@@ -176,6 +178,7 @@ export const MappedFileAtom = atom(
     const team = await get(SelectedTeamAtom);
     const file = await get(SelectedFileAtom);
     const count = get(MappedFileBackingAtom);
+    const fullIndex = get(IndexedDatabaseAtom);
     if (team.length > 0 && file.length > 0) {
       const maybeIdx: ErrorOr<FileIndex> = await LoadAndIndexFile(team, file);
       if (!isError(maybeIdx)) {
@@ -198,11 +201,7 @@ type MapAtom<Str, T> = WritableAtom<Promise<Map<Str, T>>, [Map<Str, T>], void>;
 
 export const NamedValuesAtom = atom(async (get): Promise<NamedValue[]> => {
   const index = await get(SelectedPathChainClassAtom);
-  if (index) {
-    console.log('Making mapped values', index.fullName);
-  }
   return index ? index.values : [];
-  // isDefined(index) ? new Map(index.values.map((nv) => [nv.name, nv.value])) : new Map();
 });
 
 export const MappedValuesAtom: MapAtom<ValueName, ValueRef | RadiansRef> =
@@ -210,17 +209,19 @@ export const MappedValuesAtom: MapAtom<ValueName, ValueRef | RadiansRef> =
 
 export const NamedPosesAtom = atom(async (get): Promise<NamedPose[]> => {
   const index = await get(SelectedPathChainClassAtom);
-  if (index) {
-    console.log('Making mapped poses', index.fullName);
-  }
   return index ? index.poses : [];
-  // isDefined(index) ? new Map(index.values.map((nv) => [nv.name, nv.value])) : new Map();
 });
 
 export const MappedPosesAtom: MapAtom<PoseName, PoseRef> = focusAtom(
   MappedFileAtom,
   (optic) => optic.prop('namedPoses'),
 );
+
+export const NamedBeziersAtom = atom(async (get): Promise<NamedBezier[]> => {
+  const index = await get(SelectedPathChainClassAtom);
+  return index ? index.beziers : [];
+});
+
 export const MappedBeziersAtom: MapAtom<BezierName, BezierRef> = focusAtom(
   MappedFileAtom,
   (optic) => optic.prop('namedBeziers'),

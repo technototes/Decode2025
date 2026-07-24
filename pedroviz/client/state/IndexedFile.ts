@@ -3,6 +3,7 @@ import {
   ErrorOr,
   isDefined,
   isError,
+  isString,
   isUndefined,
   MakeError,
 } from '@freik/typechk';
@@ -70,12 +71,17 @@ function MakeNameLookup(): NameLookup {
   const registerIndex = (index: FileIndex) => {
     indexMap.set(index.container.fullName, index);
   };
-  function dig<K, V>(
+  // Private helper to find an index for a given full name (or parsed class)
+  const getIndex = (pcc: PathChainClass | string): FileIndex | undefined => {
+    return indexMap.get(isString(pcc) ? pcc : pcc.fullName);
+  };
+  // Private helper to look for names, including cross-class and static namespace shortcuts
+  function dig<K extends string, V>(
     val: K,
     context: PathChainClass,
     sel: (idx: FileIndex) => Map<K, V>,
   ): V | undefined {
-    const index = indexMap.get(context.fullName);
+    const index = getIndex(context);
     if (isUndefined(index)) {
       console.error('Unable to find context index', context.fullName);
       return;
@@ -84,13 +90,32 @@ function MakeNameLookup(): NameLookup {
     if (isDefined(res)) {
       return res;
     }
-    console.log(
-      'Unable to resolve name',
-      val,
-      'in the context of',
-      context.fullName,
-    );
-    // TODO: Dig around using name scopes-n-stuff
+    // We didn't find the item. If it has no dots, then it's a flat name, and we're done.
+    const dot = val.indexOf('.');
+    if (dot < 0) {
+      return;
+    }
+    const ss = getIndex(context)?.staticShortcuts.get(val.substring(0, dot));
+    if (isDefined(ss)) {
+      // Try again, with the updated name:
+      return dig(`${ss}${val.substring(dot)}`, context, sel);
+    }
+    // Okay, let's see if we can find a package class that matches
+    const lastDot = val.lastIndexOf('.');
+    const prefix = val.substring(0, lastDot);
+    const suffix = val.substring(lastDot + 1);
+    // Walk the import list, looking for a fully qualified class name
+    // that exists in the index
+    for (const imp of context.imports) {
+      const pkg = getIndex(`${imp}.${prefix}`);
+      if (isUndefined(pkg)) {
+        continue;
+      }
+      const maybe = dig(suffix, pkg.container, sel);
+      if (isDefined(maybe)) {
+        return maybe;
+      }
+    }
   }
   const findValue = (
     val: ValueName,
