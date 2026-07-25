@@ -31,7 +31,7 @@ export function ScaledCanvas(): ReactElement {
     ...pathChains
       .values()
       .map((npc: AnonymousPathChain) =>
-        npc.paths.map((br) => calcBezierRef(file, br)),
+        npc.paths.map((br) => calcBezierRef(br, file.container)),
       ),
   ].flat(1);
   const showColors = false;

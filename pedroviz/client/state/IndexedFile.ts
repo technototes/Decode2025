@@ -308,18 +308,19 @@ function cerr(nm: string, set: Set<string>): Error {
 }
 
 export function calcValueRef(
-  idx: FileIndex,
   vr: ValueRef | RadiansRef,
+  ctx: ParsedClass,
   circ?: Set<string>,
 ): number {
   let av = vr;
+  const lkup = GetNameLookup();
   const seen = new Set<string>(circ ?? []);
   while (isRef(av)) {
     if (seen.has(av)) {
       throw cerr(av, seen);
     }
     seen.add(av);
-    const maybe = idx.namedValues.get(av as ValueName);
+    const maybe = lkup.findValue(av as ValueName, ctx);
     if (isUndefined(maybe)) {
       throw new Error(`Invalid ValueRef ${vr} through ${av}`);
     }
@@ -330,22 +331,23 @@ export function calcValueRef(
     throw new Error(`Invalid ValueRef ${vr}`);
   }
   */
-  return calcValue(idx, av, seen);
+  return calcValue(av, ctx, seen);
 }
 
 export function calcPoseRefHeading(
-  idx: FileIndex,
   pr: PoseRef,
+  ctx: ParsedClass,
   circ?: Set<string>,
 ): number {
   let ap = pr;
   const seen = new Set<string>(circ ?? []);
+  const lkup = GetNameLookup();
   while (isRef(ap)) {
     if (seen.has(ap)) {
       throw cerr(ap, seen);
     }
     seen.add(ap);
-    const maybe = idx.namedPoses.get(ap);
+    const maybe = lkup.findPose(ap, ctx);
     if (isUndefined(maybe)) {
       throw new Error(`Invalid PoseRef heading ${pr} through ${ap}`);
     }
@@ -357,22 +359,23 @@ export function calcPoseRefHeading(
   if (isUndefined(ap.heading)) {
     throw new Error(`No heading for Pose ${ap} from PoseRef ${pr}`);
   }
-  return calcHeadingRef(idx, ap.heading, seen);
+  return calcHeadingRef(ap.heading, ctx, seen);
 }
 
 export function calcPoseRef(
-  idx: FileIndex,
   pr: PoseRef,
+  ctx: ParsedClass,
   circ?: Set<string>,
 ): Point {
   let ap = pr;
+  const lkup = GetNameLookup();
   const seen = new Set<string>(circ ?? []);
   while (isRef(ap)) {
     if (seen.has(ap)) {
       throw cerr(ap, seen);
     }
     seen.add(ap);
-    const maybe = idx.namedPoses.get(ap);
+    const maybe = lkup.findPose(ap, ctx);
     if (isUndefined(maybe)) {
       throw new Error(`Invalid PoseRef ${pr} through ${ap}`);
     }
@@ -381,14 +384,15 @@ export function calcPoseRef(
   if (isUndefined(ap)) {
     throw new Error(`Invalid PoseRef ${pr}`);
   }
-  return { x: calcValueRef(idx, ap.x, seen), y: calcValueRef(idx, ap.y, seen) };
+  return { x: calcValueRef(ap.x, ctx, seen), y: calcValueRef(ap.y, ctx, seen) };
 }
 
 export function calcBezierRef(
-  idx: FileIndex,
   br: BezierRef,
+  ctx: ParsedClass,
   circ?: Set<string>,
 ): Point[] {
+  const lkup = GetNameLookup();
   let ab = br;
   const seen = new Set<string>(circ ?? []);
   while (isRef(ab)) {
@@ -396,7 +400,7 @@ export function calcBezierRef(
       throw cerr(ab, seen);
     }
     seen.add(ab);
-    const maybe = idx.namedBeziers.get(ab);
+    const maybe = lkup.findBezier(ab, ctx);
     if (isUndefined(maybe)) {
       throw new Error(`Invalid BezierRef ${br} through ${ab}`);
     }
@@ -407,39 +411,40 @@ export function calcBezierRef(
     throw new Error(`Invalid BezierRef ${br}`);
   }
   */
-  return ab.points.map((p) => calcPoseRef(idx, p, seen));
+  return ab.points.map((p) => calcPoseRef(p, ctx, seen));
 }
 
 export function calcHeadingRef(
-  idx: FileIndex,
   hr: HeadingRef,
+  ctx: ParsedClass,
   circ?: Set<string>,
 ): number {
   if (isRef(hr)) {
     // Either a PoseName, AnonymousValue, or ValueName;
     if (isAnonymousValue(hr)) {
-      return calcValueRef(idx, hr, circ);
+      return calcValueRef(hr, ctx, circ);
     }
-    const val = idx.namedValues.get(hr as ValueName);
+    const lkup = GetNameLookup();
+    const val = lkup.findValue(hr as ValueName, ctx);
     if (isDefined(val)) {
-      return calcValueRef(idx, val, circ);
+      return calcValueRef(val, ctx, circ);
     }
-    const pose = idx.namedPoses.get(hr as PoseName);
+    const pose = lkup.findPose(hr as PoseName, ctx);
     if (isDefined(pose)) {
-      return calcPoseRefHeading(idx, pose, circ);
+      return calcPoseRefHeading(pose, ctx, circ);
     }
     throw new Error(`Missing heading for ${hr}`);
   } else if (isRadiansRef(hr)) {
-    return (Math.PI * calcValueRef(idx, hr.radians, circ)) / 180.0;
+    return (Math.PI * calcValueRef(hr.radians, ctx, circ)) / 180.0;
   } else {
-    return calcValueRef(idx, hr, circ);
+    return calcValueRef(hr, ctx, circ);
   }
 }
 
 // Evaluation from the parsed code representation:
 export function calcValue(
-  idx: FileIndex,
   av: AnonymousValue | RadiansRef,
+  ctx: ParsedClass,
   circ?: Set<string>,
 ): number {
   if (isDoubleValue(av)) {
@@ -447,7 +452,8 @@ export function calcValue(
   } else if (isIntValue(av)) {
     return av.int;
   } else {
-    return (Math.PI * calcValueRef(idx, av.radians, circ)) / 180.0;
+    const lkup = GetNameLookup();
+    return (Math.PI * calcValueRef(av.radians, ctx, circ)) / 180.0;
   }
 }
 
