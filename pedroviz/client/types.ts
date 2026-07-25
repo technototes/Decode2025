@@ -1,5 +1,6 @@
 import {
   chkAnyOf,
+  chkArrayOf,
   chkObjectOfExactType,
   chkTupleOf,
   isNumber,
@@ -26,37 +27,91 @@ export type AnonymousPathChain = {
   heading: AnonymousFacing;
 };
 
-export type ConcreteTangentHeading = { htype: 'T' };
-export const chkConreteTangentHeading =
-  chkObjectOfExactType<ConcreteTangentHeading>({
-    htype: (t: unknown): t is 'T' => t === 'T',
-  });
+export type Point = { x: number; y: number };
+export const chkPoint = chkObjectOfExactType({ x: isNumber, y: isNumber });
+
+export type ConcreteTangentHeading = { type: 'T' };
 export type ConcreteConstantHeading = {
-  htype: 'C';
+  type: 'C';
   heading: number;
 };
-export const chkConcreteConstantHeading =
-  chkObjectOfExactType<ConcreteConstantHeading>({
-    htype: (t: unknown): t is 'C' => t === 'C',
-    heading: isNumber,
-  });
-export type ConcreteInterpolatedHeading = {
-  htype: 'I';
+export type ConcreteLinearHeading = {
+  type: 'I';
   headings: [number, number];
 };
-export const chkConcreteInterpolatedHeading =
-  chkObjectOfExactType<ConcreteInterpolatedHeading>({
-    htype: (t: unknown): t is 'I' => t === 'I',
-    headings: chkTupleOf(isNumber, isNumber),
-  });
-export type ConcreteHeadingType =
+export type ConcretePointHeading = {
+  type: 'P';
+  heading: Point;
+};
+export type ConcreteReversedHeading = {
+  type: 'R';
+  heading: ConcreteReversibleHeadingType;
+};
+export type ConcretePiece = {
+  start: number;
+  end: number;
+  heading: ConcreteSimpleHeadingType;
+};
+export type ConcretePieceWiseHeading = {
+  type: 'L';
+  pieces: ConcretePiece[];
+};
+export type ConcreteReversibleHeadingType =
   | ConcreteTangentHeading
   | ConcreteConstantHeading
-  | ConcreteInterpolatedHeading;
-export const chkConcreteHeadingType: typecheck<ConcreteHeadingType> = chkAnyOf(
-  chkConreteTangentHeading,
-  chkConcreteConstantHeading,
-  chkConcreteInterpolatedHeading,
+  | ConcreteLinearHeading
+  | ConcretePointHeading;
+export type ConcreteSimpleHeadingType =
+  ConcreteReversibleHeadingType | ConcreteReversedHeading;
+export type ConcreteHeadingType =
+  ConcreteReversibleHeadingType | ConcretePieceWiseHeading;
+
+export const chkConcreteTangentHeading =
+  chkObjectOfExactType<ConcreteTangentHeading>({
+    type: (t: unknown): t is 'T' => t === 'T',
+  });
+export const chkConcreteConstantHeading =
+  chkObjectOfExactType<ConcreteConstantHeading>({
+    type: (t: unknown): t is 'C' => t === 'C',
+    heading: isNumber,
+  });
+export const chkConcreteLinearHeading =
+  chkObjectOfExactType<ConcreteLinearHeading>({
+    type: (t: unknown): t is 'I' => t === 'I',
+    headings: chkTupleOf(isNumber, isNumber),
+  });
+export const chkConcretePointHeading =
+  chkObjectOfExactType<ConcretePointHeading>({
+    type: (t: unknown): t is 'P' => t === 'P',
+    heading: chkPoint,
+  });
+export const chkConcreteReversibleHeadingType: typecheck<ConcreteReversibleHeadingType> =
+  chkAnyOf(
+    chkConcreteTangentHeading,
+    chkConcreteConstantHeading,
+    chkConcreteLinearHeading,
+    chkConcretePointHeading,
+  );
+export const chkConcreteReversedHeading =
+  chkObjectOfExactType<ConcreteReversedHeading>({
+    type: (t: unknown): t is 'R' => t === 'R',
+    heading: chkConcreteReversibleHeadingType,
+  });
+export const chkConcreteSimpleHeadingType: typecheck<ConcreteSimpleHeadingType> =
+  chkAnyOf(chkConcreteReversedHeading, chkConcreteReversedHeading);
+export const chkConcretePiece = chkObjectOfExactType({
+  start: isNumber,
+  end: isNumber,
+  heading: chkConcreteSimpleHeadingType,
+});
+export const chkConcretePieceWiseHeading =
+  chkObjectOfExactType<ConcretePieceWiseHeading>({
+    type: (t: unknown): t is 'R' => t === 'R',
+    pieces: chkArrayOf(chkConcretePiece),
+  });
+export const chkConcreteHeadingType = chkAnyOf(
+  chkConcretePieceWiseHeading,
+  chkConcreteSimpleHeadingType,
 );
 
 export type OneFileIndex = {
@@ -82,8 +137,6 @@ export type NameLookup = {
     context: ParsedClass,
   ) => AnonymousPathChain | undefined;
 };
-
-export type Point = { x: number; y: number };
 
 export type HasItem<T> = {
   has: (item: T) => boolean;

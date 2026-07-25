@@ -10,6 +10,7 @@ import {
 
 import {
   AnonymousBezier,
+  AnonymousFacing,
   AnonymousPose,
   AnonymousValue,
   BezierName,
@@ -32,7 +33,14 @@ import {
   ValueName,
   ValueRef,
 } from '../../server/types';
-import { AnonymousPathChain, NameLookup, OneFileIndex, Point } from '../types';
+import {
+  AnonymousPathChain,
+  ConcreteHeadingType,
+  ConcreteTangentHeading,
+  NameLookup,
+  OneFileIndex,
+  Point,
+} from '../types';
 import { ValidRes } from './API';
 
 export function MakeFileIndex(container: ParsedClass): OneFileIndex {
@@ -455,6 +463,14 @@ export function calcValue(
     const lkup = GetNameLookup();
     return (Math.PI * calcValueRef(av.radians, ctx, circ)) / 180.0;
   }
+}
+
+function mkTangent(): ConcreteTangentHeading {
+  return { type: 'T' };
+}
+
+export function calcFacing(heading: AnonymousFacing): ConcreteHeadingType {
+  return mkTangent();
 }
 
 export const EmptyMappedFile: OneFileIndex = {

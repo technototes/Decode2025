@@ -1,7 +1,13 @@
 import { ReactElement, useEffect, useRef } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { NamedPathChain } from '../../server/types';
+import { isDefined } from 'node_modules/@freik/typechk/lib/esm';
+
+import {
+  AnonymousFacing,
+  HeadingRef,
+  NamedPathChain,
+} from '../../server/types';
 import {
   ColorsAtom,
   MappedBeziersAtom,
@@ -10,8 +16,16 @@ import {
   MappedPosesAtom,
   MappedValuesAtom,
 } from '../state/Atoms';
-import { calcBezierRef } from '../state/IndexedFile';
-import { AnonymousPathChain, Point } from '../types';
+import { calcBezierRef, calcFacing } from '../state/IndexedFile';
+import {
+  AnonymousPathChain,
+  chkConcreteConstantHeading,
+  chkConcreteLinearHeading,
+  chkConcretePointHeading,
+  chkConcreteTangentHeading,
+  ConcreteHeadingType,
+  Point,
+} from '../types';
 import { bezierLength, deCasteljau } from './bezier';
 
 const Scale = 1;
@@ -29,13 +43,15 @@ export function ScaledCanvas(): ReactElement {
   const file = useAtomValue(MappedFileAtom);
   const points = [
     ...pathChains
-      .values()
-      .map((npc: AnonymousPathChain) =>
-        npc.paths.map((br) => calcBezierRef(br, file.container)),
+      .entries()
+      .flatMap(([, apc]) =>
+        apc.paths.map((br): [Point[], ConcreteHeadingType] => [
+          calcBezierRef(br, file.container),
+          calcFacing(apc.heading),
+        ]),
       ),
-  ].flat(1);
+  ];
   const showColors = false;
-  const showTime = false;
   useEffect(() => {
     const start = performance.now();
     const canvas = canvasRef.current;
@@ -63,12 +79,9 @@ export function ScaledCanvas(): ReactElement {
 
     ctx.clearRect(0, 0, fix * Scale, fix * Scale);
 
-    points.forEach((ctrlPoints, index) =>
-      renderPath(ctx, ctrlPoints, colors[index % colors.length]!),
+    points.forEach(([ctrlPoints, facing], index) =>
+      renderPath(ctx, ctrlPoints, facing, colors[index % colors.length]!),
     );
-    if (showTime) {
-      drawTime(ctx, performance.now() - start, dpr, scale);
-    }
     // Draw the colors
     if (showColors) {
       drawColors(ctx, colors);
@@ -78,9 +91,19 @@ export function ScaledCanvas(): ReactElement {
   return <canvas className="field" ref={canvasRef} />;
 }
 
+function diff(a: Point, b: Point): Point {
+  return { x: b.x - a.x, y: b.y - a.y };
+}
+
+function distance(a: Point, b: Point): number {
+  const delta = diff(a, b);
+  return Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+}
+
 function renderPath(
   ctx: CanvasRenderingContext2D,
   curveControlPoints: Point[],
+  heading: ConcreteHeadingType,
   color: string,
 ) {
   if (curveControlPoints.length < 2) {
@@ -102,15 +125,23 @@ function renderPath(
       ctx.restore();
       */
   ctx.beginPath();
-  ctx.lineWidth = 0.25;
+  ctx.lineWidth = 0.1;
   ctx.strokeStyle = color;
+  let approxLen = 0;
   ctx.moveTo(
     curveControlPoints[0]!.x * Scale,
     curveControlPoints[0]!.y * Scale,
   );
+  let lastPt = curveControlPoints[0]!;
   for (const pt of pts) {
+    approxLen += distance(lastPt, pt);
+    lastPt = pt;
     ctx.lineTo(pt.x * Scale, pt.y * Scale);
   }
+  approxLen += distance(
+    lastPt,
+    curveControlPoints[curveControlPoints.length - 1]!,
+  );
   ctx.lineTo(
     curveControlPoints[curveControlPoints.length - 1]!.x * Scale,
     curveControlPoints[curveControlPoints.length - 1]!.y * Scale,
@@ -120,11 +151,20 @@ function renderPath(
   ctx.lineWidth = 0.5;
   for (const pt of curveControlPoints) {
     ctx.strokeStyle = color;
-    ctx.moveTo(pt.x + PointRadius, pt.y);
-    ctx.arc(pt.x, pt.y, PointRadius, 0, 2 * Math.PI);
+    ctx.moveTo((pt.x + PointRadius) * Scale, pt.y * Scale);
+    ctx.arc(pt.x * Scale, pt.y * Scale, PointRadius * Scale, 0, 2 * Math.PI);
   }
   ctx.stroke();
-  // These two items wil be usefil for animation in the footure
+  drawHeadingLines(
+    ctx,
+    color,
+    approxLen,
+    [...pts, curveControlPoints[curveControlPoints.length - 1]!],
+    heading,
+    5,
+  );
+
+  // These two items wil be useful for animation in the footure
   /*
       const tang = bezierDerivative(curveControlPoints, 0.4);
       const mid = deCasteljau(curveControlPoints, 0.4);
@@ -155,18 +195,90 @@ function drawColors(ctx: CanvasRenderingContext2D, colors: string[]) {
   ctx.restore();
 }
 
-function drawTime(
+function magnitude(pt: Point, val: number): Point {
+  const mag = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
+  return { x: (pt.x * val) / mag, y: (pt.y * val) / mag };
+}
+
+function drawHeadingLines(
   ctx: CanvasRenderingContext2D,
-  time: number,
-  dpr: number,
-  scale: number,
+  color: string,
+  len: number,
+  pts: Point[],
+  heading: ConcreteHeadingType,
+  count: number,
 ) {
-  ctx.save();
-  ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-  ctx.font = '5px Arial'; // Set font size and family
-  ctx.fillStyle = 'green'; // Set fill color for the text
-  ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
-  ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
-  ctx.fillText(`Time: ${time}`, 50, 20);
-  ctx.restore();
+  // for "n" points, I'm not drawing starting/ending headings, so I actually want to split
+  // the length into count + 1 pieces, and find the point in between each piece
+  const pieceLen = len / (count + 1);
+  if (count <= 0 || pts.length < 3 || pieceLen < 1) {
+    return;
+  }
+  let curPtIndex = 1;
+  let lastDelta: Point = { x: 0, y: 0 };
+  for (let pos = 0; pos < count && curPtIndex < pts.length; pos++) {
+    let pathPos = pieceLen * (pos + 1);
+    // Walk the length of the path, until we find the heading-draw point
+    let point: Point | undefined;
+    // This is just laziness. I shouldn't need to recalculate the whole thing, but
+    // math is hard...
+    for (let curPtIndex = 1; pathPos > 0; curPtIndex++) {
+      const prev = pts[curPtIndex - 1]!;
+      const cur = pts[curPtIndex]!;
+      lastDelta = diff(prev, cur);
+      const l = distance(prev, cur);
+      if (l >= pathPos) {
+        const partWay = magnitude(diff(prev, cur), pathPos);
+        point = { x: prev.x + partWay.x, y: prev.y + partWay.y };
+      }
+      pathPos -= l;
+    }
+    if (isDefined(point)) {
+      // Draw the heading line at this location.
+      // Include the tangent, and the portion of the overall path that's complete.
+      drawHeadingLine(
+        ctx,
+        color,
+        point,
+        lastDelta,
+        (pos + 1) / (count + 1),
+        heading,
+      );
+    }
+  }
+}
+
+function drawHeadingLine(
+  ctx: CanvasRenderingContext2D,
+  color: string,
+  point: Point,
+  tangent: Point,
+  percentage: number,
+  heading: ConcreteHeadingType,
+) {
+  let disp: Point = { x: 0, y: 0 };
+  if (chkConcreteTangentHeading(heading)) {
+    disp = magnitude(tangent, 5);
+  } else if (chkConcreteConstantHeading(heading)) {
+    disp = magnitude(
+      { x: Math.cos(heading.heading), y: Math.sin(heading.heading) },
+      5,
+    );
+  } else if (chkConcreteLinearHeading(heading)) {
+    const radians =
+      (heading.headings[0] + (heading.headings[1] - heading.headings[0])) *
+      percentage;
+    disp = magnitude({ x: Math.cos(radians), y: Math.sin(radians) }, 5);
+  } else if (chkConcretePointHeading(heading)) {
+    disp = magnitude(diff(heading.heading, point), 5);
+  } else {
+    // We don't handle others yet...
+    disp = magnitude(tangent, 0.1);
+  }
+  ctx.beginPath();
+  ctx.lineWidth = 0.25;
+  ctx.strokeStyle = color;
+  ctx.moveTo(point.x * Scale, point.y * Scale);
+  ctx.lineTo((point.x + disp.x) * Scale, (point.y + disp.y) * Scale);
+  ctx.stroke();
 }

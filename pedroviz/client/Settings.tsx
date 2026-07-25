@@ -32,10 +32,24 @@ export function Settings(): ReactElement {
         <DialogBody>
           <DialogTitle style={{ textAlign: 'center' }}>Settings</DialogTitle>
           <DialogContent>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                rowGap: 10,
+                margin: 10,
+              }}>
+              <Text>Path Thickness</Text>
+              <Text>TODO: [value]</Text>
+              <Text>CtrlPt Thickness</Text>
+              <Text>TODO: [value]</Text>
               <Text>Show heading</Text>
               <Text>TODO [button]</Text>
               <Text>Heading Spacing</Text>
+              <Text>TODO [value]</Text>
+              <Text>Heading length</Text>
+              <Text>TODO [value]</Text>
+              <Text>Heading thickness</Text>
               <Text>TODO [value]</Text>
               <Text>Reset preferences</Text>
               <span>
