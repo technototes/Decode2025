@@ -262,7 +262,7 @@ export function NamedValueList(): ReactElement {
 
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name {items.length}</Text>
+      <Text size={400}>Name</Text>
       <Text size={400}>Value</Text>
       <Text size={400}>Units</Text>
       {items.map((val) => (

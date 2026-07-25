@@ -284,36 +284,37 @@ describe('API validation', () => {
       expect(isError(res)).toBeFalse();
       return;
     }
+    const ctx = res.container;
     expect(res.namedValues.size).toEqual(6);
     expect(res.namedPoses.size).toEqual(3);
     expect(res.namedBeziers.size).toEqual(2);
     expect(res.namedPathChains.size).toEqual(3);
 
-    expect(calcValue(res, { int: 1 })).toEqual(1);
-    expect(() => calcValueRef(res, 'valCirc' as ValueName)).toThrowError(
+    expect(calcValue({ int: 1 }, ctx)).toEqual(1);
+    expect(() => calcValueRef('valCirc' as ValueName, ctx)).toThrowError(
       'Circular reference for valCirc (valCirc, valCirc2 cause the cycle)',
     );
-    expect(calcValueRef(res, { double: 2.5 })).toEqual(2.5);
-    expect(calcValueRef(res, { radians: { int: 180 } })).toEqual(Math.PI);
-    expect(calcValueRef(res, 'val2' as ValueName)).toEqual(2.5);
+    expect(calcValueRef({ double: 2.5 }, ctx)).toEqual(2.5);
+    expect(calcValueRef({ radians: { int: 180 } }, ctx)).toEqual(Math.PI);
+    expect(calcValueRef('val2' as ValueName, ctx)).toEqual(2.5);
     expect(
-      calcPoseRef(res, { x: 'val1' as ValueName, y: 'val2' as ValueName }),
+      calcPoseRef({ x: 'val1' as ValueName, y: 'val2' as ValueName }, ctx),
     ).toEqual({ x: 1, y: 2.5 });
-    const pose3 = calcPoseRef(res, 'pose3' as PoseName);
+    const pose3 = calcPoseRef('pose3' as PoseName, ctx);
     expect(pose3).toEqual({ x: 1, y: 2.5 });
-    expect(() => calcPoseRef(res, 'noPose' as PoseName)).toThrow();
-    expect(calcBezierRef(res, 'bez2' as BezierName)).toEqual([
+    expect(() => calcPoseRef('noPose' as PoseName, ctx)).toThrow();
+    expect(calcBezierRef('bez2' as BezierName, ctx)).toEqual([
       { x: 1, y: 1 },
       { x: 2.5, y: 1 },
       { x: 2.5, y: 1 },
     ]);
-    expect(calcValueRef(res, 'val1' as ValueName)).toEqual(1);
-    expect(calcHeadingRef(res, { radians: 'val2' as ValueName })).toEqual(
+    expect(calcValueRef('val1' as ValueName, ctx)).toEqual(1);
+    expect(calcHeadingRef({ radians: 'val2' as ValueName }, ctx)).toEqual(
       (2.5 * Math.PI) / 180,
     );
-    expect(calcValueRef(res, { int: 15 })).toEqual(15);
-    expect(calcValueRef(res, mkValNm('refVal'))).toEqual(1);
-    expect(calcPoseRefHeading(res, mkPoseNm('pose3'))).toEqual(Math.PI / 2);
+    expect(calcValueRef({ int: 15 }, ctx)).toEqual(15);
+    expect(calcValueRef(mkValNm('refVal'), ctx)).toEqual(1);
+    expect(calcPoseRefHeading(mkPoseNm('pose3'), ctx)).toEqual(Math.PI / 2);
     const res2 = await LoadAndIndexFile('team2', 'path3.java');
     expect(!isError(res2)).toBeTrue();
   });

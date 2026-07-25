@@ -59,7 +59,7 @@ export const chkConcreteHeadingType: typecheck<ConcreteHeadingType> = chkAnyOf(
   chkConcreteInterpolatedHeading,
 );
 
-export type FileIndex = {
+export type OneFileIndex = {
   container: ParsedClass;
   namedValues: Map<ValueName, ValueRef | RadiansRef>;
   namedPoses: Map<PoseName, PoseRef>;
@@ -69,7 +69,7 @@ export type FileIndex = {
 };
 
 export type NameLookup = {
-  registerIndex: (index: FileIndex) => void;
+  registerIndex: (index: OneFileIndex) => void;
   reset: () => void;
   findValue: (
     val: ValueName,

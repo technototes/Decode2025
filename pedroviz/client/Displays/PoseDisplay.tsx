@@ -111,7 +111,7 @@ export function NamedPoseList(): ReactElement {
   };
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name {items.size}</Text>
+      <Text size={400}>Name</Text>
       <AnonymousPoseHeader />
       {[
         ...items.entries().map(([name, pose]) => {

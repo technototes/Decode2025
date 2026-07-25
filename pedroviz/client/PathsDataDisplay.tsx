@@ -1,7 +1,7 @@
 import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { Button, Text } from '@fluentui/react-components';
+import { Text } from '@fluentui/react-components';
 import { Expandable } from '@freik/fluent9-tools';
 import { isDefined, isUndefined } from '@freik/typechk';
 
@@ -12,8 +12,6 @@ import {
   isRef,
   PoseRef,
 } from '../server/types';
-import { NewPose } from './Displays/NewPose';
-import { NewValue } from './Displays/NewValue';
 import { NamedPoseList } from './Displays/PoseDisplay';
 import {
   AnonymousValueDisplay,
@@ -96,7 +94,7 @@ export function NamedBezierList(): ReactElement {
   };
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name {beziers.size}</Text>
+      <Text size={400}>Name</Text>
       <Text size={400}>Poses</Text>
       {[
         ...beziers
@@ -134,6 +132,10 @@ function HeadingTypeDisplay({
   heading: AnonymousFacing;
   style?: CSSProperties;
 }): ReactElement {
+  if (isUndefined(heading)) {
+    // TODO: I'm not sure why I'm landin here sometimes.
+    return <></>;
+  }
   switch (heading.type) {
     case 'constant':
       return (
@@ -256,7 +258,7 @@ export function PathChainList(): ReactElement {
   };
   return (
     <div style={gridStyle}>
-      <Text size={400}>Name {items.size}</Text>
+      <Text size={400}>Name</Text>
       <Text
         size={400}
         style={{

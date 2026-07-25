@@ -24,7 +24,7 @@ import {
   ValueName,
   ValueRef,
 } from '../../server/types';
-import { AnonymousPathChain, FileIndex } from '../types';
+import { AnonymousPathChain, OneFileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetFullDb, LoadAndIndexFile, UpdateIndexFile } from './API';
 import { EmptyMappedFile, GetNameLookup, MakeFileIndex } from './IndexedFile';
@@ -180,7 +180,10 @@ export const MappedFileAtom = atom(
     const count = get(MappedFileBackingAtom);
     const fullIndex = get(IndexedDatabaseAtom);
     if (team.length > 0 && file.length > 0) {
-      const maybeIdx: ErrorOr<FileIndex> = await LoadAndIndexFile(team, file);
+      const maybeIdx: ErrorOr<OneFileIndex> = await LoadAndIndexFile(
+        team,
+        file,
+      );
       if (!isError(maybeIdx)) {
         return maybeIdx;
       }
@@ -188,7 +191,7 @@ export const MappedFileAtom = atom(
     }
     return EmptyMappedFile;
   },
-  async (get, set, data: FileIndex | Promise<FileIndex>) => {
+  async (get, set, data: OneFileIndex | Promise<OneFileIndex>) => {
     const team = await get(SelectedTeamAtom);
     const file = await get(SelectedFileAtom);
     const val = get(MappedFileBackingAtom);

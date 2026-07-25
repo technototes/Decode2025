@@ -16,7 +16,7 @@ import {
   PathDatabase,
   Team,
 } from '../../server/types';
-import { FileIndex, NameLookup } from '../types';
+import { NameLookup, OneFileIndex } from '../types';
 import { GetNameLookup, MakeFileIndex, ValidateIndex } from './IndexedFile';
 import { fetchApi } from './Storage';
 
@@ -49,14 +49,14 @@ export async function GetFullDb(): Promise<PathDatabase> {
 const lastLoadedIndexFile = {
   team: '',
   file: '',
-  data: null as null | FileIndex,
+  data: null as null | OneFileIndex,
 };
-const indexedFiles: Map<[Team, Path], FileIndex> = new Map();
+const indexedFiles: Map<[Team, Path], OneFileIndex> = new Map();
 
 export async function LoadAndIndexFile(
   team: string,
   file: string,
-): Promise<ErrorOr<FileIndex>> {
+): Promise<ErrorOr<OneFileIndex>> {
   if (
     lastLoadedIndexFile.team === team &&
     lastLoadedIndexFile.file === file &&
@@ -93,7 +93,11 @@ export async function LoadAndIndexFile(
   return indexFile;
 }
 
-export function UpdateIndexFile(team: string, file: string, data: FileIndex) {
+export function UpdateIndexFile(
+  team: string,
+  file: string,
+  data: OneFileIndex,
+) {
   lastLoadedIndexFile.team = team;
   lastLoadedIndexFile.file = file;
   lastLoadedIndexFile.data = data;
