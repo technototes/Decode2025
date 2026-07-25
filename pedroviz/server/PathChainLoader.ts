@@ -37,6 +37,7 @@ import {
   BezierName,
   BezierRef,
   EmptyParsedClass,
+  FacingReversible,
   HeadingRef,
   isAnonymousValue,
   isRadiansRef,
@@ -747,7 +748,11 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (pathHeading === null) {
             return;
           }
-          pathHeading = { type: 'reversed', facing: pathHeading };
+          // TODO: Don't cast. Error!
+          pathHeading = {
+            type: 'reversed',
+            facing: pathHeading as FacingReversible,
+          };
           continue;
 
         case 'setHeadingInterpolation':
@@ -926,11 +931,23 @@ export function anyItems(pc: ParsedClass): boolean {
   return anyItem;
 }
 
-/*
 if (import.meta.main) {
   MakeParsedClass(
-    ['..', 'Sixteen750', 'src', 'main', 'java', 'org', 'firstinspires', 'ftc', 'sixteen750', 'commands', 'auto', 'Poses.java',].join('/'))
+    [
+      '..',
+      'Sixteen750',
+      'src',
+      'main',
+      'java',
+      'org',
+      'firstinspires',
+      'ftc',
+      'sixteen750',
+      'commands',
+      'auto',
+      'RPaths.java',
+    ].join('/'),
+  )
     .then((strOrPc) => console.log(strOrPc))
     .catch((err) => console.error(err));
 }
-*/

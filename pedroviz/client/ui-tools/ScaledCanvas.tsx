@@ -47,7 +47,7 @@ export function ScaledCanvas(): ReactElement {
       .flatMap(([, apc]) =>
         apc.paths.map((br): [Point[], ConcreteHeadingType] => [
           calcBezierRef(br, file.container),
-          calcFacing(apc.heading),
+          calcFacing(apc.heading, file.container),
         ]),
       ),
   ];

@@ -64,7 +64,7 @@ export type ConcreteReversibleHeadingType =
 export type ConcreteSimpleHeadingType =
   ConcreteReversibleHeadingType | ConcreteReversedHeading;
 export type ConcreteHeadingType =
-  ConcreteReversibleHeadingType | ConcretePieceWiseHeading;
+  ConcreteSimpleHeadingType | ConcretePieceWiseHeading;
 
 export const chkConcreteTangentHeading =
   chkObjectOfExactType<ConcreteTangentHeading>({

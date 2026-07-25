@@ -52,7 +52,7 @@ export type BezierRef = AnonymousBezier | BezierName;
 // NYI: Offset; works like reverse, but shifts the bot from the target by a
 // fixed amount. Reverse is *mostly* "offset 180" (not for linear)
 export type FacingTiming = { start: ValueRef; end: ValueRef };
-export type FacingReversed = { type: 'reversed'; facing: FacingRef };
+export type FacingReversed = { type: 'reversed'; facing: FacingReversible };
 export type FacingTangent = { type: 'tangent' };
 export type FacingConstant = { type: 'constant'; heading: HeadingRef };
 export type FacingPoint = { type: 'point'; point: PoseRef };
@@ -61,9 +61,11 @@ export type FacingLinear = {
   start: HeadingRef;
   end: HeadingRef;
 };
-export type FacingPiece = { timing: FacingTiming; heading: FacingRef };
+export type FacingReversible =
+  FacingTangent | FacingConstant | FacingLinear | FacingPoint;
+export type FacingSimple = FacingReversible | FacingReversed;
+export type FacingPiece = { timing: FacingTiming; heading: FacingSimple };
 export type FacingPieceWise = { type: 'piecewise'; pieces: FacingPiece[] };
-export type FacingName = Nominal<string, 'Facing'>;
 export type AnonymousFacing =
   | FacingTangent
   | FacingConstant
@@ -71,8 +73,6 @@ export type AnonymousFacing =
   | FacingPoint
   | FacingPieceWise
   | FacingReversed;
-export type NamedFacing = { name: FacingName; heading: AnonymousFacing };
-export type FacingRef = AnonymousFacing | FacingName;
 
 // No such thing as an anonymous PathChain
 export type PathChainName = Nominal<string, 'PathChain'>;
@@ -239,24 +239,31 @@ export const isPointFacing = chkObjectOfExactType<FacingPoint>({
   type: isPointFacingType,
   point: isPoseRef,
 });
+export const isReversibleFacing: typecheck<FacingReversible> = chkAnyOf(
+  isTangentFacing,
+  isConstantFacing,
+  isLinearFacing,
+  isPointFacing,
+);
 export const isFacingTiming = chkObjectOfExactType<FacingTiming>({
   start: isValueRef,
   end: isValueRef,
 });
+export const isReversedFacing: typecheck<FacingReversed> =
+  chkObjectOfExactType<FacingReversed>({
+    type: isReversedFacingType,
+    facing: isReversibleFacing,
+  });
+export const isSimpleFacing = chkAnyOf(isReversibleFacing, isReversedFacing);
 export const isPiecewiseEntry: typecheck<FacingPiece> =
   chkObjectOfExactType<FacingPiece>({
     timing: isFacingTiming,
-    heading: isFacingRef,
+    heading: isReversibleFacing,
   });
 export const isPiecewiseFacing = chkObjectOfExactType<FacingPieceWise>({
   type: isPiecewiseFacingType,
   pieces: chkArrayOf(isPiecewiseEntry),
 });
-export const isReversedFacing: typecheck<FacingReversed> =
-  chkObjectOfExactType<FacingReversed>({
-    type: isReversedFacingType,
-    facing: isFacingRef,
-  });
 export const isAnonymousFacing: typecheck<AnonymousFacing> = chkAnyOf(
   isTangentFacing,
   isConstantFacing,
@@ -265,9 +272,6 @@ export const isAnonymousFacing: typecheck<AnonymousFacing> = chkAnyOf(
   isPiecewiseFacing,
   isReversedFacing,
 );
-export function isFacingRef(obj: unknown): obj is FacingRef {
-  return chkAnyOf(isAnonymousFacing, isString)(obj);
-}
 
 export const isNamedPathChain = chkObjectOfExactType<NamedPathChain>({
   name: isString,

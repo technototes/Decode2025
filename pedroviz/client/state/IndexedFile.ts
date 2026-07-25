@@ -16,14 +16,26 @@ import {
   BezierName,
   BezierRef,
   EmptyParsedClass,
+  FacingConstant,
+  FacingLinear,
+  FacingPiece,
+  FacingPieceWise,
+  FacingPoint,
+  FacingReversed,
+  FacingSimple,
   HeadingRef,
   isAnonymousValue,
   isConstantFacing,
   isDoubleValue,
   isIntValue,
   isLinearFacing,
+  isPiecewiseFacing,
+  isPointFacing,
   isRadiansRef,
   isRef,
+  isReversedFacing,
+  isReversibleFacing,
+  isSimpleFacing,
   isTangentFacing,
   ParsedClass,
   PathChainName,
@@ -35,7 +47,16 @@ import {
 } from '../../server/types';
 import {
   AnonymousPathChain,
+  chkConcreteTangentHeading,
+  ConcreteConstantHeading,
   ConcreteHeadingType,
+  ConcreteLinearHeading,
+  ConcretePiece,
+  ConcretePieceWiseHeading,
+  ConcretePointHeading,
+  ConcreteReversedHeading,
+  ConcreteReversibleHeadingType,
+  ConcreteSimpleHeadingType,
   ConcreteTangentHeading,
   NameLookup,
   OneFileIndex,
@@ -469,7 +490,80 @@ function mkTangent(): ConcreteTangentHeading {
   return { type: 'T' };
 }
 
-export function calcFacing(heading: AnonymousFacing): ConcreteHeadingType {
+function mkConstant(
+  heading: FacingConstant,
+  ctx: ParsedClass,
+): ConcreteConstantHeading {
+  return { type: 'C', heading: calcHeadingRef(heading.heading, ctx) };
+}
+
+function mkLinear(
+  heading: FacingLinear,
+  ctx: ParsedClass,
+): ConcreteLinearHeading {
+  return {
+    type: 'I',
+    headings: [
+      calcHeadingRef(heading.start, ctx),
+      calcHeadingRef(heading.end, ctx),
+    ],
+  };
+}
+
+function mkPoint(heading: FacingPoint, ctx: ParsedClass): ConcretePointHeading {
+  return { type: 'P', heading: calcPoseRef(heading.point, ctx) };
+}
+
+function mkReversible(
+  heading: FacingSimple,
+  ctx: ParsedClass,
+): ConcreteReversibleHeadingType {
+  if (isTangentFacing(heading)) {
+    return mkTangent();
+  } else if (isConstantFacing(heading)) {
+    return mkConstant(heading, ctx);
+  } else if (isLinearFacing(heading)) {
+    return mkLinear(heading, ctx);
+  } else if (isPointFacing(heading)) {
+    return mkPoint(heading, ctx);
+  }
+  throw new Error('Unknown simple Facing type');
+}
+
+function mkReversed(
+  heading: FacingReversed,
+  ctx: ParsedClass,
+): ConcreteReversedHeading {
+  const revheading = mkReversible(heading.facing, ctx);
+  return { type: 'R', heading: revheading };
+}
+
+function mkPiece(piece: FacingPiece, ctx: ParsedClass): ConcretePiece {
+  return {
+    start: calcValueRef(piece.timing.start, ctx),
+    end: calcValueRef(piece.timing.end, ctx),
+    heading: mkReversible(piece.heading, ctx),
+  };
+}
+
+function mkPiecewise(
+  head: FacingPieceWise,
+  ctx: ParsedClass,
+): ConcretePieceWiseHeading {
+  return { type: 'L', pieces: head.pieces.map((fp) => mkPiece(fp, ctx)) };
+}
+
+export function calcFacing(
+  heading: AnonymousFacing,
+  ctx: ParsedClass,
+): ConcreteHeadingType {
+  if (isReversibleFacing(heading)) {
+    return mkReversible(heading, ctx);
+  } else if (isReversedFacing(heading)) {
+    return mkReversed(heading, ctx);
+  } else if (isPiecewiseFacing(heading)) {
+    return mkPiecewise(heading, ctx);
+  }
   return mkTangent();
 }
 
