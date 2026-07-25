@@ -4,7 +4,6 @@ import { useAtom } from 'jotai';
 import {
   Button,
   Dialog,
-  DialogActions,
   DialogBody,
   DialogContent,
   DialogSurface,
@@ -31,24 +30,26 @@ export function Settings(): ReactElement {
       </DialogTrigger>
       <DialogSurface>
         <DialogBody>
-          <DialogTitle>Settings</DialogTitle>
+          <DialogTitle style={{ textAlign: 'center' }}>Settings</DialogTitle>
           <DialogContent>
-            <div style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
               <Text>Show heading</Text>
               <Text>TODO [button]</Text>
               <Text>Heading Spacing</Text>
-              <Text>TODO</Text>
-              <Text>Clear settings</Text>
-              <Button
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.reload();
-                }}>
-                {Strings.Reset}
-              </Button>
+              <Text>TODO [value]</Text>
+              <Text>Reset preferences</Text>
+              <span>
+                <Button
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.reload();
+                  }}>
+                  {Strings.Reset}
+                </Button>
+                <span />
+              </span>
               <Text>Theme</Text>
               <span>
-                {' '}
                 <WeatherSunnyRegular />
                 <Switch
                   checked={theTheme === 'dark'}
