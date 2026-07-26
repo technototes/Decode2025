@@ -629,8 +629,42 @@ function getBezierRef(
 function getHeadingInterpolation(
   method: PrimarySuffixCstNode,
 ): AnonymousFacing | undefined {
-  // TODO: Fix this, cuz it's *very* wrong
-  return { type: 'piecewise', pieces: [] };
+  // Get the arguments to the setHeadingInterpolation method
+  const args = getArgList(method);
+  if (isUndefined(args) || args.length !== 1) {
+    return { type: 'tangent' };
+  }
+  // Single argument: Get the static method:
+  const methodRef = getRef(args[0]!);
+  if (isUndefined(methodRef)) {
+    return;
+  }
+  const maybeArgList = child(
+    child(
+      child(child(args[0]!.children.conditionalExpression)?.binaryExpression)
+        ?.unaryExpression,
+    )?.primary,
+  )?.primarySuffix;
+  if (isUndefined(maybeArgList) || maybeArgList.length === 0) {
+    return;
+  }
+  const methodArgs = getArgList(maybeArgList[0]);
+  if (isUndefined(methodArgs)) {
+    return;
+  }
+  switch (methodRef) {
+    case 'HeadingInterpolator.facingPoint':
+      if (methodArgs.length !== 1) {
+        return;
+      }
+      const pose = getPoseRef(methodArgs[0]!);
+      if (isUndefined(pose)) {
+        return;
+      }
+      return { type: 'point', point: pose };
+    case 'HeadingInterpolator.pieceWise':
+      return { type: 'tangent' };
+  }
 }
 
 function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
@@ -761,7 +795,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (isUndefined(interp)) {
             return;
           }
-
+          pathHeading = interp;
           continue;
 
         case 'addPath':
@@ -945,7 +979,7 @@ if (import.meta.main) {
       'sixteen750',
       'commands',
       'auto',
-      'RPaths.java',
+      'Paths.java',
     ].join('/'),
   )
     .then((strOrPc) => console.log(strOrPc))
