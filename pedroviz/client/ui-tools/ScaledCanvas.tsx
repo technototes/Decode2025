@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef } from 'react';
+import { act, ReactElement, useEffect, useRef } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { isDefined } from 'node_modules/@freik/typechk/lib/esm';
@@ -257,27 +257,33 @@ function drawHeadingLine(
   heading: ConcreteHeadingType,
 ) {
   let disp: Point = { x: 0, y: 0 };
+  let actualColor = color;
   if (chkConcreteTangentHeading(heading)) {
     disp = magnitude(tangent, 5);
+    actualColor = '#777';
   } else if (chkConcreteConstantHeading(heading)) {
     disp = magnitude(
       { x: Math.cos(heading.heading), y: Math.sin(heading.heading) },
       5,
     );
+    actualColor = '#70f';
   } else if (chkConcreteLinearHeading(heading)) {
     const radians =
       (heading.headings[0] + (heading.headings[1] - heading.headings[0])) *
       percentage;
     disp = magnitude({ x: Math.cos(radians), y: Math.sin(radians) }, 5);
+    actualColor = '#F07';
   } else if (chkConcretePointHeading(heading)) {
     disp = magnitude(diff(heading.heading, point), 5);
+    actualColor = '#07F';
   } else {
     // We don't handle others yet...
     disp = magnitude(tangent, 0.1);
+    actualColor = '#0f7';
   }
   ctx.beginPath();
   ctx.lineWidth = 0.25;
-  ctx.strokeStyle = color;
+  ctx.strokeStyle = color; // actualColor;
   ctx.moveTo(point.x * Scale, point.y * Scale);
   ctx.lineTo((point.x + disp.x) * Scale, (point.y + disp.y) * Scale);
   ctx.stroke();

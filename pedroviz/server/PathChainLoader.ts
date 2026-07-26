@@ -37,7 +37,10 @@ import {
   BezierName,
   BezierRef,
   EmptyParsedClass,
+  FacingLinear,
+  FacingPiece,
   FacingReversible,
+  FacingSimple,
   HeadingRef,
   isAnonymousValue,
   isRadiansRef,
@@ -626,22 +629,47 @@ function getBezierRef(
   return getRefOr(arg, getAnonymousBezier);
 }
 
-function getHeadingInterpolation(
-  method: PrimarySuffixCstNode,
-): AnonymousFacing | undefined {
-  // Get the arguments to the setHeadingInterpolation method
-  const args = getArgList(method);
-  if (isUndefined(args) || args.length !== 1) {
-    return { type: 'tangent' };
+// parse each argument to HeadingInterpolator.piecewise(...) thing
+function getPiece(expr: ExpressionCstNode): FacingPiece | undefined {
+  const [ctor, args] = getCtorArgs(expr);
+  if (
+    isUndefined(args) ||
+    ctor !== 'HeadingInterpolator.PiecewiseNode' ||
+    args.length !== 3
+  ) {
+    return;
   }
+  const start = getOnlyValueRef(args[0]);
+  const end = getOnlyValueRef(args[1]);
+  const val = getHeadingInterpolation(args[2]!, true);
+  if (isUndefined(start) || isUndefined(end) || isUndefined(val)) {
+    return;
+  }
+  return { timing: { start, end }, heading: val };
+}
+
+function getHeadingInterpolation(
+  expr: ExpressionCstNode,
+  simple: true,
+): FacingSimple | undefined;
+function getHeadingInterpolation(
+  expr: ExpressionCstNode,
+  simple?: false,
+): AnonymousFacing | undefined;
+
+// TODO: This doesn't (yet) properly handle chaining :/
+function getHeadingInterpolation(
+  expr: ExpressionCstNode,
+  simple?: boolean,
+): AnonymousFacing | undefined {
   // Single argument: Get the static method:
-  const methodRef = getRef(args[0]!);
+  const methodRef = getRef(expr);
   if (isUndefined(methodRef)) {
     return;
   }
   const maybeArgList = child(
     child(
-      child(child(args[0]!.children.conditionalExpression)?.binaryExpression)
+      child(child(expr.children.conditionalExpression)?.binaryExpression)
         ?.unaryExpression,
     )?.primary,
   )?.primarySuffix;
@@ -653,17 +681,62 @@ function getHeadingInterpolation(
     return;
   }
   switch (methodRef) {
+    case 'HeadingInterpolator.piecewise':
+      if (simple) {
+        break;
+      }
+      // Reach each arg as a piece (unsafecast is for the return type)
+      const pieces = methodArgs.map(getPiece) as FacingPiece[];
+      // If everything wasn't a piece, fail (required for the cast above)
+      if (pieces.every(isDefined)) {
+        return { type: 'piecewise', pieces };
+      }
+      break;
     case 'HeadingInterpolator.facingPoint':
-      if (methodArgs.length !== 1) {
-        return;
+      if (methodArgs.length === 1) {
+        const pose = getPoseRef(methodArgs[0]!);
+        if (isDefined(pose)) {
+          return { type: 'point', point: pose };
+        }
+      } else if (methodArgs.length === 2) {
+        const x = getOnlyValueRef(methodArgs[0]);
+        const y = getOnlyValueRef(methodArgs[1]);
+        if (isDefined(x) && isDefined(y)) {
+          return { type: 'point', point: { x, y } };
+        }
       }
-      const pose = getPoseRef(methodArgs[0]!);
-      if (isUndefined(pose)) {
-        return;
-      }
-      return { type: 'point', point: pose };
-    case 'HeadingInterpolator.pieceWise':
+      break;
+    case 'HeadingInterpolator.tangent':
       return { type: 'tangent' };
+      break;
+    case 'HeadingInterpolator.constant':
+      const heading = getHeadingRef(methodArgs[0]);
+      if (isDefined(heading)) {
+        return { type: 'constant', heading };
+      }
+      break;
+    case 'HeadingInterpolator.linear':
+    case 'HeadingInterpolator.reversedLinear':
+      // start, end / start, end, time
+      if (methodArgs.length < 2 || methodArgs.length > 3) {
+        break;
+      }
+      const start = getHeadingRef(methodArgs[0]);
+      const end = getHeadingRef(methodArgs[1]);
+      if (isUndefined(start) || isUndefined(end)) {
+        break;
+      }
+      const endT =
+        methodArgs.length === 3 ? getOnlyValueRef(methodArgs[3]) : undefined;
+      // TODO: Handle endT appropriately
+      const linear: FacingLinear = { type: 'linear', start, end };
+      return methodRef.indexOf('v') < 0
+        ? linear
+        : { type: 'reversed', facing: linear };
+    // TODO: These only make sense once I handle chaining.
+    case 'HeadingInterpolator.reverse':
+    case 'HeadingInterpolator.reverse':
+      return;
   }
 }
 
@@ -790,8 +863,11 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           continue;
 
         case 'setHeadingInterpolation':
-          // TODO: This is *very* not working
-          const interp = getHeadingInterpolation(method);
+          const interpArgs = getArgList(method);
+          if (isUndefined(interpArgs) || interpArgs.length !== 1) {
+            return;
+          }
+          const interp = getHeadingInterpolation(interpArgs[0]!);
           if (isUndefined(interp)) {
             return;
           }
@@ -979,7 +1055,7 @@ if (import.meta.main) {
       'sixteen750',
       'commands',
       'auto',
-      'Paths.java',
+      'RPaths.java',
     ].join('/'),
   )
     .then((strOrPc) => console.log(strOrPc))
