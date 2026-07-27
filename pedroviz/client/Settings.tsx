@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 
 import {
   Button,
@@ -19,10 +19,28 @@ import {
 } from '@fluentui/react-icons';
 
 import { Strings } from './constants';
-import { ThemeAtom } from './state/Atoms';
+import {
+  CtrlPtRadiusAtom,
+  CtrlPtThicknessAtom,
+  HeadingCountAtom,
+  HeadingLengthAtom,
+  HeadingThicknessAtom,
+  PathThicknessAtom,
+  ShowBotHeadingAtom,
+  ShowFieldAtom,
+  ThemeAtom,
+} from './state/SavedSettings';
 
 export function Settings(): ReactElement {
   const [theTheme, setTheme] = useAtom(ThemeAtom);
+  const [showField, setShowField] = useAtom(ShowFieldAtom);
+  const [showBotHeading, setShowBotHeading] = useAtom(ShowBotHeadingAtom);
+  const pathThickness = useAtomValue(PathThicknessAtom);
+  const ctrlPtThickness = useAtomValue(CtrlPtThicknessAtom);
+  const ctrlPtRadius = useAtomValue(CtrlPtRadiusAtom);
+  const headingLength = useAtomValue(HeadingLengthAtom);
+  const headingCount = useAtomValue(HeadingCountAtom);
+  const headingThickness = useAtomValue(HeadingThicknessAtom);
   return (
     <Dialog modalType="non-modal">
       <DialogTrigger disableButtonEnhancement>
@@ -40,19 +58,27 @@ export function Settings(): ReactElement {
                 margin: 10,
               }}>
               <Text>Show field image</Text>
-              <Text>Switch [TODO]</Text>
+              <Switch
+                checked={showField}
+                onChange={(_, data) => setShowField(data.checked)}
+              />
               <Text>Path Thickness</Text>
-              <Text>TODO: [value]</Text>
+              <Text>{pathThickness}</Text>
+              <Text>CtrlPt Radius</Text>
+              <Text>{ctrlPtRadius}</Text>
               <Text>CtrlPt Thickness</Text>
-              <Text>TODO: [value]</Text>
-              <Text>Show heading</Text>
-              <Text>TODO [button]</Text>
-              <Text>Heading Spacing</Text>
-              <Text>TODO [value]</Text>
+              <Text>{ctrlPtThickness}</Text>
+              <Text>Show robot heading</Text>
+              <Switch
+                checked={showBotHeading}
+                onChange={(_, data) => setShowBotHeading(data.checked)}
+              />
+              <Text>Heading Indicator Count</Text>
+              <Text>{headingCount}</Text>
               <Text>Heading length</Text>
-              <Text>TODO [value]</Text>
+              <Text>{headingLength}</Text>
               <Text>Heading thickness</Text>
-              <Text>TODO [value]</Text>
+              <Text>{headingThickness}</Text>
               <Text>Reset preferences</Text>
               <span>
                 <Button

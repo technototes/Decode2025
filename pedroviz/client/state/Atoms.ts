@@ -28,13 +28,8 @@ import { AnonymousPathChain, OneFileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetFullDb, LoadAndIndexFile, UpdateIndexFile } from './API';
 import { EmptyMappedFile, GetNameLookup, MakeFileIndex } from './IndexedFile';
+import { ThemeAtom } from './SavedSettings';
 
-export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
-  'theme',
-  'light',
-  undefined,
-  { getOnInit: true },
-);
 export const ColorsAtom = atom((get) => {
   const theme = get(ThemeAtom);
   return theme === 'dark' ? lightOnBlack : darkOnWhite;

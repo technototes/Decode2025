@@ -20,6 +20,8 @@ import { Pickle } from '@freik/typechk';
 
 import '@testing-library/jest-dom';
 
+import { ThemeAtom } from 'client/state/SavedSettings';
+
 import { makeKey } from '../../server/full-database';
 import {
   AnonymousBezier,
@@ -50,7 +52,6 @@ import {
   PoseAtomFamily,
   SelectedFileAtom,
   SelectedTeamAtom,
-  ThemeAtom,
   ValueAtomFamily,
 } from '../state/Atoms';
 import { getStore } from '../state/Storage';

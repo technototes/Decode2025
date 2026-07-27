@@ -12,7 +12,7 @@ import { Strings } from './constants';
 import { PathsDataDisplay } from './PathsDataDisplay';
 import { PathSelector } from './PathSelector';
 import { Settings } from './Settings';
-import { ThemeAtom } from './state/Atoms';
+import { ThemeAtom } from './state/SavedSettings';
 import { getStore } from './state/Storage';
 import { ScaledCanvas } from './ui-tools/ScaledCanvas';
 

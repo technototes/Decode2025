@@ -1,6 +1,16 @@
 import { ReactElement, useEffect, useRef, useState } from 'react';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 
+import {
+  CtrlPtRadiusAtom,
+  CtrlPtThicknessAtom,
+  HeadingCountAtom,
+  HeadingLengthAtom,
+  HeadingThicknessAtom,
+  PathThicknessAtom,
+  ShowBotHeadingAtom,
+  ShowFieldAtom,
+} from 'client/state/SavedSettings';
 import { isDefined } from 'node_modules/@freik/typechk/lib/esm';
 
 import {
@@ -23,11 +33,19 @@ import {
 import { bezierLength, deCasteljau } from './bezier';
 
 const Scale = 1;
-const PointRadius = 1;
 
 const fix = 144;
 
 export function ScaledCanvas(): ReactElement {
+  const showField = useAtomValue(ShowFieldAtom);
+  const showBotHeading = useAtomValue(ShowBotHeadingAtom);
+  const ctrlPtThickness = useAtomValue(CtrlPtThicknessAtom);
+  const ctrlPtRadius = useAtomValue(CtrlPtRadiusAtom);
+  const pathThickness = useAtomValue(PathThicknessAtom);
+  const headingCount = useAtomValue(HeadingCountAtom);
+  const headingThickness = useAtomValue(HeadingThicknessAtom);
+  const headingLength = useAtomValue(HeadingLengthAtom);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState(0);
   const colors = useAtomValue(ColorsAtom);
@@ -48,6 +66,11 @@ export function ScaledCanvas(): ReactElement {
       ),
   ];
   const showColors = false;
+  const bgStyle = showField
+    ? {
+        backgroundImage: "url('/assets/field.png')",
+      }
+    : {};
   // This makes the canvas resize
   useEffect(() => {
     if (!containerRef.current) return;
@@ -89,13 +112,24 @@ export function ScaledCanvas(): ReactElement {
     ctx.setTransform(dpr * scale, 0, 0, -dpr * scale, 0, canvas.height);
 
     points.forEach(([ctrlPoints, facing], index) =>
-      renderPath(ctx, ctrlPoints, facing, colors[index % colors.length]!),
+      renderPath(
+        ctx,
+        ctrlPoints,
+        showBotHeading && facing,
+        colors[index % colors.length]!,
+        pathThickness,
+        ctrlPtRadius,
+        ctrlPtThickness,
+        headingCount,
+        headingThickness,
+        headingLength,
+      ),
     );
     // Draw the colors
     if (showColors) {
       drawColors(ctx, colors);
     }
-  }, [pathChains, beziers, poses, values, canvasRef, size]);
+  }, [pathChains, beziers, poses, values, canvasRef, size, showBotHeading]);
 
   return (
     <div
@@ -108,7 +142,7 @@ export function ScaledCanvas(): ReactElement {
         justifyContent: 'end',
         alignItems: 'start',
       }}>
-      {size > 0 && <canvas className="field" ref={canvasRef} />}
+      {size > 0 && <canvas style={bgStyle} className="field" ref={canvasRef} />}
     </div>
   );
 }
@@ -125,8 +159,14 @@ function distance(a: Point, b: Point): number {
 function renderPath(
   ctx: CanvasRenderingContext2D,
   curveControlPoints: Point[],
-  heading: ConcreteHeadingType,
+  heading: ConcreteHeadingType | false,
   color: string,
+  pathThickness: number,
+  ctrlPtRadius: number,
+  ctrlPtThickness: number,
+  headingCount: number,
+  headingThickness: number,
+  headingLength: number,
 ) {
   if (curveControlPoints.length < 2) {
     return;
@@ -147,7 +187,7 @@ function renderPath(
       ctx.restore();
       */
   ctx.beginPath();
-  ctx.lineWidth = 0.1;
+  ctx.lineWidth = pathThickness;
   ctx.strokeStyle = color;
   let approxLen = 0;
   ctx.moveTo(
@@ -170,21 +210,25 @@ function renderPath(
   );
   ctx.stroke();
   ctx.beginPath();
-  ctx.lineWidth = 0.5;
+  ctx.lineWidth = ctrlPtThickness;
   for (const pt of curveControlPoints) {
     ctx.strokeStyle = color;
-    ctx.moveTo((pt.x + PointRadius) * Scale, pt.y * Scale);
-    ctx.arc(pt.x * Scale, pt.y * Scale, PointRadius * Scale, 0, 2 * Math.PI);
+    ctx.moveTo((pt.x + ctrlPtRadius) * Scale, pt.y * Scale);
+    ctx.arc(pt.x * Scale, pt.y * Scale, ctrlPtRadius * Scale, 0, 2 * Math.PI);
   }
   ctx.stroke();
-  drawHeadingLines(
-    ctx,
-    color,
-    approxLen,
-    [...pts, curveControlPoints[curveControlPoints.length - 1]!],
-    heading,
-    5,
-  );
+  if (heading) {
+    drawHeadingLines(
+      ctx,
+      color,
+      approxLen,
+      [...pts, curveControlPoints[curveControlPoints.length - 1]!],
+      heading,
+      headingCount,
+      headingThickness,
+      headingLength,
+    );
+  }
 
   // These two items wil be useful for animation in the footure
   /*
@@ -229,6 +273,8 @@ function drawHeadingLines(
   pts: Point[],
   heading: ConcreteHeadingType,
   count: number,
+  headingThickness: number,
+  headingLength: number,
 ) {
   // for "n" points, I'm not drawing starting/ending headings, so I actually want to split
   // the length into count + 1 pieces, and find the point in between each piece
@@ -265,6 +311,8 @@ function drawHeadingLines(
         lastDelta,
         (pos + 1) / (count + 1),
         heading,
+        headingThickness,
+        headingLength,
       );
     }
   }
@@ -277,26 +325,31 @@ function drawHeadingLine(
   tangent: Point,
   percentage: number,
   heading: ConcreteHeadingType,
+  lineThickness: number,
+  headingLength: number,
 ) {
   let disp: Point = { x: 0, y: 0 };
   let actualColor = color;
   if (chkConcreteTangentHeading(heading)) {
-    disp = magnitude(tangent, 5);
+    disp = magnitude(tangent, headingLength);
     actualColor = '#777';
   } else if (chkConcreteConstantHeading(heading)) {
     disp = magnitude(
       { x: Math.cos(heading.heading), y: Math.sin(heading.heading) },
-      5,
+      headingLength,
     );
     actualColor = '#70f';
   } else if (chkConcreteLinearHeading(heading)) {
     const radians =
       (heading.headings[0] + (heading.headings[1] - heading.headings[0])) *
       percentage;
-    disp = magnitude({ x: Math.cos(radians), y: Math.sin(radians) }, 5);
+    disp = magnitude(
+      { x: Math.cos(radians), y: Math.sin(radians) },
+      headingLength,
+    );
     actualColor = '#F07';
   } else if (chkConcretePointHeading(heading)) {
-    disp = magnitude(diff(heading.heading, point), 5);
+    disp = magnitude(diff(heading.heading, point), headingLength);
     actualColor = '#07F';
   } else {
     // We don't handle others yet...
@@ -304,7 +357,7 @@ function drawHeadingLine(
     actualColor = '#0f7';
   }
   ctx.beginPath();
-  ctx.lineWidth = 0.25;
+  ctx.lineWidth = lineThickness;
   ctx.strokeStyle = actualColor;
   ctx.moveTo(point.x * Scale, point.y * Scale);
   ctx.lineTo((point.x + disp.x) * Scale, (point.y + disp.y) * Scale);
