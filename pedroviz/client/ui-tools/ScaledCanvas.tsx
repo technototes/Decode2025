@@ -1,13 +1,8 @@
-import { act, ReactElement, useEffect, useRef } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { isDefined } from 'node_modules/@freik/typechk/lib/esm';
 
-import {
-  AnonymousFacing,
-  HeadingRef,
-  NamedPathChain,
-} from '../../server/types';
 import {
   ColorsAtom,
   MappedBeziersAtom,
@@ -18,7 +13,6 @@ import {
 } from '../state/Atoms';
 import { calcBezierRef, calcFacing } from '../state/IndexedFile';
 import {
-  AnonymousPathChain,
   chkConcreteConstantHeading,
   chkConcreteLinearHeading,
   chkConcretePointHeading,
@@ -34,6 +28,8 @@ const PointRadius = 1;
 const fix = 144;
 
 export function ScaledCanvas(): ReactElement {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(0);
   const colors = useAtomValue(ColorsAtom);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pathChains = useAtomValue(MappedPathChainsAtom);
@@ -52,17 +48,32 @@ export function ScaledCanvas(): ReactElement {
       ),
   ];
   const showColors = false;
+  // This makes the canvas resize
   useEffect(() => {
-    const start = performance.now();
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) {
+        const { width, height } = entry.contentRect;
+        // Floor the value to prevent fractional pixel jittering during fast drags
+        setSize(Math.floor(Math.min(width, height)));
+      }
+    });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || size === 0) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
+    // const rect = canvas.getBoundingClientRect();
 
-    const squareSize = Math.min(rect.width, rect.height);
+    const squareSize = size; // Math.min(rect.width, rect.height);
 
     canvas.width = squareSize * dpr;
     canvas.height = squareSize * dpr;
@@ -77,8 +88,6 @@ export function ScaledCanvas(): ReactElement {
     // or just a single line of code:
     ctx.setTransform(dpr * scale, 0, 0, -dpr * scale, 0, canvas.height);
 
-    ctx.clearRect(0, 0, fix * Scale, fix * Scale);
-
     points.forEach(([ctrlPoints, facing], index) =>
       renderPath(ctx, ctrlPoints, facing, colors[index % colors.length]!),
     );
@@ -86,9 +95,22 @@ export function ScaledCanvas(): ReactElement {
     if (showColors) {
       drawColors(ctx, colors);
     }
-  }, [pathChains, beziers, poses, values, canvasRef]);
+  }, [pathChains, beziers, poses, values, canvasRef, size]);
 
-  return <canvas className="field" ref={canvasRef} />;
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        flexGrow: 1,
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        justifyContent: 'end',
+        alignItems: 'start',
+      }}>
+      {size > 0 && <canvas className="field" ref={canvasRef} />}
+    </div>
+  );
 }
 
 function diff(a: Point, b: Point): Point {
@@ -283,7 +305,7 @@ function drawHeadingLine(
   }
   ctx.beginPath();
   ctx.lineWidth = 0.25;
-  ctx.strokeStyle = color; // actualColor;
+  ctx.strokeStyle = actualColor;
   ctx.moveTo(point.x * Scale, point.y * Scale);
   ctx.lineTo((point.x + disp.x) * Scale, (point.y + disp.y) * Scale);
   ctx.stroke();

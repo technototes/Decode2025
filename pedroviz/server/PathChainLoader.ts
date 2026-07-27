@@ -718,12 +718,9 @@ function getHeadingInterpolation(
     case 'HeadingInterpolator.linear':
     case 'HeadingInterpolator.reversedLinear':
       // start, end / start, end, time
-      if (methodArgs.length < 2 || methodArgs.length > 3) {
-        break;
-      }
       const start = getHeadingRef(methodArgs[0]);
       const end = getHeadingRef(methodArgs[1]);
-      if (isUndefined(start) || isUndefined(end)) {
+      if (isUndefined(start) || isUndefined(end) || methodArgs.length > 3) {
         break;
       }
       const endT =
@@ -735,7 +732,7 @@ function getHeadingInterpolation(
         : { type: 'reversed', facing: linear };
     // TODO: These only make sense once I handle chaining.
     case 'HeadingInterpolator.reverse':
-    case 'HeadingInterpolator.reverse':
+    case 'HeadingInterpolator.offset':
       return;
   }
 }

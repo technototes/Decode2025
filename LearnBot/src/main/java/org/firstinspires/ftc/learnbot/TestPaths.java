@@ -104,7 +104,7 @@ public class TestPaths {
             .addPath(unused4)
             .addPath(u4_ol)
             .addPath(otherLine)
-            .setTangentHeadingInterpolation()
+            .setHeadingInterpolator(HeadingInterpolator.facingPoint(1, 1))
             .build();
     }
 }

@@ -49,9 +49,10 @@ body {
 }
 
 .display {
-  display: grid;
-  justify-content: end; /* stick to right */
-  align-items: start; /* stick to top */
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -72,13 +73,13 @@ body {
 
 /* Square canvas area */
 .field {
-  aspect-ratio: 1 / 1; /* force square */
-  width: min(100%, 100%); /* largest square that fits */
-  height: min(100%, 100%);
-  max-height: 100%;
-  max-width: 100%;
-  border: 2px solid #333; /* border around the square */
-  box-sizing: border-box;
+  /* border: 2px solid #666; */
+  /* box-sizing: border-box; */
+  background-image: url('/field.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* background-color: brown; */
 }
 
 .col3div {

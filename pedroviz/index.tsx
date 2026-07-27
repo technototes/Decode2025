@@ -9,6 +9,9 @@ const server = serve({
   routes: {
     // Serve index.html for all unmatched routes.
     '/*': index,
+    '/assets/field.png': new Response(await Bun.file('./field.png').bytes()),
+    // ^^ That way keeps the thing in memory
+    // Bun.file('./field.png'),
     '/api/loadpath/:team/:path': async (req) =>
       LoadPath(
         decodeURIComponent(req.params.team),

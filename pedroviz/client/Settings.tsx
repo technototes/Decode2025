@@ -39,6 +39,8 @@ export function Settings(): ReactElement {
                 rowGap: 10,
                 margin: 10,
               }}>
+              <Text>Show field image</Text>
+              <Text>Switch [TODO]</Text>
               <Text>Path Thickness</Text>
               <Text>TODO: [value]</Text>
               <Text>CtrlPt Thickness</Text>
