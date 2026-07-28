@@ -22,6 +22,8 @@ import {
   ValueRef,
 } from '../server/types';
 
+export type CtrlPtStyles = 'o' | 't' | 's' | '+' | 'x' | 'z';
+
 export type PathRenderOptions = {
   ShowField: boolean;
   PathThickness: number;
@@ -35,7 +37,7 @@ export type PathRenderOptions = {
   ControlPoint: {
     Thickness: number;
     Size: number;
-    Style: 'circle' | 'triangle' | 'square' | 'cross';
+    Style: CtrlPtStyles;
   };
 };
 

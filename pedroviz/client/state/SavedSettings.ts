@@ -1,7 +1,7 @@
 import { atom, useAtom, useAtomValue } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-import { PathRenderOptions } from 'client/types';
+import { CtrlPtStyles, PathRenderOptions } from 'client/types';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
   'theme',
@@ -25,7 +25,7 @@ export const PathRenderOptionsAtom = atomWithStorage<PathRenderOptions>(
     ControlPoint: {
       Thickness: 0.4,
       Size: 2,
-      Style: 'circle',
+      Style: 'o',
     },
   },
   undefined,
@@ -40,6 +40,18 @@ export const CtrlPtSizeAtom = atom(
   (get, set, val: number) => {
     const newVal = structuredClone(get(PathRenderOptionsAtom));
     newVal.ControlPoint.Size = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
+);
+
+export const CtrlPtStyleAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.ControlPoint.Style;
+  },
+  (get, set, val: CtrlPtStyles) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.ControlPoint.Style = val;
     set(PathRenderOptionsAtom, newVal);
   },
 );

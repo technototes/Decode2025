@@ -1,5 +1,5 @@
-import { ReactElement, useCallback } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
+import { ReactElement, useCallback, useState } from 'react';
+import { useAtom } from 'jotai';
 
 import {
   Button,
@@ -9,6 +9,10 @@ import {
   DialogSurface,
   DialogTitle,
   DialogTrigger,
+  Dropdown,
+  DropdownProps,
+  Label,
+  Option,
   SpinButton,
   SpinButtonChangeEvent,
   SpinButtonOnChangeData,
@@ -24,6 +28,7 @@ import {
 import { Strings } from './constants';
 import {
   CtrlPtSizeAtom,
+  CtrlPtStyleAtom,
   CtrlPtThicknessAtom,
   HeadingCountAtom,
   HeadingLengthAtom,
@@ -34,6 +39,26 @@ import {
   ShowFieldKeyAtom,
   ThemeAtom,
 } from './state/SavedSettings';
+import { CtrlPtStyles } from './types';
+
+function getName(s: CtrlPtStyles): string {
+  switch (s) {
+    case 'o':
+      return 'Circle';
+    case 'x':
+      return 'X';
+    case '+':
+      return 'Crosshair';
+    case 't':
+      return 'Triangle';
+    case 's':
+      return 'Square';
+    case 'z':
+      return 'Nothing';
+  }
+}
+
+const ctrlPtStyles: CtrlPtStyles[] = ['o', 'x', '+', 't', 's', 'z'];
 
 export function Settings(): ReactElement {
   const [theTheme, setTheme] = useAtom(ThemeAtom);
@@ -118,6 +143,18 @@ export function Settings(): ReactElement {
     },
     [setHeadingThickness],
   );
+  const [ctrlPtStyle, setCtrlPtStyle] = useAtom(CtrlPtStyleAtom);
+  const [ctrlPtName, setCtrlPtName] = useState(getName(ctrlPtStyle));
+  const onOptionSelect: DropdownProps['onOptionSelect'] = useCallback(
+    (ev, data) => {
+      if (data.selectedOptions.length > 0) {
+        setCtrlPtStyle(data.selectedOptions[0] as CtrlPtStyles);
+        setCtrlPtName(data.optionText ?? '');
+      }
+    },
+    [setCtrlPtStyle, setCtrlPtName],
+  );
+
   return (
     <Dialog modalType="non-modal">
       <DialogTrigger disableButtonEnhancement>
@@ -130,54 +167,56 @@ export function Settings(): ReactElement {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                rowGap: 10,
+                gridTemplateColumns: '1.5fr 1fr .4fr 1.5fr 1fr',
+                rowGap: 5,
+                columnGap: 1,
                 margin: 10,
+                alignItems: 'center',
               }}>
-              <Text>Show field image</Text>
+              <Label htmlFor="showFieldId">Show field image</Label>
               <Switch
+                id="showFieldId"
                 checked={showField}
                 onChange={(_, data) => setShowField(data.checked)}
               />
-              <Text>Show field coordinates</Text>
+              <span />
+              <Label htmlFor="showCoordsId">Show field coordinates</Label>
               <Switch
+                id="showCoordsId"
                 checked={showCoords}
                 onChange={(_, data) => setShowCoords(data.checked)}
               />
-              <Text>Path Thickness</Text>
+              <Label htmlFor="pathThicknessId">Path Thickness</Label>
               <SpinButton
+                id="pathThicknessId"
                 value={pathThickness}
                 onChange={changePathThickness}
                 step={0.1}
                 stepPage={1}
-                min={0.1}
+                min={0}
                 max={2}
               />
-              <Text>CtrlPt Size</Text>
+              <span />
+              <Label htmlFor="showBotHeadingId">Show robot heading</Label>
+              <Switch
+                id="showBotHeadingId"
+                checked={showBotHeading}
+                onChange={(_, data) => setShowBotHeading(data.checked)}
+              />
+              <Label htmlFor="ctrlPtSizeId">CtrlPt Size</Label>
               <SpinButton
+                id="ctrlPtSizeId"
                 value={ctrlPtSize}
                 onChange={changeCtrlPtSize}
                 step={0.25}
                 stepPage={1}
                 min={0.5}
                 max={4}
-              />
-              <Text>CtrlPt Thickness</Text>
+              />{' '}
+              <span />
+              <Label htmlFor="headingCountId">Heading Indicator Count</Label>
               <SpinButton
-                value={ctrlPtThickness}
-                onChange={changeCtrlPtThickness}
-                step={0.1}
-                stepPage={1}
-                min={0.1}
-                max={2}
-              />
-              <Text>Show robot heading</Text>
-              <Switch
-                checked={showBotHeading}
-                onChange={(_, data) => setShowBotHeading(data.checked)}
-              />
-              <Text>Heading Indicator Count</Text>
-              <SpinButton
+                id="headingCountId"
                 disabled={!showBotHeading}
                 value={headingCount}
                 onChange={changeHeadingCount}
@@ -186,18 +225,20 @@ export function Settings(): ReactElement {
                 min={1}
                 max={25}
               />
-              <Text>Heading length</Text>
+              <Label htmlFor="ctrlPtThicknessId">CtrlPt Thickness</Label>
               <SpinButton
-                disabled={!showBotHeading}
-                value={headingLength}
-                onChange={changeHeadingLength}
-                step={1}
-                stepPage={5}
-                min={1}
-                max={25}
-              />
-              <Text>Heading thickness</Text>
+                id="ctrlPtThicknessId"
+                value={ctrlPtThickness}
+                onChange={changeCtrlPtThickness}
+                step={0.1}
+                stepPage={1}
+                min={0.1}
+                max={2}
+              />{' '}
+              <span />
+              <Label htmlFor="headingThicknessId">Heading thickness</Label>
               <SpinButton
+                id="headingThicknessId"
                 disabled={!showBotHeading}
                 value={headingThickness}
                 onChange={changeHeadingThickness}
@@ -206,9 +247,48 @@ export function Settings(): ReactElement {
                 min={0.1}
                 max={2}
               />
-              <Text>Reset preferences</Text>
+              <Label htmlFor="ctrlPtStyleId">CtrlPt Style</Label>
+              <Dropdown
+                style={{ minWidth: 50 }}
+                id="ctrlPtStyleId"
+                value={ctrlPtName}
+                selectedOptions={[ctrlPtStyle]}
+                onOptionSelect={onOptionSelect}>
+                {ctrlPtStyles.map((s) => (
+                  <Option key={s} text={getName(s)} value={s}>
+                    {getName(s)}
+                  </Option>
+                ))}
+              </Dropdown>
+              <span />
+              <Label htmlFor="headingLengthId">Heading length</Label>
+              <SpinButton
+                id="headingLengthId"
+                disabled={!showBotHeading}
+                value={headingLength}
+                onChange={changeHeadingLength}
+                step={1}
+                stepPage={5}
+                min={1}
+                max={25}
+              />
+              <Label htmlFor="setThemeId">Theme</Label>
+              <span>
+                <WeatherSunnyRegular />
+                <Switch
+                  id="setThemeId"
+                  checked={theTheme === 'dark'}
+                  onChange={(_, data) =>
+                    setTheme(data.checked ? 'dark' : 'light')
+                  }
+                />
+                <WeatherMoonFilled />
+              </span>{' '}
+              <span />
+              <Label htmlFor="resetPrefsId">Reset preferences</Label>
               <span>
                 <Button
+                  id="resetPrefsId"
                   onClick={() => {
                     localStorage.clear();
                     window.location.reload();
@@ -216,17 +296,6 @@ export function Settings(): ReactElement {
                   {Strings.Reset}
                 </Button>
                 <span />
-              </span>
-              <Text>Theme</Text>
-              <span>
-                <WeatherSunnyRegular />
-                <Switch
-                  checked={theTheme === 'dark'}
-                  onChange={(_, data) =>
-                    setTheme(data.checked ? 'dark' : 'light')
-                  }
-                />
-                <WeatherMoonFilled />
               </span>
             </div>
           </DialogContent>

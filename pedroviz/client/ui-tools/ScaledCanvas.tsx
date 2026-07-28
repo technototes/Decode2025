@@ -96,84 +96,7 @@ export function ScaledCanvas(): ReactElement {
     // or just a single line of code:
     ctx.setTransform(dpr * scale, 0, 0, -dpr * scale, 0, canvas.height);
     if (opts.ShowCoords) {
-      ctx.save();
-      ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-      ctx.font = '5px sans-serif'; // Set font size and family
-      ctx.fillStyle = theme === 'light' ? 'black' : 'white'; // Set fill color for the text
-      ctx.strokeStyle = theme === 'light' ? 'white' : 'black';
-      ctx.lineWidth = 0.2;
-
-      // Draw the coordinate points
-      ctx.textAlign = 'start'; // Set text alignment (e.g., "start", "end", "center")
-      ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
-      ctx.strokeText('(0,0)', 5, 139);
-      ctx.fillText('(0,0)', 5, 139);
-      ctx.strokeText('(0,144)', 5, 5);
-      ctx.fillText('(0,144)', 5, 5);
-      ctx.textAlign = 'end'; // Set text alignment (e.g., "start", "end", "center")
-      ctx.strokeText('(144,0)', 139, 5);
-      ctx.fillText('(144,0)', 139, 5);
-      ctx.strokeText('(144,144)', 139, 139);
-      ctx.fillText('(144,144)', 139, 139);
-      ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
-      ctx.strokeText('(72,72)', 72, 72);
-      ctx.fillText('(72,72)', 72, 72);
-
-      // Label the axis directions
-      ctx.strokeText('+y', 71, 84.5);
-      ctx.fillText('+y', 71, 84.5);
-      ctx.strokeText('-y', 71, 104.5);
-      ctx.fillText('-y', 71, 104.5);
-      ctx.strokeText('-x', 62, 95);
-      ctx.fillText('-x', 62, 95);
-      ctx.strokeText('+x', 82, 95);
-      ctx.fillText('+x', 82, 95);
-
-      // Label the compass angles
-      ctx.strokeText('90°(½π)', 72, 40);
-      ctx.fillText('90°(½π)', 72, 40);
-      ctx.strokeText('0°', 81, 48);
-      ctx.fillText('0°', 81, 48);
-      ctx.strokeText('180°(π)', 58, 48);
-      ctx.fillText('180°(π)', 58, 48);
-      ctx.strokeText('270°(³/₂π)', 72, 56);
-      ctx.fillText('270°(³/₂π)', 72, 56);
-
-      // Draw the axis directions
-      ctx.lineCap = 'round';
-      ctx.lineWidth = 0.5;
-      ctx.strokeStyle = theme === 'light' ? 'black' : 'white';
-      ctx.beginPath();
-      let xc = 72;
-      let yc = 95;
-      // Vertical double arrow:
-      ctx.moveTo(xc - 2, yc - 5);
-      ctx.lineTo(xc, yc - 7);
-      ctx.lineTo(xc + 2, yc - 5);
-      ctx.moveTo(xc, yc - 7);
-      ctx.lineTo(xc, yc + 7);
-      ctx.moveTo(xc + 2, yc + 5);
-      ctx.lineTo(xc, yc + 7);
-      ctx.lineTo(xc - 2, yc + 5);
-      // Horizontal double arrow
-      ctx.moveTo(xc - 5, yc - 2);
-      ctx.lineTo(xc - 7, yc);
-      ctx.lineTo(xc - 5, yc + 2);
-      ctx.moveTo(xc - 7, yc);
-      ctx.lineTo(xc + 7, yc);
-      ctx.moveTo(xc + 5, yc + 2);
-      ctx.lineTo(xc + 7, yc);
-      ctx.lineTo(xc + 5, yc - 2);
-      // Arrow for the compass
-      ctx.moveTo(77 + 1, 48 + 2);
-      ctx.lineTo(77, 48);
-      ctx.lineTo(77 - 1.75, 48 + 1.75);
-      ctx.stroke();
-      ctx.beginPath();
-      // Arc for the compass
-      ctx.arc(72, 48, 5, Math.PI * -0.25, 0, true);
-      ctx.stroke();
-      ctx.restore();
+      renderCoordinateLegend(ctx, dpr, scale, theme);
     }
 
     points.forEach(([ctrlPoints, facing], index) =>
@@ -203,6 +126,92 @@ export function ScaledCanvas(): ReactElement {
   );
 }
 
+function renderCoordinateLegend(
+  ctx: CanvasRenderingContext2D,
+  dpr: number,
+  scale: number,
+  theme: string,
+) {
+  ctx.save();
+  ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+  ctx.font = '4px sans-serif'; // Set font size and family
+  ctx.fillStyle = theme === 'light' ? 'black' : 'white'; // Set fill color for the text
+  ctx.strokeStyle = theme === 'light' ? 'white' : 'black';
+  ctx.lineWidth = 0.2;
+
+  // Draw the coordinate points
+  ctx.textAlign = 'start'; // Set text alignment (e.g., "start", "end", "center")
+  ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
+  ctx.strokeText('(0,0)', 2, 139);
+  ctx.fillText('(0,0)', 2, 139);
+  ctx.strokeText('(0,144)', 2, 5);
+  ctx.fillText('(0,144)', 2, 5);
+  ctx.textAlign = 'end'; // Set text alignment (e.g., "start", "end", "center")
+  ctx.strokeText('(144,0)', 142, 5);
+  ctx.fillText('(144,0)', 142, 5);
+  ctx.strokeText('(144,144)', 142, 139);
+  ctx.fillText('(144,144)', 142, 139);
+  ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
+  ctx.strokeText('(72,72)', 72, 72);
+  ctx.fillText('(72,72)', 72, 72);
+
+  // Label the axis directions
+  ctx.strokeText('+y', 71, 84.5);
+  ctx.fillText('+y', 71, 84.5);
+  ctx.strokeText('-y', 71, 104.5);
+  ctx.fillText('-y', 71, 104.5);
+  ctx.strokeText('-x', 62, 95);
+  ctx.fillText('-x', 62, 95);
+  ctx.strokeText('+x', 82, 95);
+  ctx.fillText('+x', 82, 95);
+
+  // Label the compass angles
+  ctx.strokeText('½π 90°', 72, 40);
+  ctx.fillText('½π 90°', 72, 40);
+  ctx.strokeText('0°', 81, 48);
+  ctx.fillText('0°', 81, 48);
+  ctx.strokeText('π 180°', 58, 48);
+  ctx.fillText('π 180°', 58, 48);
+  ctx.strokeText('³/₂π 270°', 72, 56);
+  ctx.fillText('³/₂π 270°', 72, 56);
+
+  // Draw the axis directions
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 0.5;
+  ctx.strokeStyle = theme === 'light' ? 'black' : 'white';
+  ctx.beginPath();
+  let xc = 72;
+  let yc = 95;
+  // Vertical double arrow:
+  ctx.moveTo(xc - 2, yc - 5);
+  ctx.lineTo(xc, yc - 7);
+  ctx.lineTo(xc + 2, yc - 5);
+  ctx.moveTo(xc, yc - 7);
+  ctx.lineTo(xc, yc + 7);
+  ctx.moveTo(xc + 2, yc + 5);
+  ctx.lineTo(xc, yc + 7);
+  ctx.lineTo(xc - 2, yc + 5);
+  // Horizontal double arrow
+  ctx.moveTo(xc - 5, yc - 2);
+  ctx.lineTo(xc - 7, yc);
+  ctx.lineTo(xc - 5, yc + 2);
+  ctx.moveTo(xc - 7, yc);
+  ctx.lineTo(xc + 7, yc);
+  ctx.moveTo(xc + 5, yc + 2);
+  ctx.lineTo(xc + 7, yc);
+  ctx.lineTo(xc + 5, yc - 2);
+  // Arrow for the compass
+  ctx.moveTo(77 + 1, 48 + 2);
+  ctx.lineTo(77, 48);
+  ctx.lineTo(77 - 1.75, 48 + 1.75);
+  ctx.stroke();
+  ctx.beginPath();
+  // Arc for the compass
+  ctx.arc(72, 48, 5, Math.PI * -0.25, 0, true);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function diff(a: Point, b: Point): Point {
   return { x: b.x - a.x, y: b.y - a.y };
 }
@@ -227,44 +236,85 @@ function renderPath(
   for (let t = 0; t <= 1.0; t += 1 / len) {
     pts.push(deCasteljau(curveControlPoints, t));
   }
-  ctx.beginPath();
+  const drawPath = opts.PathThickness > 1e-10;
+  if (drawPath) {
+    ctx.beginPath();
+  }
   ctx.lineWidth = opts.PathThickness;
   ctx.strokeStyle = color;
   let approxLen = 0;
-  ctx.moveTo(
-    curveControlPoints[0]!.x * Scale,
-    curveControlPoints[0]!.y * Scale,
-  );
+  if (drawPath) {
+    ctx.moveTo(
+      curveControlPoints[0]!.x * Scale,
+      curveControlPoints[0]!.y * Scale,
+    );
+  }
   let lastPt = curveControlPoints[0]!;
   for (const pt of pts) {
     approxLen += distance(lastPt, pt);
     lastPt = pt;
-    ctx.lineTo(pt.x * Scale, pt.y * Scale);
+    if (drawPath) {
+      ctx.lineTo(pt.x * Scale, pt.y * Scale);
+    }
   }
   approxLen += distance(
     lastPt,
     curveControlPoints[curveControlPoints.length - 1]!,
   );
-  ctx.lineTo(
-    curveControlPoints[curveControlPoints.length - 1]!.x * Scale,
-    curveControlPoints[curveControlPoints.length - 1]!.y * Scale,
-  );
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.lineWidth = opts.ControlPoint.Thickness;
-  for (const pt of curveControlPoints) {
-    ctx.strokeStyle = color;
-    // TODO: Support more point display styles
-    ctx.moveTo((pt.x + opts.ControlPoint.Size / 2) * Scale, pt.y * Scale);
-    ctx.arc(
-      pt.x * Scale,
-      pt.y * Scale,
-      (opts.ControlPoint.Size / 2) * Scale,
-      0,
-      2 * Math.PI,
+  if (drawPath) {
+    ctx.lineTo(
+      curveControlPoints[curveControlPoints.length - 1]!.x * Scale,
+      curveControlPoints[curveControlPoints.length - 1]!.y * Scale,
     );
+    ctx.stroke();
   }
-  ctx.stroke();
+  if (
+    opts.ControlPoint.Style != 'z' &&
+    opts.ControlPoint.Size > 1e-10 &&
+    opts.ControlPoint.Thickness > 1e-10
+  ) {
+    ctx.beginPath();
+    ctx.lineWidth = opts.ControlPoint.Thickness;
+    const half = opts.ControlPoint.Size / 2;
+    const shape = opts.ControlPoint.Style;
+    for (const pt of curveControlPoints) {
+      ctx.strokeStyle = color;
+      // TODO: Support more point display styles
+      switch (shape) {
+        case 'o':
+          ctx.moveTo((pt.x + half) * Scale, pt.y * Scale);
+          ctx.arc(pt.x * Scale, pt.y * Scale, half * Scale, 0, 2 * Math.PI);
+          break;
+        case 's': // square
+          ctx.rect(
+            (pt.x - half) * Scale,
+            (pt.y - half) * Scale,
+            opts.ControlPoint.Size,
+            opts.ControlPoint.Size,
+          );
+          break;
+        case 'x':
+          ctx.moveTo((pt.x - half) * Scale, (pt.y - half) * Scale);
+          ctx.lineTo((pt.x + half) * Scale, (pt.y + half) * Scale);
+          ctx.moveTo((pt.x - half) * Scale, (pt.y + half) * Scale);
+          ctx.lineTo((pt.x + half) * Scale, (pt.y - half) * Scale);
+          break;
+        case 't': // triangle
+          ctx.moveTo((pt.x - half) * Scale, (pt.y - half) * Scale);
+          ctx.lineTo(pt.x * Scale, (pt.y + half) * Scale);
+          ctx.lineTo((pt.x + half) * Scale, (pt.y - half) * Scale);
+          ctx.closePath();
+          break;
+        case '+':
+          ctx.moveTo((pt.x - half) * Scale, pt.y * Scale);
+          ctx.lineTo((pt.x + half) * Scale, pt.y * Scale);
+          ctx.moveTo(pt.x * Scale, (pt.y + half) * Scale);
+          ctx.lineTo(pt.x * Scale, (pt.y - half) * Scale);
+          break;
+      }
+    }
+    ctx.stroke();
+  }
   if (heading) {
     drawHeadingLines(
       ctx,
