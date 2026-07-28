@@ -1,18 +1,16 @@
-import {
-  hasField,
-  isArray,
-  isDefined,
-  isString,
-  isUndefined,
-} from '@freik/typechk';
+import { promises as fsp } from 'node:fs';
+
 import {
   BaseJavaCstVisitorWithDefaults,
   BlockStatementCstNode,
+  ClassDeclarationCtx,
   ConstructorDeclarationCtx,
   ExpressionCstNode,
   FieldDeclarationCtx,
   FqnOrRefTypeCstNode,
+  ImportDeclarationCtx,
   IToken,
+  PackageDeclarationCtx,
   parse,
   PrimaryCtx,
   PrimarySuffixCstNode,
@@ -20,35 +18,61 @@ import {
   UnaryExpressionCtx,
   VariableDeclaratorCtx,
 } from 'java-parser';
-import { promises as fsp } from 'node:fs';
+import {
+  ErrorOr,
+  hasField,
+  isArray,
+  isDefined,
+  isString,
+  isUndefined,
+  MakeError,
+} from '@freik/typechk';
+
+import { ForEachPathChainIndex } from './full-database';
 import {
   AnonymousBezier,
+  AnonymousFacing,
   AnonymousPose,
   AnonymousValue,
+  BezierName,
   BezierRef,
-  chkAnonymousValue,
+  EmptyParsedClass,
+  FacingLinear,
+  FacingPiece,
+  FacingReversible,
+  FacingSimple,
   HeadingRef,
-  HeadingType,
+  isAnonymousValue,
+  isRadiansRef,
+  isRef,
   NamedBezier,
   NamedPathChain,
   NamedPose,
   NamedValue,
-  PathChainFile,
+  ParsedClass,
+  PathChainHelper,
+  PathChainName,
+  PoseName,
   PoseRef,
   RadiansRef,
+  ValueName,
   ValueRef,
 } from './types';
+
+type PCContext = { pathChainFields: string[] };
+type PCInfo = PCContext & ParsedClass;
+type OptPCInfo = Partial<PCContext> & ParsedClass;
 
 class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
   content: string = '';
   parsed: ReturnType<typeof parse> | null = null;
-  pathChainFields: string[] = [];
-  info: PathChainFile = {
-    name: '',
-    values: [], // NamedValue[];
-    poses: [], // NamedPose[];
-    beziers: [], // Bezier[];
-    pathChains: [], // PathChain[];
+
+  contextStack: PCInfo[] = [];
+  package: string = '';
+  imports: string[] = [];
+  info: PCInfo = {
+    ...structuredClone(EmptyParsedClass),
+    pathChainFields: [],
   };
 
   constructor() {
@@ -56,14 +80,14 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     this.validateVisitor();
   }
 
-  async loadFile(filename: string): Promise<string | true> {
+  async loadFile(fileName: string): Promise<string | true> {
     // Read the contents fo the file and parse it:
-    this.info.name = filename;
+    this.info.container = { fileName };
     try {
-      const content = await fsp.readFile(filename, 'utf-8');
+      const content = await fsp.readFile(fileName, 'utf-8');
       return this.parseContent(content);
     } catch (e) {
-      return `Could not read file: ${filename} - ${e}`;
+      return `Could not read file: ${fileName} - ${e}`;
     }
   }
 
@@ -88,7 +112,26 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
   // double's, int's, pose's, BezierCurve's, BezierLine's.
   // PathChains shouldn't be static
 
-  fieldDeclaration(ctx: FieldDeclarationCtx) {
+  override packageDeclaration(ctx: PackageDeclarationCtx) {
+    this.package = nameOf(ctx.Identifier) || '';
+    super.packageDeclaration(ctx);
+  }
+
+  override importDeclaration(ctx: ImportDeclarationCtx) {
+    // console.log("IMPORt", ctx);
+    const importName = nameOf(child(ctx.packageOrTypeName)?.Identifier);
+    if (
+      isDefined(importName) &&
+      !importName.startsWith('com.pedropathing.') &&
+      !importName.startsWith('com.bylazar.') &&
+      !importName.startsWith('com.technototes.library.')
+    ) {
+      this.imports.push(importName);
+    }
+    super.importDeclaration(ctx);
+  }
+
+  override fieldDeclaration(ctx: FieldDeclarationCtx) {
     // We're looking for public static double/int name = value;
     const maybeNamedValue = tryMatchingNamedValues(ctx);
     if (isDefined(maybeNamedValue)) {
@@ -107,14 +150,49 @@ class PathChainLoader extends BaseJavaCstVisitorWithDefaults {
     }
     const maybePathChainField = tryMatchingPathChainFields(ctx);
     if (isDefined(maybePathChainField)) {
-      this.pathChainFields.push(maybePathChainField);
+      this.info.pathChainFields.push(maybePathChainField);
     }
     return super.fieldDeclaration(ctx);
   }
 
-  constructorDeclaration(ctx: ConstructorDeclarationCtx) {
+  override constructorDeclaration(ctx: ConstructorDeclarationCtx) {
+    this.info.pathChainHelpers.push(...getPathChainHelpers(ctx));
     this.info.pathChains.push(...getPathChainFactories(ctx));
     return super.constructorDeclaration(ctx);
+  }
+
+  // I need to handle nested classes.
+  // I should probably make sure they're static if they're nested
+  override classDeclaration(ctx: ClassDeclarationCtx, param?: any) {
+    const theClassName = nameOf(
+      child(child(ctx?.normalClassDeclaration)?.typeIdentifier)?.Identifier,
+    );
+    if (isUndefined(theClassName)) {
+      return;
+    }
+    // If the stack is empty, we just push the current PC.
+    // If the stack *isn't* empty, we need to create a new ParsedClass (and push it).
+    if (this.contextStack.length !== 0) {
+      const parent = this.info;
+      this.info = {
+        ...structuredClone(EmptyParsedClass),
+        container: { className: parent.name },
+        pathChainFields: [],
+      };
+      parent.children[theClassName] = this.info;
+    }
+    this.info.name = theClassName;
+    this.contextStack.push(this.info);
+
+    const res = super.classDeclaration(ctx, param);
+
+    // Let's make the name the fully qualified name, now
+    this.info.name = this.contextStack.map((pc) => pc.name).join('.');
+    this.contextStack.pop();
+    if (this.contextStack.length > 0) {
+      this.info = this.contextStack[this.contextStack.length - 1]!;
+    }
+    return res;
   }
 }
 
@@ -131,8 +209,9 @@ function child<T extends { children: any }>(
   return descend(ctx)?.children;
 }
 
-function nameOf(ctx: IToken[] | undefined): string | undefined {
-  return descend(ctx)?.image;
+function nameOf(ctx: IToken[] | IToken | undefined): string | undefined {
+  if (isArray(ctx)) return ctx.map((tok) => tok.image).join('.');
+  else return ctx?.image;
 }
 
 function getBType(className: string): 'line' | 'curve' | undefined {
@@ -159,11 +238,10 @@ function isPublicStaticField(ctx: FieldDeclarationCtx): boolean {
 }
 
 function isPublicField(ctx: FieldDeclarationCtx): boolean {
-  return (
-    ctx.fieldModifier &&
-    ctx.fieldModifier.length === 1 &&
-    isDefined(ctx.fieldModifier[0].children.Public)
-  );
+  if (!ctx.fieldModifier || ctx.fieldModifier.length !== 1) {
+    return false;
+  }
+  return isDefined(ctx.fieldModifier[0]!.children.Public);
 }
 
 // This matches the 'public static int/double name = value;' pattern
@@ -182,7 +260,7 @@ function tryMatchingNamedValues(
   if (!numType) {
     return;
   }
-  const value: AnonymousValue = { type: 'double', value: 0 };
+  let type = 'double';
   if (numType.floatingPointType) {
     if (!child(numType.floatingPointType)?.Double) {
       return;
@@ -191,7 +269,7 @@ function tryMatchingNamedValues(
     if (!child(numType.integralType)?.Int) {
       return;
     }
-    value.type = 'int';
+    type = 'int';
   }
   // Okay, found the type. Need the name and the initialized value.
   if (ctx.variableDeclaratorList.length !== 1) {
@@ -201,10 +279,11 @@ function tryMatchingNamedValues(
   if (!varDecl) {
     return;
   }
-  const name = nameOf(child(varDecl.variableDeclaratorId)?.Identifier);
-  if (!name) {
+  const maybeName = nameOf(child(varDecl.variableDeclaratorId)?.Identifier);
+  if (!maybeName) {
     return;
   }
+  const name: ValueName = maybeName as ValueName;
   // TODO: Support initializers of "Math.toRadians(K)"
   const expr = descend(child(varDecl.variableInitializer)?.expression);
   if (isUndefined(expr)) {
@@ -212,12 +291,10 @@ function tryMatchingNamedValues(
   }
   const valRef = getHeadingRef(expr);
   if (isString(valRef)) {
-    return;
+    return { name, value: valRef as ValueName };
   }
-  if (chkAnonymousValue(valRef)) {
+  if (isAnonymousValue(valRef) || isRadiansRef(valRef)) {
     return { name, value: valRef };
-  } else if (!isString(valRef.radians)) {
-    return { name, value: valRef.radians };
   }
 }
 
@@ -233,22 +310,37 @@ function getNumericConstant(
   if (isDefined(whichLit?.integerLiteral)) {
     const value = nameOf(child(whichLit.integerLiteral)?.DecimalLiteral);
     if (isDefined(value)) {
-      return { type: 'int', value: parseInt(value) * negative };
+      return { int: parseInt(value) * negative };
     }
   } else if (isDefined(whichLit?.floatingPointLiteral)) {
     const value = nameOf(child(whichLit.floatingPointLiteral)?.FloatLiteral);
     if (isDefined(value)) {
-      return { type: 'double', value: parseFloat(value) * negative };
+      return { double: parseFloat(value) * negative };
     }
   }
   return;
 }
 
 function getRefTypeName(fqn: FqnOrRefTypeCstNode[]): string | undefined {
-  return nameOf(
+  let name = nameOf(
     child(child(child(fqn)?.fqnOrRefTypePartFirst)?.fqnOrRefTypePartCommon)
       ?.Identifier,
   );
+  if (isUndefined(name)) {
+    return;
+  }
+  const rest = child(fqn)?.fqnOrRefTypePartRest;
+  if (isDefined(rest)) {
+    for (const item of rest.map(
+      (fqnRest) => fqnRest.children.fqnOrRefTypePartCommon,
+    )) {
+      const next = nameOf(descend(item)?.children.Identifier);
+      if (isDefined(next)) {
+        name = name + '.' + next;
+      }
+    }
+  }
+  return name;
 }
 
 function getRef(expr: ExpressionCstNode): string | undefined {
@@ -262,26 +354,23 @@ function getRef(expr: ExpressionCstNode): string | undefined {
   }
 }
 
-function getRefOr<T>(
-  expr: ExpressionCstNode,
+function getRefOr<Str, T>(
+  expr: ExpressionCstNode | undefined,
   getOr: (expr: ExpressionCstNode) => T | undefined,
-): T | string | undefined {
+): T | Str | undefined {
+  if (isUndefined(expr)) {
+    return undefined;
+  }
   const ref = getRef(expr);
-  return isString(ref) ? ref : getOr(expr);
+  return isString(ref) ? (ref as Str) : getOr(expr);
 }
 
-function getMethodInvoke(primary: PrimaryCtx): [string, string] | undefined {
+function getMethodInvoke(primary: PrimaryCtx): string | undefined {
   const methodInvoke = child(primary.primaryPrefix)?.fqnOrRefType;
-  const objName = getRefTypeName(methodInvoke);
-  if (isUndefined(objName)) {
+  if (isUndefined(methodInvoke)) {
     return;
   }
-  let methodName = nameOf(
-    child(
-      child(child(methodInvoke)?.fqnOrRefTypePartRest)?.fqnOrRefTypePartCommon,
-    )?.Identifier,
-  );
-  return isDefined(methodName) ? [objName, methodName] : undefined;
+  return getRefTypeName(methodInvoke);
 }
 
 function getToRadians(
@@ -291,33 +380,37 @@ function getToRadians(
     child(
       child(child(expr.children.conditionalExpression)?.binaryExpression)
         ?.unaryExpression,
-    ).primary,
+    )?.primary,
   );
+  if (isUndefined(maybeMethod)) {
+    return;
+  }
   const maybeMathToRad = getMethodInvoke(maybeMethod);
   if (
     isUndefined(maybeMathToRad) ||
-    maybeMathToRad[0] !== 'Math' ||
-    maybeMathToRad[1] !== 'toRadians'
+    maybeMathToRad !== 'Math.toRadians' ||
+    isUndefined(expr.children.conditionalExpression)
   ) {
     return;
   }
-  const argList = getArgList(
+  const maybeArgList = child(
     child(
-      child(
-        child(child(expr.children.conditionalExpression)?.binaryExpression)
-          ?.unaryExpression,
-      )?.primary,
-    )?.primarySuffix[0],
-  );
-  if (argList.length !== 1) {
+      child(child(expr.children.conditionalExpression)?.binaryExpression)
+        ?.unaryExpression,
+    )?.primary,
+  )?.primarySuffix;
+  if (isUndefined(maybeArgList) || maybeArgList.length === 0) {
+    return;
+  }
+  const argList = getArgList(maybeArgList[0]);
+  if (isUndefined(argList) || argList.length !== 1) {
     return;
   }
   const numRef = getOnlyValueRef(argList[0]);
   if (isString(numRef)) {
     return { radians: numRef };
   } else if (isDefined(numRef)) {
-    numRef.type = 'radians';
-    return numRef;
+    return { radians: numRef };
   }
 }
 
@@ -375,7 +468,7 @@ function getCtorArgs(
     }
     expr = theExpr;
   } else {
-    expr = decl;
+    expr = decl as unknown as ExpressionCstNode;
   }
   const newExpr = child(
     child(
@@ -395,7 +488,7 @@ function getCtorArgs(
   if (isDefined(type) && dataType !== type) {
     return ['', undefined];
   }
-  return [type || dataType, child(newExpr?.argumentList)?.expression];
+  return [type || dataType || '', child(newExpr?.argumentList)?.expression];
 }
 
 function tryMatchingNamedPoses(
@@ -417,7 +510,7 @@ function tryMatchingNamedPoses(
     return;
   }
   const pose = getAnonymousPose(decl);
-  return isDefined(pose) ? { name, pose } : undefined;
+  return isDefined(pose) ? { name: name as PoseName, pose } : undefined;
 }
 
 function getAnonymousPose(
@@ -435,7 +528,8 @@ function getAnonymousPose(
   if (isUndefined(x) || isUndefined(y)) {
     return;
   }
-  const heading = getHeadingRef(ctorArgs[2]);
+  const heading =
+    ctorArgs.length === 3 ? getHeadingRef(ctorArgs[2]!) : undefined;
   return isUndefined(heading) ? { x, y } : { x, y, heading };
 }
 
@@ -448,15 +542,22 @@ function getAnonymousBezier(
   checkType?: string,
 ): AnonymousBezier | undefined {
   const firstExpr = isArray(expr) ? expr[0] : expr;
+  if (isUndefined(firstExpr)) {
+    return;
+  }
   const [foundType, ctorArgs] = getCtorArgs(firstExpr, checkType);
   if (isUndefined(ctorArgs)) {
     return;
   }
-  const points = ctorArgs.map(getPoseRef);
+  const type = getBType(foundType);
+  if (isUndefined(type)) {
+    return;
+  }
+  const points: PoseRef[] = ctorArgs.map(getPoseRef) as unknown as PoseRef[];
   if (!points.every(isDefined)) {
     return;
   }
-  return { type: getBType(foundType), points };
+  return { type, points };
 }
 
 function tryMatchingBeziers(ctx: FieldDeclarationCtx): NamedBezier | undefined {
@@ -464,15 +565,19 @@ function tryMatchingBeziers(ctx: FieldDeclarationCtx): NamedBezier | undefined {
     return;
   }
   const classType = getClassTypeName(ctx.unannType);
+  if (isUndefined(classType)) {
+    return;
+  }
   const type = getBType(classType);
   const decl = getVariableDeclarator(ctx);
   if (isUndefined(decl) || isUndefined(type)) {
     return;
   }
-  const name = getLValueName(decl);
-  if (isUndefined(name)) {
+  const maybeName = getLValueName(decl);
+  if (isUndefined(maybeName)) {
     return;
   }
+  const name: BezierName = maybeName as BezierName;
   const points = getAnonymousBezier(
     child(decl.variableInitializer)?.expression,
   );
@@ -499,27 +604,137 @@ function tryMatchingPathChainFields(
 
 function getArgList(
   cstNode: PrimarySuffixCstNode | undefined,
-): ExpressionCstNode[] {
-  return child(child(cstNode.children.methodInvocationSuffix)?.argumentList)
+): ExpressionCstNode[] | undefined {
+  return child(child(cstNode?.children.methodInvocationSuffix)?.argumentList)
     ?.expression;
 }
 
 function getHeadingRef(
-  arg: ExpressionCstNode,
+  arg: ExpressionCstNode | undefined,
   poseAllowed: boolean = false,
 ): HeadingRef | undefined {
-  if (poseAllowed) {
-    // TODO:
-    // Check for a <ref>.getHeading() expression
-    // As it currently stands, this just gets the name of the ref, which is the end result
-    // we're looking for, but it doesn't do any validation that it's also a "foo.getHeading()"
-    // for names refer to poses.
+  const valRef = getValueRef(arg);
+  if (isDefined(valRef) && poseAllowed) {
+    // Check for a <ref>.getHeading() expression, which turns into a simple PoseName
+    if (isRef(valRef) && valRef.endsWith('.getHeading')) {
+      return valRef.substring(0, valRef.length - 11) as PoseName;
+    }
   }
-  return getValueRef(arg);
+  return valRef;
 }
 
-function getBezierRef(arg: ExpressionCstNode): BezierRef | undefined {
+function getBezierRef(
+  arg: ExpressionCstNode | undefined,
+): BezierRef | undefined {
   return getRefOr(arg, getAnonymousBezier);
+}
+
+// parse each argument to HeadingInterpolator.piecewise(...) thing
+function getPiece(expr: ExpressionCstNode): FacingPiece | undefined {
+  const [ctor, args] = getCtorArgs(expr);
+  if (
+    isUndefined(args) ||
+    ctor !== 'HeadingInterpolator.PiecewiseNode' ||
+    args.length !== 3
+  ) {
+    return;
+  }
+  const start = getOnlyValueRef(args[0]);
+  const end = getOnlyValueRef(args[1]);
+  const val = getHeadingInterpolation(args[2]!, true);
+  if (isUndefined(start) || isUndefined(end) || isUndefined(val)) {
+    return;
+  }
+  return { timing: { start, end }, heading: val };
+}
+
+function getHeadingInterpolation(
+  expr: ExpressionCstNode,
+  simple: true,
+): FacingSimple | undefined;
+function getHeadingInterpolation(
+  expr: ExpressionCstNode,
+  simple?: false,
+): AnonymousFacing | undefined;
+
+// TODO: This doesn't (yet) properly handle chaining :/
+function getHeadingInterpolation(
+  expr: ExpressionCstNode,
+  simple?: boolean,
+): AnonymousFacing | undefined {
+  // Single argument: Get the static method:
+  const methodRef = getRef(expr);
+  if (isUndefined(methodRef)) {
+    return;
+  }
+  const maybeArgList = child(
+    child(
+      child(child(expr.children.conditionalExpression)?.binaryExpression)
+        ?.unaryExpression,
+    )?.primary,
+  )?.primarySuffix;
+  if (isUndefined(maybeArgList) || maybeArgList.length === 0) {
+    return;
+  }
+  const methodArgs = getArgList(maybeArgList[0]);
+  if (isUndefined(methodArgs)) {
+    return;
+  }
+  switch (methodRef) {
+    case 'HeadingInterpolator.piecewise':
+      if (simple) {
+        break;
+      }
+      // Reach each arg as a piece (unsafecast is for the return type)
+      const pieces = methodArgs.map(getPiece) as FacingPiece[];
+      // If everything wasn't a piece, fail (required for the cast above)
+      if (pieces.every(isDefined)) {
+        return { type: 'piecewise', pieces };
+      }
+      break;
+    case 'HeadingInterpolator.facingPoint':
+      if (methodArgs.length === 1) {
+        const pose = getPoseRef(methodArgs[0]!);
+        if (isDefined(pose)) {
+          return { type: 'point', point: pose };
+        }
+      } else if (methodArgs.length === 2) {
+        const x = getOnlyValueRef(methodArgs[0]);
+        const y = getOnlyValueRef(methodArgs[1]);
+        if (isDefined(x) && isDefined(y)) {
+          return { type: 'point', point: { x, y } };
+        }
+      }
+      break;
+    case 'HeadingInterpolator.tangent':
+      return { type: 'tangent' };
+      break;
+    case 'HeadingInterpolator.constant':
+      const heading = getHeadingRef(methodArgs[0]);
+      if (isDefined(heading)) {
+        return { type: 'constant', heading };
+      }
+      break;
+    case 'HeadingInterpolator.linear':
+    case 'HeadingInterpolator.reversedLinear':
+      // start, end / start, end, time
+      const start = getHeadingRef(methodArgs[0]);
+      const end = getHeadingRef(methodArgs[1]);
+      if (isUndefined(start) || isUndefined(end) || methodArgs.length > 3) {
+        break;
+      }
+      const endT =
+        methodArgs.length === 3 ? getOnlyValueRef(methodArgs[3]) : undefined;
+      // TODO: Handle endT appropriately
+      const linear: FacingLinear = { type: 'linear', start, end };
+      return methodRef.indexOf('v') < 0
+        ? linear
+        : { type: 'reversed', facing: linear };
+    // TODO: These only make sense once I handle chaining.
+    case 'HeadingInterpolator.reverse':
+    case 'HeadingInterpolator.offset':
+      return;
+  }
 }
 
 function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
@@ -537,13 +752,16 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
       )?.conditionalExpression,
     )?.binaryExpression,
   );
-  if (isUndefined(stmt.AssignmentOperator)) {
+  if (isUndefined(stmt) || isUndefined(stmt.AssignmentOperator)) {
     return;
   }
-  const fieldName = getRefTypeName(
-    child(child(child(stmt.unaryExpression)?.primary)?.primaryPrefix)
-      .fqnOrRefType,
+  const maybeFqnOrRef = child(
+    child(child(stmt.unaryExpression)?.primary)?.primaryPrefix,
   );
+  if (isUndefined(maybeFqnOrRef) || isUndefined(maybeFqnOrRef.fqnOrRefType)) {
+    return;
+  }
+  const fieldName = getRefTypeName(maybeFqnOrRef.fqnOrRefType);
   // TODO: make sure the field name is in the list of fields
   const builder = child(
     child(
@@ -552,28 +770,27 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
       )?.unaryExpression,
     )?.primary,
   );
+  if (isUndefined(builder)) {
+    return;
+  }
   const objInvoke = getMethodInvoke(builder);
-  if (
-    isUndefined(objInvoke) ||
-    objInvoke[0] !== 'follower' ||
-    objInvoke[1] !== 'pathBuilder'
-  ) {
+  if (isUndefined(objInvoke) || objInvoke !== 'follower.pathBuilder') {
     return;
   }
   const methods = builder.primarySuffix;
-  if (methods.length < 5) {
+  if (isUndefined(methods) || methods.length < 5) {
     return;
   }
   // Okay, remove the '.pathBuilder()' prefix, and the
   // '.build();' suffix.
   let chain: BezierRef[] = [];
-  let heading: HeadingType | null = null;
-  let lastMethodName = 'pathBuilder';
+  let pathHeading: AnonymousFacing | null = null;
+  let lastMethodName: string | undefined = 'pathBuilder';
   for (let index = 0; index < methods.length; index++) {
-    const method = methods[index];
+    const method = methods[index]!;
     if (index % 2 === 1) {
       // This should be a dot
-      if (isUndefined(method.children.Dot)) {
+      if (isUndefined(method?.children?.Dot)) {
         return;
       }
       lastMethodName = nameOf(method.children.Identifier);
@@ -583,6 +800,8 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
         case 'setTangentHeadingInterpolation':
         case 'setLinearHeadingInterpolation':
         case 'setConstantHeadingInterpolation':
+        case 'setHeadingInterpolation':
+        case 'setReversed':
         case 'build':
           continue;
         default:
@@ -600,11 +819,11 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (isDefined(getArgList(method))) {
             return;
           }
-          heading = { type: 'tangent' };
+          pathHeading = { type: 'tangent' };
           continue;
         case 'setLinearHeadingInterpolation':
           const linearArgs = getArgList(method);
-          if (linearArgs.length !== 2) {
+          if (linearArgs?.length !== 2) {
             return;
           }
           const startHeading = getHeadingRef(linearArgs[0], true);
@@ -612,25 +831,49 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (isUndefined(startHeading) || isUndefined(endHeading)) {
             return;
           }
-          heading = {
-            type: 'interpolated',
-            headings: [startHeading, endHeading],
+          pathHeading = {
+            type: 'linear',
+            start: startHeading,
+            end: endHeading,
           };
           continue;
         case 'setConstantHeadingInterpolation':
           const constantArgs = getArgList(method);
-          if (constantArgs.length !== 1) {
+          if (constantArgs?.length !== 1) {
             return;
           }
           const headingRef = getHeadingRef(constantArgs[0], true);
           if (isUndefined(headingRef)) {
             return;
           }
-          heading = { type: 'constant', heading: headingRef };
+          pathHeading = { type: 'constant', heading: headingRef };
           continue;
+        case 'setReversed':
+          if (pathHeading === null) {
+            return;
+          }
+          // TODO: Don't cast. Error!
+          pathHeading = {
+            type: 'reversed',
+            facing: pathHeading as FacingReversible,
+          };
+          continue;
+
+        case 'setHeadingInterpolation':
+          const interpArgs = getArgList(method);
+          if (isUndefined(interpArgs) || interpArgs.length !== 1) {
+            return;
+          }
+          const interp = getHeadingInterpolation(interpArgs[0]!);
+          if (isUndefined(interp)) {
+            return;
+          }
+          pathHeading = interp;
+          continue;
+
         case 'addPath':
           const pathArgs = getArgList(method);
-          if (pathArgs.length !== 1) {
+          if (pathArgs?.length !== 1) {
             return;
           }
           const bezierRef = getBezierRef(pathArgs[0]);
@@ -644,7 +887,96 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
       }
     }
   }
-  return { name: fieldName, paths: chain, heading };
+  if (pathHeading === null) {
+    return;
+  }
+  return { name: fieldName as PathChainName, paths: chain, pathHeading };
+}
+
+function getPathChainHelper(
+  node: BlockStatementCstNode,
+): PathChainHelper | undefined {
+  const varDecl = child(
+    child(node.children.localVariableDeclarationStatement)
+      ?.localVariableDeclaration,
+  );
+  if (isUndefined(varDecl)) {
+    return;
+  }
+  const lclType = child(
+    child(
+      child(
+        child(child(varDecl.localVariableType)?.unannType)?.unannReferenceType,
+      )?.unannClassOrInterfaceType,
+    )?.unannClassType,
+  )?.Identifier;
+  if (isUndefined(lclType) || lclType.length === 0) {
+    return;
+  }
+  const lclVal = child(
+    child(varDecl.variableDeclaratorList)?.variableDeclarator,
+  );
+  if (isUndefined(lclVal)) {
+    return;
+  }
+  const typeName = nameOf(lclType);
+  const varName = getLValueName(lclVal);
+  if (isUndefined(varName) || isUndefined(typeName)) {
+    return;
+  }
+  const newExpr = child(
+    child(
+      child(
+        child(
+          child(
+            child(
+              child(
+                child(child(lclVal.variableInitializer)?.expression)
+                  ?.conditionalExpression,
+              )?.binaryExpression,
+            )?.unaryExpression,
+          )?.primary,
+        )?.primaryPrefix,
+      )?.newExpression,
+    )?.unqualifiedClassInstanceCreationExpression,
+  );
+  if (isUndefined(newExpr)) {
+    return;
+  }
+  const ctorClass = child(
+    newExpr.classOrInterfaceTypeToInstantiate,
+  )?.Identifier;
+  if (isUndefined(ctorClass)) {
+    return;
+  }
+  const ctorName = nameOf(ctorClass);
+  if (ctorName !== typeName) {
+    // This is being picky, but tough luck: I'm picky..
+    return;
+  }
+  if (
+    isDefined(newExpr.argumentList) ||
+    isDefined(newExpr.classBody) ||
+    isDefined(newExpr.typeArguments)
+  ) {
+    return;
+  }
+  // TODO: Read the file's package and make the names fully qualified
+  return { name: varName, staticType: typeName };
+}
+
+function getPathChainHelpers(
+  ctx: ConstructorDeclarationCtx,
+): PathChainHelper[] {
+  const statements = child(
+    child(ctx.constructorBody)?.blockStatements,
+  )?.blockStatement;
+  if (isUndefined(statements)) {
+    return [];
+  }
+  return statements
+    .map(getPathChainHelper)
+    .filter(isDefined) as PathChainHelper[];
 }
 
 function getPathChainFactories(
@@ -656,14 +988,73 @@ function getPathChainFactories(
   if (isUndefined(statements)) {
     return [];
   }
-  const pathChains = statements.map(getPathChain);
-  return pathChains.filter(isDefined);
+  return statements.map(getPathChain).filter(isDefined) as NamedPathChain[];
 }
 
-export async function MakePathChainFile(
+export async function MakeParsedClass(
   filename: string,
-): Promise<PathChainFile | string> {
+): Promise<ErrorOr<ParsedClass>> {
   const loader = new PathChainLoader();
   const res = await loader.loadFile(filename);
-  return isString(res) ? res : loader.info;
+  if (isString(res)) {
+    return MakeError(res);
+  }
+  let pc: OptPCInfo = { ...loader.info };
+  delete pc.pathChainFields;
+  if (anyItems(pc)) {
+    const imports = [...loader.imports];
+    ForEachPathChainIndex(pc, (item) => {
+      // Make a fake import for the parent package, because I *think* that's
+      // how Java name resolution works.
+      const newImports = [...imports];
+      if (hasField(item.container, 'className')) {
+        newImports.push(loader.package + '.' + item.container.className);
+      } else {
+        newImports.push(loader.package);
+      }
+      item.imports = newImports;
+      item.fullName = `${loader.package}.${item.name}`;
+    });
+  }
+  return pc;
+}
+
+// Returns true if that file has *any* items we care about in it.
+// This does wind up triggering for something that just has a static int/double,
+// but that's okay (better than missing one...)
+export function anyItems(pc: ParsedClass): boolean {
+  let anyItem = false;
+  ForEachPathChainIndex(pc, (item) => {
+    if (
+      item.beziers.length ||
+      item.poses.length ||
+      item.pathChains.length ||
+      item.values.length
+    ) {
+      anyItem = true;
+      return true;
+    }
+  });
+  return anyItem;
+}
+
+if (import.meta.main) {
+  MakeParsedClass(
+    [
+      '..',
+      'Sixteen750',
+      'src',
+      'main',
+      'java',
+      'org',
+      'firstinspires',
+      'ftc',
+      'sixteen750',
+      'commands',
+      'auto',
+      'RPaths.java',
+    ].join('/'),
+  )
+    .then((strOrPc) => console.log(strOrPc))
+    .catch((err) => console.error(err));
 }

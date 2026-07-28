@@ -1,14 +1,18 @@
+import { ReactElement, Suspense } from 'react';
+import { Provider, useAtomValue } from 'jotai';
+
 import {
   FluentProvider,
   webDarkTheme,
   webLightTheme,
 } from '@fluentui/react-components';
-import { Provider, useAtomValue } from 'jotai';
-import { ReactElement } from 'react';
+import { Group, Panel, Separator } from 'react-resizable-panels';
+
+import { Strings } from './constants';
 import { PathsDataDisplay } from './PathsDataDisplay';
 import { PathSelector } from './PathSelector';
 import { Settings } from './Settings';
-import { ThemeAtom } from './state/Atoms';
+import { ThemeAtom } from './state/SavedSettings';
 import { getStore } from './state/Storage';
 import { ScaledCanvas } from './ui-tools/ScaledCanvas';
 
@@ -17,21 +21,24 @@ import './index.css';
 export function MyApp(): ReactElement {
   return (
     <div className="app">
-      <div className="header">
+      <Suspense>
         <div className="header-left">
           <PathSelector />
         </div>
-        <div className="header-center">Vote4Pedro</div>
+        <div className="header-center">{Strings.Viz4Pedro}</div>
         <div className="header-right">
           <Settings />
         </div>
-      </div>
-      <div className="sidebar">
-        <PathsDataDisplay />
-      </div>
-      <div className="display">
-        <ScaledCanvas />
-      </div>
+        <Group className="main">
+          <Panel className="sidebar">
+            <PathsDataDisplay />
+          </Panel>
+          <Separator id="view-separator" />
+          <Panel className="display">
+            <ScaledCanvas />
+          </Panel>
+        </Group>
+      </Suspense>
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import { chkFieldOf, isNumber, isString } from '@freik/typechk';
 import { describe, expect, test } from 'bun:test';
+import { chkFieldOf, isNumber, isString } from '@freik/typechk';
+
 import { fetchApi, getStore } from '../state/Storage';
 
 async function MyFetchFunc(
@@ -27,9 +28,11 @@ describe('Storage validation', () => {
   });
   test('Simple fetch of mocked value', async () => {
     globalThis.fetch = MyFetchFunc;
-    const res = await fetchApi('test', chkFieldOf('a', isString));
+    const res = await fetchApi('test', chkFieldOf('a', isString), { a: 'foo' });
     expect(res).toEqual({ a: 'b' });
-    const res2 = await fetchApi('test', chkFieldOf('a', isNumber));
-    expect(res2).toBeUndefined();
+    const res2 = await fetchApi('test', chkFieldOf('a', isNumber), {
+      a: 'foo',
+    });
+    expect(res2).toEqual({ a: 'foo' });
   });
 });

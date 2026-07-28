@@ -1,16 +1,33 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    // Environment setup & latest features
     "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
     "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "allowJs": false,
-    "esModuleInterop": true,
+    "allowJs": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false,
     "noEmit": true,
-    "pretty": true,
-    "skipLibCheck": true
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    "paths": { "*": ["./*"] },
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "types": ["bun-types"]
   },
-  "include": ["bun-env.d.ts", "**/*.ts?"]
+
+  "exclude": ["dist", "node_modules"]
 }

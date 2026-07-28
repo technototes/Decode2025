@@ -16,7 +16,7 @@ function luminance(rgb: RGB): number {
     const c = v / 255;
     return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
   });
-  return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+  return 0.2126 * srgb[0]! + 0.7152 * srgb[1]! + 0.0722 * srgb[2]!;
 }
 
 // Utility: contrast ratio
@@ -110,7 +110,7 @@ export function GenerateColors(n: number, bg: RGB = [255, 255, 255]): string[] {
   const res: string[] = [];
   let i = 0;
   while (res.length < n) {
-    res.push(col(colors[i]));
+    res.push(col(colors[i]!));
     i = (i + step) % colors.length;
   }
   return res;

@@ -1,49 +1,87 @@
-import { useAtomValue } from 'jotai';
-import { ReactElement, useEffect, useRef } from 'react';
-import { NamedPathChain } from '../../server/types';
+import { ReactElement, useEffect, useRef, useState } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
+import { PathRenderOptionsAtom, ThemeAtom } from 'client/state/SavedSettings';
+import { isDefined } from 'node_modules/@freik/typechk/lib/esm';
+
 import {
   ColorsAtom,
-  FileContentsAtom,
-  NamedBeziersAtom,
-  NamedPathChainsAtom,
-  NamedPosesAtom,
-  NamedValuesAtom,
+  MappedBeziersAtom,
+  MappedFileAtom,
+  MappedPathChainsAtom,
+  MappedPosesAtom,
+  MappedValuesAtom,
 } from '../state/Atoms';
-import { Point } from '../state/types';
+import { calcBezierRef, calcFacing } from '../state/IndexedFile';
+import {
+  chkConcreteConstantHeading,
+  chkConcreteLinearHeading,
+  chkConcretePointHeading,
+  chkConcreteTangentHeading,
+  ConcreteHeadingType,
+  PathRenderOptions,
+  Point,
+} from '../types';
 import { bezierLength, deCasteljau } from './bezier';
 
 const Scale = 1;
-const PointRadius = 1;
 
 const fix = 144;
 
 export function ScaledCanvas(): ReactElement {
+  const opts = useAtomValue(PathRenderOptionsAtom);
+  const theme = useAtomValue(ThemeAtom);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(0);
   const colors = useAtomValue(ColorsAtom);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const curPathChainFile = useAtomValue(CurPathChainAtom);
-  const file = useAtomValue(FileContentsAtom);
-  const pathChains = useAtomValue(NamedPathChainsAtom);
-  const beziers = useAtomValue(NamedBeziersAtom);
-  const poses = useAtomValue(NamedPosesAtom);
-  const values = useAtomValue(NamedValuesAtom);
+  const pathChains = useAtomValue(MappedPathChainsAtom);
+  const beziers = useAtomValue(MappedBeziersAtom);
+  const poses = useAtomValue(MappedPosesAtom);
+  const values = useAtomValue(MappedValuesAtom);
+  const file = useAtomValue(MappedFileAtom);
   const points = [
     ...pathChains
-      .values()
-      .map((npc: NamedPathChain) => npc.paths.map(file.getBezierRefPoints)),
-  ].flat(1);
-  const showColors = false;
-  const showTime = false;
+      .entries()
+      .flatMap(([, apc]) =>
+        apc.paths.map((br): [Point[], ConcreteHeadingType] => [
+          calcBezierRef(br, file.container),
+          calcFacing(apc.heading, file.container),
+        ]),
+      ),
+  ];
+  const bgStyle = opts.ShowField
+    ? {
+        backgroundImage: `url('/assets/field-${theme}.jpg')`,
+      }
+    : {};
+  // This makes the canvas resize
   useEffect(() => {
-    const start = performance.now();
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) {
+        const { width, height } = entry.contentRect;
+        // Floor the value to prevent fractional pixel jittering during fast drags
+        setSize(Math.floor(Math.min(width, height)));
+      }
+    });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || size === 0) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
+    // const rect = canvas.getBoundingClientRect();
 
-    const squareSize = Math.min(rect.width, rect.height);
+    const squareSize = size; // Math.min(rect.width, rect.height);
 
     canvas.width = squareSize * dpr;
     canvas.height = squareSize * dpr;
@@ -57,65 +95,188 @@ export function ScaledCanvas(): ReactElement {
     // ctx.scale(dpr * scale, -dpr * scale);
     // or just a single line of code:
     ctx.setTransform(dpr * scale, 0, 0, -dpr * scale, 0, canvas.height);
+    if (opts.ShowCoords) {
+      ctx.save();
+      ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+      ctx.font = '5px sans-serif'; // Set font size and family
+      ctx.fillStyle = theme === 'light' ? 'black' : 'white'; // Set fill color for the text
+      ctx.strokeStyle = theme === 'light' ? 'white' : 'black';
+      ctx.lineWidth = 0.2;
 
-    ctx.clearRect(0, 0, fix * Scale, fix * Scale);
+      // Draw the coordinate points
+      ctx.textAlign = 'start'; // Set text alignment (e.g., "start", "end", "center")
+      ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
+      ctx.strokeText('(0,0)', 5, 139);
+      ctx.fillText('(0,0)', 5, 139);
+      ctx.strokeText('(0,144)', 5, 5);
+      ctx.fillText('(0,144)', 5, 5);
+      ctx.textAlign = 'end'; // Set text alignment (e.g., "start", "end", "center")
+      ctx.strokeText('(144,0)', 139, 5);
+      ctx.fillText('(144,0)', 139, 5);
+      ctx.strokeText('(144,144)', 139, 139);
+      ctx.fillText('(144,144)', 139, 139);
+      ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
+      ctx.strokeText('(72,72)', 72, 72);
+      ctx.fillText('(72,72)', 72, 72);
 
-    points.forEach((ctrlPoints, index) =>
-      renderPath(ctx, ctrlPoints, colors[index % colors.length]),
+      // Label the axis directions
+      ctx.strokeText('+y', 71, 84.5);
+      ctx.fillText('+y', 71, 84.5);
+      ctx.strokeText('-y', 71, 104.5);
+      ctx.fillText('-y', 71, 104.5);
+      ctx.strokeText('+x', 62, 95);
+      ctx.fillText('+x', 62, 95);
+      ctx.strokeText('-x', 82, 95);
+      ctx.fillText('-x', 82, 95);
+
+      // Label the compass angles
+      ctx.strokeText('90°(½π)', 72, 40);
+      ctx.fillText('90°(½π)', 72, 40);
+      ctx.strokeText('0°', 81, 48);
+      ctx.fillText('0°', 81, 48);
+      ctx.strokeText('180°(π)', 58, 48);
+      ctx.fillText('180°(π)', 58, 48);
+      ctx.strokeText('270°(³/₂π)', 72, 56);
+      ctx.fillText('270°(³/₂π)', 72, 56);
+
+      // Draw the axis directions
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = theme === 'light' ? 'black' : 'white';
+      ctx.beginPath();
+      let xc = 72;
+      let yc = 95;
+      // Vertical double arrow:
+      ctx.moveTo(xc - 2, yc - 5);
+      ctx.lineTo(xc, yc - 7);
+      ctx.lineTo(xc + 2, yc - 5);
+      ctx.moveTo(xc, yc - 7);
+      ctx.lineTo(xc, yc + 7);
+      ctx.moveTo(xc + 2, yc + 5);
+      ctx.lineTo(xc, yc + 7);
+      ctx.lineTo(xc - 2, yc + 5);
+      // Horizontal double arrow
+      ctx.moveTo(xc - 5, yc - 2);
+      ctx.lineTo(xc - 7, yc);
+      ctx.lineTo(xc - 5, yc + 2);
+      ctx.moveTo(xc - 7, yc);
+      ctx.lineTo(xc + 7, yc);
+      ctx.moveTo(xc + 5, yc + 2);
+      ctx.lineTo(xc + 7, yc);
+      ctx.lineTo(xc + 5, yc - 2);
+      // Arrow for the compass
+      ctx.moveTo(77 + 1, 48 + 2);
+      ctx.lineTo(77, 48);
+      ctx.lineTo(77 - 1.75, 48 + 1.75);
+      ctx.stroke();
+      ctx.beginPath();
+      // Arc for the compass
+      ctx.arc(72, 48, 5, Math.PI * -0.25, 0, true);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    points.forEach(([ctrlPoints, facing], index) =>
+      renderPath(
+        ctx,
+        ctrlPoints,
+        opts.Heading.Display && facing,
+        colors[index % colors.length]!,
+        opts,
+      ),
     );
-    if (showTime) {
-      drawTime(ctx, performance.now() - start, dpr, scale);
-    }
-    // Draw the colors
-    if (showColors) {
-      drawColors(ctx, colors);
-    }
-  }, [pathChains, beziers, poses, values, canvasRef]);
+  }, [pathChains, beziers, poses, values, canvasRef, size, opts, theme]);
 
-  return <canvas className="field" ref={canvasRef} />;
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        flexGrow: 1,
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        justifyContent: 'end',
+        alignItems: 'start',
+      }}>
+      {size > 0 && <canvas style={bgStyle} className="field" ref={canvasRef} />}
+    </div>
+  );
+}
+
+function diff(a: Point, b: Point): Point {
+  return { x: b.x - a.x, y: b.y - a.y };
+}
+
+function distance(a: Point, b: Point): number {
+  const delta = diff(a, b);
+  return Math.sqrt(delta.x * delta.x + delta.y * delta.y);
 }
 
 function renderPath(
   ctx: CanvasRenderingContext2D,
   curveControlPoints: Point[],
+  heading: ConcreteHeadingType | false,
   color: string,
+  opts: PathRenderOptions,
 ) {
+  if (curveControlPoints.length < 2) {
+    return;
+  }
   const len = bezierLength(curveControlPoints);
   const pts: Point[] = [];
   for (let t = 0; t <= 1.0; t += 1 / len) {
     pts.push(deCasteljau(curveControlPoints, t));
   }
-  /*
-      ctx.save();
-      ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-      ctx.font = '3px Arial'; // Set font size and family
-      ctx.fillStyle = 'blue'; // Set fill color for the text
-      ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
-      ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
-      ctx.fillText(`Text${i}`, 45 + 15 * i++, fix - (80 + 5 * i));
-      ctx.restore();
-      */
   ctx.beginPath();
-  ctx.lineWidth = 0.25;
+  ctx.lineWidth = opts.PathThickness;
   ctx.strokeStyle = color;
-  ctx.moveTo(curveControlPoints[0].x * Scale, curveControlPoints[0].y * Scale);
+  let approxLen = 0;
+  ctx.moveTo(
+    curveControlPoints[0]!.x * Scale,
+    curveControlPoints[0]!.y * Scale,
+  );
+  let lastPt = curveControlPoints[0]!;
   for (const pt of pts) {
+    approxLen += distance(lastPt, pt);
+    lastPt = pt;
     ctx.lineTo(pt.x * Scale, pt.y * Scale);
   }
+  approxLen += distance(
+    lastPt,
+    curveControlPoints[curveControlPoints.length - 1]!,
+  );
   ctx.lineTo(
-    curveControlPoints[curveControlPoints.length - 1].x * Scale,
-    curveControlPoints[curveControlPoints.length - 1].y * Scale,
+    curveControlPoints[curveControlPoints.length - 1]!.x * Scale,
+    curveControlPoints[curveControlPoints.length - 1]!.y * Scale,
   );
   ctx.stroke();
   ctx.beginPath();
-  ctx.lineWidth = 0.5;
+  ctx.lineWidth = opts.ControlPoint.Thickness;
   for (const pt of curveControlPoints) {
     ctx.strokeStyle = color;
-    ctx.moveTo(pt.x + PointRadius, pt.y);
-    ctx.arc(pt.x, pt.y, PointRadius, 0, 2 * Math.PI);
+    // TODO: Support more point display styles
+    ctx.moveTo((pt.x + opts.ControlPoint.Size / 2) * Scale, pt.y * Scale);
+    ctx.arc(
+      pt.x * Scale,
+      pt.y * Scale,
+      (opts.ControlPoint.Size / 2) * Scale,
+      0,
+      2 * Math.PI,
+    );
   }
   ctx.stroke();
-  // These two items wil be usefil for animation in the footure
+  if (heading) {
+    drawHeadingLines(
+      ctx,
+      color,
+      approxLen,
+      [...pts, curveControlPoints[curveControlPoints.length - 1]!],
+      heading,
+      opts,
+    );
+  }
+
+  // These two items wil be useful for animation in the footure
   /*
       const tang = bezierDerivative(curveControlPoints, 0.4);
       const mid = deCasteljau(curveControlPoints, 0.4);
@@ -139,25 +300,113 @@ function drawColors(ctx: CanvasRenderingContext2D, colors: string[]) {
   ctx.save();
   for (let j = 0; j < colors.length; j++) {
     ctx.beginPath();
-    ctx.fillStyle = colors[(j + 7) % colors.length];
+    ctx.fillStyle = colors[(j + 7) % colors.length]!;
     ctx.fillRect(j * 4, 0, 4, 4);
     ctx.stroke();
   }
   ctx.restore();
 }
 
-function drawTime(
+function magnitude(pt: Point, val: number): Point {
+  const mag = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
+  return { x: (pt.x * val) / mag, y: (pt.y * val) / mag };
+}
+
+function drawHeadingLines(
   ctx: CanvasRenderingContext2D,
-  time: number,
-  dpr: number,
-  scale: number,
+  color: string,
+  len: number,
+  pts: Point[],
+  heading: ConcreteHeadingType,
+  opts: PathRenderOptions,
 ) {
-  ctx.save();
-  ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-  ctx.font = '5px Arial'; // Set font size and family
-  ctx.fillStyle = 'green'; // Set fill color for the text
-  ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
-  ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
-  ctx.fillText(`Time: ${time}`, 50, 20);
-  ctx.restore();
+  // for "n" points, I'm not drawing starting/ending headings, so I actually want to split
+  // the length into count + 1 pieces, and find the point in between each piece
+  const pieceLen = len / (opts.Heading.Count + 1);
+  if (opts.Heading.Count <= 0 || pts.length < 3 || pieceLen < 1) {
+    return;
+  }
+  let curPtIndex = 1;
+  let lastDelta: Point = { x: 0, y: 0 };
+  for (
+    let pos = 0;
+    pos < opts.Heading.Count && curPtIndex < pts.length;
+    pos++
+  ) {
+    let pathPos = pieceLen * (pos + 1);
+    // Walk the length of the path, until we find the heading-draw point
+    let point: Point | undefined;
+    // This is just laziness. I shouldn't need to recalculate the whole thing, but
+    // math is hard...
+    for (let curPtIndex = 1; pathPos > 0; curPtIndex++) {
+      const prev = pts[curPtIndex - 1]!;
+      const cur = pts[curPtIndex]!;
+      lastDelta = diff(prev, cur);
+      const l = distance(prev, cur);
+      if (l >= pathPos) {
+        const partWay = magnitude(diff(prev, cur), pathPos);
+        point = { x: prev.x + partWay.x, y: prev.y + partWay.y };
+      }
+      pathPos -= l;
+    }
+    if (isDefined(point)) {
+      // Draw the heading line at this location.
+      // Include the tangent, and the portion of the overall path that's complete.
+      drawHeadingLine(
+        ctx,
+        color,
+        point,
+        lastDelta,
+        (pos + 1) / (opts.Heading.Count + 1),
+        heading,
+        opts,
+      );
+    }
+  }
+}
+
+function drawHeadingLine(
+  ctx: CanvasRenderingContext2D,
+  color: string,
+  point: Point,
+  tangent: Point,
+  percentage: number,
+  heading: ConcreteHeadingType,
+  opts: PathRenderOptions,
+) {
+  let disp: Point = { x: 0, y: 0 };
+  let actualColor = color;
+  if (chkConcreteTangentHeading(heading)) {
+    disp = magnitude(tangent, opts.Heading.Length);
+    actualColor = '#777';
+  } else if (chkConcreteConstantHeading(heading)) {
+    disp = magnitude(
+      { x: Math.cos(heading.heading), y: Math.sin(heading.heading) },
+      opts.Heading.Length,
+    );
+    actualColor = '#70f';
+  } else if (chkConcreteLinearHeading(heading)) {
+    const radians =
+      (heading.headings[0] + (heading.headings[1] - heading.headings[0])) *
+      percentage;
+    disp = magnitude(
+      { x: Math.cos(radians), y: Math.sin(radians) },
+      opts.Heading.Length,
+    );
+    actualColor = '#F07';
+  } else if (chkConcretePointHeading(heading)) {
+    disp = magnitude(diff(heading.heading, point), opts.Heading.Length);
+    actualColor = '#07F';
+  } else {
+    // We don't handle others yet...
+    disp = magnitude(tangent, 0.1);
+    actualColor = '#0f7';
+  }
+  ctx.beginPath();
+  ctx.lineCap = 'round';
+  ctx.lineWidth = opts.Heading.Thickness;
+  ctx.strokeStyle = actualColor;
+  ctx.moveTo(point.x * Scale, point.y * Scale);
+  ctx.lineTo((point.x + disp.x) * Scale, (point.y + disp.y) * Scale);
+  ctx.stroke();
 }

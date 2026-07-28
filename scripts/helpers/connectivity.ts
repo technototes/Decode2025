@@ -1,6 +1,8 @@
-import { hasFieldType, isObject, isString } from '@freik/typechk';
 import { promises as dns } from 'dns';
 import { networkInterfaces } from 'os';
+
+import { hasFieldType, isObject, isString } from '@freik/typechk';
+
 import { Error } from './menu.js';
 
 // Gets an array of interface and ip address pairs

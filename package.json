@@ -69,7 +69,7 @@
     "- // z ": "Type check the scripts (BUG: It's typechecking node_modules too!)",
     "types": "tsc --noEmit -p tsconfig.json",
     "- //": "This is just a shortcut helper script for now to launch the pedropath visualizer",
-    "pv": "bun run open http://localhost:3000 && cd pedroviz && bun install && bun pvdev",
+    "pv": "cd pedroviz && bun install && bun pvdev",
     "- // graph-": "",
     "- // graph1": "This generates class graphs for the various codebases. Paste it into https://mermaid.live to visualize",
     "- // graph2": "First build the java2umltext tool with './gradlew :java2umltext:build' (or bun build)",
@@ -83,19 +83,64 @@
     "graph": "bun run graphlib && bun run graph16 && bun run graph20 && bun run graphlb"
   },
   "dependencies": {
-    "@freik/containers": "^0.4.4",
-    "@freik/typechk": "^0.9.0",
-    "@freik/workspace": "^0.6.5",
-    "prettier": "^3.7.4",
-    "prettier-plugin-java": "^2.7.7",
-    "prettier-plugin-organize-imports": "^4.3.0",
+    "@freik/containers": "^0.4.10",
+    "@freik/typechk": "^0.10.0",
+    "@freik/workspace": "^0.8.1",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "prettier": "^3.9.6",
+    "prettier-plugin-java": "^2.10.3",
     "pretty-quick": "^4.2.2",
-    "simple-git": "^3.30.0",
+    "simple-git": "^3.36.0",
     "simple-git-hooks": "^2.13.1",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "devDependencies": {
-    "@types/bun": "1.3.5"
+    "@types/bun": "1.3.14"
   },
-  "private": true
+  "prettier": {
+    "printWidth": 80,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "proseWrap": "always",
+    "tabWidth": 2,
+    "useTabs": false,
+    "bracketSameLine": true,
+    "arrowParens": "always",
+    "plugins": ["prettier-plugin-java", "@ianvs/prettier-plugin-sort-imports"],
+    "overrides": [
+      {
+        "files": "*.json",
+        "options": {
+          "parser": "json"
+        }
+      },
+      {
+        "files": "*.mts",
+        "options": {
+          "parser": "typescript"
+        }
+      },
+      {
+        "files": "*.java",
+        "options": {
+          "tabWidth": 4,
+          "printWidth": 100,
+          "arrowParens": "avoid"
+        }
+      }
+    ],
+    "importOrder": [
+      "^react$",
+      "^react-dom$",
+      "^react-dom/client$",
+      "^.*jotai.*$",
+      "",
+      "<THIRD_PARTY_MODULES>",
+      "^@freik/.*$",
+      "",
+      "^(?!.*[.]css$)[./].*$",
+      "",
+      ".css$"
+    ]
+  }
 }

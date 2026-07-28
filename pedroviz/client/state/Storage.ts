@@ -1,5 +1,12 @@
-import { typecheck } from '@freik/typechk';
 import { createStore } from 'jotai';
+
+import {
+  hasStrField,
+  isDefined,
+  isUndefined,
+  SafelyUnpickle,
+  typecheck,
+} from '@freik/typechk';
 
 // import { atomWithStorage } from 'jotai/utils';
 // import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
@@ -19,18 +26,23 @@ export function getStore(curStore?: MyStore): MyStore {
 export async function fetchApi<T>(
   key: string,
   chk: typecheck<T>,
-  def?: T,
+  def: T,
 ): Promise<T> {
   const fetched = await fetch('/api/' + key);
   if (fetched.ok) {
-    const res = await fetched.json();
-    if (chk(res)) {
-      return res;
+    const res = await fetched.text();
+    const try2 = SafelyUnpickle(res, chk);
+    if (isDefined(try2)) {
+      return try2;
     }
-    // else {
-    //   console.log('Invalid result for', key);
-    //   console.log(res);
-    // }
+    try {
+      const val = JSON.parse(res);
+      if (hasStrField(val, 'error')) {
+        console.error('Received error from server', val.error);
+      }
+    } catch {
+      console.error('Received malformed message from server:', res);
+    }
   }
   return def;
 }

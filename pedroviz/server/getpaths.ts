@@ -1,11 +1,10 @@
 import fs, { promises as fsp } from 'node:fs';
 import path from 'node:path';
-import { TeamPaths } from './types';
+
+import { Path, Team, TeamPaths } from './types';
 import { firstFtcSrc, isDirectory } from './utility';
 
-// Send the list of TeamPaths to the client
-export async function GetPathFileNames(): Promise<Response> {
-  // First, get the path to the root of the repository:
+export async function GetTeamPaths() {
   const repoRoot = await getRelativeRepoRoot(
     Bun.fileURLToPath(new URL('.', import.meta.url)),
   );
@@ -16,24 +15,23 @@ export async function GetPathFileNames(): Promise<Response> {
   for (const teamName of teamDirs) {
     filePaths[teamName] = await getPathFiles(repoRoot, teamName);
   }
-  // console.log('Found the following paths:', filePaths);
-  return Response.json(filePaths);
+  return filePaths;
 }
 
-const pathNameMatch = /Path[^\/\\]*\.java$/;
+const pathNameMatch = /[^\/\\]*(Path|Pose)[^\/\\]*\.java$/;
 
 // Find all the files in the team directory that look like good Path files
 export async function getPathFiles(
   repoRoot: string,
   teamName: string,
-): Promise<string[]> {
+): Promise<Path[]> {
   const teamDir = path.join(
     repoRoot,
     teamName,
     firstFtcSrc,
     teamName.toLocaleLowerCase(),
   );
-  const pathFiles: string[] = [];
+  const pathFiles: Path[] = [];
   // A worklist of directories to check for PedroPath-containing java files
   const pathsToCheck: string[] = [teamDir];
   while (pathsToCheck.length > 0) {
@@ -44,19 +42,19 @@ export async function getPathFiles(
       if (entry.isDirectory()) {
         pathsToCheck.push(fullPath);
       } else if (await isPathFile(entry)) {
-        pathFiles.push(path.relative(teamDir, fullPath));
+        pathFiles.push(path.relative(teamDir, fullPath) as Path);
       }
     }
   }
   return pathFiles;
 }
 
-// The imports we're looking for in a Path*.java file:
+// The *only* imports we're looking for in a Path*.java file. This is probably too strict.
 const imports = [
   /^\s*import\s+com\.pedropathing\.follower\.Follower\s*;/,
-  /^\s*import\s+com\.pedropathing\.geometry\.Bezier[A-Za-z]+\s*;/,
-  /^\s*import\s+com\.pedropathing\.geometry\.Pose\s*;/,
-  /^\s*import\s+com\.pedropathing\.paths\.PathChain\s*;/,
+  /^\s*import\s+com\.pedropathing\.geometry\.(Bezier[A-Za-z]+|Pose)\s*;/,
+  /^\s*import\s+com\.pedropathing\.paths\.(HeadingInterpolator|PathChain)\s*;/,
+  /^\s*import\s+com\.bylazar\.configurables\.annotations\.Configurable\s*;/,
 ];
 
 async function isPathFile(entry: fs.Dirent): Promise<boolean> {
@@ -74,8 +72,7 @@ async function isPathFile(entry: fs.Dirent): Promise<boolean> {
     }
     return false;
   });
-  // console.log(`File ${filePath} has ${matches.length} relevant import lines.`, matches);
-  return matches.length >= 4;
+  return matches.length !== 0;
 }
 
 export async function getRelativeRepoRoot(
@@ -97,11 +94,11 @@ export async function getRelativeRepoRoot(
   throw new Error('Could not find repository root');
 }
 
-export async function getTeamDirectories(repoRoot: string): Promise<string[]> {
+export async function getTeamDirectories(repoRoot: string): Promise<Team[]> {
   const entries = await fsp.readdir(`${repoRoot}`, { withFileTypes: true });
   const teamDirs = entries
     .filter((dir) => isTeamDirectory(repoRoot, dir))
-    .map((dir) => dir.name);
+    .map((dir) => dir.name as Team);
   return teamDirs;
 }
 

@@ -1,51 +1,24 @@
-import { chkAnyOf, isString } from '@freik/typechk';
 import {
-  accError,
+  chkAnyOf,
+  ErrorOr,
+  isError,
+  isString,
+  MakeError,
+} from '@freik/typechk';
+
+import {
   AnonymousBezier,
   AnonymousPose,
-  AnonymousValue,
-  BezierRef,
-  chkConstantHeading,
-  chkInterpolatedHeading,
-  chkPathChainFile,
-  chkRadiansRef,
-  chkTeamPaths,
-  ErrorOr,
-  HeadingRef,
-  HeadingType,
-  isError,
-  isRef,
-  makeError,
-  NamedBezier,
-  NamedPathChain,
-  NamedPose,
-  NamedValue,
-  PathChainFile,
-  PoseRef,
-  TeamPaths,
-  ValueRef,
+  chkParsedClass,
+  chkPathDatabase,
+  ParsedClass,
+  Path,
+  PathDatabase,
+  Team,
 } from '../../server/types';
-import { MakeIndexedFile } from './IndexedFile';
+import { NameLookup, OneFileIndex } from '../types';
+import { GetNameLookup, MakeFileIndex, ValidateIndex } from './IndexedFile';
 import { fetchApi } from './Storage';
-import {
-  AnonymousPathChain,
-  IndexedFile,
-  IndexedPCF,
-  IndexedPCFile,
-  Point,
-} from './types';
-
-let ipcf: IndexedPCF = {
-  name: 'empty',
-  values: [],
-  poses: [],
-  beziers: [],
-  pathChains: [],
-  namedValues: new Map<string, number>(),
-  namedPoses: new Map<string, number>(),
-  namedBeziers: new Map<string, number>(),
-  namedPathChains: new Map<string, number>(),
-};
 
 export type ValidRes = ErrorOr<true>;
 // Some of the logic seems a little odd, because I want the validation to fully
@@ -54,6 +27,7 @@ export type ValidRes = ErrorOr<true>;
 const colorLookup: Map<string, number> = new Map();
 let colorCount = 0;
 
+// This provides a consistent color for a given curve/pose
 export function getColorFor(
   item: string | AnonymousBezier | AnonymousPose,
 ): number {
@@ -61,68 +35,78 @@ export function getColorFor(
     if (!colorLookup.has(item)) {
       colorLookup.set(item, colorCount++);
     }
-    return colorLookup.get(item);
+    return colorLookup.get(item)!;
   }
   return getColorFor(JSON.stringify(item));
 }
 
-export async function GetPaths(): Promise<TeamPaths> {
-  const teamFileList = await fetchApi('getpaths', chkTeamPaths, {});
-  for (const i of Object.keys(teamFileList)) {
-    teamFileList[i].sort();
-  }
-  return teamFileList;
+// Get the entire Database from the server
+export async function GetFullDb(): Promise<PathDatabase> {
+  return await fetchApi('db', chkPathDatabase, new Map());
 }
 
-export const EmptyPathChainFile: IndexedPCF = {
-  name: '',
-  values: [],
-  poses: [],
-  beziers: [],
-  pathChains: [],
-  namedValues: new Map(),
-  namedPoses: new Map(),
-  namedBeziers: new Map(),
-  namedPathChains: new Map(),
-};
-
 // last loaded file, I guess?
-const lastLoadedFile = { team: '', file: '', data: null as null | IndexedFile };
-export async function LoadFile(
+const lastLoadedIndexFile = {
+  team: '',
+  file: '',
+  data: null as null | OneFileIndex,
+};
+const indexedFiles: Map<[Team, Path], OneFileIndex> = new Map();
+
+export async function LoadAndIndexFile(
   team: string,
   file: string,
-): Promise<ErrorOr<IndexedFile>> {
+): Promise<ErrorOr<OneFileIndex>> {
   if (
-    lastLoadedFile.team === team &&
-    lastLoadedFile.file === file &&
-    lastLoadedFile.data !== null
+    lastLoadedIndexFile.team === team &&
+    lastLoadedIndexFile.file === file &&
+    lastLoadedIndexFile.data !== null
   ) {
     console.log('using cached file for', team, file);
-    return lastLoadedFile.data;
+    return lastLoadedIndexFile.data;
   }
-  lastLoadedFile.team = team;
-  lastLoadedFile.file = file;
-  lastLoadedFile.data = null;
-  const pcf = await fetchApi(
+  lastLoadedIndexFile.team = team;
+  lastLoadedIndexFile.file = file;
+  lastLoadedIndexFile.data = null;
+  const pc = await fetchApi(
     `loadpath/${encodeURIComponent(team)}/${encodeURIComponent(file)}`,
-    chkAnyOf(chkPathChainFile, isString),
-    "Invalid PathChainFile loaded from server",
+    chkAnyOf(chkParsedClass, isString),
+    'Invalid ParsedClass loaded from server',
   );
-  if (isString(pcf)) {
-    return makeError(pcf);
+  if (isString(pc)) {
+    return MakeError(pc);
   }
-  const indexFile = MakeIndexedFile(pcf);
-  if (isError(indexFile)) {
-    return makeError(`Loaded file ${team}/${file} has dangling references.`);
+  const indexFile = await MakeFileIndex(pc);
+  const lookup: NameLookup = GetNameLookup();
+  lookup.registerIndex(indexFile);
+  const validate = ValidateIndex(indexFile, lookup, pc);
+  if (isError(validate)) {
+    return MakeError(
+      validate,
+      `Loaded file ${team}/${file} has dangling references.`,
+    );
+  } else {
+    // TODO: This shouldn't be manual. If you have dangling references, you should evaluate the other files...
+    indexedFiles.set([team as Team, file as Path], indexFile);
   }
-  lastLoadedFile.data = indexFile;
+  lastLoadedIndexFile.data = indexFile;
   return indexFile;
+}
+
+export function UpdateIndexFile(
+  team: string,
+  file: string,
+  data: OneFileIndex,
+) {
+  lastLoadedIndexFile.team = team;
+  lastLoadedIndexFile.file = file;
+  lastLoadedIndexFile.data = data;
 }
 
 export async function SavePath(
   team: string,
   path: string,
-  data: PathChainFile,
+  data: ParsedClass,
 ): Promise<undefined | string> {
   // NYI on the server, either :D
   return 'NYI';

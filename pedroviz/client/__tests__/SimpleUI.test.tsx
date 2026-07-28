@@ -1,11 +1,13 @@
 /// <reference lib="dom" />
 
+import { ReactElement } from 'react';
+import { Provider, useAtom } from 'jotai';
+
 import {
   FluentProvider,
   webDarkTheme,
   webLightTheme,
 } from '@fluentui/react-components';
-import '@testing-library/jest-dom';
 import {
   act,
   fireEvent,
@@ -14,89 +16,158 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { Provider, useAtom } from 'jotai';
-import { ReactElement } from 'react';
-import { AnonymousBezier, PathChainFile, TeamPaths } from '../../server/types';
-import { select_a_bot, select_a_file } from '../constants';
+import { Pickle } from '@freik/typechk';
+
+import '@testing-library/jest-dom';
+
+import { ThemeAtom } from 'client/state/SavedSettings';
+
+import { makeKey } from '../../server/full-database';
+import {
+  AnonymousBezier,
+  BezierName,
+  EmptyParsedClass,
+  ParsedClass,
+  Path,
+  PathChainName,
+  PathDBKey,
+  PathDBValue,
+  PoseName,
+  Team,
+  TeamPaths,
+  ValueName,
+} from '../../server/types';
+import { Strings } from '../constants';
 import { PathsDataDisplay } from '../PathsDataDisplay';
 import { PathSelector } from '../PathSelector';
-import { EmptyPathChainFile } from '../state/API';
 import {
+  ClearCache,
   ColorForNumber,
   ColorsAtom,
-  FilesForSelectedTeam,
-  NamedBeziersAtom,
-  NamedPathChainsAtom,
-  NamedPosesAtom,
-  NamedValuesAtom,
+  FilesForSelectedTeamAtom,
+  MappedBeziersAtom,
+  MappedPathChainsAtom,
+  MappedPosesAtom,
+  MappedValuesAtom,
+  PoseAtomFamily,
   SelectedFileAtom,
   SelectedTeamAtom,
-  ThemeAtom,
+  ValueAtomFamily,
 } from '../state/Atoms';
 import { getStore } from '../state/Storage';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
+
 import './jest-dom-types-fix.test';
 
 // Mocks & phony data for my tests:
 const teamPaths: TeamPaths = {
-  team1: ['path1.java', 'path2.java'],
-  team2: ['path3.java', 'path4.java'],
+  ['team1' as Team]: ['path1.java' as Path, 'path2.java' as Path],
+  ['team2' as Team]: ['path3.java' as Path, 'path4.java' as Path],
 };
 
-const testPathChainFile: PathChainFile = {
-  ...EmptyPathChainFile,
+const testParsedClass: ParsedClass = {
+  values: [],
+  poses: [],
+  beziers: [],
+  pathChainHelpers: [],
+  pathChains: [],
+  container: { fileName: '' },
+  children: {},
   name: 'path1.java',
+  fullName: 'test.path1',
+  imports: [],
 };
 
 const simpleBez: AnonymousBezier = {
   type: 'curve',
-  points: [{ x: 'val1', y: 'val1' }, 'pose1', 'pose2'],
+  points: [
+    { x: 'val1' as ValueName, y: 'val1' as ValueName },
+    'pose1' as PoseName,
+    'pose2' as PoseName,
+  ],
 };
-const fullPathChainFile: PathChainFile = {
+const fullParsedClass: ParsedClass = {
   name: 'path3.java',
+  fullName: 'test.path3',
+  imports: [],
   values: [
-    { name: 'val1', value: { type: 'int', value: 1 } },
-    { name: 'val2', value: { type: 'double', value: 2.5 } },
-    { name: 'val3', value: { type: 'radians', value: 90 } },
+    { name: 'val1' as ValueName, value: { int: 1 } },
+    { name: 'val2' as ValueName, value: { double: 2.5 } },
+    { name: 'val3' as ValueName, value: { radians: { int: 90 } } },
   ],
   poses: [
-    { name: 'pose1', pose: { x: { type: 'double', value: 2.5 }, y: 'val1' } },
     {
-      name: 'pose2',
-      pose: { x: 'val2', y: 'val1', heading: { type: 'radians', value: 60 } },
+      name: 'pose1' as PoseName,
+      pose: { x: { double: 2.5 }, y: 'val1' as ValueName },
     },
     {
-      name: 'pose3',
-      pose: { x: 'val1', y: 'val2', heading: 'val3' },
+      name: 'pose2' as PoseName,
+      pose: {
+        x: 'val2' as ValueName,
+        y: 'val1' as ValueName,
+        heading: { radians: { int: 60 } },
+      },
+    },
+    {
+      name: 'pose3' as PoseName,
+      pose: {
+        x: 'val1' as ValueName,
+        y: 'val2' as ValueName,
+        heading: 'val3' as ValueName,
+      },
     },
   ],
   beziers: [
-    { name: 'bez1', points: { type: 'line', points: ['pose1', 'pose2'] } },
     {
-      name: 'bez2',
+      name: 'bez1' as BezierName,
+      points: {
+        type: 'line',
+        points: ['pose1' as PoseName, 'pose2' as PoseName],
+      },
+    },
+    {
+      name: 'bez2' as BezierName,
       points: simpleBez,
     },
   ],
   pathChains: [
     {
-      name: 'pc1',
-      paths: ['bez1', 'bez2'],
-      heading: { type: 'tangent' },
+      name: 'pc1' as PathChainName,
+      paths: ['bez1' as BezierName, 'bez2' as BezierName],
+      pathHeading: { type: 'tangent' },
     },
     {
-      name: 'pc2',
-      paths: ['bez2', { type: 'line', points: ['pose1', 'pose3'] }],
-      heading: { type: 'constant', heading: 'pose3' },
+      name: 'pc2' as PathChainName,
+      paths: [
+        'bez2' as BezierName,
+        { type: 'line', points: ['pose1' as PoseName, 'pose3' as PoseName] },
+      ],
+      pathHeading: { type: 'constant', heading: 'pose3' as PoseName },
     },
     {
-      name: 'pc3',
-      paths: ['bez1', { type: 'curve', points: ['pose1', 'pose3', 'pose2'] }],
-      heading: {
-        type: 'interpolated',
-        headings: ['pose2', { radians: { type: 'int', value: 135 } }],
+      name: 'pc3' as PathChainName,
+      paths: [
+        'bez1' as BezierName,
+        {
+          type: 'curve',
+          points: [
+            'pose1' as PoseName,
+            'pose3' as PoseName,
+            'pose2' as PoseName,
+          ],
+        },
+      ],
+      pathHeading: {
+        type: 'linear',
+        start: 'pose2' as PoseName,
+        end: { radians: { int: 135 } },
       },
     },
   ],
+  // TODO
+  container: { fileName: '' },
+  children: {},
+  pathChainHelpers: [],
 };
 
 const status = {
@@ -104,25 +175,32 @@ const status = {
   headers: { 'Content-Type': 'application/json' },
 };
 
+const database = new Map<PathDBKey, PathDBValue>([
+  [makeKey('team1' as Team, 'path1.java' as Path), [[], EmptyParsedClass]],
+  [makeKey('team1' as Team, 'path2.java' as Path), [[], EmptyParsedClass]],
+  [makeKey('team2' as Team, 'path3.java' as Path), [[], fullParsedClass]],
+  [makeKey('team2' as Team, 'path4.java' as Path), [[], EmptyParsedClass]],
+]);
+
 async function MyFetchFunc(
   key: string | URL | Request,
   init?: RequestInit,
 ): Promise<Response> {
   switch (key) {
-    case '/api/getpaths': {
-      const body = JSON.stringify(teamPaths);
-      return new Response(body, status);
-    }
     case '/api/loadpath/team1/path2.java': {
-      const body = JSON.stringify(testPathChainFile);
+      const body = JSON.stringify(testParsedClass);
       return new Response(body, status);
     }
     case '/api/loadpath/team2/path3.java': {
-      const body = JSON.stringify(fullPathChainFile);
+      const body = JSON.stringify(fullParsedClass);
+      return new Response(body, status);
+    }
+    case '/api/db': {
+      const body = Pickle(database);
       return new Response(body, status);
     }
   }
-  return new Response('ERROR', { status: 404 });
+  throw new Error(`Unknown key: ${key}`);
 }
 MyFetchFunc.preconnect = () => {};
 
@@ -151,7 +229,7 @@ function JotaiProvider({
   const store = getStore();
   return (
     <Provider store={store}>
-      <FluentFixture change={false || change}>{children}</FluentFixture>
+      <FluentFixture change={change!!}>{children}</FluentFixture>
     </Provider>
   );
 }
@@ -160,6 +238,7 @@ beforeEach(async () => {
   // Execute the localStorage clear function within the test environment
   // This approach is common when using test runners that control a browser context
   await window.localStorage.clear();
+  ClearCache();
 });
 
 describe('Simplest UI validation', () => {
@@ -201,19 +280,19 @@ describe('Simplest UI validation', () => {
       );
     });
     // Need to cover Paths & Teams atoms
-    let open = screen.getByText(select_a_bot);
+    let open = screen.getByText(Strings.select_a_bot);
     expect(open).toBeEnabled();
-    let path = screen.getByText(select_a_file);
+    let path = screen.getByText(Strings.select_a_file);
     expect(path).toBeDisabled();
     await act(async () => fireEvent.click(open));
     let select = screen.getByText('team2');
     expect(select).toBeEnabled();
     await act(async () => fireEvent.click(select));
     await waitFor(async () => {
-      expect(await store.get(SelectedTeamAtom)).toBe('team2');
+      expect(await store.get(SelectedTeamAtom)).toBe('team2' as Team);
     });
     await waitFor(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('');
+      expect(await store.get(SelectedFileAtom)).toBe('' as Path);
     });
     // The second menu should now be enabled
     expect(path).toBeEnabled();
@@ -224,13 +303,13 @@ describe('Simplest UI validation', () => {
     expect(selectFile).toBeEnabled();
     await act(async () => fireEvent.click(selectFile));
     await waitFor(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('path3.java');
+      expect(await store.get(SelectedFileAtom)).toBe('path3.java' as Path);
     });
     await act(async () => {
       await store.set(SelectedTeamAtom, 'team3');
     });
     await act(async () => {
-      expect(await store.get(FilesForSelectedTeam)).toEqual([]);
+      expect(await store.get(FilesForSelectedTeamAtom)).toEqual([]);
     });
   });
 });
@@ -246,29 +325,32 @@ describe('SchemaAtom tests', () => {
         </JotaiProvider>,
       );
     });
-    store.set(SelectedTeamAtom, 'team2');
-    store.set(SelectedFileAtom, 'path3.java');
-    await waitFor(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('path3.java');
+    await act(async () => {
+      await store.set(SelectedTeamAtom, 'team2');
+      await store.set(SelectedFileAtom, 'path3.java');
     });
-    expect(store.get(NamedValuesAtom)).toBeDefined();
-    expect(store.get(NamedPosesAtom)).toBeDefined();
-    expect(store.get(NamedBeziersAtom)).toBeDefined();
-    expect(store.get(NamedPathChainsAtom)).toBeDefined();
+    await act(async () => {
+      expect(await store.get(SelectedFileAtom)).toBe('path3.java' as Path);
+    });
+    expect(await store.get(MappedValuesAtom)).toBeDefined();
+    expect(await store.get(MappedPosesAtom)).toBeDefined();
+    expect(await store.get(MappedBeziersAtom)).toBeDefined();
+    expect(await store.get(MappedPathChainsAtom)).toBeDefined();
     await act(() =>
-      store.set(NamedValuesAtom, {
-        name: 'valX',
-        value: { type: 'int', value: 42 },
-      }),
+      store.set(ValueAtomFamily('valX' as ValueName), { int: 42 }),
     );
-    waitFor(async () => {
-      expect(await store.get(NamedValuesAtom)).toHaveProperty('valX');
-      expect(await store.get(NamedPosesAtom)).toHaveProperty('poseX');
+    await waitFor(async () => {
+      expect(
+        (await store.get(MappedValuesAtom)).has('valX' as ValueName),
+      ).toBeTrue();
+      expect(
+        (await store.get(MappedPosesAtom)).has('poseX' as PoseName),
+      ).toBeFalse();
     });
     await act(() =>
-      store.set(NamedPosesAtom, {
-        name: 'poseX',
-        pose: { x: 'valX', y: 'valX' },
+      store.set(PoseAtomFamily('poseX' as PoseName), {
+        x: 'valX' as ValueName,
+        y: 'valX' as ValueName,
       }),
     );
   });

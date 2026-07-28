@@ -11,8 +11,11 @@ public class TeamTestPaths {
 
     public static double org = 72.0;
     public static int step = 80;
+    public static int ninety = 90;
     public static double one80 = Math.toRadians(180);
     public static double step_mid = 74.0;
+    public static double radRef = Math.toRadians(ninety);
+    public static double valRef = org;
 
     public static Pose start = new Pose(org, org, 0);
     public static Pose step1 = new Pose(step, org, Math.toRadians(90));
@@ -65,7 +68,7 @@ public class TeamTestPaths {
             .addPath(new BezierLine(new Pose(0, 0), new Pose(20, 20)))
             .addPath(new BezierCurve(step1, step2, step3, step4))
             .addPath(step4_to_start)
-            .setLinearHeadingInterpolation(Math.toRadians(step), step4.getHeading())
+            .setLinearHeadingInterpolation(Math.toRadians(step), radRef)
             .build();
     }
 }
