@@ -124,10 +124,10 @@ export function ScaledCanvas(): ReactElement {
       ctx.fillText('+y', 71, 84.5);
       ctx.strokeText('-y', 71, 104.5);
       ctx.fillText('-y', 71, 104.5);
-      ctx.strokeText('+x', 62, 95);
-      ctx.fillText('+x', 62, 95);
-      ctx.strokeText('-x', 82, 95);
-      ctx.fillText('-x', 82, 95);
+      ctx.strokeText('-x', 62, 95);
+      ctx.fillText('-x', 62, 95);
+      ctx.strokeText('+x', 82, 95);
+      ctx.fillText('+x', 82, 95);
 
       // Label the compass angles
       ctx.strokeText('90°(½π)', 72, 40);
