@@ -6,9 +6,16 @@ import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
+import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
 public class RPaths {
+
+    Poses.StartPoses sp = new Poses.StartPoses();
+
+    public static Follower follower;
+    public Robot robot;
 
     public PathChain PRStartToRLaunch;
     public PathChain PRLaunchToRInt1;
