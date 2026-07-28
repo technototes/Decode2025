@@ -22,8 +22,8 @@ public class MotorPlus<T extends DcMotorSimple> extends HardwareDevice<T> implem
     protected double power;
     protected DcMotorSimple.Direction dir;
     protected DcMotor.ZeroPowerBehavior zeroBehavior;
-    protected static double RPM;
-    protected static double maxVoltage;
+    protected double RPM;
+    protected double maxVoltage;
 
     private String dirStr() {
         return dir == DcMotorSimple.Direction.FORWARD ? "Fwd" : "Rev";
@@ -89,8 +89,8 @@ public class MotorPlus<T extends DcMotorSimple> extends HardwareDevice<T> implem
     }
 
     // sets the rpm to the given value (set this value to the motor speed on the label with the exception of bare/6000 which you set to 5800
-    public MotorPlus<T> setRPM(double RPM) {
-        MotorPlus.RPM = RPM;
+    public MotorPlus<T> setRPM(double rpm) {
+        this.RPM = rpm;
         T device = getRawDevice();
         if (device != null) {
             this.setRPM(RPM);
@@ -100,7 +100,7 @@ public class MotorPlus<T extends DcMotorSimple> extends HardwareDevice<T> implem
 
     //sets the maximum voltage the motor is supplied with this is needed for some funny math
     public MotorPlus<T> setMaxVolt(double V) {
-        MotorPlus.maxVoltage = V;
+        this.maxVoltage = V;
         T device = getRawDevice();
         if (device != null) {
             this.setMaxVolt(V);
