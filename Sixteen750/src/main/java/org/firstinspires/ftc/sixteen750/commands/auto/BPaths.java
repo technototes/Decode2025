@@ -5,12 +5,6 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.PathChain;
-import com.technototes.library.command.Command;
-import com.technototes.library.command.SequentialCommandGroup;
-import com.technototes.library.command.WaitCommand;
-import org.firstinspires.ftc.sixteen750.Robot;
-import org.firstinspires.ftc.sixteen750.commands.AltAutoOrient;
-import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
 public class BPaths {
@@ -51,8 +45,8 @@ public class BPaths {
     public PathChain BFLaunchToBFInt2;
     public PathChain BFLaunchToBFInt3;
     public PathChain BFLaunchToBFEnd;
-    public static double power085 = 0.72;
-    public static double power092 = 0.92;
+    public static double power085 = 0.85;
+    public static double power095 = 0.95;
 
     public BPaths(Follower follower) {
         follower.setMaxPowerScaling(1);

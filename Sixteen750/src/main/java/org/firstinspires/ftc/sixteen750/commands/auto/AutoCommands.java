@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.sixteen750.commands.auto;
 
 import com.technototes.library.command.Command;
+import com.technototes.library.command.ParallelCommandGroup;
 import com.technototes.library.command.ParallelRaceGroup;
 import com.technototes.library.command.SequentialCommandGroup;
 import com.technototes.library.command.WaitCommand;
@@ -11,17 +12,25 @@ import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
 
 public class AutoCommands {
 
+    public static Command PostLaunchRoutine(Robot r) {
+        return new ParallelCommandGroup(TeleCommands.GateUp(r), TeleCommands.Feed(r));
+    }
+
+    public static Command AutoStartRoutine(Robot r) {
+        return new ParallelCommandGroup(
+            TeleCommands.GateUp(r),
+            TeleCommands.Launch(r),
+            TeleCommands.HoodUp(r)
+        );
+    }
+
     public static Command AutoLaunching3Balls(Robot r) {
         return new SequentialCommandGroup(
             //TeleCommands.IntakeStop(r),
-            TeleCommands.Feed(r),
+            new ParallelCommandGroup(TeleCommands.Feed(r), TeleCommands.GateDown(r)),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
-            TeleCommands.GateDown(r),
-            new WaitCommand(0.5),
-            TeleCommands.GateUp(r),
-            TeleCommands.Intake(r)
-
+            new WaitCommand(0.5)
             // want to keep launcher running during auto also no need to stop intake
         )
             //.alongWith(new AltAutoOrient(r));

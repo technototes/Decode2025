@@ -42,11 +42,11 @@ public class Poses {
 
         public static Pose RLaunch = new Pose(88, 82);
         public static double RLaunchHead = Math.toRadians(49);
-        public static Pose RInt1 = new Pose(135, 64.8);
+        public static Pose RInt1 = new Pose(135, 64);
         public static double RInt1Head = Math.toRadians(348);
-        public static Pose RInt1CtrlPoint1 = new Pose(104, 84);
-        public static Pose RInt1CtrlPoint2 = new Pose(102, 66);
-        public static Pose RInt1ToLaunchCtrlPoint = new Pose(96, 42);
+        public static Pose RInt1CtrlPoint1 = new Pose(88, 60);
+        public static Pose RInt1CtrlPoint2 = new Pose(88, 66);
+        public static Pose RInt1ToLaunchCtrlPoint = new Pose(120, 58);
         public static Pose RGateInt = new Pose(134.4, 65.1);
         public static Pose RGateInt2 = new Pose(134.4, 66.9);
         public static Pose RGateInt3 = new Pose(134.4, 67.2);
@@ -64,7 +64,7 @@ public class Poses {
 
         public static Pose RLaunch = new Pose(88, 82);
         public static double RLaunchHead = Math.toRadians(49);
-        public static Pose RInt1 = new Pose(135, 64.8);
+        public static Pose RInt1 = new Pose(135, 64.4);
         public static double RInt1Head = Math.toRadians(354);
         public static Pose RInt1CtrlPoint1 = new Pose(82.5, 64);
         public static Pose RInt1CtrlPoint2 = new Pose(102, 66);
@@ -72,7 +72,7 @@ public class Poses {
         public static Pose RGateInt = new Pose(134.4, 66.5);
         public static Pose RInt2 = new Pose(135, 42);
         public static double RInt2Head = Math.toRadians(0);
-        public static Pose RInt2CtrlPoint1 = new Pose(92, 42);
+        public static Pose RInt2CtrlPoint1 = new Pose(92, 42); // use this 3 times for the tangential path
         public static Pose RInt2CtrlPoint2 = new Pose(96, 42);
         public static Pose RGateInt2 = new Pose(134.4, 68.5);
         public static double RGateIntHead = Math.toRadians(18);

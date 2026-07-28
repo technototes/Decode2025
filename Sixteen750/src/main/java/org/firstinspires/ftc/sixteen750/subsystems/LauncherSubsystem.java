@@ -85,7 +85,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double REGRESSION_A = 8.73; // multiplier for x for close zone launch speed formula
     public static double REGRESSION_B = 1240; // minimum velocity for close zone launch speed formula 1560
     public static double REGRESSION_C = 18.1; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 220; // minimum velocity for far zone launch speed formula - 130, 255
+    public static double REGRESSION_D = 160; // minimum velocity for far zone launch speed formula - 130, 255
     public static double REGRESSION_C_TELEOP = 20.3; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D_TELEOP = 160; // minimum velocity for far zone launch speed formula
     public static double REGRESSION_C_AUTO = 17.25; // multiplier for x for far zone launch speed formula

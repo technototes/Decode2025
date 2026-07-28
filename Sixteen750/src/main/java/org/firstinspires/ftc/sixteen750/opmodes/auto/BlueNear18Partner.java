@@ -22,7 +22,7 @@ import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.BPaths;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
-import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.WaitForArtifacts;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
@@ -40,30 +40,33 @@ public class BlueNear18Partner extends CommandOpMode {
 
     private static Command BlueGateCycle1(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, BPaths.PBLaunchToBGateInt1),
-            new WaitCommand(1.1),
-            new PedroPathCommand(r.follower, BPaths.PBGateInt1ToBLaunch),
+            new PedroPathCommand(r.follower, BPaths.PBLaunchToBGateInt1)
+                .alongWith(AutoCommands.PostLaunchRoutine(r))
+                .withTimeout(2.5),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
+            new PedroPathCommand(r.follower, BPaths.PBGateInt1ToBLaunch).withTimeout(2.5),
             AutoCommands.AutoLaunching3Balls(r)
         );
     }
 
     private static Command BlueGateCycle2(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, BPaths.PBLaunchToBGateInt2),
-            new WaitCommand(1.1),
-            new PedroPathCommand(r.follower, BPaths.PBGateInt2ToBLaunch),
+            new PedroPathCommand(r.follower, BPaths.PBLaunchToBGateInt2)
+                .alongWith(AutoCommands.PostLaunchRoutine(r))
+                .withTimeout(2.5),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
+            new PedroPathCommand(r.follower, BPaths.PBGateInt2ToBLaunch).withTimeout(2.5),
             AutoCommands.AutoLaunching3Balls(r)
         );
     }
 
     private static Command BlueGateCycle3(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, BPaths.PBLaunchToBGateInt3),
-            new WaitCommand(1.1),
-            new PedroPathCommand(r.follower, BPaths.PBGateInt3ToBLaunch),
+            new PedroPathCommand(r.follower, BPaths.PBLaunchToBGateInt3)
+                .alongWith(AutoCommands.PostLaunchRoutine(r))
+                .withTimeout(2.5),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
+            new PedroPathCommand(r.follower, BPaths.PBGateInt3ToBLaunch).withTimeout(2.5),
             AutoCommands.AutoLaunching3Balls(r)
         );
     }
@@ -82,28 +85,26 @@ public class BlueNear18Partner extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new AltAutoVelocity(robot).alongWith(
                 new SequentialCommandGroup(
-                    t.Launch(robot),
-                    //TeleCommands.AutoLaunch1(robot),
-                    t.GateUp(robot),
-                    t.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.PBStartToBLaunch, p.power085),
+                    new PedroPathCommand(robot.follower, p.PBStartToBLaunch)
+                        .alongWith(a.AutoStartRoutine(robot))
+                        .withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.PBLaunchToBInt1, p.power092).alongWith(
-                        t.Intake(robot)
-                    ),
-                    t.IntakeStop(robot),
-                    new PedroPathCommand(robot.follower, p.PBInt1ToBLaunch),
+                    new PedroPathCommand(robot.follower, p.PBLaunchToBInt1, p.power095)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
+                    new PedroPathCommand(robot.follower, p.PBInt1ToBLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    BlueGateCycle1(robot).alongWith(t.Intake(robot)),
-                    BlueGateCycle2(robot).alongWith(t.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.PBLaunchToBInt2, p.power085).alongWith(
-                        t.Intake(robot)
-                    ),
-                    new PedroPathCommand(robot.follower, p.PBInt2ToBLaunch),
+                    BlueGateCycle1(robot),
+                    BlueGateCycle2(robot),
+                    new PedroPathCommand(robot.follower, p.PBLaunchToBInt2, p.power095)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
+                    new PedroPathCommand(robot.follower, p.PBInt2ToBLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    BlueGateCycle3(robot).alongWith(t.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.PBLaunchToBEnd),
-                    t.StopLaunch(robot),
+                    BlueGateCycle3(robot),
+                    new PedroPathCommand(robot.follower, p.PBLaunchToBEnd)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
                     CommandScheduler::terminateOpMode
                 )
             ),

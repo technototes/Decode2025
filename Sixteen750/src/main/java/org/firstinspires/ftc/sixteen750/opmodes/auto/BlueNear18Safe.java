@@ -22,7 +22,7 @@ import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.BPaths;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
-import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
+import org.firstinspires.ftc.sixteen750.commands.auto.WaitForArtifacts;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
@@ -41,9 +41,11 @@ public class BlueNear18Safe extends CommandOpMode {
     private static Command BlueGateCycle1(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, BPaths.SBLaunchToBGateInt1),
-            new WaitCommand(1.1),
-            new PedroPathCommand(r.follower, BPaths.SBGateInt1ToBLaunch),
+            new PedroPathCommand(r.follower, BPaths.SBLaunchToBGateInt1)
+                .alongWith(AutoCommands.PostLaunchRoutine(r))
+                .withTimeout(2.5),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
+            new PedroPathCommand(r.follower, BPaths.SBGateInt1ToBLaunch).withTimeout(2.5),
             AutoCommands.AutoLaunching3Balls(r)
         );
     }
@@ -51,15 +53,15 @@ public class BlueNear18Safe extends CommandOpMode {
     private static Command BlueGateCycle2(Robot r) {
         return new SequentialCommandGroup(
             TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, BPaths.SBLaunchToBGateInt2),
-            new WaitCommand(1.1),
-            new PedroPathCommand(r.follower, BPaths.SBGateInt2ToBLaunch),
+            new PedroPathCommand(r.follower, BPaths.SBLaunchToBGateInt2)
+                .alongWith(AutoCommands.PostLaunchRoutine(r))
+                .withTimeout(2.5),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
+            new PedroPathCommand(r.follower, BPaths.SBGateInt2ToBLaunch).withTimeout(2.5),
             AutoCommands.AutoLaunching3Balls(r)
         );
     }
 
-    // POSITION FOR COLIN:
-    // X = 132.5 Y = 65.75 H = 41
     @Override
     public void uponInit() {
         hardware = new Hardware(hardwareMap);
@@ -72,31 +74,29 @@ public class BlueNear18Safe extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new AltAutoVelocity(robot).alongWith(
                 new SequentialCommandGroup(
-                    t.Launch(robot),
-                    //TeleCommands.AutoLaunch1(robot),
-                    t.GateUp(robot),
-                    t.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.SBStartToBLaunch, p.power085),
+                    a.AutoStartRoutine(robot),
+                    new PedroPathCommand(robot.follower, p.SBStartToBLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.SBLaunchToBInt1, p.power092).alongWith(
-                        t.Intake(robot)
-                    ),
-                    new PedroPathCommand(robot.follower, p.SBInt1ToBLaunch),
+                    new PedroPathCommand(robot.follower, p.SBLaunchToBInt1, p.power095)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
+                    new PedroPathCommand(robot.follower, p.SBInt1ToBLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    BlueGateCycle1(robot).alongWith(t.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.SBLaunchToBInt2, p.power092).alongWith(
-                        t.Intake(robot)
-                    ),
-                    new PedroPathCommand(robot.follower, p.SBInt2ToBLaunch),
+                    BlueGateCycle1(robot),
+                    new PedroPathCommand(robot.follower, p.SBLaunchToBInt2, p.power095)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
+                    new PedroPathCommand(robot.follower, p.SBInt2ToBLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    BlueGateCycle2(robot).alongWith(t.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.SBLaunchToBInt3, p.power085).alongWith(
-                        t.Intake(robot)
-                    ),
-                    new PedroPathCommand(robot.follower, p.SBInt3ToBLaunch),
+                    BlueGateCycle2(robot),
+                    new PedroPathCommand(robot.follower, p.SBLaunchToBInt3, p.power095)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
+                    new PedroPathCommand(robot.follower, p.SBInt3ToBLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.SBLaunchToBEnd),
-                    t.StopLaunch(robot),
+                    new PedroPathCommand(robot.follower, p.SBLaunchToBEnd)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
                     CommandScheduler::terminateOpMode
                 )
             ),
