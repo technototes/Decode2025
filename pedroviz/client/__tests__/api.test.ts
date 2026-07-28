@@ -1,5 +1,4 @@
 import { describe, expect, test } from 'bun:test';
-
 import { isError, isNumber, isString } from '@freik/typechk';
 
 import {

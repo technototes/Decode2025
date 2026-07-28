@@ -42,8 +42,7 @@ export function TeamSelector(): ReactElement {
 }
 
 export function FileSelector(): ReactElement {
-  // TODO: get the atom from Jotai for the files
-  let files = useAtomValue(FilesForSelectedTeamAtom); // ['Path1.java', 'MyPaths.java'];
+  let files = useAtomValue(FilesForSelectedTeamAtom);
   const [file, setFile] = useAtom(SelectedFileAtom);
   // if all the files have a common folder prefix, filter the prefix out
   let prefix = '';

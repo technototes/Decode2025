@@ -1,4 +1,7 @@
-import { atomWithStorage } from 'node_modules/jotai/esm/utils.mjs';
+import { atom, useAtom, useAtomValue } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+
+import { PathRenderOptions } from 'client/types';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
   'theme',
@@ -7,58 +10,132 @@ export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
   { getOnInit: true },
 );
 
-export const ShowFieldAtom = atomWithStorage<boolean>(
-  'ShowField',
-  true,
+export const PathRenderOptionsAtom = atomWithStorage<PathRenderOptions>(
+  'PathRenderOptions',
+  {
+    ShowField: true,
+    PathThickness: 0.1,
+    ShowCoords: true,
+    Heading: {
+      Display: true,
+      Count: 6,
+      Length: 5,
+      Thickness: 0.5,
+    },
+    ControlPoint: {
+      Thickness: 0.4,
+      Size: 2,
+      Style: 'circle',
+    },
+  },
   undefined,
   { getOnInit: true },
 );
 
-export const ShowBotHeadingAtom = atomWithStorage<boolean>(
-  'ShowBotHeading',
-  true,
-  undefined,
-  { getOnInit: true },
+export const CtrlPtSizeAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.ControlPoint.Size;
+  },
+  (get, set, val: number) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.ControlPoint.Size = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
 );
 
-export const PathThicknessAtom = atomWithStorage<number>(
-  'PathThickness',
-  0.1,
-  undefined,
-  { getOnInit: true },
+export const CtrlPtThicknessAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.ControlPoint.Thickness;
+  },
+  (get, set, val: number) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.ControlPoint.Thickness = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
 );
 
-export const CtrlPtRadiusAtom = atomWithStorage<number>(
-  'CtrlPtRadius',
-  1,
-  undefined,
-  { getOnInit: true },
+export const ShowBotHeadingAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.Heading.Display;
+  },
+  (get, set, val: boolean) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.Heading.Display = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
 );
 
-export const CtrlPtThicknessAtom = atomWithStorage<number>(
-  'CtrlPtThicknss',
-  1,
-  undefined,
-  { getOnInit: true },
+export const HeadingCountAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.Heading.Count;
+  },
+  (get, set, val: number) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.Heading.Count = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
 );
 
-export const HeadingCountAtom = atomWithStorage<number>(
-  'HeadingCount',
-  6,
-  undefined,
-  { getOnInit: true },
+export const HeadingLengthAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.Heading.Length;
+  },
+  (get, set, val: number) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.Heading.Length = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
 );
 
-export const HeadingThicknessAtom = atomWithStorage<number>(
-  'HeadingThickness',
-  0.5,
-  undefined,
-  { getOnInit: true },
+export const HeadingThicknessAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.Heading.Thickness;
+  },
+  (get, set, val: number) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.Heading.Thickness = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
 );
 
-export const HeadingLengthAtom = atomWithStorage<number>(
-  'HeadingLength',
-  5,
-  undefined,
-  { getOnInit: true },
+export const PathThicknessAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.PathThickness;
+  },
+  (get, set, val: number) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.PathThickness = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
+);
+
+export const ShowFieldAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.ShowField;
+  },
+  (get, set, val: boolean) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.ShowField = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
+);
+
+export const ShowFieldKeyAtom = atom(
+  (get) => {
+    const opts = get(PathRenderOptionsAtom);
+    return opts.ShowCoords;
+  },
+  (get, set, val: boolean) => {
+    const newVal = structuredClone(get(PathRenderOptionsAtom));
+    newVal.ShowCoords = val;
+    set(PathRenderOptionsAtom, newVal);
+  },
 );

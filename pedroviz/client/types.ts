@@ -22,6 +22,23 @@ import {
   ValueRef,
 } from '../server/types';
 
+export type PathRenderOptions = {
+  ShowField: boolean;
+  PathThickness: number;
+  ShowCoords: boolean;
+  Heading: {
+    Display: boolean;
+    Count: number;
+    Length: number;
+    Thickness: number;
+  };
+  ControlPoint: {
+    Thickness: number;
+    Size: number;
+    Style: 'circle' | 'triangle' | 'square' | 'cross';
+  };
+};
+
 export type AnonymousPathChain = {
   paths: BezierRef[];
   heading: AnonymousFacing;

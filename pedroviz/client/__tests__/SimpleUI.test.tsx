@@ -1,6 +1,5 @@
 /// <reference lib="dom" />
 
-import { beforeEach, describe, expect, test } from 'bun:test';
 import { ReactElement } from 'react';
 import { Provider, useAtom } from 'jotai';
 
@@ -16,6 +15,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import { beforeEach, describe, expect, test } from 'bun:test';
 import { Pickle } from '@freik/typechk';
 
 import '@testing-library/jest-dom';

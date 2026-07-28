@@ -174,7 +174,7 @@ function HeadingTypeDisplay({
     case 'reversed':
       return <Text {...props}>Reversed...[TODO!]</Text>;
     case 'piecewise':
-      return <Text {...props}>Piecewised [TODO!]</Text>;
+      return <Text {...props}>Piecewise heading...[TODO!]</Text>;
   }
 }
 

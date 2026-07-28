@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, useCallback } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
 import {
@@ -9,6 +9,9 @@ import {
   DialogSurface,
   DialogTitle,
   DialogTrigger,
+  SpinButton,
+  SpinButtonChangeEvent,
+  SpinButtonOnChangeData,
   Switch,
   Text,
 } from '@fluentui/react-components';
@@ -20,7 +23,7 @@ import {
 
 import { Strings } from './constants';
 import {
-  CtrlPtRadiusAtom,
+  CtrlPtSizeAtom,
   CtrlPtThicknessAtom,
   HeadingCountAtom,
   HeadingLengthAtom,
@@ -28,6 +31,7 @@ import {
   PathThicknessAtom,
   ShowBotHeadingAtom,
   ShowFieldAtom,
+  ShowFieldKeyAtom,
   ThemeAtom,
 } from './state/SavedSettings';
 
@@ -35,12 +39,85 @@ export function Settings(): ReactElement {
   const [theTheme, setTheme] = useAtom(ThemeAtom);
   const [showField, setShowField] = useAtom(ShowFieldAtom);
   const [showBotHeading, setShowBotHeading] = useAtom(ShowBotHeadingAtom);
-  const pathThickness = useAtomValue(PathThicknessAtom);
-  const ctrlPtThickness = useAtomValue(CtrlPtThicknessAtom);
-  const ctrlPtRadius = useAtomValue(CtrlPtRadiusAtom);
-  const headingLength = useAtomValue(HeadingLengthAtom);
-  const headingCount = useAtomValue(HeadingCountAtom);
-  const headingThickness = useAtomValue(HeadingThicknessAtom);
+  const [pathThickness, setPathThickness] = useAtom(PathThicknessAtom);
+  const [showCoords, setShowCoords] = useAtom(ShowFieldKeyAtom);
+  const changePathThickness = useCallback(
+    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+      if (
+        data.value !== undefined &&
+        data.value !== null &&
+        !Number.isNaN(data.value)
+      ) {
+        setPathThickness(data.value);
+      }
+    },
+    [setPathThickness],
+  );
+  const [ctrlPtThickness, setCtrlPtThickness] = useAtom(CtrlPtThicknessAtom);
+  const changeCtrlPtThickness = useCallback(
+    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+      if (
+        data.value !== undefined &&
+        data.value !== null &&
+        !Number.isNaN(data.value)
+      ) {
+        setCtrlPtThickness(data.value);
+      }
+    },
+    [setCtrlPtThickness],
+  );
+  const [ctrlPtSize, setCtrlPtSize] = useAtom(CtrlPtSizeAtom);
+  const changeCtrlPtSize = useCallback(
+    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+      if (
+        data.value !== undefined &&
+        data.value !== null &&
+        !Number.isNaN(data.value)
+      ) {
+        setCtrlPtSize(data.value);
+      }
+    },
+    [setCtrlPtSize],
+  );
+  const [headingLength, setHeadingLength] = useAtom(HeadingLengthAtom);
+  const changeHeadingLength = useCallback(
+    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+      if (
+        data.value !== undefined &&
+        data.value !== null &&
+        !Number.isNaN(data.value)
+      ) {
+        setHeadingLength(data.value);
+      }
+    },
+    [setHeadingLength],
+  );
+  const [headingCount, setHeadingCount] = useAtom(HeadingCountAtom);
+  const changeHeadingCount = useCallback(
+    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+      if (
+        data.value !== undefined &&
+        data.value !== null &&
+        !Number.isNaN(data.value)
+      ) {
+        setHeadingCount(Math.round(data.value));
+      }
+    },
+    [setHeadingCount],
+  );
+  const [headingThickness, setHeadingThickness] = useAtom(HeadingThicknessAtom);
+  const changeHeadingThickness = useCallback(
+    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+      if (
+        data.value !== undefined &&
+        data.value !== null &&
+        !Number.isNaN(data.value)
+      ) {
+        setHeadingThickness(data.value);
+      }
+    },
+    [setHeadingThickness],
+  );
   return (
     <Dialog modalType="non-modal">
       <DialogTrigger disableButtonEnhancement>
@@ -62,23 +139,73 @@ export function Settings(): ReactElement {
                 checked={showField}
                 onChange={(_, data) => setShowField(data.checked)}
               />
+              <Text>Show field coordinates</Text>
+              <Switch
+                checked={showCoords}
+                onChange={(_, data) => setShowCoords(data.checked)}
+              />
               <Text>Path Thickness</Text>
-              <Text>{pathThickness}</Text>
-              <Text>CtrlPt Radius</Text>
-              <Text>{ctrlPtRadius}</Text>
+              <SpinButton
+                value={pathThickness}
+                onChange={changePathThickness}
+                step={0.1}
+                stepPage={1}
+                min={0.1}
+                max={2}
+              />
+              <Text>CtrlPt Size</Text>
+              <SpinButton
+                value={ctrlPtSize}
+                onChange={changeCtrlPtSize}
+                step={0.25}
+                stepPage={1}
+                min={0.5}
+                max={4}
+              />
               <Text>CtrlPt Thickness</Text>
-              <Text>{ctrlPtThickness}</Text>
+              <SpinButton
+                value={ctrlPtThickness}
+                onChange={changeCtrlPtThickness}
+                step={0.1}
+                stepPage={1}
+                min={0.1}
+                max={2}
+              />
               <Text>Show robot heading</Text>
               <Switch
                 checked={showBotHeading}
                 onChange={(_, data) => setShowBotHeading(data.checked)}
               />
               <Text>Heading Indicator Count</Text>
-              <Text>{headingCount}</Text>
+              <SpinButton
+                disabled={!showBotHeading}
+                value={headingCount}
+                onChange={changeHeadingCount}
+                step={1}
+                stepPage={5}
+                min={1}
+                max={25}
+              />
               <Text>Heading length</Text>
-              <Text>{headingLength}</Text>
+              <SpinButton
+                disabled={!showBotHeading}
+                value={headingLength}
+                onChange={changeHeadingLength}
+                step={1}
+                stepPage={5}
+                min={1}
+                max={25}
+              />
               <Text>Heading thickness</Text>
-              <Text>{headingThickness}</Text>
+              <SpinButton
+                disabled={!showBotHeading}
+                value={headingThickness}
+                onChange={changeHeadingThickness}
+                step={0.1}
+                stepPage={1}
+                min={0.1}
+                max={2}
+              />
               <Text>Reset preferences</Text>
               <span>
                 <Button

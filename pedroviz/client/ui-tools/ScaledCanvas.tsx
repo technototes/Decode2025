@@ -1,16 +1,7 @@
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
-import {
-  CtrlPtRadiusAtom,
-  CtrlPtThicknessAtom,
-  HeadingCountAtom,
-  HeadingLengthAtom,
-  HeadingThicknessAtom,
-  PathThicknessAtom,
-  ShowBotHeadingAtom,
-  ShowFieldAtom,
-} from 'client/state/SavedSettings';
+import { PathRenderOptionsAtom, ThemeAtom } from 'client/state/SavedSettings';
 import { isDefined } from 'node_modules/@freik/typechk/lib/esm';
 
 import {
@@ -28,6 +19,7 @@ import {
   chkConcretePointHeading,
   chkConcreteTangentHeading,
   ConcreteHeadingType,
+  PathRenderOptions,
   Point,
 } from '../types';
 import { bezierLength, deCasteljau } from './bezier';
@@ -37,14 +29,8 @@ const Scale = 1;
 const fix = 144;
 
 export function ScaledCanvas(): ReactElement {
-  const showField = useAtomValue(ShowFieldAtom);
-  const showBotHeading = useAtomValue(ShowBotHeadingAtom);
-  const ctrlPtThickness = useAtomValue(CtrlPtThicknessAtom);
-  const ctrlPtRadius = useAtomValue(CtrlPtRadiusAtom);
-  const pathThickness = useAtomValue(PathThicknessAtom);
-  const headingCount = useAtomValue(HeadingCountAtom);
-  const headingThickness = useAtomValue(HeadingThicknessAtom);
-  const headingLength = useAtomValue(HeadingLengthAtom);
+  const opts = useAtomValue(PathRenderOptionsAtom);
+  const theme = useAtomValue(ThemeAtom);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState(0);
@@ -65,10 +51,9 @@ export function ScaledCanvas(): ReactElement {
         ]),
       ),
   ];
-  const showColors = false;
-  const bgStyle = showField
+  const bgStyle = opts.ShowField
     ? {
-        backgroundImage: "url('/assets/field.png')",
+        backgroundImage: `url('/assets/field-${theme}.jpg')`,
       }
     : {};
   // This makes the canvas resize
@@ -110,26 +95,97 @@ export function ScaledCanvas(): ReactElement {
     // ctx.scale(dpr * scale, -dpr * scale);
     // or just a single line of code:
     ctx.setTransform(dpr * scale, 0, 0, -dpr * scale, 0, canvas.height);
+    if (opts.ShowCoords) {
+      ctx.save();
+      ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+      ctx.font = '5px sans-serif'; // Set font size and family
+      ctx.fillStyle = theme === 'light' ? 'black' : 'white'; // Set fill color for the text
+      ctx.strokeStyle = theme === 'light' ? 'white' : 'black';
+      ctx.lineWidth = 0.2;
+
+      // Draw the coordinate points
+      ctx.textAlign = 'start'; // Set text alignment (e.g., "start", "end", "center")
+      ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
+      ctx.strokeText('(0,0)', 5, 139);
+      ctx.fillText('(0,0)', 5, 139);
+      ctx.strokeText('(0,144)', 5, 5);
+      ctx.fillText('(0,144)', 5, 5);
+      ctx.textAlign = 'end'; // Set text alignment (e.g., "start", "end", "center")
+      ctx.strokeText('(144,0)', 139, 5);
+      ctx.fillText('(144,0)', 139, 5);
+      ctx.strokeText('(144,144)', 139, 139);
+      ctx.fillText('(144,144)', 139, 139);
+      ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
+      ctx.strokeText('(72,72)', 72, 72);
+      ctx.fillText('(72,72)', 72, 72);
+
+      // Label the axis directions
+      ctx.strokeText('+y', 71, 84.5);
+      ctx.fillText('+y', 71, 84.5);
+      ctx.strokeText('-y', 71, 104.5);
+      ctx.fillText('-y', 71, 104.5);
+      ctx.strokeText('+x', 62, 95);
+      ctx.fillText('+x', 62, 95);
+      ctx.strokeText('-x', 82, 95);
+      ctx.fillText('-x', 82, 95);
+
+      // Label the compass angles
+      ctx.strokeText('90°(½π)', 72, 40);
+      ctx.fillText('90°(½π)', 72, 40);
+      ctx.strokeText('0°', 81, 48);
+      ctx.fillText('0°', 81, 48);
+      ctx.strokeText('180°(π)', 58, 48);
+      ctx.fillText('180°(π)', 58, 48);
+      ctx.strokeText('270°(³/₂π)', 72, 56);
+      ctx.fillText('270°(³/₂π)', 72, 56);
+
+      // Draw the axis directions
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = theme === 'light' ? 'black' : 'white';
+      ctx.beginPath();
+      let xc = 72;
+      let yc = 95;
+      // Vertical double arrow:
+      ctx.moveTo(xc - 2, yc - 5);
+      ctx.lineTo(xc, yc - 7);
+      ctx.lineTo(xc + 2, yc - 5);
+      ctx.moveTo(xc, yc - 7);
+      ctx.lineTo(xc, yc + 7);
+      ctx.moveTo(xc + 2, yc + 5);
+      ctx.lineTo(xc, yc + 7);
+      ctx.lineTo(xc - 2, yc + 5);
+      // Horizontal double arrow
+      ctx.moveTo(xc - 5, yc - 2);
+      ctx.lineTo(xc - 7, yc);
+      ctx.lineTo(xc - 5, yc + 2);
+      ctx.moveTo(xc - 7, yc);
+      ctx.lineTo(xc + 7, yc);
+      ctx.moveTo(xc + 5, yc + 2);
+      ctx.lineTo(xc + 7, yc);
+      ctx.lineTo(xc + 5, yc - 2);
+      // Arrow for the compass
+      ctx.moveTo(77 + 1, 48 + 2);
+      ctx.lineTo(77, 48);
+      ctx.lineTo(77 - 1.75, 48 + 1.75);
+      ctx.stroke();
+      ctx.beginPath();
+      // Arc for the compass
+      ctx.arc(72, 48, 5, Math.PI * -0.25, 0, true);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     points.forEach(([ctrlPoints, facing], index) =>
       renderPath(
         ctx,
         ctrlPoints,
-        showBotHeading && facing,
+        opts.Heading.Display && facing,
         colors[index % colors.length]!,
-        pathThickness,
-        ctrlPtRadius,
-        ctrlPtThickness,
-        headingCount,
-        headingThickness,
-        headingLength,
+        opts,
       ),
     );
-    // Draw the colors
-    if (showColors) {
-      drawColors(ctx, colors);
-    }
-  }, [pathChains, beziers, poses, values, canvasRef, size, showBotHeading]);
+  }, [pathChains, beziers, poses, values, canvasRef, size, opts, theme]);
 
   return (
     <div
@@ -161,12 +217,7 @@ function renderPath(
   curveControlPoints: Point[],
   heading: ConcreteHeadingType | false,
   color: string,
-  pathThickness: number,
-  ctrlPtRadius: number,
-  ctrlPtThickness: number,
-  headingCount: number,
-  headingThickness: number,
-  headingLength: number,
+  opts: PathRenderOptions,
 ) {
   if (curveControlPoints.length < 2) {
     return;
@@ -176,18 +227,8 @@ function renderPath(
   for (let t = 0; t <= 1.0; t += 1 / len) {
     pts.push(deCasteljau(curveControlPoints, t));
   }
-  /*
-      ctx.save();
-      ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-      ctx.font = '3px Arial'; // Set font size and family
-      ctx.fillStyle = 'blue'; // Set fill color for the text
-      ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
-      ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
-      ctx.fillText(`Text${i}`, 45 + 15 * i++, fix - (80 + 5 * i));
-      ctx.restore();
-      */
   ctx.beginPath();
-  ctx.lineWidth = pathThickness;
+  ctx.lineWidth = opts.PathThickness;
   ctx.strokeStyle = color;
   let approxLen = 0;
   ctx.moveTo(
@@ -210,11 +251,18 @@ function renderPath(
   );
   ctx.stroke();
   ctx.beginPath();
-  ctx.lineWidth = ctrlPtThickness;
+  ctx.lineWidth = opts.ControlPoint.Thickness;
   for (const pt of curveControlPoints) {
     ctx.strokeStyle = color;
-    ctx.moveTo((pt.x + ctrlPtRadius) * Scale, pt.y * Scale);
-    ctx.arc(pt.x * Scale, pt.y * Scale, ctrlPtRadius * Scale, 0, 2 * Math.PI);
+    // TODO: Support more point display styles
+    ctx.moveTo((pt.x + opts.ControlPoint.Size / 2) * Scale, pt.y * Scale);
+    ctx.arc(
+      pt.x * Scale,
+      pt.y * Scale,
+      (opts.ControlPoint.Size / 2) * Scale,
+      0,
+      2 * Math.PI,
+    );
   }
   ctx.stroke();
   if (heading) {
@@ -224,9 +272,7 @@ function renderPath(
       approxLen,
       [...pts, curveControlPoints[curveControlPoints.length - 1]!],
       heading,
-      headingCount,
-      headingThickness,
-      headingLength,
+      opts,
     );
   }
 
@@ -272,19 +318,21 @@ function drawHeadingLines(
   len: number,
   pts: Point[],
   heading: ConcreteHeadingType,
-  count: number,
-  headingThickness: number,
-  headingLength: number,
+  opts: PathRenderOptions,
 ) {
   // for "n" points, I'm not drawing starting/ending headings, so I actually want to split
   // the length into count + 1 pieces, and find the point in between each piece
-  const pieceLen = len / (count + 1);
-  if (count <= 0 || pts.length < 3 || pieceLen < 1) {
+  const pieceLen = len / (opts.Heading.Count + 1);
+  if (opts.Heading.Count <= 0 || pts.length < 3 || pieceLen < 1) {
     return;
   }
   let curPtIndex = 1;
   let lastDelta: Point = { x: 0, y: 0 };
-  for (let pos = 0; pos < count && curPtIndex < pts.length; pos++) {
+  for (
+    let pos = 0;
+    pos < opts.Heading.Count && curPtIndex < pts.length;
+    pos++
+  ) {
     let pathPos = pieceLen * (pos + 1);
     // Walk the length of the path, until we find the heading-draw point
     let point: Point | undefined;
@@ -309,10 +357,9 @@ function drawHeadingLines(
         color,
         point,
         lastDelta,
-        (pos + 1) / (count + 1),
+        (pos + 1) / (opts.Heading.Count + 1),
         heading,
-        headingThickness,
-        headingLength,
+        opts,
       );
     }
   }
@@ -325,18 +372,17 @@ function drawHeadingLine(
   tangent: Point,
   percentage: number,
   heading: ConcreteHeadingType,
-  lineThickness: number,
-  headingLength: number,
+  opts: PathRenderOptions,
 ) {
   let disp: Point = { x: 0, y: 0 };
   let actualColor = color;
   if (chkConcreteTangentHeading(heading)) {
-    disp = magnitude(tangent, headingLength);
+    disp = magnitude(tangent, opts.Heading.Length);
     actualColor = '#777';
   } else if (chkConcreteConstantHeading(heading)) {
     disp = magnitude(
       { x: Math.cos(heading.heading), y: Math.sin(heading.heading) },
-      headingLength,
+      opts.Heading.Length,
     );
     actualColor = '#70f';
   } else if (chkConcreteLinearHeading(heading)) {
@@ -345,11 +391,11 @@ function drawHeadingLine(
       percentage;
     disp = magnitude(
       { x: Math.cos(radians), y: Math.sin(radians) },
-      headingLength,
+      opts.Heading.Length,
     );
     actualColor = '#F07';
   } else if (chkConcretePointHeading(heading)) {
-    disp = magnitude(diff(heading.heading, point), headingLength);
+    disp = magnitude(diff(heading.heading, point), opts.Heading.Length);
     actualColor = '#07F';
   } else {
     // We don't handle others yet...
@@ -357,7 +403,8 @@ function drawHeadingLine(
     actualColor = '#0f7';
   }
   ctx.beginPath();
-  ctx.lineWidth = lineThickness;
+  ctx.lineCap = 'round';
+  ctx.lineWidth = opts.Heading.Thickness;
   ctx.strokeStyle = actualColor;
   ctx.moveTo(point.x * Scale, point.y * Scale);
   ctx.lineTo((point.x + disp.x) * Scale, (point.y + disp.y) * Scale);

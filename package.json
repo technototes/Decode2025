@@ -69,7 +69,7 @@
     "- // z ": "Type check the scripts (BUG: It's typechecking node_modules too!)",
     "types": "tsc --noEmit -p tsconfig.json",
     "- //": "This is just a shortcut helper script for now to launch the pedropath visualizer",
-    "pv": "bun run open http://localhost:3000 && cd pedroviz && bun install && bun pvdev",
+    "pv": "cd pedroviz && bun install && bun pvdev",
     "- // graph-": "",
     "- // graph1": "This generates class graphs for the various codebases. Paste it into https://mermaid.live to visualize",
     "- // graph2": "First build the java2umltext tool with './gradlew :java2umltext:build' (or bun build)",
