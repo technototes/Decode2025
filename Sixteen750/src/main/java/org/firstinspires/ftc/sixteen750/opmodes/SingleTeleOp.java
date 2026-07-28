@@ -126,30 +126,33 @@ public class SingleTeleOp extends CommandOpMode {
                         for (LLResultTypes.FiducialResult fr : fiducialResults) {
                             if (
                                 fr.getFiducialId() == 23 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
+                                Arrays.equals(Setup.HardwareNames.Motif, new String[] {
+                                    "1",
+                                    "2",
+                                    "3",
+                                })
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE2";
                             } else if (
                                 fr.getFiducialId() == 22 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
+                                Arrays.equals(Setup.HardwareNames.Motif, new String[] {
+                                    "1",
+                                    "2",
+                                    "3",
+                                })
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE3";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[2] = "\uD83D\uDFE3";
                             } else if (
                                 fr.getFiducialId() == 21 &&
-                                Arrays.equals(
-                                    Setup.HardwareNames.Motif,
-                                    new String[] { "1", "2", "3" }
-                                )
+                                Arrays.equals(Setup.HardwareNames.Motif, new String[] {
+                                    "1",
+                                    "2",
+                                    "3",
+                                })
                             ) {
                                 Setup.HardwareNames.Motif[0] = "\uD83D\uDFE2";
                                 Setup.HardwareNames.Motif[1] = "\uD83D\uDFE3";

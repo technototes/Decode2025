@@ -89,11 +89,17 @@ public class DriveBaseValidation extends LinearOpMode {
             motors[1] = new MotorConfig(hardwareMap, HardwareNames.FR_DRIVE_MOTOR, true, () ->
                 triggered(gamepad1.right_trigger)
             );
-            motors[2] = new MotorConfig(hardwareMap, HardwareNames.RL_DRIVE_MOTOR, true, () ->
-                gamepad1.left_bumper
+            motors[2] = new MotorConfig(
+                hardwareMap,
+                HardwareNames.RL_DRIVE_MOTOR,
+                true,
+                () -> gamepad1.left_bumper
             );
-            motors[3] = new MotorConfig(hardwareMap, HardwareNames.RR_DRIVE_MOTOR, true, () ->
-                gamepad1.right_bumper
+            motors[3] = new MotorConfig(
+                hardwareMap,
+                HardwareNames.RR_DRIVE_MOTOR,
+                true,
+                () -> gamepad1.right_bumper
             );
         } else {
             motors = null;

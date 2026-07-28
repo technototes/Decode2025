@@ -102,7 +102,6 @@ public class RAD extends CommandOpMode {
                     //                    ),
                     //                    new WaitCommand(0.05),
                     //                    Paths.AutoLaunching3Balls(robot),
-
                     new PedroPathCommand(
                         robot.follower,
                         p.RLaunchtoIntakeGateInOne,

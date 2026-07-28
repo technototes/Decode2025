@@ -144,20 +144,22 @@ public class AutoConstants {
 
     public static FollowerConstants getFollowerConstants() {
         // tune these
-        return new FollowerConstants()
-            .mass(botWeightKg)
-            .forwardZeroPowerAcceleration(fwdDeceleration)
-            .lateralZeroPowerAcceleration(latDeceleration)
-            .predictiveBrakingCoefficients(
-                new PredictiveBrakingCoefficients(kP, kLinear, kQuadratic)
-            )
-            // .holdPointTranslationalScaling(1)
-            .headingPIDFCoefficients(headingPIDF)
-            .useSecondaryHeadingPIDF(true)
-            .secondaryHeadingPIDFCoefficients(second_headingPIDF)
-            // .drivePIDFCoefficients(drivePIDF)
-            // .translationalPIDFCoefficients(translationPIDF)
-            .centripetalScaling(0 /*centripetalScaling*/);
+        return (
+            new FollowerConstants()
+                .mass(botWeightKg)
+                .forwardZeroPowerAcceleration(fwdDeceleration)
+                .lateralZeroPowerAcceleration(latDeceleration)
+                .predictiveBrakingCoefficients(
+                    new PredictiveBrakingCoefficients(kP, kLinear, kQuadratic)
+                )
+                // .holdPointTranslationalScaling(1)
+                .headingPIDFCoefficients(headingPIDF)
+                .useSecondaryHeadingPIDF(true)
+                .secondaryHeadingPIDFCoefficients(second_headingPIDF)
+                // .drivePIDFCoefficients(drivePIDF)
+                // .translationalPIDFCoefficients(translationPIDF)
+                .centripetalScaling(0 /*centripetalScaling*/)
+        );
     }
 
     public static PathConstraints getPathConstraints() {

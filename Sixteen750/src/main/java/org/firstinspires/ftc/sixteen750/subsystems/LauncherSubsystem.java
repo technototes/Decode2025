@@ -85,7 +85,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
     public static double REGRESSION_A = 8.73; // multiplier for x for close zone launch speed formula
     public static double REGRESSION_B = 1240; // minimum velocity for close zone launch speed formula 1560
     public static double REGRESSION_C = 18.1; // multiplier for x for far zone launch speed formula
-    public static double REGRESSION_D = 220; // minimum velocity for far zone launch speed formula - 130, 255
+    public static double REGRESSION_D = 160; // minimum velocity for far zone launch speed formula - 130, 255
     public static double REGRESSION_C_TELEOP = 20.3; // multiplier for x for far zone launch speed formula
     public static double REGRESSION_D_TELEOP = 160; // minimum velocity for far zone launch speed formula
     public static double REGRESSION_C_AUTO = 17.25; // multiplier for x for far zone launch speed formula
@@ -117,17 +117,16 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             launcher2.setPIDFCoefficients(launcherPIDF);
             //ready = false;
             ls = new LimelightSubsystem(h);
-            double ADDITION = (PEAK_VOLTAGE - h.voltage());
+            double ADDITION = PEAK_VOLTAGE - h.voltage();
             if (ADDITION == 0) {
                 SPIN_VOLT_COMP = SPIN_VOLT_COMP + 0.001;
             } else {
-                SPIN_VOLT_COMP = SPIN_VOLT_COMP + (ADDITION * DIFFERENCE);
+                SPIN_VOLT_COMP = SPIN_VOLT_COMP + ADDITION * DIFFERENCE;
             }
             launcherPID = new PIDFController(launcherPI, target ->
                 target == 0
                     ? 0
-                    : (SPIN_F_SCALE * target) +
-                      (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()))
+                    : SPIN_F_SCALE * target + SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage())
             );
 
             //            top.setPIDFCoefficients(launcherP);
@@ -135,8 +134,7 @@ public class LauncherSubsystem implements Loggable, Subsystem {
             launcherPID = new PIDFController(launcherPI, target ->
                 target == 0.00001
                     ? 0.00001
-                    : (SPIN_F_SCALE * target) +
-                      (SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage()))
+                    : SPIN_F_SCALE * target + SPIN_VOLT_COMP * Math.min(PEAK_VOLTAGE, h.voltage())
             );
 
             //            top.setPIDFCoefficients(launcherP);
@@ -392,11 +390,11 @@ public class LauncherSubsystem implements Loggable, Subsystem {
         autoVelocity = autoVelocity();
         currentLaunchVelocity = readVelocity();
 
-        if (launcherPID.getTarget() == (Math.PI) && ls.getRawDistance() <= 100) {
+        if (launcherPID.getTarget() == Math.PI && ls.getRawDistance() <= 100) {
             setMotorPower(IdlePowerNear);
             launcherPID.update(getMotorSpeed());
             launcherPID.reset();
-        } else if (launcherPID.getTarget() == (Math.PI) && ls.getRawDistance() > 100) {
+        } else if (launcherPID.getTarget() == Math.PI && ls.getRawDistance() > 100) {
             setMotorPower(IdlePowerFar);
             launcherPID.update(getMotorSpeed());
             launcherPID.reset();

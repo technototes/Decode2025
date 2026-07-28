@@ -168,7 +168,7 @@ class LocalizationTest extends OpMode {
         );
         telemetryM.debug(
             "Drivetrain debug string " +
-                (((debugStringEnabled) ? "enabled" : "disabled")) +
+                (debugStringEnabled ? "enabled" : "disabled") +
                 " (press gamepad a to toggle)"
         );
         telemetryM.update(telemetry);
@@ -277,9 +277,9 @@ class ForwardTuner extends OpMode {
         );
         telemetryM.debug(
             "Multiplier: " +
-                (DISTANCE /
+                DISTANCE /
                     (follower.getPose().getX() /
-                        follower.getPoseTracker().getLocalizer().getForwardMultiplier()))
+                        follower.getPoseTracker().getLocalizer().getForwardMultiplier())
         );
         telemetryM.update(telemetry);
 
@@ -351,9 +351,9 @@ class LateralTuner extends OpMode {
         );
         telemetryM.debug(
             "Multiplier: " +
-                (DISTANCE /
+                DISTANCE /
                     (follower.getPose().getY() /
-                        follower.getPoseTracker().getLocalizer().getLateralMultiplier()))
+                        follower.getPoseTracker().getLocalizer().getLateralMultiplier())
         );
         telemetryM.update(telemetry);
 
@@ -426,9 +426,9 @@ class TurnTuner extends OpMode {
         );
         telemetryM.debug(
             "Multiplier: " +
-                (ANGLE /
+                ANGLE /
                     (follower.getTotalHeading() /
-                        follower.getPoseTracker().getLocalizer().getTurningMultiplier()))
+                        follower.getPoseTracker().getLocalizer().getTurningMultiplier())
         );
         telemetryM.update(telemetry);
 
@@ -512,7 +512,7 @@ class ForwardVelocityTuner extends OpMode {
         drawCurrentAndHistory();
 
         if (!end) {
-            if (Math.abs(follower.getPose().getX()) > (DISTANCE + 72)) {
+            if (Math.abs(follower.getPose().getX()) > DISTANCE + 72) {
                 end = true;
                 stopRobot();
             } else {
@@ -631,7 +631,7 @@ class LateralVelocityTuner extends OpMode {
         drawCurrentAndHistory();
 
         if (!end) {
-            if (Math.abs(follower.getPose().getY()) > (DISTANCE + 72)) {
+            if (Math.abs(follower.getPose().getY()) > DISTANCE + 72) {
                 end = true;
                 stopRobot();
             } else {
@@ -997,7 +997,7 @@ class PredictiveBrakingTuner extends OpMode {
             return;
         }
 
-        double direction = (iteration % 2 == 0) ? 1 : -1;
+        double direction = iteration % 2 == 0 ? 1 : -1;
 
         switch (state) {
             case START_MOVE: {
@@ -1587,15 +1587,15 @@ class Circle extends OpMode {
             .addPath(
                 new BezierCurve(
                     new Pose(RADIUS + 72, RADIUS + 72),
-                    new Pose(RADIUS + 72, (2 * RADIUS) + 72),
-                    new Pose(72, (2 * RADIUS) + 72)
+                    new Pose(RADIUS + 72, 2 * RADIUS + 72),
+                    new Pose(72, 2 * RADIUS + 72)
                 )
             )
             .setHeadingInterpolation(HeadingInterpolator.facingPoint(72, RADIUS + 72))
             .addPath(
                 new BezierCurve(
-                    new Pose(72, (2 * RADIUS) + 72),
-                    new Pose(-RADIUS + 72, (2 * RADIUS) + 72),
+                    new Pose(72, 2 * RADIUS + 72),
+                    new Pose(-RADIUS + 72, 2 * RADIUS + 72),
                     new Pose(-RADIUS + 72, RADIUS + 72)
                 )
             )
@@ -1747,7 +1747,7 @@ class SwerveOffsetsTest extends OpMode {
         );
         telemetryM.debug(
             "Drivetrain debug string " +
-                (((debugStringEnabled) ? "enabled" : "disabled")) +
+                (debugStringEnabled ? "enabled" : "disabled") +
                 " (press gamepad a to toggle)"
         );
         telemetryM.update(telemetry);
@@ -1809,7 +1809,7 @@ class SwerveTurnTest extends OpMode {
         );
         telemetryM.debug(
             "Drivetrain debug string " +
-                (((debugStringEnabled) ? "enabled" : "disabled")) +
+                (debugStringEnabled ? "enabled" : "disabled") +
                 " (press gamepad a to toggle)"
         );
         telemetryM.update(telemetry);
@@ -1891,8 +1891,8 @@ class OffsetsTuner extends OpMode {
         telemetryM.debug(
             "The following values are the offsets in inches that should be applied to your localizer."
         );
-        telemetryM.debug("strafeX: " + ((72.0 - follower.getPose().getX()) / 2.0));
-        telemetryM.debug("forwardY: " + ((72.0 - follower.getPose().getY()) / 2.0));
+        telemetryM.debug("strafeX: " + (72.0 - follower.getPose().getX()) / 2.0);
+        telemetryM.debug("forwardY: " + (72.0 - follower.getPose().getY()) / 2.0);
         telemetryM.update(telemetry);
 
         drawCurrentAndHistory();

@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.technototes.library.command.Command;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.command.SequentialCommandGroup;
-import com.technototes.library.command.WaitCommand;
 import com.technototes.library.structure.CommandOpMode;
 import com.technototes.library.util.Alliance;
 import com.technototes.library.util.HeadingHelper;
@@ -23,7 +22,6 @@ import org.firstinspires.ftc.sixteen750.commands.auto.AutoCommands;
 import org.firstinspires.ftc.sixteen750.commands.auto.Poses;
 import org.firstinspires.ftc.sixteen750.commands.auto.RPaths;
 import org.firstinspires.ftc.sixteen750.commands.auto.WaitForArtifacts;
-import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
@@ -41,30 +39,33 @@ public class RedNear18Partner extends CommandOpMode {
 
     private static Command RedGateCycle(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt1),
-            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.5),
-            new PedroPathCommand(r.follower, RPaths.PRGateInt1ToRLaunch),
+            new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt1)
+                .alongWith(AutoCommands.PostLaunchRoutine(r))
+                .withTimeout(2.5),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
+            new PedroPathCommand(r.follower, RPaths.PRGateInt1ToRLaunch).withTimeout(2.5),
             AutoCommands.AutoLaunching3Balls(r)
         );
     }
 
     private static Command RedGateCycle2(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt2),
-            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.5),
-            new PedroPathCommand(r.follower, RPaths.PRGateInt2ToRLaunch),
+            new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt2)
+                .alongWith(AutoCommands.PostLaunchRoutine(r))
+                .withTimeout(2.5),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
+            new PedroPathCommand(r.follower, RPaths.PRGateInt2ToRLaunch).withTimeout(2.5),
             AutoCommands.AutoLaunching3Balls(r)
         );
     }
 
     private static Command RedGateCycle3(Robot r) {
         return new SequentialCommandGroup(
-            TeleCommands.Intake(r),
-            new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt3),
-            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.5),
-            new PedroPathCommand(r.follower, RPaths.PRGateInt3ToRLaunch),
+            new PedroPathCommand(r.follower, RPaths.PRLaunchToRGateInt3)
+                .alongWith(AutoCommands.PostLaunchRoutine(r))
+                .withTimeout(2.5),
+            new WaitForArtifacts(r.intakeSubsystem).withTimeout(1.25),
+            new PedroPathCommand(r.follower, RPaths.PRGateInt3ToRLaunch).withTimeout(2.5),
             AutoCommands.AutoLaunching3Balls(r)
         );
     }
@@ -83,28 +84,25 @@ public class RedNear18Partner extends CommandOpMode {
         CommandScheduler.scheduleForState(
             new AltAutoVelocity(robot).alongWith(
                 new SequentialCommandGroup(
-                    //TeleCommands.AutoLaunch1(robot),
-                    t.GateUp(robot),
-                    t.Launch(robot),
-                    t.Intake(robot),
-                    t.HoodUp(robot),
-                    new PedroPathCommand(robot.follower, p.PRStartToRLaunch),
+                    a.AutoStartRoutine(robot),
+                    new PedroPathCommand(robot.follower, p.PRStartToRLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    new PedroPathCommand(robot.follower, p.PRLaunchToRInt1, p.power092).alongWith(
-                        t.Intake(robot)
-                    ),
-                    t.IntakeStop(robot),
-                    new PedroPathCommand(robot.follower, p.PRInt1ToRLaunch),
+                    new PedroPathCommand(robot.follower, p.PRLaunchToRInt1, p.power095)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
+                    new PedroPathCommand(robot.follower, p.PRInt1ToRLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    RedGateCycle(robot).alongWith(t.Intake(robot)),
-                    RedGateCycle2(robot).alongWith(t.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.PRLaunchToRInt2, p.power092).alongWith(
-                        t.Intake(robot)
-                    ),
-                    new PedroPathCommand(robot.follower, p.PRInt2ToRLaunch),
+                    RedGateCycle(robot),
+                    RedGateCycle2(robot),
+                    new PedroPathCommand(robot.follower, p.PRLaunchToRInt2, p.power095)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
+                    new PedroPathCommand(robot.follower, p.PRInt2ToRLaunch).withTimeout(2.5),
                     a.AutoLaunching3Balls(robot),
-                    RedGateCycle3(robot).alongWith(t.Intake(robot)),
-                    new PedroPathCommand(robot.follower, p.PRLaunchToREnd),
+                    RedGateCycle3(robot),
+                    new PedroPathCommand(robot.follower, p.PRLaunchToREnd)
+                        .alongWith(a.PostLaunchRoutine(robot))
+                        .withTimeout(2.5),
                     CommandScheduler::terminateOpMode
                 )
             ),

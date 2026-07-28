@@ -59,7 +59,6 @@ public class BAD extends CommandOpMode {
                     ).alongWith(TeleCommands.Intake(robot)),
                     new PedroPathCommand(robot.follower, p.Intake2endtoLaunch),
                     //   TeleCommands.AutoLaunch2(robot),
-
                     Paths.AutoLaunching3Balls(robot),
                     new PedroPathCommand(
                         robot.follower,

@@ -20,6 +20,7 @@ import org.firstinspires.ftc.sixteen750.commands.driving.DrivingCommands;
 import org.firstinspires.ftc.sixteen750.controls.DriverController;
 import org.firstinspires.ftc.sixteen750.controls.OperatorController;
 import org.firstinspires.ftc.sixteen750.helpers.StartingPosition;
+import org.firstinspires.ftc.sixteen750.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LauncherSubsystem;
 import org.firstinspires.ftc.sixteen750.subsystems.LimelightSubsystem;
 
@@ -113,6 +114,13 @@ public class RedTele extends CommandOpMode implements Loggable {
             .addData("Distraw", String.valueOf(LimelightSubsystem.RawDistance));
 
         panelsTelemetry.getTelemetry().update(telemetry);*/
+        // panelsTelemetry
+        //     .getTelemetry()
+        //      .addData("IntSpeed", String.valueOf(IntakeSubsystem.IntakeSpeed));
+        //  panelsTelemetry
+        //      .getTelemetry()
+        //     .addData("TransferSpeed", String.valueOf(IntakeSubsystem.TransferSpeed));
+        // panelsTelemetry.getTelemetry().update(telemetry);
     }
 
     /*

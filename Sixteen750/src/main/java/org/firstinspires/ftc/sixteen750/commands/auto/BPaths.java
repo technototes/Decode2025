@@ -41,8 +41,8 @@ public class BPaths {
     public PathChain BFLaunchToBFInt2;
     public PathChain BFLaunchToBFInt3;
     public PathChain BFLaunchToBFEnd;
-    public static double power085 = 0.72;
-    public static double power092 = 0.92;
+    public static double power085 = 0.85;
+    public static double power095 = 0.95;
 
     public BPaths(Follower follower) {
         follower.setMaxPowerScaling(1);

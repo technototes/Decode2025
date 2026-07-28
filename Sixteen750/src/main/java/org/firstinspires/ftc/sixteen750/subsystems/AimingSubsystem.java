@@ -22,7 +22,7 @@ public class AimingSubsystem implements Loggable, Subsystem {
     public static boolean GateDown = false;
     public static double BangBangRegConstant = 0.0014; // multiplier for ratio of encoder ticks per second to hood adjustment in terms of servo pos ie 0-1 still needs some tuning
     public static double BangBangFarConstant = 0.0016;
-    public static double LEVER_POS = 0.7; //.65
+    public static double LEVER_POS = 0.69; //.65
     public static double LEVER_POS_GO = 0.4; //0.2
     public static double LastHoodPos = 0;
     public static double HOOD_DOWN_THRESHOLD = 38;

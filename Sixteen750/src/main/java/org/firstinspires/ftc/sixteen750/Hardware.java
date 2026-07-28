@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.technototes.library.hardware.motor.CRServo;
 import com.technototes.library.hardware.motor.EncodedMotor;
+import com.technototes.library.hardware.motor.MotorPlus;
 import com.technototes.library.hardware.sensor.AdafruitIMU;
 import com.technototes.library.hardware.sensor.IGyro;
 import com.technototes.library.hardware.sensor.IMU;
@@ -25,8 +26,8 @@ public class Hardware implements Loggable {
 
     public IGyro imu;
     public EncodedMotor<DcMotorEx> fl, fr, rl, rr, testMotor;
-    public DcMotorEx intake;
-    public DcMotorEx intake2;
+    public MotorPlus<DcMotorEx> intake;
+    public MotorPlus<DcMotorEx> intake2;
     public EncodedMotor launcher1;
     public EncodedMotor launcher2;
     public Servo brake;
@@ -69,8 +70,8 @@ public class Hardware implements Loggable {
             odo = hwmap.get(SparkFunOTOS.class, Setup.HardwareNames.OTOS);
         }
         if (Setup.Connected.INTAKESUBSYSTEM) {
-            intake = this.map.get(DcMotorEx.class, Setup.HardwareNames.INTAKE_MOTOR);
-            intake2 = this.map.get(DcMotorEx.class, Setup.HardwareNames.ODOFB);
+            intake = new MotorPlus(Setup.HardwareNames.INTAKE_MOTOR);
+            intake2 = new MotorPlus(Setup.HardwareNames.ODOFB);
             gulpServo = new CRServo(Setup.HardwareNames.ITKANL);
             gobbleServo = new CRServo(Setup.HardwareNames.ITKANR);
         }

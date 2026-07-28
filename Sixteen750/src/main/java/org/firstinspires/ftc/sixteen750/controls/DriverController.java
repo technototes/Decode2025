@@ -194,7 +194,9 @@ public class DriverController implements Loggable {
         gateButton.whenReleased(TeleCommands.GateUp(robot));
 
         //
-        holdButton.whilePressed(TeleCommands.HoldIntake(robot));
+        holdButton.whilePressed(TeleCommands.Intake(robot));
+        holdButton.whenPressed(TeleCommands.GateDown(robot));
         holdButton.whenReleased(TeleCommands.IntakeStop(robot));
+        holdButton.whenReleased(TeleCommands.GateUp(robot));
     }
 }

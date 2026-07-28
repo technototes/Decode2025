@@ -6,9 +6,14 @@ import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.PathChain;
+import org.firstinspires.ftc.sixteen750.Robot;
+import org.firstinspires.ftc.sixteen750.commands.TeleCommands;
 
 @Configurable
 public class RPaths {
+
+    Poses.StartPoses sp = new Poses.StartPoses();
+    Poses.RNear18PartnerPoses p = new Poses.RNear18PartnerPoses();
 
     public PathChain PRStartToRLaunch;
     public PathChain PRLaunchToRInt1;
@@ -43,13 +48,10 @@ public class RPaths {
     public PathChain RFLaunchToRFInt3;
     public PathChain RFLaunchToRFEnd;
     public static double power085 = 0.85;
-    public static double power092 = 0.92;
+    public static double power095 = 0.95;
 
     public RPaths(Follower follower) {
         follower.setMaxPowerScaling(1);
-
-        Poses.StartPoses sp = new Poses.StartPoses();
-        Poses.RNear18PartnerPoses p = new Poses.RNear18PartnerPoses();
 
         PRStartToRLaunch = follower
             .pathBuilder()
@@ -59,21 +61,12 @@ public class RPaths {
         PRLaunchToRInt1 = follower
             .pathBuilder()
             .addPath(new BezierCurve(p.RLaunch, p.RInt1CtrlPoint1, p.RInt1CtrlPoint2, p.RInt1))
-            .setHeadingInterpolation(
-                HeadingInterpolator.piecewise(
-                    new HeadingInterpolator.PiecewiseNode(0, .4, HeadingInterpolator.tangent),
-                    new HeadingInterpolator.PiecewiseNode(
-                        .4,
-                        1,
-                        HeadingInterpolator.constant(p.RInt1.getHeading())
-                    )
-                )
-            )
+            .setConstantHeadingInterpolation(p.RInt1.getHeading())
             .build();
         PRInt1ToRLaunch = follower
             .pathBuilder()
             .addPath(new BezierCurve(p.RInt1, p.RInt1ToLaunchCtrlPoint, p.RLaunch))
-            .setConstantHeadingInterpolation(p.RLaunchHead)
+            .setLinearHeadingInterpolation(p.RLaunchHead, p.RInt1.getHeading())
             .build();
         PRLaunchToRGateInt1 = follower
             .pathBuilder()

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.technototes.library.command.CommandScheduler;
 import com.technototes.library.hardware.motor.CRServo;
+import com.technototes.library.hardware.motor.MotorPlus;
 import com.technototes.library.logger.Log;
 import com.technototes.library.logger.Loggable;
 import com.technototes.library.subsystem.Subsystem;
@@ -18,20 +19,28 @@ public class IntakeSubsystem implements Loggable, Subsystem {
 
     Gamepad gamepad;
 
-    @Log.Number(name = "intakePow")
+    //@Log.Number(name = "intakePow")
     public static double SMART_INTAKE_VELOCITY = 1;
 
-    @Log.Number(name = "transferPow")
+    // @Log.Number(name = "transferPow")
     public static double SMART_TRANSFER_VELOCITY = 1;
 
-    public static double TRANSFER_ONE_THRESHOLD = 2.5;
-    public static double TRANSFER_TWO_THRESHOLD = 3.2;
+    @Log.Number(name = "IntSpeed")
+    public static double IntakeSpeed = 0;
+
+    @Log.Number(name = "TransferSpeed")
+    public static double TransferSpeed = 0;
+
+    public static double TRANSFER_ONE_THRESHOLD = 0.9;
+    public static double TRANSFER_TWO_THRESHOLD = 1.7;
     public static double INTAKE_THRESHOLD = 3;
     public static double ONE_THRESHOLD = 1.65;
     public static double TWO_THRESHOLD = 3;
     public static double THREE_THRESHOLD = 10;
     public static double INTAKE_VELOCITY = 1;
-    public static double SLOW_MOTOR_VELOCITY = 0.55; // 0.5 1.0
+    public static double SLOW_MOTOR_VELOCITY = 0.6; // 0.5 1.0
+    public static double SLOW_INTAKE_VELOCITY = 0.4; // velocity to set intake motor too once we have 3 balls
+    public static double SLOW_TRANSFER_VELOCITY = 0.55;
     public static int duration = 80;
     public static double GATE_INTAKE_HEADING_BLUE = 155;
     public static double GATE_INTAKE_HEADING_RED = 25;
@@ -53,12 +62,16 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     @Log.Number(name = "intakeFull")
     public boolean intakeFull = false;
 
-    public static double intakecurrent = 0;
-    public static double transfercurrent = 0;
+    @Log.Number(name = "IntakeCur")
+    public static double intakecurrent = 0.0;
+
+    @Log.Number(name = "TransferCur")
+    public static double transfercurrent = 0.0;
+
     public static double intakespike = 0; //the current it goes to when a ball is intake - will test and see
 
-    DcMotorEx intake;
-    DcMotorEx transfer;
+    MotorPlus intake;
+    MotorPlus transfer;
     CRServo gobbleServo;
     CRServo gulpServo;
 
@@ -89,7 +102,7 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         // Spin the motors
         if (hasHardware) {
             intake.setPower(INTAKE_VELOCITY);
-            transfer.setPower(SLOW_MOTOR_VELOCITY);
+            transfer.setPower(SLOW_TRANSFER_VELOCITY);
             gobbleServo.setPower(1);
             gulpServo.setPower(-1);
         }
@@ -156,11 +169,11 @@ public class IntakeSubsystem implements Loggable, Subsystem {
     }
 
     public double getIntakeCurrent() {
-        return intake.getCurrent(CurrentUnit.AMPS);
+        return intake.getAmperage(CurrentUnit.AMPS);
     }
 
     public double getTransferCurrent() {
-        return transfer.getCurrent(CurrentUnit.AMPS);
+        return transfer.getAmperage(CurrentUnit.AMPS);
     }
 
     /* public void detectBall(double averageCurrent) {
@@ -247,6 +260,24 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         return valuesTotal / 8;
     }
 
+    public double getIntakeSpeed() {
+        // funny math chatgpt gave me it looks right i plug in current draw and it gives me velocity in rpm (for bare motor)
+        IntakeSpeed = (5900 * (9.3 - getIntakeCurrent())) / 9;
+        return IntakeSpeed;
+    }
+
+    public double getTransferSpeed() {
+        TransferSpeed = (5900 * (9.3 - getTransferCurrent())) / 9;
+        return TransferSpeed;
+    }
+
+    //public double getIntakeSpeed() {
+    // return intake.getSpeed();
+    //}
+    //public double getTransferSpeed() {
+    //  return transfer.getSpeed();
+    // }
+
     @Override
     public void periodic() {
         // Add an item to the array and update the index for the next update to the 'circular' array
@@ -256,5 +287,9 @@ public class IntakeSubsystem implements Loggable, Subsystem {
         // detectBall(getAverageIntakeCurrent());
         SmartIntake(getAverageIntakeCurrent(), getAverageTransferCurrent());
         SmartTransferVelocity();
+        intakecurrent = getAverageIntakeCurrent();
+        transfercurrent = getAverageTransferCurrent();
+        IntakeSpeed = getIntakeSpeed();
+        TransferSpeed = getTransferSpeed();
     }
 }

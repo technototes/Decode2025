@@ -62,14 +62,12 @@ public class Red12BallFar extends CommandOpMode {
                 Paths.AutoLaunching3BallsNormalIntake(robot),
                 //                new PedroPathCommand(robot.follower, p.RlaunchfartointakeCorner, 0.7).alongWith(TeleCommands.Intake(robot)),
                 //                new PedroPathCommand(robot.follower, p.RintakeCornertolaunchfar),
-
                 new PedroPathCommand(robot.follower, p.RlaunchfartointakeVertical, 0.6).alongWith(
                     TeleCommands.Intake(robot)
                 ),
                 new PedroPathCommand(robot.follower, p.RintakeVerticaltolaunchfar),
                 //the two paths above is a new way to intake the corner balls
                 //the two commented paths above these new ones is the old way to intake the corner balls
-
                 Paths.AutoLaunching3BallsNormalIntake(robot),
                 new PedroPathCommand(robot.follower, p.RlaunchfartointakeHorizontal, 0.6).alongWith(
                     TeleCommands.Intake(robot)
@@ -78,7 +76,6 @@ public class Red12BallFar extends CommandOpMode {
                 new PedroPathCommand(robot.follower, p.RintakeHorizontaltolaunchfar, 0.9),
                 //the two paths above is a new way to intake the corner balls
                 //the two commented paths above these new ones is the old way to intake the corner balls
-
                 Paths.AutoLaunching3BallsNormalIntake(robot),
                 //                    new PedroPathCommand(robot.follower, p.RlaunchfartointakeCornerNew,
                 //                        0.5

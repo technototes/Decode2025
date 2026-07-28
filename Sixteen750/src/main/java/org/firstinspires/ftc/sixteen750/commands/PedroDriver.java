@@ -299,8 +299,9 @@ public class PedroDriver implements Command, Loggable {
         // Negative, because pushing left is negative, but that is a positive change in Pedro's
         // coordinate system.
         double rotation = -r.getAsDouble();
-        curHeading = (MathUtils.normalizeDeltaRadians(follower.getHeading()) -
-            MathUtils.normalizeDeltaRadians(headingOffset));
+        curHeading =
+            MathUtils.normalizeDeltaRadians(follower.getHeading()) -
+            MathUtils.normalizeDeltaRadians(headingOffset);
         double targetHeading = 0;
         switch (driveStyle) {
             case Right:
@@ -338,7 +339,7 @@ public class PedroDriver implements Command, Loggable {
                 return rotation * turnSpeed;
         }
         // TODO: Use the Pedro heading PIDF to get this value?
-        return (Math.clamp(targetHeading - curHeading, -1, 1) * turnSpeed);
+        return Math.clamp(targetHeading - curHeading, -1, 1) * turnSpeed;
         //so the line above overrides the joystick and makes it ignore what the human
         //is doing with the joystick and makes it turn a specific way (vision control)
     }

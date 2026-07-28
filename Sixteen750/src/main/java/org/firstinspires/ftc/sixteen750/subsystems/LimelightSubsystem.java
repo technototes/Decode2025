@@ -212,8 +212,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
     public double getRawDistance() {
         if (getLatestResult()) {
             RawDistance =
-                (DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY /
-                    Math.tan(Math.toRadians(Yangle))) +
+                DISTANCE_FROM_LIMELIGHT_TO_APRILTAG_VERTICALLY / Math.tan(Math.toRadians(Yangle)) +
                 LL_DISTANCE_OFFSET;
             return RawDistance;
         }
@@ -226,7 +225,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
 
     public double getVelocity() {
         if (getLatestResult()) {
-            Velocity = (deltaDistance) / (deltaTime);
+            Velocity = deltaDistance / deltaTime;
         }
         return Velocity;
     }
@@ -249,7 +248,7 @@ public class LimelightSubsystem implements Loggable, Subsystem {
 
     public double getPredictedDistance() {
         if (getLatestResult()) {
-            PredictedDistance = RawDistance + (Velocity * FLIGHT_TIME);
+            PredictedDistance = RawDistance + Velocity * FLIGHT_TIME;
         }
         return PredictedDistance;
     }

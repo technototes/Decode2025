@@ -59,7 +59,6 @@ public class BlueNearLeverNoThird extends CommandOpMode {
                     ),
                     new WaitCommand(0.05),
                     //TeleCommands.AutoLaunch2(robot),
-
                     new PedroPathCommand(robot.follower, p.Intake2endtoLaunch).alongWith(
                         TeleCommands.IntakeStop(robot)
                     ),

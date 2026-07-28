@@ -44,21 +44,23 @@ public class Paths {
     }
 
     public static Command AutoLaunching3Balls(Robot r) {
-        return new SequentialCommandGroup(
-            //TeleCommands.IntakeStop(r),
-            TeleCommands.GateUp(r),
-            TeleCommands.Intake(r),
-            // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
-            //switched to slow intake to remove the up down up down of the gate aswell as drain less power
-            TeleCommands.GateDown(r),
-            new WaitCommand(0.55),
-            TeleCommands.GateUp(r),
-            TeleCommands.IntakeStop(r)
+        return (
+            new SequentialCommandGroup(
+                //TeleCommands.IntakeStop(r),
+                TeleCommands.GateUp(r),
+                TeleCommands.Intake(r),
+                // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
+                //switched to slow intake to remove the up down up down of the gate aswell as drain less power
+                TeleCommands.GateDown(r),
+                new WaitCommand(0.55),
+                TeleCommands.GateUp(r),
+                TeleCommands.IntakeStop(r)
 
-            // want to keep launcher running during auto also no need to stop intake
-        )
-            //.alongWith(new AltAutoOrient(r));
-            .raceWith(new AltAutoOrient(r));
+                // want to keep launcher running during auto also no need to stop intake
+            )
+                //.alongWith(new AltAutoOrient(r));
+                .raceWith(new AltAutoOrient(r))
+        );
     }
 
     public static Command AutoLaunching3BallsSlowIntake(Robot r) {
@@ -67,8 +69,7 @@ public class Paths {
                 //TeleCommands.IntakeStop(r),
                 TeleCommands.GateUp(r),
                 new WaitCommand(0.7)
-            )
-                .raceWith(new AltAutoOrient(r)),
+            ).raceWith(new AltAutoOrient(r)),
             TeleCommands.HoldIntake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
@@ -88,8 +89,7 @@ public class Paths {
                 //TeleCommands.IntakeStop(r),
                 TeleCommands.GateUp(r),
                 new WaitCommand(0.7)
-            )
-                .raceWith(new AltAutoOrient(r)),
+            ).raceWith(new AltAutoOrient(r)),
             TeleCommands.Intake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
@@ -109,8 +109,7 @@ public class Paths {
                 //TeleCommands.IntakeStop(r),
                 TeleCommands.GateUp(r),
                 new WaitCommand(0.7)
-            )
-                .raceWith(new AltAutoOrientFar(r)),
+            ).raceWith(new AltAutoOrientFar(r)),
             TeleCommands.HoldIntake(r),
             // no need to wait for spinup as we will leave the flywheel spinning constantly during auto
             //switched to slow intake to remove the up down up down of the gate aswell as drain less power
@@ -396,51 +395,57 @@ public class Paths {
 
     public Paths(Follower follower) {
         follower.setMaxPowerScaling(0.3);
-        launch = follower
-            .pathBuilder()
-            .addPath(new BezierLine(Start, Launch))
-            .setConstantHeadingInterpolation(Math.toRadians(launchHeading0))
-            //.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(135))
-            .build();
+        launch =
+            follower
+                .pathBuilder()
+                .addPath(new BezierLine(Start, Launch))
+                .setConstantHeadingInterpolation(Math.toRadians(launchHeading0))
+                //.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(135))
+                .build();
         follower.setMaxPowerScaling(1);
-        launchtointake1 = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(Launch, new Pose(73.411, 86.685), Intake1end))
-            .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
-            //.setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
-            .build();
+        launchtointake1 =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(Launch, new Pose(73.411, 86.685), Intake1end))
+                .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
+                //.setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+                .build();
 
-        intake1tolaunch = follower
-            .pathBuilder()
-            .addPath(
-                //changing all return-to-launch coordinate points except for the very first one cause its
-                //not touching the white line when shooting (x increases by 10, y decreases by 10)
-                new BezierLine(Intake1end, Launch)
-            )
-            .setConstantHeadingInterpolation(Math.toRadians(launchHeading1))
-            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-            .build();
+        intake1tolaunch =
+            follower
+                .pathBuilder()
+                .addPath(
+                    //changing all return-to-launch coordinate points except for the very first one cause its
+                    //not touching the white line when shooting (x increases by 10, y decreases by 10)
+                    new BezierLine(Intake1end, Launch)
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(launchHeading1))
+                //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+                .build();
 
-        launchtointake2 = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(Launch, new Pose(80, 61), Intake2end))
-            .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
-            //.setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
-            .build();
+        launchtointake2 =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(Launch, new Pose(80, 61), Intake2end))
+                .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
+                //.setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
+                .build();
 
-        intake2tolaunch = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(Intake2end, new Pose(62, 76), Launch))
-            .setConstantHeadingInterpolation(Math.toRadians(launchHeading2))
-            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-            .build();
+        intake2tolaunch =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(Intake2end, new Pose(62, 76), Launch))
+                .setConstantHeadingInterpolation(Math.toRadians(launchHeading2))
+                //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+                .build();
 
-        launchtointake3 = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(Launch, new Pose(46.407, 96.652), Intake3end))
-            .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
-            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-            .build();
+        launchtointake3 =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(Launch, new Pose(46.407, 96.652), Intake3end))
+                .setConstantHeadingInterpolation(Math.toRadians(intakeHeading))
+                //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+                .build();
 
         launchtopark = follower
             .pathBuilder()
@@ -448,68 +453,76 @@ public class Paths {
             .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
             .build();
 
-        intake3tolaunch = follower
-            .pathBuilder()
-            .addPath(new BezierLine(Intake3end, Launch))
-            .setConstantHeadingInterpolation(Math.toRadians(launchHeading3))
-            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-            .build();
+        intake3tolaunch =
+            follower
+                .pathBuilder()
+                .addPath(new BezierLine(Intake3end, Launch))
+                .setConstantHeadingInterpolation(Math.toRadians(launchHeading3))
+                //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+                .build();
         //red zone autos
-        Rstarttolaunch = follower
-            .pathBuilder()
-            .addPath(new BezierLine(RStart, RLaunch))
-            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading1))
-            //.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(45))
-            .build();
+        Rstarttolaunch =
+            follower
+                .pathBuilder()
+                .addPath(new BezierLine(RStart, RLaunch))
+                .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading1))
+                //.setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(45))
+                .build();
         follower.setMaxPowerScaling(1);
-        Rlaunchtointake1 = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(RLaunch, new Pose(71, 86.685), RIntake1))
-            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
-            //.setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
-            .build();
+        Rlaunchtointake1 =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(RLaunch, new Pose(71, 86.685), RIntake1))
+                .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
+                //.setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                .build();
 
-        Rintake1tolaunch = follower
-            .pathBuilder()
-            .addPath(
-                //changing all return-to-launch coordinate points except for the very first one cause its
-                //not touching the white line when shooting (x increases by 10, y decreases by 10)
-                new BezierLine(RIntake1, RLaunch)
-            )
-            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading2))
-            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
-            .build();
+        Rintake1tolaunch =
+            follower
+                .pathBuilder()
+                .addPath(
+                    //changing all return-to-launch coordinate points except for the very first one cause its
+                    //not touching the white line when shooting (x increases by 10, y decreases by 10)
+                    new BezierLine(RIntake1, RLaunch)
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading2))
+                //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
 
-        Rlaunchtointake2 = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(RLaunch, new Pose(64, 61), RIntake2end))
-            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
-            //.setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(RintakeHeading))
-            .build();
-        Rintake2tolaunch = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(RIntake2end, new Pose(82, 76), RLaunch))
-            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading3))
-            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RlaunchHeading3))
-            .build();
-        Rlaunchtointake3 = follower
-            .pathBuilder()
-            .addPath(new BezierLine(RLaunch, RIntake3end))
-            .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
-            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-            .build();
+        Rlaunchtointake2 =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(RLaunch, new Pose(64, 61), RIntake2end))
+                .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
+                //.setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(RintakeHeading))
+                .build();
+        Rintake2tolaunch =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(RIntake2end, new Pose(82, 76), RLaunch))
+                .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading3))
+                //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(RlaunchHeading3))
+                .build();
+        Rlaunchtointake3 =
+            follower
+                .pathBuilder()
+                .addPath(new BezierLine(RLaunch, RIntake3end))
+                .setConstantHeadingInterpolation(Math.toRadians(RintakeHeading))
+                //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
+                .build();
         Rlaunchtopark = follower
             .pathBuilder()
             .addPath(new BezierLine(new Pose(93, 101.595), new Pose(115, 49.617)))
             .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
             .build();
 
-        Rintake3tolaunch = follower
-            .pathBuilder()
-            .addPath(new BezierLine(RIntake3end, RLaunch))
-            .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading4))
-            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
-            .build();
+        Rintake3tolaunch =
+            follower
+                .pathBuilder()
+                .addPath(new BezierLine(RIntake3end, RLaunch))
+                .setConstantHeadingInterpolation(Math.toRadians(RlaunchHeading4))
+                //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                .build();
 
         StarttoLaunch = follower
             .pathBuilder()
@@ -528,12 +541,13 @@ public class Paths {
             .addPath(new BezierLine(Intake1, Intake1end))
             .setTangentHeadingInterpolation()
             .build();
-        Intake1endtoLever = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(Intake1end, LeverControlPoint, Lever))
-            .setConstantHeadingInterpolation(Math.toRadians(180))
-            //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
-            .build();
+        Intake1endtoLever =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(Intake1end, LeverControlPoint, Lever))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
+                .build();
         LevertoLaunch = follower
             .pathBuilder()
             .addPath(new BezierLine(Lever, Launch))
@@ -678,12 +692,13 @@ public class Paths {
             .addPath(new BezierLine(RIntake1, RIntake1end))
             .setTangentHeadingInterpolation()
             .build();
-        RIntake1endtoLever = follower
-            .pathBuilder()
-            .addPath(new BezierCurve(RIntake1end, RleverControlPoint, Rlever))
-            .setConstantHeadingInterpolation(Math.toRadians(0))
-            //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
-            .build();
+        RIntake1endtoLever =
+            follower
+                .pathBuilder()
+                .addPath(new BezierCurve(RIntake1end, RleverControlPoint, Rlever))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
+                //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
+                .build();
 
         RLevertoLaunch = follower
             .pathBuilder()
