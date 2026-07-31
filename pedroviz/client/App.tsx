@@ -14,7 +14,7 @@ import { PathSelector } from './PathSelector';
 import { Settings } from './Settings';
 import { ThemeAtom } from './state/SavedSettings';
 import { getStore } from './state/Storage';
-import { ScaledCanvas } from './ui-tools/ScaledCanvas';
+import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
 
 import './index.css';
 
@@ -35,7 +35,7 @@ export function MyApp(): ReactElement {
           </Panel>
           <Separator id="view-separator" />
           <Panel className="display">
-            <ScaledCanvas />
+            <ResponsiveSquareCanvas />
           </Panel>
         </Group>
       </Suspense>

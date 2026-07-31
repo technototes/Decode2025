@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useRef, useState } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 
 import { isDefined } from '@freik/typechk';
 
@@ -26,14 +26,30 @@ import { bezierLength, deCasteljau } from './bezier';
 
 const fix = 144;
 
-export function ScaledCanvas(): ReactElement {
+export function ResponsiveSquareCanvas(): ReactElement {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [size, setSize] = useState(0);
+
+  // This makes the canvas resize
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) {
+        const { width, height } = entry.contentRect;
+        // Floor the value to prevent fractional pixel jittering during fast drags
+        setSize(Math.floor(Math.min(width, height)));
+      }
+    });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [containerRef]);
+
   const opts = useAtomValue(PathRenderOptionsAtom);
   const theme = useAtomValue(ThemeAtom);
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState(0);
   const colors = useAtomValue(ColorsAtom);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const pathChains = useAtomValue(MappedPathChainsAtom);
   const beziers = useAtomValue(MappedBeziersAtom);
   const poses = useAtomValue(MappedPosesAtom);
@@ -54,21 +70,6 @@ export function ScaledCanvas(): ReactElement {
         backgroundImage: `url('/assets/field-${theme}.jpg')`,
       }
     : {};
-  // This makes the canvas resize
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry) {
-        const { width, height } = entry.contentRect;
-        // Floor the value to prevent fractional pixel jittering during fast drags
-        setSize(Math.floor(Math.min(width, height)));
-      }
-    });
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -77,9 +78,8 @@ export function ScaledCanvas(): ReactElement {
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    // const rect = canvas.getBoundingClientRect();
 
-    const squareSize = size; // Math.min(rect.width, rect.height);
+    const squareSize = size;
 
     canvas.width = squareSize * dpr;
     canvas.height = squareSize * dpr;
@@ -88,6 +88,7 @@ export function ScaledCanvas(): ReactElement {
 
     // Map logical 144×144 units into square
     const scale = squareSize / fix;
+
     // Move the origin to the lower left, corner, and scale it up
     // ctx.translate(0, canvas.height);
     // ctx.scale(dpr * scale, -dpr * scale);
