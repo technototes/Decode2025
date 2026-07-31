@@ -17,7 +17,7 @@ import { EditRegular } from '@fluentui/react-icons';
 
 import { isIntValue, isValueName, ValueRef } from '../../server/types';
 import { BlurAtom } from '../state/Atoms';
-import { GetValueAsString, HasItem, HasKeys } from '../types';
+import { GetValueAsString, HasItem, HasKeys, ValidateState } from '../types';
 import {
   CheckValidValueOrName,
   IsValidJavaIdentifier,
@@ -64,7 +64,7 @@ export function NumberOrNamedValue<U extends HasKeys<string>>({
     } else if (IsValidNumber(value)) {
       setValue(value);
     }
-    if (state !== 'error') {
+    if (state !== ValidateState.Error) {
       setValue(value);
     } else {
       setCurValue(value);
@@ -85,7 +85,7 @@ export function NumberOrNamedValue<U extends HasKeys<string>>({
       data.optionText || '',
       true,
     ));
-    if (state !== 'error') {
+    if (state !== ValidateState.Error) {
       setValue(data.optionText || '');
     } else {
       setCurValue(data.optionText || '');

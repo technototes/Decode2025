@@ -4,7 +4,14 @@ import path from 'path';
 import { isError } from 'node_modules/@freik/typechk/lib/esm';
 
 import { MakeParsedClass } from '../PathChainLoader';
-import { BezierName, PathChainName, PoseName, ValueName } from '../types';
+import {
+  BezierName,
+  BezierType,
+  FacingType,
+  PathChainName,
+  PoseName,
+  ValueName,
+} from '../types';
 import { firstFtcSrc, getProjectFilePath } from '../utility';
 import { LoadPath } from '../web-interface';
 
@@ -121,7 +128,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     name: 'start_to_step1' as BezierName,
     points: {
       points: ['start' as PoseName, 'step1' as PoseName],
-      type: 'line',
+      type: BezierType.Line,
     },
   });
   expect(paths.beziers[1]).toEqual({
@@ -132,7 +139,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
         'step23_mid' as PoseName,
         'step3' as PoseName,
       ],
-      type: 'curve',
+      type: BezierType.Curve,
     },
   });
   expect(paths.beziers[2]).toEqual({
@@ -143,7 +150,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
         { x: 'org' as ValueName, y: { int: 15 } },
         'start' as PoseName,
       ],
-      type: 'curve',
+      type: BezierType.Curve,
     },
   });
   expect(paths.beziers[3]).toEqual({
@@ -161,7 +168,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
           heading: { radians: { int: 60 } },
         },
       ],
-      type: 'line',
+      type: BezierType.Line,
     },
   });
 
@@ -170,7 +177,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     name: 'Path1' as PathChainName,
     paths: ['start_to_step1' as BezierName],
     pathHeading: {
-      type: 'linear',
+      type: FacingType.Linear,
       start: 'start' as PoseName,
       end: 'step1' as PoseName,
     },
@@ -178,10 +185,13 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
   expect(paths.pathChains[1]).toEqual({
     name: 'Path2' as PathChainName,
     paths: [
-      { type: 'curve', points: ['step1' as PoseName, 'step2' as PoseName] },
+      {
+        type: BezierType.Curve,
+        points: ['step1' as PoseName, 'step2' as PoseName],
+      },
     ],
     pathHeading: {
-      type: 'linear',
+      type: FacingType.Linear,
       start: {
         radians: { int: 90 },
       },
@@ -192,7 +202,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     name: 'Path3' as PathChainName,
     paths: ['step2_to_step3' as BezierName],
     pathHeading: {
-      type: 'linear',
+      type: FacingType.Linear,
       start: 'step_mid' as PoseName,
       end: 'step3' as PoseName,
     },
@@ -200,22 +210,25 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
   expect(paths.pathChains[3]).toEqual({
     name: 'Path4' as PathChainName,
     paths: [
-      { type: 'line', points: ['step3' as PoseName, 'step4' as PoseName] },
+      {
+        type: BezierType.Line,
+        points: ['step3' as PoseName, 'step4' as PoseName],
+      },
     ],
-    pathHeading: { type: 'constant', heading: 'one80' as ValueName },
+    pathHeading: { type: FacingType.Constant, heading: 'one80' as ValueName },
   });
   expect(paths.pathChains[4]).toEqual({
     name: 'AnotherPath' as PathChainName,
     paths: [
       {
-        type: 'line',
+        type: BezierType.Line,
         points: [
           { x: { int: 0 }, y: { int: 0 } },
           { x: { int: 20 }, y: { int: 20 } },
         ],
       },
       {
-        type: 'curve',
+        type: BezierType.Curve,
         points: [
           'step1' as PoseName,
           'step2' as PoseName,
@@ -226,7 +239,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
       'step4_to_start' as BezierName,
     ],
     pathHeading: {
-      type: 'linear',
+      type: FacingType.Linear,
       start: { radians: 'step' as ValueName },
       end: 'radRef' as PoseName,
     },

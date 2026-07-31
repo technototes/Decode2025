@@ -6,6 +6,7 @@ import {
   ClassDeclarationCtx,
   ConstructorDeclarationCtx,
   ExpressionCstNode,
+  ExpressionCtx,
   FieldDeclarationCtx,
   FqnOrRefTypeCstNode,
   ImportDeclarationCtx,
@@ -16,6 +17,7 @@ import {
   PrimarySuffixCstNode,
   UnannTypeCstNode,
   UnaryExpressionCtx,
+  UnqualifiedClassInstanceCreationExpressionCtx,
   VariableDeclaratorCtx,
 } from 'java-parser';
 import {
@@ -36,11 +38,13 @@ import {
   AnonymousValue,
   BezierName,
   BezierRef,
+  BezierType,
   EmptyParsedClass,
   FacingLinear,
   FacingPiece,
   FacingReversible,
   FacingSimple,
+  FacingType,
   HeadingRef,
   isAnonymousValue,
   isRadiansRef,
@@ -214,12 +218,12 @@ function nameOf(ctx: IToken[] | IToken | undefined): string | undefined {
   else return ctx?.image;
 }
 
-function getBType(className: string): 'line' | 'curve' | undefined {
+function getBezierType(className: string): BezierType | undefined {
   switch (className) {
     case 'BezierLine':
-      return 'line';
+      return BezierType.Line;
     case 'BezierCurve':
-      return 'curve';
+      return BezierType.Curve;
   }
 }
 
@@ -456,6 +460,23 @@ function getVariableDeclarator(
   return child(child(ctx.variableDeclaratorList)?.variableDeclarator);
 }
 
+function getNewExpr(
+  ctx: ExpressionCtx | undefined,
+): UnqualifiedClassInstanceCreationExpressionCtx | undefined {
+  return child(
+    child(
+      child(
+        child(
+          child(
+            child(child(ctx?.conditionalExpression)?.binaryExpression)
+              ?.unaryExpression,
+          )?.primary,
+        )?.primaryPrefix,
+      )?.newExpression,
+    )?.unqualifiedClassInstanceCreationExpression,
+  );
+}
+
 function getCtorArgs(
   decl: VariableDeclaratorCtx | ExpressionCstNode,
   type?: string,
@@ -470,18 +491,7 @@ function getCtorArgs(
   } else {
     expr = decl as unknown as ExpressionCstNode;
   }
-  const newExpr = child(
-    child(
-      child(
-        child(
-          child(
-            child(child(expr?.children.conditionalExpression)?.binaryExpression)
-              ?.unaryExpression,
-          )?.primary,
-        )?.primaryPrefix,
-      )?.newExpression,
-    )?.unqualifiedClassInstanceCreationExpression,
-  );
+  const newExpr = getNewExpr(expr?.children);
   const dataType = nameOf(
     child(newExpr?.classOrInterfaceTypeToInstantiate)?.Identifier,
   );
@@ -549,7 +559,7 @@ function getAnonymousBezier(
   if (isUndefined(ctorArgs)) {
     return;
   }
-  const type = getBType(foundType);
+  const type = getBezierType(foundType);
   if (isUndefined(type)) {
     return;
   }
@@ -568,7 +578,7 @@ function tryMatchingBeziers(ctx: FieldDeclarationCtx): NamedBezier | undefined {
   if (isUndefined(classType)) {
     return;
   }
-  const type = getBType(classType);
+  const type = getBezierType(classType);
   const decl = getVariableDeclarator(ctx);
   if (isUndefined(decl) || isUndefined(type)) {
     return;
@@ -687,7 +697,7 @@ function getHeadingInterpolation(
       const pieces = methodArgs.map(getPiece) as FacingPiece[];
       // If everything wasn't a piece, fail (required for the cast above)
       if (pieces.every(isDefined)) {
-        return { type: 'piecewise', pieces };
+        return { type: FacingType.Piecewise, pieces };
       }
       break;
     case 'HeadingInterpolator.facingPoint':
@@ -699,13 +709,13 @@ function getHeadingInterpolation(
         if (methodArgs.length === 1) {
           const pose = getPoseRef(methodArgs[0]!);
           if (isDefined(pose)) {
-            return { type: 'point', point: pose };
+            return { type: FacingType.Point, point: pose };
           }
         } else if (methodArgs.length === 2) {
           const x = getOnlyValueRef(methodArgs[0]);
           const y = getOnlyValueRef(methodArgs[1]);
           if (isDefined(x) && isDefined(y)) {
-            return { type: 'point', point: { x, y } };
+            return { type: FacingType.Point, point: { x, y } };
           }
         }
       }
@@ -714,13 +724,13 @@ function getHeadingInterpolation(
       if (isDefined(methodArgs)) {
         return;
       } else {
-        return { type: 'tangent' };
+        return { type: FacingType.Tangent };
       }
     case 'HeadingInterpolator.constant':
       if (isDefined(methodArgs)) {
         const heading = getHeadingRef(methodArgs[0]);
         if (isDefined(heading)) {
-          return { type: 'constant', heading };
+          return { type: FacingType.Constant, heading };
         }
       }
       return;
@@ -738,16 +748,16 @@ function getHeadingInterpolation(
       const endT =
         methodArgs.length === 3 ? getOnlyValueRef(methodArgs[3]) : undefined;
       // TODO: Handle endT appropriately
-      const linear: FacingLinear = { type: 'linear', start, end };
+      const linear: FacingLinear = { type: FacingType.Linear, start, end };
       return methodRef.indexOf('v') < 0
         ? linear
-        : { type: 'reversed', facing: linear };
+        : { type: FacingType.Reversed, facing: linear };
     // TODO: These only make sense once I handle chaining.
     case 'HeadingInterpolator.reverse':
       console.error('NYI: HeadingInterpolator.reverse');
       return;
     case 'HeadingInterpolator.offset':
-      console.error('NYI: HeadingInterpolator.reverse');
+      console.error('NYI: HeadingInterpolator.offset');
       return;
   }
 }
@@ -834,7 +844,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (isDefined(getArgList(method))) {
             return;
           }
-          pathHeading = { type: 'tangent' };
+          pathHeading = { type: FacingType.Tangent };
           continue;
         case 'setLinearHeadingInterpolation':
           const linearArgs = getArgList(method);
@@ -847,7 +857,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
             return;
           }
           pathHeading = {
-            type: 'linear',
+            type: FacingType.Linear,
             start: startHeading,
             end: endHeading,
           };
@@ -861,7 +871,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           if (isUndefined(headingRef)) {
             return;
           }
-          pathHeading = { type: 'constant', heading: headingRef };
+          pathHeading = { type: FacingType.Constant, heading: headingRef };
           continue;
         case 'setReversed':
           if (pathHeading === null) {
@@ -869,7 +879,7 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
           }
           // TODO: Don't cast. Error!
           pathHeading = {
-            type: 'reversed',
+            type: FacingType.Reversed,
             facing: pathHeading as FacingReversible,
           };
           continue;
@@ -939,21 +949,8 @@ function getPathChainHelper(
   if (isUndefined(varName) || isUndefined(typeName)) {
     return;
   }
-  const newExpr = child(
-    child(
-      child(
-        child(
-          child(
-            child(
-              child(
-                child(child(lclVal.variableInitializer)?.expression)
-                  ?.conditionalExpression,
-              )?.binaryExpression,
-            )?.unaryExpression,
-          )?.primary,
-        )?.primaryPrefix,
-      )?.newExpression,
-    )?.unqualifiedClassInstanceCreationExpression,
+  const newExpr = getNewExpr(
+    child(child(lclVal.variableInitializer)?.expression),
   );
   if (isUndefined(newExpr)) {
     return;
@@ -1052,22 +1049,11 @@ export function anyItems(pc: ParsedClass): boolean {
   });
   return anyItem;
 }
-
+/* Good for debugging just this file:
 if (import.meta.main) {
   MakeParsedClass(
-    [
-      '..',
-      'LearnBot',
-      'src',
-      'main',
-      'java',
-      'org',
-      'firstinspires',
-      'ftc',
-      'learnbot',
-      'TestPaths.java',
-    ].join('/'),
+    '../LearnBot/src/main/java/org/firstinspires/ftc/learnbot/TestPaths.java',
   )
     .then((strOrPc) => console.log(strOrPc))
     .catch((err) => console.error(err));
-}
+} */

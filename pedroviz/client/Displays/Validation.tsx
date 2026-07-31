@@ -1,7 +1,7 @@
 import { isArray } from '@freik/typechk';
 
 import { ValueName, ValueRef } from '../../server/types';
-import { HasItem, ValidationData, ValidData } from '../types';
+import { HasItem, ValidateState, ValidationData, ValidData } from '../types';
 
 const validName: RegExp = /^[A-Za-z_][a-zA-Z0-9_]*$/;
 const validNumber: RegExp = /^-? *[0-9]*\.?[0-9]*( *e *[-+]? *[0-9]+)?$/;
@@ -38,13 +38,13 @@ export function CheckValidName<T extends string, U extends HasItem<T>>(
       message: exists
         ? 'Please enter an existing variable.'
         : 'Please enter a new/unique name.',
-      state: 'error',
+      state: ValidateState.Error,
     };
   }
   return !IsValidJavaIdentifier(trimmed)
     ? {
         message: 'Please enter a valid Java variable name.',
-        state: 'error',
+        state: ValidateState.Error,
       }
     : ValidData;
 }

@@ -25,7 +25,7 @@ export const PathRenderOptionsAtom = atomWithStorage<PathRenderOptions>(
     ControlPoint: {
       Thickness: 0.4,
       Size: 2,
-      Style: 'o',
+      Style: CtrlPtStyles.Circle,
     },
   },
   undefined,

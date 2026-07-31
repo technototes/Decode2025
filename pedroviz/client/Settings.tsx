@@ -43,22 +43,29 @@ import { CtrlPtStyles } from './types';
 
 function getName(s: CtrlPtStyles): string {
   switch (s) {
-    case 'o':
+    case CtrlPtStyles.Circle:
       return 'Circle';
-    case 'x':
+    case CtrlPtStyles.X:
       return 'X';
-    case '+':
+    case CtrlPtStyles.Crosshair:
       return 'Crosshair';
-    case 't':
+    case CtrlPtStyles.Triangle:
       return 'Triangle';
-    case 's':
+    case CtrlPtStyles.Square:
       return 'Square';
-    case 'z':
+    case CtrlPtStyles.None:
       return 'Nothing';
   }
 }
 
-const ctrlPtStyles: CtrlPtStyles[] = ['o', 'x', '+', 't', 's', 'z'];
+const ctrlPtStyles: CtrlPtStyles[] = [
+  CtrlPtStyles.Circle,
+  CtrlPtStyles.X,
+  CtrlPtStyles.Crosshair,
+  CtrlPtStyles.Triangle,
+  CtrlPtStyles.Square,
+  CtrlPtStyles.None,
+];
 
 export function Settings(): ReactElement {
   const [theTheme, setTheme] = useAtom(ThemeAtom);

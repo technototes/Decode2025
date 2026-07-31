@@ -18,12 +18,11 @@ import {
   ConcreteHeading,
   ConcreteHeadingType,
   ConcreteSimpleHeading,
+  CtrlPtStyles,
   PathRenderOptions,
   Point,
 } from '../types';
 import { bezierLength, deCasteljau } from './bezier';
-
-const Scale = 1;
 
 const fix = 144;
 
@@ -88,7 +87,7 @@ export function ScaledCanvas(): ReactElement {
     canvas.style.height = `${squareSize}px`;
 
     // Map logical 144×144 units into square
-    const scale = squareSize / (fix * Scale);
+    const scale = squareSize / fix;
     // Move the origin to the lower left, corner, and scale it up
     // ctx.translate(0, canvas.height);
     // ctx.scale(dpr * scale, -dpr * scale);
@@ -125,6 +124,16 @@ export function ScaledCanvas(): ReactElement {
   );
 }
 
+function outlineText(
+  ctx: CanvasRenderingContext2D,
+  str: string,
+  x: number,
+  y: number,
+) {
+  ctx.strokeText(str, x, y);
+  ctx.fillText(str, x, y);
+}
+
 function renderCoordinateLegend(
   ctx: CanvasRenderingContext2D,
   dpr: number,
@@ -141,38 +150,25 @@ function renderCoordinateLegend(
   // Draw the coordinate points
   ctx.textAlign = 'start'; // Set text alignment (e.g., "start", "end", "center")
   ctx.textBaseline = 'middle'; // Set vertical alignment (e.g., "top", "middle", "bottom")
-  ctx.strokeText('(0,0)', 2, 139);
-  ctx.fillText('(0,0)', 2, 139);
-  ctx.strokeText('(0,144)', 2, 5);
-  ctx.fillText('(0,144)', 2, 5);
+  outlineText(ctx, '(0,0)', 2, 139);
+  outlineText(ctx, '(0,144)', 2, 5);
   ctx.textAlign = 'end'; // Set text alignment (e.g., "start", "end", "center")
-  ctx.strokeText('(144,0)', 142, 5);
-  ctx.fillText('(144,0)', 142, 5);
-  ctx.strokeText('(144,144)', 142, 139);
-  ctx.fillText('(144,144)', 142, 139);
+  outlineText(ctx, '(144,0)', 142, 5);
+  outlineText(ctx, '(144,144)', 142, 139);
   ctx.textAlign = 'center'; // Set text alignment (e.g., "start", "end", "center")
-  ctx.strokeText('(72,72)', 72, 72);
-  ctx.fillText('(72,72)', 72, 72);
+  outlineText(ctx, '(72,72)', 72, 72);
 
   // Label the axis directions
-  ctx.strokeText('+y', 71, 84.5);
-  ctx.fillText('+y', 71, 84.5);
-  ctx.strokeText('-y', 71, 104.5);
-  ctx.fillText('-y', 71, 104.5);
-  ctx.strokeText('-x', 62, 95);
-  ctx.fillText('-x', 62, 95);
-  ctx.strokeText('+x', 82, 95);
-  ctx.fillText('+x', 82, 95);
+  outlineText(ctx, '+y', 71, 84.5);
+  outlineText(ctx, '-y', 71, 104.5);
+  outlineText(ctx, '-x', 62, 95);
+  outlineText(ctx, '+x', 82, 95);
 
   // Label the compass angles
-  ctx.strokeText('½π 90°', 72, 40);
-  ctx.fillText('½π 90°', 72, 40);
-  ctx.strokeText('0°', 81, 48);
-  ctx.fillText('0°', 81, 48);
-  ctx.strokeText('π 180°', 58, 48);
-  ctx.fillText('π 180°', 58, 48);
-  ctx.strokeText('³/₂π 270°', 72, 56);
-  ctx.fillText('³/₂π 270°', 72, 56);
+  outlineText(ctx, '½π 90°', 72, 40);
+  outlineText(ctx, '0°', 81, 48);
+  outlineText(ctx, 'π 180°', 58, 48);
+  outlineText(ctx, '³/₂π 270°', 72, 56);
 
   // Draw the axis directions
   ctx.lineCap = 'round';
@@ -243,17 +239,14 @@ function renderPath(
   ctx.strokeStyle = color;
   let approxLen = 0;
   if (drawPath) {
-    ctx.moveTo(
-      curveControlPoints[0]!.x * Scale,
-      curveControlPoints[0]!.y * Scale,
-    );
+    ctx.moveTo(curveControlPoints[0]!.x, curveControlPoints[0]!.y);
   }
   let lastPt = curveControlPoints[0]!;
   for (const pt of pts) {
     approxLen += ptDistance(lastPt, pt);
     lastPt = pt;
     if (drawPath) {
-      ctx.lineTo(pt.x * Scale, pt.y * Scale);
+      ctx.lineTo(pt.x, pt.y);
     }
   }
   approxLen += ptDistance(
@@ -262,8 +255,8 @@ function renderPath(
   );
   if (drawPath) {
     ctx.lineTo(
-      curveControlPoints[curveControlPoints.length - 1]!.x * Scale,
-      curveControlPoints[curveControlPoints.length - 1]!.y * Scale,
+      curveControlPoints[curveControlPoints.length - 1]!.x,
+      curveControlPoints[curveControlPoints.length - 1]!.y,
     );
     ctx.stroke();
   }
@@ -290,19 +283,6 @@ function renderPath(
       const tang = bezierDerivative(curveControlPoints, 0.4);
       const mid = deCasteljau(curveControlPoints, 0.4);
       */
-  /*
-      ctx.beginPath();
-      ctx.lineWidth = 0.1;
-      ctx.strokeStyle = 'red';
-      ctx.moveTo(
-        mid.x * Scale - (tang.x * Scale) / 4,
-        mid.y * Scale - (tang.y * Scale) / 4,
-      );
-      ctx.lineTo(
-        mid.x * Scale + (tang.x * Scale) / 4,
-        mid.y * Scale + (tang.y * Scale) / 4,
-      );
-      ctx.stroke();*/
 }
 
 function drawControlPoints(
@@ -319,35 +299,35 @@ function drawControlPoints(
     ctx.strokeStyle = color;
     // TODO: Support more point display styles
     switch (shape) {
-      case 'o':
-        ctx.moveTo((pt.x + half) * Scale, pt.y * Scale);
-        ctx.arc(pt.x * Scale, pt.y * Scale, half * Scale, 0, 2 * Math.PI);
+      case CtrlPtStyles.Circle:
+        ctx.moveTo(pt.x + half, pt.y);
+        ctx.arc(pt.x, pt.y, half, 0, 2 * Math.PI);
         break;
-      case 's': // square
+      case CtrlPtStyles.Square:
         ctx.rect(
-          (pt.x - half) * Scale,
-          (pt.y - half) * Scale,
+          pt.x - half,
+          pt.y - half,
           opts.ControlPoint.Size,
           opts.ControlPoint.Size,
         );
         break;
-      case 'x':
-        ctx.moveTo((pt.x - half) * Scale, (pt.y - half) * Scale);
-        ctx.lineTo((pt.x + half) * Scale, (pt.y + half) * Scale);
-        ctx.moveTo((pt.x - half) * Scale, (pt.y + half) * Scale);
-        ctx.lineTo((pt.x + half) * Scale, (pt.y - half) * Scale);
+      case CtrlPtStyles.X:
+        ctx.moveTo(pt.x - half, pt.y - half);
+        ctx.lineTo(pt.x + half, pt.y + half);
+        ctx.moveTo(pt.x - half, pt.y + half);
+        ctx.lineTo(pt.x + half, pt.y - half);
         break;
-      case 't': // triangle
-        ctx.moveTo((pt.x - half) * Scale, (pt.y - half) * Scale);
-        ctx.lineTo(pt.x * Scale, (pt.y + half) * Scale);
-        ctx.lineTo((pt.x + half) * Scale, (pt.y - half) * Scale);
+      case CtrlPtStyles.Triangle:
+        ctx.moveTo(pt.x - half, pt.y - half);
+        ctx.lineTo(pt.x, pt.y + half);
+        ctx.lineTo(pt.x + half, pt.y - half);
         ctx.closePath();
         break;
-      case '+':
-        ctx.moveTo((pt.x - half) * Scale, pt.y * Scale);
-        ctx.lineTo((pt.x + half) * Scale, pt.y * Scale);
-        ctx.moveTo(pt.x * Scale, (pt.y + half) * Scale);
-        ctx.lineTo(pt.x * Scale, (pt.y - half) * Scale);
+      case CtrlPtStyles.Crosshair:
+        ctx.moveTo(pt.x - half, pt.y);
+        ctx.lineTo(pt.x + half, pt.y);
+        ctx.moveTo(pt.x, pt.y + half);
+        ctx.lineTo(pt.x, pt.y - half);
         break;
     }
   }
@@ -455,12 +435,9 @@ function drawHeadingLine(
   ctx.lineCap = 'round';
   ctx.lineWidth = opts.Heading.Thickness;
   ctx.strokeStyle = color;
-  ctx.moveTo(point.x * Scale, point.y * Scale);
+  ctx.moveTo(point.x, point.y);
   const displacement = magnitude(targetPoint, opts.Heading.Length);
-  ctx.lineTo(
-    (point.x + displacement.x) * Scale,
-    (point.y + displacement.y) * Scale,
-  );
+  ctx.lineTo(point.x + displacement.x, point.y + displacement.y);
   ctx.stroke();
 }
 

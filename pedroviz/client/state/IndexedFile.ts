@@ -14,8 +14,10 @@ import {
   AnonymousPose,
   BezierName,
   BezierRef,
+  BezierType,
   EmptyParsedClass,
   FacingPiece,
+  FacingType,
   HeadingRef,
   isRadiansRef,
   isRef,
@@ -202,9 +204,9 @@ export function ValidateIndex(
     curve.points.forEach((pr, index) => {
       res = AccError(checkPoseRef(pr, `${id}'s element ${index}`), res);
     });
-    if (curve.type === 'line' && curve.points.length !== 2) {
+    if (curve.type === BezierType.Line && curve.points.length !== 2) {
       return AccError(res, MakeError(`${id}'s line doesn't have 2 points`));
-    } else if (curve.type === 'curve' && curve.points.length < 2) {
+    } else if (curve.type === BezierType.Curve && curve.points.length < 2) {
       return AccError(
         res,
         MakeError(`${id}'s line doesn't have enough points`),
@@ -256,28 +258,28 @@ export function ValidateIndex(
   function validateFacing(heading: AnonymousFacing, id: string): ValidRes {
     let res: ValidRes = true;
     switch (heading.type) {
-      case 'constant':
+      case FacingType.Constant:
         res = checkHeadingRef(heading.heading, `${id}'s constant heading ref`);
         break;
-      case 'linear':
+      case FacingType.Linear:
         res = checkHeadingRef(heading.start, `${id}'s start heading ref`);
         res = AccError(
           checkHeadingRef(heading.end, `${id}'s end heading ref`),
           res,
         );
         break;
-      case 'tangent':
+      case FacingType.Tangent:
         break; // Nothing to see here...
-      case 'reversed':
+      case FacingType.Reversed:
         res = validateFacing(
           heading.facing,
           `${id}'s reversed heading interpolator`,
         );
         break;
-      case 'point':
+      case FacingType.Point:
         res = checkPoseRef(heading.point, `${id}'s point heading interpolator`);
         break;
-      case 'piecewise':
+      case FacingType.Piecewise:
         res = validatePieces(
           heading.pieces,
           `${id}'s Piecewise heading interpolator`,

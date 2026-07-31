@@ -26,7 +26,9 @@ import { makeKey } from '../../server/full-database';
 import {
   AnonymousBezier,
   BezierName,
+  BezierType,
   EmptyParsedClass,
+  FacingType,
   ParsedClass,
   Path,
   PathChainName,
@@ -79,7 +81,7 @@ const testParsedClass: ParsedClass = {
 };
 
 const simpleBez: AnonymousBezier = {
-  type: 'curve',
+  type: BezierType.Curve,
   points: [
     { x: 'val1' as ValueName, y: 'val1' as ValueName },
     'pose1' as PoseName,
@@ -121,7 +123,7 @@ const fullParsedClass: ParsedClass = {
     {
       name: 'bez1' as BezierName,
       points: {
-        type: 'line',
+        type: BezierType.Line,
         points: ['pose1' as PoseName, 'pose2' as PoseName],
       },
     },
@@ -134,22 +136,25 @@ const fullParsedClass: ParsedClass = {
     {
       name: 'pc1' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      pathHeading: { type: 'tangent' },
+      pathHeading: { type: FacingType.Tangent },
     },
     {
       name: 'pc2' as PathChainName,
       paths: [
         'bez2' as BezierName,
-        { type: 'line', points: ['pose1' as PoseName, 'pose3' as PoseName] },
+        {
+          type: BezierType.Line,
+          points: ['pose1' as PoseName, 'pose3' as PoseName],
+        },
       ],
-      pathHeading: { type: 'constant', heading: 'pose3' as PoseName },
+      pathHeading: { type: FacingType.Constant, heading: 'pose3' as PoseName },
     },
     {
       name: 'pc3' as PathChainName,
       paths: [
         'bez1' as BezierName,
         {
-          type: 'curve',
+          type: BezierType.Curve,
           points: [
             'pose1' as PoseName,
             'pose3' as PoseName,
@@ -158,7 +163,7 @@ const fullParsedClass: ParsedClass = {
         },
       ],
       pathHeading: {
-        type: 'linear',
+        type: FacingType.Linear,
         start: 'pose2' as PoseName,
         end: { radians: { int: 135 } },
       },

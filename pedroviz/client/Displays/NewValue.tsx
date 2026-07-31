@@ -27,7 +27,7 @@ import {
   ValueRef,
 } from '../../server/types';
 import { MappedValuesAtom, ValueAtomFamily } from '../state/Atoms';
-import { ValidationData, ValidData } from '../types';
+import { ValidateState, ValidationData, ValidData } from '../types';
 import { CheckValidName } from './Validation';
 
 type ValType = 'int' | 'double' | 'degrees';
@@ -47,10 +47,13 @@ export function NewValue(): ReactElement {
     if (valType !== 'int' && isNaN(Number.parseFloat(vl))) {
       return {
         message: 'Please enter a valid floating point number',
-        state: 'error',
+        state: ValidateState.Error,
       };
     } else if (valType === 'int' && isNaN(Number.parseInt(vl))) {
-      return { message: 'Please enter a valid integer', state: 'error' };
+      return {
+        message: 'Please enter a valid integer',
+        state: ValidateState.Error,
+      };
     }
     return ValidData;
   };

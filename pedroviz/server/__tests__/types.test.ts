@@ -1,7 +1,9 @@
 import { expect, test } from 'bun:test';
 
 import {
+  BezierType,
   chkTeamPaths,
+  FacingType,
   isAnonymousBezier,
   isAnonymousFacing,
   isAnonymousPose,
@@ -68,9 +70,9 @@ test('Parsed file types validation', () => {
   expect(isNamedPose({ ...namedPose1, dumb: 2 })).toBeFalse();
   expect(isPoseRef('ab')).toBeTrue();
   expect(isPoseRef(anonPoseXY)).toBeTrue();
-  const anonBezL = { type: 'line', points: ['a', 'b'] };
+  const anonBezL = { type: BezierType.Line, points: ['a', 'b'] };
   const anonBezC = {
-    type: 'curve',
+    type: BezierType.Curve,
     points: ['a', { x: 'a', y: { int: 1 } }, 'b'],
   };
   expect(isAnonymousBezier(anonBezL)).toBeTrue();
@@ -80,10 +82,10 @@ test('Parsed file types validation', () => {
   expect(isBezierRef('a')).toBeTrue();
   expect(isBezierRef(anonBezC)).toBeTrue();
   expect(isBezierRef(Symbol('lol'))).toBeFalse();
-  const tangHead = { type: 'tangent' };
-  const constHead = { type: 'constant', heading: 'heading' };
+  const tangHead = { type: FacingType.Tangent };
+  const constHead = { type: FacingType.Constant, heading: 'heading' };
   const linHead = {
-    type: 'linear',
+    type: FacingType.Linear,
     start: { radians: 'ref' },
     end: anonValI,
   };

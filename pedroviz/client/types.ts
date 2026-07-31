@@ -23,7 +23,15 @@ import {
   ValueRef,
 } from '../server/types';
 
-export type CtrlPtStyles = 'o' | 't' | 's' | '+' | 'x' | 'z';
+export const CtrlPtStyles = Object.freeze({
+  Circle: 'o',
+  Triangle: 't',
+  Square: 's',
+  Crosshair: '+',
+  X: 'x',
+  None: 'z',
+} as const);
+export type CtrlPtStyles = (typeof CtrlPtStyles)[keyof typeof CtrlPtStyles];
 
 export type PathRenderOptions = {
   ShowField: boolean;
@@ -50,14 +58,14 @@ export type AnonymousPathChain = {
 export type Point = { x: number; y: number };
 export const chkPoint = chkObjectOfExactType({ x: isNumber, y: isNumber });
 
-export namespace ConcreteHeadingType {
-  export const Tangent = 'T';
-  export const Constant = 'C';
-  export const Linear = 'I';
-  export const Point = 'P';
-  export const Reverse = 'R';
-  export const Piecewise = 'L';
-}
+export const ConcreteHeadingType = Object.freeze({
+  Tangent: 'T',
+  Constant: 'C',
+  Linear: 'I',
+  Point: 'P',
+  Reverse: 'R',
+  Piecewise: 'L',
+} as const);
 export type ConcreteHeadingType =
   (typeof ConcreteHeadingType)[keyof typeof ConcreteHeadingType];
 export function chkConcreteHeadingType(
@@ -189,15 +197,22 @@ export type HasKeys<T> = HasItem<T> & {
   keys: () => Iterable<T>;
 };
 
-export type ValidationState = 'error' | 'warning' | 'success' | 'none';
+export const ValidateState = Object.freeze({
+  Error: 'error',
+  Warning: 'warning',
+  Success: 'success',
+  None: 'none',
+});
+export type ValidationState =
+  (typeof ValidateState)[keyof typeof ValidateState];
 export type ValidationData = {
   message: string;
   state: ValidationState;
 };
 export const ValidData: ValidationData = Object.freeze({
   message: '',
-  state: 'none',
-});
+  state: ValidateState.None,
+} as const);
 export function ValidationResult(
   message: string,
   state: ValidationState,

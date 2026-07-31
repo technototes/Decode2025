@@ -48,7 +48,7 @@ export function AutoSelector({
         <MenuList>
           {items.map((val) => (
             <MenuItem
-              key={`${val}`}
+              key={val}
               /* Needs a delay to prevent shenanigans with React & even timing */
               onClick={() => setTimeout(() => setSelected(val), 0)}>
               {val}

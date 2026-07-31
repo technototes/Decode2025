@@ -16,7 +16,9 @@ import {
   AnonymousValue,
   BezierName,
   BezierRef,
+  BezierType,
   EmptyParsedClass,
+  FacingType,
   HeadingRef,
   NamedBezier,
   NamedPose,
@@ -77,7 +79,7 @@ function mkNmPose(name: string, pose: AnonymousPose | string): NamedPose {
 function mkBezNm(name: string): BezierName {
   return name as BezierName;
 }
-function mkBez(type: 'line' | 'curve', ...points: PoseRef[]): AnonymousBezier {
+function mkBez(type: BezierType, ...points: PoseRef[]): AnonymousBezier {
   return { type, points };
 }
 function mkNmBez(name: string, bez: AnonymousBezier | string): NamedBezier {
@@ -102,7 +104,7 @@ testParsedClass.poses.push({
 });
 
 const simpleBez: AnonymousBezier = {
-  type: 'curve',
+  type: BezierType.Curve,
   points: [
     { x: 'val1' as ValueName, y: 'val1' as ValueName },
     'pose1' as PoseName,
@@ -134,29 +136,35 @@ const fullParsedClass: ParsedClass = {
     ),
   ],
   beziers: [
-    mkNmBez('bez1', mkBez('line', mkPoseNm('pose1'), mkPoseNm('pose2'))),
+    mkNmBez(
+      'bez1',
+      mkBez(BezierType.Line, mkPoseNm('pose1'), mkPoseNm('pose2')),
+    ),
     mkNmBez('bez2', simpleBez),
   ],
   pathChains: [
     {
       name: 'pc1' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      pathHeading: { type: 'tangent' },
+      pathHeading: { type: FacingType.Tangent },
     },
     {
       name: 'pc2' as PathChainName,
       paths: [
         'bez2' as BezierName,
-        { type: 'line', points: ['pose1' as PoseName, 'pose3' as PoseName] },
+        {
+          type: BezierType.Line,
+          points: ['pose1' as PoseName, 'pose3' as PoseName],
+        },
       ],
-      pathHeading: { type: 'constant', heading: 'pose3' as PoseName },
+      pathHeading: { type: FacingType.Constant, heading: 'pose3' as PoseName },
     },
     {
       name: 'pc3' as PathChainName,
       paths: [
         'bez1' as BezierName,
         {
-          type: 'curve',
+          type: BezierType.Curve,
           points: [
             'pose1' as PoseName,
             'pose3' as PoseName,
@@ -165,7 +173,7 @@ const fullParsedClass: ParsedClass = {
         },
       ],
       pathHeading: {
-        type: 'linear',
+        type: FacingType.Linear,
         start: 'pose2' as PoseName,
         end: { radians: { int: 135 } },
       },
@@ -191,18 +199,18 @@ const danglingPC: ParsedClass = {
     mkNmBez(
       'danglingPoseRef',
       mkBez(
-        'line',
+        BezierType.Line,
         mkPoseNm('noPose'),
         mkPose('val1', 'not_here', mkVal('radians', 'nuthing')),
       ),
     ),
     mkNmBez(
       'danglingPoseRef2',
-      mkBez('curve', mkPose('val1', 'val2', mkValNm('zip'))),
+      mkBez(BezierType.Curve, mkPose('val1', 'val2', mkValNm('zip'))),
     ),
     mkNmBez(
       'danglingPoseRef3',
-      mkBez('line', mkPose('val1', 'val2', mkValNm('zip'))),
+      mkBez(BezierType.Line, mkPose('val1', 'val2', mkValNm('zip'))),
     ),
   ],
   pathChains: [
@@ -210,13 +218,16 @@ const danglingPC: ParsedClass = {
     {
       name: 'danglingBezRef' as PathChainName,
       paths: ['noBez' as BezierName],
-      pathHeading: { type: 'constant', heading: 'noHeading' as ValueName },
+      pathHeading: {
+        type: FacingType.Constant,
+        heading: 'noHeading' as ValueName,
+      },
     },
     {
       name: 'danglingBezRef2' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
       pathHeading: {
-        type: 'constant',
+        type: FacingType.Constant,
         heading: { radians: 'nospot' as ValueName },
       },
     },

@@ -44,7 +44,12 @@ export type PoseRef = AnonymousPose | PoseName;
 
 // Beziers
 export type BezierName = Nominal<string, 'Bezier'>;
-export type AnonymousBezier = { type: 'line' | 'curve'; points: PoseRef[] };
+export const BezierType = Object.freeze({
+  Line: 'line',
+  Curve: 'curve',
+} as const);
+export type BezierType = (typeof BezierType)[keyof typeof BezierType];
+export type AnonymousBezier = { type: BezierType; points: PoseRef[] };
 export type NamedBezier = { name: BezierName; points: BezierRef };
 export type BezierRef = AnonymousBezier | BezierName;
 
@@ -52,12 +57,28 @@ export type BezierRef = AnonymousBezier | BezierName;
 // NYI: Offset; works like reverse, but shifts the bot from the target by a
 // fixed amount. Reverse is *mostly* "offset 180" (not for linear)
 export type FacingTiming = { start: ValueRef; end: ValueRef };
-export type FacingReversed = { type: 'reversed'; facing: FacingReversible };
-export type FacingTangent = { type: 'tangent' };
-export type FacingConstant = { type: 'constant'; heading: HeadingRef };
-export type FacingPoint = { type: 'point'; point: PoseRef };
+
+export const FacingType = Object.freeze({
+  Reversed: 'reversed',
+  Tangent: 'tangent',
+  Constant: 'constant',
+  Linear: 'linear',
+  Point: 'point',
+  Piecewise: 'piecewise',
+} as const);
+export type FacingType = (typeof FacingType)[keyof typeof FacingType];
+export type FacingReversed = {
+  type: typeof FacingType.Reversed;
+  facing: FacingReversible;
+};
+export type FacingTangent = { type: typeof FacingType.Tangent };
+export type FacingConstant = {
+  type: typeof FacingType.Constant;
+  heading: HeadingRef;
+};
+export type FacingPoint = { type: typeof FacingType.Point; point: PoseRef };
 export type FacingLinear = {
-  type: 'linear';
+  type: typeof FacingType.Linear;
   start: HeadingRef;
   end: HeadingRef;
 };
@@ -65,7 +86,10 @@ export type FacingReversible =
   FacingTangent | FacingConstant | FacingLinear | FacingPoint;
 export type FacingSimple = FacingReversible | FacingReversed;
 export type FacingPiece = { timing: FacingTiming; heading: FacingSimple };
-export type FacingPieceWise = { type: 'piecewise'; pieces: FacingPiece[] };
+export type FacingPieceWise = {
+  type: typeof FacingType.Piecewise;
+  pieces: FacingPiece[];
+};
 export type AnonymousFacing =
   | FacingTangent
   | FacingConstant
@@ -186,8 +210,8 @@ export const isPoseRef: typecheck<PoseRef> = chkAnyOf(
   isAnonymousPose,
 );
 
-function isBezierTypeName(t: unknown): t is 'line' | 'curve' {
-  return t === 'line' || t === 'curve';
+function isBezierTypeName(t: unknown): t is BezierType {
+  return t === BezierType.Line || t === BezierType.Curve;
 }
 export const isBezierName: typecheck<BezierName> =
   isString as typecheck<BezierName>;
@@ -204,28 +228,32 @@ export const isBezierRef: typecheck<BezierRef> = chkAnyOf(
   isAnonymousBezier,
 );
 
-function isTangentFacingType(type: unknown): type is 'tangent' {
-  return type === 'tangent';
+function isTangentFacingType(type: unknown): type is typeof FacingType.Tangent {
+  return type === FacingType.Tangent;
 }
-function isConstantFacingType(type: unknown): type is 'constant' {
-  return type === 'constant';
+function isConstantFacingType(
+  type: unknown,
+): type is typeof FacingType.Constant {
+  return type === FacingType.Constant;
 }
-function isLinearFacingType(type: unknown): type is 'linear' {
-  return type === 'linear';
+function isLinearFacingType(type: unknown): type is typeof FacingType.Linear {
+  return type === FacingType.Linear;
 }
-function isPointFacingType(type: unknown): type is 'point' {
-  return type === 'point';
+function isPointFacingType(type: unknown): type is typeof FacingType.Point {
+  return type === FacingType.Point;
 }
-function isReversedFacingType(type: unknown): type is 'reversed' {
-  return type === 'reversed';
+function isReversedFacingType(
+  type: unknown,
+): type is typeof FacingType.Reversed {
+  return type === FacingType.Reversed;
 }
-function isPiecewiseFacingType(type: unknown): type is 'piecewise' {
-  return type === 'piecewise';
+function isPiecewiseFacingType(
+  type: unknown,
+): type is typeof FacingType.Piecewise {
+  return type === FacingType.Piecewise;
 }
 
-export function getFacingType(
-  facing: AnonymousFacing,
-): 'tangent' | 'constant' | 'linear' | 'point' | 'reversed' | 'piecewise' {
+export function getFacingType(facing: AnonymousFacing): FacingType {
   return facing.type;
 }
 

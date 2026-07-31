@@ -7,6 +7,7 @@ import { isDefined, isUndefined } from '@freik/typechk';
 
 import {
   AnonymousFacing,
+  FacingType,
   HeadingRef,
   isRadiansRef,
   isRef,
@@ -137,21 +138,21 @@ function HeadingTypeDisplay({
     return <></>;
   }
   switch (heading.type) {
-    case 'constant':
+    case FacingType.Constant:
       return (
         <>
           <Text {...props}>Constant heading</Text>
           <HeadingRefDisplay item={heading.heading} {...props} />
         </>
       );
-    case 'tangent':
+    case FacingType.Tangent:
       return (
         <>
           <Text {...props}>Tangent heading</Text>
           <span>&nbsp;</span>
         </>
       );
-    case 'linear':
+    case FacingType.Linear:
       return (
         <>
           <Text {...props}>Linear heading</Text>
@@ -162,7 +163,7 @@ function HeadingTypeDisplay({
           </span>
         </>
       );
-    case 'point':
+    case FacingType.Point:
       return (
         <>
           <Text {...props}>Point heading</Text>
@@ -171,9 +172,9 @@ function HeadingTypeDisplay({
           </span>
         </>
       );
-    case 'reversed':
+    case FacingType.Reversed:
       return <Text {...props}>Reversed...[TODO!]</Text>;
-    case 'piecewise':
+    case FacingType.Piecewise:
       return <Text {...props}>Piecewise heading...[TODO!]</Text>;
   }
 }
