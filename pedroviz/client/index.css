@@ -71,15 +71,6 @@ body {
   margin-right: 5;
 }
 
-/* Square canvas area */
-.field {
-  border: 2px solid #666;
-  /* box-sizing: border-box; */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
 .col3div {
   display: grid;
   grid-template-columns: auto 1fr 4fr 1fr 4fr;

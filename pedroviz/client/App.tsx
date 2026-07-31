@@ -14,9 +14,10 @@ import { PathSelector } from './PathSelector';
 import { Settings } from './Settings';
 import { ThemeAtom } from './state/SavedSettings';
 import { getStore } from './state/Storage';
-import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
 
 import './index.css';
+
+import { FieldRenderer } from './FieldRenderer';
 
 export function MyApp(): ReactElement {
   return (
@@ -35,7 +36,7 @@ export function MyApp(): ReactElement {
           </Panel>
           <Separator id="view-separator" />
           <Panel className="display">
-            <ResponsiveSquareCanvas />
+            <FieldRenderer />
           </Panel>
         </Group>
       </Suspense>
