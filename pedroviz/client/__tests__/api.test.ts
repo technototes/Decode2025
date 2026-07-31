@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test';
 
+import {
+  calcBezierRef,
+  calcHeadingRef,
+  calcPoseRef,
+  calcPoseRefHeading,
+  calcValue,
+  calcValueRef,
+} from 'client/ExpressionEval';
 import { isError, isNumber, isString } from '@freik/typechk';
 
 import {
@@ -21,14 +29,6 @@ import {
   ValueRef,
 } from '../../server/types';
 import { LoadAndIndexFile, SavePath } from '../state/API';
-import {
-  calcBezierRef,
-  calcHeadingRef,
-  calcPoseRef,
-  calcPoseRefHeading,
-  calcValue,
-  calcValueRef,
-} from '../state/IndexedFile';
 
 function mkValNm(name: string): ValueName {
   return name as ValueName;

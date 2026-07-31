@@ -1,9 +1,9 @@
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
-import { PathRenderOptionsAtom, ThemeAtom } from 'client/state/SavedSettings';
-import { isDefined } from 'node_modules/@freik/typechk/lib/esm';
+import { isDefined } from '@freik/typechk';
 
+import { calcBezierRef, calcFacing } from '../ExpressionEval';
 import {
   ColorsAtom,
   MappedBeziersAtom,
@@ -12,7 +12,7 @@ import {
   MappedPosesAtom,
   MappedValuesAtom,
 } from '../state/Atoms';
-import { calcBezierRef, calcFacing } from '../state/IndexedFile';
+import { PathRenderOptionsAtom, ThemeAtom } from '../state/SavedSettings';
 import {
   chkConcreteSimpleHeading,
   ConcreteHeading,
