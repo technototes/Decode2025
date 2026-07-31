@@ -1,6 +1,7 @@
 import {
   AccError,
   ErrorOr,
+  ErrorVal,
   isDefined,
   isError,
   isString,
@@ -22,7 +23,9 @@ import {
   FacingPieceWise,
   FacingPoint,
   FacingReversed,
+  FacingReversible,
   FacingSimple,
+  getFacingType,
   HeadingRef,
   isAnonymousValue,
   isConstantFacing,
@@ -49,14 +52,14 @@ import {
   AnonymousPathChain,
   chkConcreteTangentHeading,
   ConcreteConstantHeading,
-  ConcreteHeadingType,
+  ConcreteHeading,
   ConcreteLinearHeading,
   ConcretePiece,
-  ConcretePieceWiseHeading,
+  ConcretePiecewiseHeading,
   ConcretePointHeading,
   ConcreteReversedHeading,
-  ConcreteReversibleHeadingType,
-  ConcreteSimpleHeadingType,
+  ConcreteReversibleHeading,
+  ConcreteSimpleHeading,
   ConcreteTangentHeading,
   NameLookup,
   OneFileIndex,
@@ -180,6 +183,16 @@ export function GetNameLookup(): NameLookup {
   return nameLookup;
 }
 
+// Very dumb canstants lookup table
+function readConstant(name: string): number | undefined {
+  switch (name) {
+    case 'Math.PI':
+      return Math.PI;
+    case 'Math.E':
+      return Math.E;
+  }
+}
+
 export function ValidateIndex(
   fileIndex: OneFileIndex,
   lkup: NameLookup,
@@ -188,10 +201,11 @@ export function ValidateIndex(
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
     if (isRef(vr)) {
       if (!lkup.findValue(vr, context)) {
-        // TODO: This should trigger cross file lookup
-        return MakeError(
-          `${id}'s "${vr}" value reference appears to be undefined.`,
-        );
+        if (isUndefined(readConstant(vr))) {
+          return MakeError(
+            `${id}'s "${vr}" value reference appears to be undefined.`,
+          );
+        }
       }
     }
     return true;
@@ -259,30 +273,65 @@ export function ValidateIndex(
     apc: AnonymousPathChain,
     id: string,
   ): ValidRes {
-    let res: ValidRes = true;
-    if (isConstantFacing(apc.heading)) {
-      res = checkHeadingRef(
-        apc.heading.heading,
-        `${id}'s constant heading ref`,
-      );
-    } else if (isLinearFacing(apc.heading)) {
-      res = checkHeadingRef(apc.heading.start, `${id}'s start heading ref`);
-      res = AccError(
-        checkHeadingRef(apc.heading.end, `${id}'s end heading ref`),
-        res,
-      );
-    } else if (isTangentFacing(apc.heading)) {
-      // Nothing to see here...
-    } else {
-      // TODO: Handing reverse, point, and piecewise
-      console.error(
-        'NYI: Not checking the heading interpolator used by this path chain!',
-        apc.heading,
-      );
-    }
+    let res = validateFacing(apc.heading, id);
     apc.paths.forEach((br, index) => {
       res = AccError(checkBezierRef(br, `${id}'s path element ${index}`), res);
     });
+    return res;
+  }
+
+  function validatePieces(pieces: FacingPiece[], id: string): ValidRes {
+    let res: ValidRes = true;
+    pieces.forEach((piece, idx) => {
+      res = AccError(
+        checkValueRef(piece.timing.start, `${id}'s timing start #${idx}`),
+        res,
+      );
+      res = AccError(
+        checkValueRef(piece.timing.end, `${id}'s timing end #${idx}`),
+        res,
+      );
+      res = AccError(
+        validateFacing(piece.heading, `${id}'s heading #${idx}`),
+        res,
+      );
+    });
+    return res;
+  }
+
+  function validateFacing(heading: AnonymousFacing, id: string): ValidRes {
+    let res: ValidRes = true;
+    switch (heading.type) {
+      case 'constant':
+        res = checkHeadingRef(heading.heading, `${id}'s constant heading ref`);
+        break;
+      case 'linear':
+        res = checkHeadingRef(heading.start, `${id}'s start heading ref`);
+        res = AccError(
+          checkHeadingRef(heading.end, `${id}'s end heading ref`),
+          res,
+        );
+        break;
+      case 'tangent':
+        break; // Nothing to see here...
+      case 'reversed':
+        res = validateFacing(
+          heading.facing,
+          `${id}'s reversed heading interpolator`,
+        );
+        break;
+      case 'point':
+        res = checkPoseRef(heading.point, `${id}'s point heading interpolator`);
+        break;
+      case 'piecewise':
+        res = validatePieces(
+          heading.pieces,
+          `${id}'s Piecewise heading interpolator`,
+        );
+        break;
+      default:
+        console.error('NYI: Unknown heading interpolator type', heading);
+    }
     return res;
   }
 
@@ -351,6 +400,11 @@ export function calcValueRef(
     seen.add(av);
     const maybe = lkup.findValue(av as ValueName, ctx);
     if (isUndefined(maybe)) {
+      // Special case constants go here:
+      const value = readConstant(av);
+      if (isDefined(value)) {
+        return value;
+      }
       throw new Error(`Invalid ValueRef ${vr} through ${av}`);
     }
     av = maybe;
@@ -462,6 +516,10 @@ export function calcHeadingRef(
     if (isDefined(pose)) {
       return calcPoseRefHeading(pose, ctx, circ);
     }
+    const constVal = readConstant(hr);
+    if (isDefined(constVal)) {
+      return constVal;
+    }
     throw new Error(`Missing heading for ${hr}`);
   } else if (isRadiansRef(hr)) {
     return (Math.PI * calcValueRef(hr.radians, ctx, circ)) / 180.0;
@@ -515,9 +573,9 @@ function mkPoint(heading: FacingPoint, ctx: ParsedClass): ConcretePointHeading {
 }
 
 function mkReversible(
-  heading: FacingSimple,
+  heading: FacingReversible,
   ctx: ParsedClass,
-): ConcreteReversibleHeadingType {
+): ConcreteReversibleHeading {
   if (isTangentFacing(heading)) {
     return mkTangent();
   } else if (isConstantFacing(heading)) {
@@ -527,7 +585,7 @@ function mkReversible(
   } else if (isPointFacing(heading)) {
     return mkPoint(heading, ctx);
   }
-  throw new Error('Unknown simple Facing type');
+  throw new Error(`Unknown simple Facing type`);
 }
 
 function mkReversed(
@@ -538,25 +596,36 @@ function mkReversed(
   return { type: 'R', heading: revheading };
 }
 
+function mkSimple(
+  heading: FacingSimple,
+  ctx: ParsedClass,
+): ConcreteSimpleHeading {
+  if (isReversedFacing(heading)) {
+    return mkReversed(heading, ctx);
+  } else {
+    return mkReversible(heading, ctx);
+  }
+}
+
 function mkPiece(piece: FacingPiece, ctx: ParsedClass): ConcretePiece {
   return {
     start: calcValueRef(piece.timing.start, ctx),
     end: calcValueRef(piece.timing.end, ctx),
-    heading: mkReversible(piece.heading, ctx),
+    heading: mkSimple(piece.heading, ctx),
   };
 }
 
 function mkPiecewise(
   head: FacingPieceWise,
   ctx: ParsedClass,
-): ConcretePieceWiseHeading {
+): ConcretePiecewiseHeading {
   return { type: 'L', pieces: head.pieces.map((fp) => mkPiece(fp, ctx)) };
 }
 
 export function calcFacing(
   heading: AnonymousFacing,
   ctx: ParsedClass,
-): ConcreteHeadingType {
+): ConcreteHeading {
   if (isReversibleFacing(heading)) {
     return mkReversible(heading, ctx);
   } else if (isReversedFacing(heading)) {

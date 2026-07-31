@@ -205,15 +205,15 @@ public class IntakeSubsystem implements Loggable, Subsystem {
                 if (averageIntakeCurrent < INTAKE_THRESHOLD) {
                     intakeFull = false;
                 }
-            } else if (averageTransferCurrent >= TRANSFER_TWO_THRESHOLD) {
+            } else /* if (averageTransferCurrent >= TRANSFER_TWO_THRESHOLD) */ {
                 transferFull = true;
                 artifacts = 2;
                 if (averageIntakeCurrent < INTAKE_THRESHOLD) {
                     intakeFull = false;
-                } else if (averageIntakeCurrent >= INTAKE_THRESHOLD) {
+                } else /* if (averageIntakeCurrent >= INTAKE_THRESHOLD) */ {
                     intakeFull = true;
                     artifacts = 3;
-                } else robotFull = intakeFull;
+                } // else robotFull = intakeFull;
             }
         }
     }

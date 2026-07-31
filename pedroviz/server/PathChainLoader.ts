@@ -603,8 +603,11 @@ function tryMatchingPathChainFields(
 }
 
 function getArgList(
-  cstNode: PrimarySuffixCstNode | undefined,
+  cstNode: PrimarySuffixCstNode[] | PrimarySuffixCstNode | undefined,
 ): ExpressionCstNode[] | undefined {
+  if (isArray(cstNode)) {
+    return getArgList(cstNode[0]);
+  }
   return child(child(cstNode?.children.methodInvocationSuffix)?.argumentList)
     ?.expression;
 }
@@ -667,22 +670,17 @@ function getHeadingInterpolation(
   if (isUndefined(methodRef)) {
     return;
   }
-  const maybeArgList = child(
+  const methodArgs = getArgList(
     child(
-      child(child(expr.children.conditionalExpression)?.binaryExpression)
-        ?.unaryExpression,
-    )?.primary,
-  )?.primarySuffix;
-  if (isUndefined(maybeArgList) || maybeArgList.length === 0) {
-    return;
-  }
-  const methodArgs = getArgList(maybeArgList[0]);
-  if (isUndefined(methodArgs)) {
-    return;
-  }
+      child(
+        child(child(expr.children.conditionalExpression)?.binaryExpression)
+          ?.unaryExpression,
+      )?.primary,
+    )?.primarySuffix,
+  );
   switch (methodRef) {
     case 'HeadingInterpolator.piecewise':
-      if (simple) {
+      if (simple || isUndefined(methodArgs)) {
         break;
       }
       // Reach each arg as a piece (unsafecast is for the return type)
@@ -693,35 +691,49 @@ function getHeadingInterpolation(
       }
       break;
     case 'HeadingInterpolator.facingPoint':
-      if (methodArgs.length === 1) {
-        const pose = getPoseRef(methodArgs[0]!);
-        if (isDefined(pose)) {
-          return { type: 'point', point: pose };
-        }
-      } else if (methodArgs.length === 2) {
-        const x = getOnlyValueRef(methodArgs[0]);
-        const y = getOnlyValueRef(methodArgs[1]);
-        if (isDefined(x) && isDefined(y)) {
-          return { type: 'point', point: { x, y } };
+      if (
+        isDefined(methodArgs) &&
+        methodArgs.length > 0 &&
+        methodArgs.length < 3
+      ) {
+        if (methodArgs.length === 1) {
+          const pose = getPoseRef(methodArgs[0]!);
+          if (isDefined(pose)) {
+            return { type: 'point', point: pose };
+          }
+        } else if (methodArgs.length === 2) {
+          const x = getOnlyValueRef(methodArgs[0]);
+          const y = getOnlyValueRef(methodArgs[1]);
+          if (isDefined(x) && isDefined(y)) {
+            return { type: 'point', point: { x, y } };
+          }
         }
       }
-      break;
+      return;
     case 'HeadingInterpolator.tangent':
-      return { type: 'tangent' };
-      break;
-    case 'HeadingInterpolator.constant':
-      const heading = getHeadingRef(methodArgs[0]);
-      if (isDefined(heading)) {
-        return { type: 'constant', heading };
+      if (isDefined(methodArgs)) {
+        return;
+      } else {
+        return { type: 'tangent' };
       }
-      break;
+    case 'HeadingInterpolator.constant':
+      if (isDefined(methodArgs)) {
+        const heading = getHeadingRef(methodArgs[0]);
+        if (isDefined(heading)) {
+          return { type: 'constant', heading };
+        }
+      }
+      return;
     case 'HeadingInterpolator.linear':
     case 'HeadingInterpolator.reversedLinear':
       // start, end / start, end, time
+      if (isUndefined(methodArgs) || methodArgs.length < 2) {
+        return;
+      }
       const start = getHeadingRef(methodArgs[0]);
       const end = getHeadingRef(methodArgs[1]);
       if (isUndefined(start) || isUndefined(end) || methodArgs.length > 3) {
-        break;
+        return;
       }
       const endT =
         methodArgs.length === 3 ? getOnlyValueRef(methodArgs[3]) : undefined;
@@ -732,7 +744,10 @@ function getHeadingInterpolation(
         : { type: 'reversed', facing: linear };
     // TODO: These only make sense once I handle chaining.
     case 'HeadingInterpolator.reverse':
+      console.error('NYI: HeadingInterpolator.reverse');
+      return;
     case 'HeadingInterpolator.offset':
+      console.error('NYI: HeadingInterpolator.reverse');
       return;
   }
 }
@@ -1042,17 +1057,15 @@ if (import.meta.main) {
   MakeParsedClass(
     [
       '..',
-      'Sixteen750',
+      'LearnBot',
       'src',
       'main',
       'java',
       'org',
       'firstinspires',
       'ftc',
-      'sixteen750',
-      'commands',
-      'auto',
-      'RPaths.java',
+      'learnbot',
+      'TestPaths.java',
     ].join('/'),
   )
     .then((strOrPc) => console.log(strOrPc))

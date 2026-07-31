@@ -14,11 +14,10 @@ import {
 } from '../state/Atoms';
 import { calcBezierRef, calcFacing } from '../state/IndexedFile';
 import {
-  chkConcreteConstantHeading,
-  chkConcreteLinearHeading,
-  chkConcretePointHeading,
-  chkConcreteTangentHeading,
+  chkConcreteSimpleHeading,
+  ConcreteHeading,
   ConcreteHeadingType,
+  ConcreteSimpleHeading,
   PathRenderOptions,
   Point,
 } from '../types';
@@ -45,7 +44,7 @@ export function ScaledCanvas(): ReactElement {
     ...pathChains
       .entries()
       .flatMap(([, apc]) =>
-        apc.paths.map((br): [Point[], ConcreteHeadingType] => [
+        apc.paths.map((br): [Point[], ConcreteHeading] => [
           calcBezierRef(br, file.container),
           calcFacing(apc.heading, file.container),
         ]),
@@ -103,7 +102,7 @@ export function ScaledCanvas(): ReactElement {
       renderPath(
         ctx,
         ctrlPoints,
-        opts.Heading.Display && facing,
+        opts.Heading.Display ? facing : false,
         colors[index % colors.length]!,
         opts,
       ),
@@ -212,19 +211,19 @@ function renderCoordinateLegend(
   ctx.restore();
 }
 
-function diff(a: Point, b: Point): Point {
-  return { x: b.x - a.x, y: b.y - a.y };
+function ptDiff(a: Point, b: Point): Point {
+  return { x: a.x - b.x, y: a.y - b.y };
 }
 
-function distance(a: Point, b: Point): number {
-  const delta = diff(a, b);
+function ptDistance(a: Point, b: Point): number {
+  const delta = ptDiff(a, b);
   return Math.sqrt(delta.x * delta.x + delta.y * delta.y);
 }
 
 function renderPath(
   ctx: CanvasRenderingContext2D,
   curveControlPoints: Point[],
-  heading: ConcreteHeadingType | false,
+  heading: ConcreteHeading | false,
   color: string,
   opts: PathRenderOptions,
 ) {
@@ -251,13 +250,13 @@ function renderPath(
   }
   let lastPt = curveControlPoints[0]!;
   for (const pt of pts) {
-    approxLen += distance(lastPt, pt);
+    approxLen += ptDistance(lastPt, pt);
     lastPt = pt;
     if (drawPath) {
       ctx.lineTo(pt.x * Scale, pt.y * Scale);
     }
   }
-  approxLen += distance(
+  approxLen += ptDistance(
     lastPt,
     curveControlPoints[curveControlPoints.length - 1]!,
   );
@@ -273,47 +272,7 @@ function renderPath(
     opts.ControlPoint.Size > 1e-10 &&
     opts.ControlPoint.Thickness > 1e-10
   ) {
-    ctx.beginPath();
-    ctx.lineWidth = opts.ControlPoint.Thickness;
-    const half = opts.ControlPoint.Size / 2;
-    const shape = opts.ControlPoint.Style;
-    for (const pt of curveControlPoints) {
-      ctx.strokeStyle = color;
-      // TODO: Support more point display styles
-      switch (shape) {
-        case 'o':
-          ctx.moveTo((pt.x + half) * Scale, pt.y * Scale);
-          ctx.arc(pt.x * Scale, pt.y * Scale, half * Scale, 0, 2 * Math.PI);
-          break;
-        case 's': // square
-          ctx.rect(
-            (pt.x - half) * Scale,
-            (pt.y - half) * Scale,
-            opts.ControlPoint.Size,
-            opts.ControlPoint.Size,
-          );
-          break;
-        case 'x':
-          ctx.moveTo((pt.x - half) * Scale, (pt.y - half) * Scale);
-          ctx.lineTo((pt.x + half) * Scale, (pt.y + half) * Scale);
-          ctx.moveTo((pt.x - half) * Scale, (pt.y + half) * Scale);
-          ctx.lineTo((pt.x + half) * Scale, (pt.y - half) * Scale);
-          break;
-        case 't': // triangle
-          ctx.moveTo((pt.x - half) * Scale, (pt.y - half) * Scale);
-          ctx.lineTo(pt.x * Scale, (pt.y + half) * Scale);
-          ctx.lineTo((pt.x + half) * Scale, (pt.y - half) * Scale);
-          ctx.closePath();
-          break;
-        case '+':
-          ctx.moveTo((pt.x - half) * Scale, pt.y * Scale);
-          ctx.lineTo((pt.x + half) * Scale, pt.y * Scale);
-          ctx.moveTo(pt.x * Scale, (pt.y + half) * Scale);
-          ctx.lineTo(pt.x * Scale, (pt.y - half) * Scale);
-          break;
-      }
-    }
-    ctx.stroke();
+    drawControlPoints(ctx, opts, curveControlPoints, color);
   }
   if (heading) {
     drawHeadingLines(
@@ -346,6 +305,55 @@ function renderPath(
       ctx.stroke();*/
 }
 
+function drawControlPoints(
+  ctx: CanvasRenderingContext2D,
+  opts: PathRenderOptions,
+  curveControlPoints: Point[],
+  color: string,
+) {
+  ctx.beginPath();
+  ctx.lineWidth = opts.ControlPoint.Thickness;
+  const half = opts.ControlPoint.Size / 2;
+  const shape = opts.ControlPoint.Style;
+  for (const pt of curveControlPoints) {
+    ctx.strokeStyle = color;
+    // TODO: Support more point display styles
+    switch (shape) {
+      case 'o':
+        ctx.moveTo((pt.x + half) * Scale, pt.y * Scale);
+        ctx.arc(pt.x * Scale, pt.y * Scale, half * Scale, 0, 2 * Math.PI);
+        break;
+      case 's': // square
+        ctx.rect(
+          (pt.x - half) * Scale,
+          (pt.y - half) * Scale,
+          opts.ControlPoint.Size,
+          opts.ControlPoint.Size,
+        );
+        break;
+      case 'x':
+        ctx.moveTo((pt.x - half) * Scale, (pt.y - half) * Scale);
+        ctx.lineTo((pt.x + half) * Scale, (pt.y + half) * Scale);
+        ctx.moveTo((pt.x - half) * Scale, (pt.y + half) * Scale);
+        ctx.lineTo((pt.x + half) * Scale, (pt.y - half) * Scale);
+        break;
+      case 't': // triangle
+        ctx.moveTo((pt.x - half) * Scale, (pt.y - half) * Scale);
+        ctx.lineTo(pt.x * Scale, (pt.y + half) * Scale);
+        ctx.lineTo((pt.x + half) * Scale, (pt.y - half) * Scale);
+        ctx.closePath();
+        break;
+      case '+':
+        ctx.moveTo((pt.x - half) * Scale, pt.y * Scale);
+        ctx.lineTo((pt.x + half) * Scale, pt.y * Scale);
+        ctx.moveTo(pt.x * Scale, (pt.y + half) * Scale);
+        ctx.lineTo(pt.x * Scale, (pt.y - half) * Scale);
+        break;
+    }
+  }
+  ctx.stroke();
+}
+
 function drawColors(ctx: CanvasRenderingContext2D, colors: string[]) {
   ctx.save();
   for (let j = 0; j < colors.length; j++) {
@@ -367,7 +375,7 @@ function drawHeadingLines(
   color: string,
   len: number,
   pts: Point[],
-  heading: ConcreteHeadingType,
+  heading: ConcreteHeading,
   opts: PathRenderOptions,
 ) {
   // for "n" points, I'm not drawing starting/ending headings, so I actually want to split
@@ -391,10 +399,10 @@ function drawHeadingLines(
     for (let curPtIndex = 1; pathPos > 0; curPtIndex++) {
       const prev = pts[curPtIndex - 1]!;
       const cur = pts[curPtIndex]!;
-      lastDelta = diff(prev, cur);
-      const l = distance(prev, cur);
+      lastDelta = ptDiff(cur, prev);
+      const l = ptDistance(prev, cur);
       if (l >= pathPos) {
-        const partWay = magnitude(diff(prev, cur), pathPos);
+        const partWay = magnitude(ptDiff(cur, prev), pathPos);
         point = { x: prev.x + partWay.x, y: prev.y + partWay.y };
       }
       pathPos -= l;
@@ -421,42 +429,70 @@ function drawHeadingLine(
   point: Point,
   tangent: Point,
   percentage: number,
-  heading: ConcreteHeadingType,
+  heading: ConcreteHeading,
   opts: PathRenderOptions,
 ) {
-  let disp: Point = { x: 0, y: 0 };
-  let actualColor = color;
-  if (chkConcreteTangentHeading(heading)) {
-    disp = magnitude(tangent, opts.Heading.Length);
-    actualColor = '#777';
-  } else if (chkConcreteConstantHeading(heading)) {
-    disp = magnitude(
-      { x: Math.cos(heading.heading), y: Math.sin(heading.heading) },
-      opts.Heading.Length,
-    );
-    actualColor = '#70f';
-  } else if (chkConcreteLinearHeading(heading)) {
-    const radians =
-      (heading.headings[0] + (heading.headings[1] - heading.headings[0])) *
-      percentage;
-    disp = magnitude(
-      { x: Math.cos(radians), y: Math.sin(radians) },
-      opts.Heading.Length,
-    );
-    actualColor = '#F07';
-  } else if (chkConcretePointHeading(heading)) {
-    disp = magnitude(diff(heading.heading, point), opts.Heading.Length);
-    actualColor = '#07F';
-  } else {
-    // We don't handle others yet...
-    disp = magnitude(tangent, 0.1);
-    actualColor = '#0f7';
+  let targetPoint: Point = { x: 0, y: 0 };
+  if (chkConcreteSimpleHeading(heading)) {
+    targetPoint = calcSimpleHeading(heading, point, tangent, percentage);
+  } else /* if (heading.type == ConcreteHeadingType.Piecewise)*/ {
+    // Find the piece that this percentage is contained by
+    // I think a linear search is fine, here..
+    for (const piece of heading.pieces) {
+      if (percentage <= piece.end && percentage >= piece.start) {
+        // Found the right piece, rescale percentage accordingly, and
+        // get the heading for the piece
+        targetPoint = calcSimpleHeading(
+          piece.heading,
+          point,
+          tangent,
+          (percentage - piece.start) / (piece.end - piece.start),
+        );
+      }
+    }
   }
   ctx.beginPath();
   ctx.lineCap = 'round';
   ctx.lineWidth = opts.Heading.Thickness;
-  ctx.strokeStyle = actualColor;
+  ctx.strokeStyle = color;
   ctx.moveTo(point.x * Scale, point.y * Scale);
-  ctx.lineTo((point.x + disp.x) * Scale, (point.y + disp.y) * Scale);
+  const displacement = magnitude(targetPoint, opts.Heading.Length);
+  ctx.lineTo(
+    (point.x + displacement.x) * Scale,
+    (point.y + displacement.y) * Scale,
+  );
   ctx.stroke();
+}
+
+function calcSimpleHeading(
+  heading: ConcreteSimpleHeading,
+  point: Point,
+  tangent: Point,
+  percent: number,
+): Point {
+  switch (heading.type) {
+    case ConcreteHeadingType.Tangent:
+      return tangent;
+    case ConcreteHeadingType.Constant:
+      return {
+        x: Math.cos(heading.heading),
+        y: Math.sin(heading.heading),
+      };
+    case ConcreteHeadingType.Linear:
+      const radians =
+        (heading.headings[0] + (heading.headings[1] - heading.headings[0])) *
+        percent;
+      return { x: Math.cos(radians), y: Math.sin(radians) };
+    case ConcreteHeadingType.Point:
+      return ptDiff(point, heading.heading);
+    case ConcreteHeadingType.Reverse:
+      // Get the target point, then flip it the other direction
+      const toReverse = calcSimpleHeading(
+        heading.heading,
+        point,
+        tangent,
+        percent,
+      );
+      return ptDiff(point, ptDiff(toReverse, point));
+  }
 }

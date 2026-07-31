@@ -1,7 +1,7 @@
+import { beforeEach, describe, expect, test } from 'bun:test';
 import { useAtom, useAtomValue } from 'jotai';
 
 import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, test } from 'bun:test';
 import { Pickle } from 'node_modules/@freik/typechk/lib/esm';
 
 import { makeKey } from '../../server/full-database';

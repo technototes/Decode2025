@@ -4,6 +4,7 @@ import {
   chkObjectOfExactType,
   chkTupleOf,
   isNumber,
+  isString,
   typecheck,
 } from '@freik/typechk';
 
@@ -49,62 +50,83 @@ export type AnonymousPathChain = {
 export type Point = { x: number; y: number };
 export const chkPoint = chkObjectOfExactType({ x: isNumber, y: isNumber });
 
-export type ConcreteTangentHeading = { type: 'T' };
+export namespace ConcreteHeadingType {
+  export const Tangent = 'T';
+  export const Constant = 'C';
+  export const Linear = 'I';
+  export const Point = 'P';
+  export const Reverse = 'R';
+  export const Piecewise = 'L';
+}
+export type ConcreteHeadingType =
+  (typeof ConcreteHeadingType)[keyof typeof ConcreteHeadingType];
+export function chkConcreteHeadingType(
+  val: unknown,
+): val is ConcreteHeadingType {
+  return isString(val) && 'TCIPRL'.indexOf(val) >= 0;
+}
+
+export type ConcreteTangentHeading = {
+  type: typeof ConcreteHeadingType.Tangent;
+};
 export type ConcreteConstantHeading = {
-  type: 'C';
+  type: typeof ConcreteHeadingType.Constant;
   heading: number;
 };
 export type ConcreteLinearHeading = {
-  type: 'I';
+  type: typeof ConcreteHeadingType.Linear;
   headings: [number, number];
 };
 export type ConcretePointHeading = {
-  type: 'P';
+  type: typeof ConcreteHeadingType.Point;
   heading: Point;
 };
 export type ConcreteReversedHeading = {
-  type: 'R';
-  heading: ConcreteReversibleHeadingType;
+  type: typeof ConcreteHeadingType.Reverse;
+  heading: ConcreteReversibleHeading;
 };
 export type ConcretePiece = {
   start: number;
   end: number;
-  heading: ConcreteSimpleHeadingType;
+  heading: ConcreteSimpleHeading;
 };
-export type ConcretePieceWiseHeading = {
-  type: 'L';
+export type ConcretePiecewiseHeading = {
+  type: typeof ConcreteHeadingType.Piecewise;
   pieces: ConcretePiece[];
 };
-export type ConcreteReversibleHeadingType =
+export type ConcreteReversibleHeading =
   | ConcreteTangentHeading
   | ConcreteConstantHeading
   | ConcreteLinearHeading
   | ConcretePointHeading;
-export type ConcreteSimpleHeadingType =
-  ConcreteReversibleHeadingType | ConcreteReversedHeading;
-export type ConcreteHeadingType =
-  ConcreteSimpleHeadingType | ConcretePieceWiseHeading;
+export type ConcreteSimpleHeading =
+  ConcreteReversibleHeading | ConcreteReversedHeading;
+export type ConcreteHeading = ConcreteSimpleHeading | ConcretePiecewiseHeading;
 
 export const chkConcreteTangentHeading =
   chkObjectOfExactType<ConcreteTangentHeading>({
-    type: (t: unknown): t is 'T' => t === 'T',
+    type: (t: unknown): t is typeof ConcreteHeadingType.Tangent =>
+      t === ConcreteHeadingType.Tangent,
   });
 export const chkConcreteConstantHeading =
   chkObjectOfExactType<ConcreteConstantHeading>({
-    type: (t: unknown): t is 'C' => t === 'C',
+    type: (t: unknown): t is typeof ConcreteHeadingType.Constant =>
+      t === ConcreteHeadingType.Constant,
     heading: isNumber,
   });
 export const chkConcreteLinearHeading =
   chkObjectOfExactType<ConcreteLinearHeading>({
-    type: (t: unknown): t is 'I' => t === 'I',
+    type: (t: unknown): t is typeof ConcreteHeadingType.Linear =>
+      t === ConcreteHeadingType.Linear,
     headings: chkTupleOf(isNumber, isNumber),
   });
 export const chkConcretePointHeading =
   chkObjectOfExactType<ConcretePointHeading>({
-    type: (t: unknown): t is 'P' => t === 'P',
+    type: (t: unknown): t is typeof ConcreteHeadingType.Point =>
+      t === ConcreteHeadingType.Point,
     heading: chkPoint,
   });
-export const chkConcreteReversibleHeadingType: typecheck<ConcreteReversibleHeadingType> =
+export const chkConcreteReversibleHeading: typecheck<ConcreteReversibleHeading> =
   chkAnyOf(
     chkConcreteTangentHeading,
     chkConcreteConstantHeading,
@@ -113,24 +135,26 @@ export const chkConcreteReversibleHeadingType: typecheck<ConcreteReversibleHeadi
   );
 export const chkConcreteReversedHeading =
   chkObjectOfExactType<ConcreteReversedHeading>({
-    type: (t: unknown): t is 'R' => t === 'R',
-    heading: chkConcreteReversibleHeadingType,
+    type: (t: unknown): t is typeof ConcreteHeadingType.Reverse =>
+      t === ConcreteHeadingType.Reverse,
+    heading: chkConcreteReversibleHeading,
   });
-export const chkConcreteSimpleHeadingType: typecheck<ConcreteSimpleHeadingType> =
-  chkAnyOf(chkConcreteReversedHeading, chkConcreteReversedHeading);
+export const chkConcreteSimpleHeading: typecheck<ConcreteSimpleHeading> =
+  chkAnyOf(chkConcreteReversibleHeading, chkConcreteReversedHeading);
 export const chkConcretePiece = chkObjectOfExactType({
   start: isNumber,
   end: isNumber,
-  heading: chkConcreteSimpleHeadingType,
+  heading: chkConcreteSimpleHeading,
 });
 export const chkConcretePieceWiseHeading =
-  chkObjectOfExactType<ConcretePieceWiseHeading>({
-    type: (t: unknown): t is 'R' => t === 'R',
+  chkObjectOfExactType<ConcretePiecewiseHeading>({
+    type: (t: unknown): t is typeof ConcreteHeadingType.Piecewise =>
+      t === ConcreteHeadingType.Piecewise,
     pieces: chkArrayOf(chkConcretePiece),
   });
-export const chkConcreteHeadingType = chkAnyOf(
+export const chkConcreteHeading = chkAnyOf(
   chkConcretePieceWiseHeading,
-  chkConcreteSimpleHeadingType,
+  chkConcreteSimpleHeading,
 );
 
 export type OneFileIndex = {
