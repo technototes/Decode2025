@@ -3,16 +3,14 @@ import { useAtomValue } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
 
+import { isDoubleValue, isRadiansRef, isRef } from '../../CodeTypeCheck';
 import {
   AnonymousValue,
-  isDoubleValue,
-  isRadiansRef,
-  isRef,
   PoseName,
   RadiansRef,
   ValueName,
   ValueRef,
-} from '../../server/types';
+} from '../../CodeTypes';
 import { NamedValuesAtom } from '../state/Atoms';
 import { ItemWithStyle } from '../ui-tools/types';
 
@@ -81,14 +79,6 @@ export function EditableValueRef({
     </Field>
   );
 }
-
-import {
-  Combobox,
-  makeStyles,
-  Option,
-  useId,
-} from "@fluentui/react-components";
-import type { ComboboxProps } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
   root: {

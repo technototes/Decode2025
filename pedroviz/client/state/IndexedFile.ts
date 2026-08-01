@@ -1,3 +1,4 @@
+import { AnonymousPathChain } from 'CodeTypes';
 import {
   AccError,
   ErrorOr,
@@ -8,6 +9,7 @@ import {
   MakeError,
 } from '@freik/typechk';
 
+import { EmptyParsedClass, isRadiansRef, isRef } from '../../CodeTypeCheck';
 import {
   AnonymousBezier,
   AnonymousFacing,
@@ -15,12 +17,9 @@ import {
   BezierName,
   BezierRef,
   BezierType,
-  EmptyParsedClass,
   FacingPiece,
   FacingType,
   HeadingRef,
-  isRadiansRef,
-  isRef,
   ParsedClass,
   PathChainName,
   PoseName,
@@ -28,9 +27,9 @@ import {
   RadiansRef,
   ValueName,
   ValueRef,
-} from '../../server/types';
+} from '../../CodeTypes';
 import { readConstant } from '../ExpressionEval';
-import { AnonymousPathChain, NameLookup, OneFileIndex } from '../types';
+import { NameLookup, OneFileIndex } from '../types';
 import { ValidRes } from './API';
 
 export function MakeFileIndex(container: ParsedClass): OneFileIndex {

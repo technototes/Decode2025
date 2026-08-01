@@ -6,16 +6,10 @@ import {
   MakeError,
 } from '@freik/typechk';
 
-import {
-  AnonymousBezier,
-  AnonymousPose,
-  chkParsedClass,
-  chkPathDatabase,
-  ParsedClass,
-  Path,
-  PathDatabase,
-  Team,
-} from '../../server/types';
+import { chkParsedClass } from '../../CodeTypeCheck';
+import { AnonymousBezier, AnonymousPose, ParsedClass } from '../../CodeTypes';
+import { chkPathDatabase } from '../../IpcTypeCheck';
+import { Path, PathDatabase, Team } from '../../IpcTypes';
 import { NameLookup, OneFileIndex } from '../types';
 import { GetNameLookup, MakeFileIndex, ValidateIndex } from './IndexedFile';
 import { fetchApi } from './Storage';

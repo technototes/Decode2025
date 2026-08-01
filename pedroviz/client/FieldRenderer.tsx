@@ -1,27 +1,23 @@
 import { CSSProperties, ReactElement, useCallback } from 'react';
-import { useAtomValue } from 'node_modules/jotai/esm/react.mjs';
+import { useAtomValue } from 'jotai';
 
-import { isDefined } from 'node_modules/@freik/typechk/lib/esm';
+import { isDefined } from '@freik/typechk';
 
-import { calcBezierRef, calcFacing } from './ExpressionEval';
+import { chkConcreteSimpleHeading } from './ConcreteEvalTypeCheck';
 import {
-  ColorsAtom,
-  MappedBeziersAtom,
-  MappedFileAtom,
-  MappedPathChainsAtom,
-  MappedPosesAtom,
-  MappedValuesAtom,
-} from './state/Atoms';
-import { PathRenderOptionsAtom, ThemeAtom } from './state/SavedSettings';
-import {
-  chkConcreteSimpleHeading,
   ConcreteHeading,
   ConcreteHeadingType,
   ConcreteSimpleHeading,
-  CtrlPtStyles,
-  PathRenderOptions,
   Point,
-} from './types';
+} from './ConcreteEvalTypes';
+import { calcBezierRef, calcFacing } from './ExpressionEval';
+import {
+  ColorsAtom,
+  MappedFileAtom,
+  MappedPathChainsAtom,
+} from './state/Atoms';
+import { PathRenderOptionsAtom, ThemeAtom } from './state/SavedSettings';
+import { CtrlPtStyles, PathRenderOptions } from './types';
 import { bezierLength, deCasteljau } from './ui-tools/bezier';
 import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
 

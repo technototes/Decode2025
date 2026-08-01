@@ -4,7 +4,8 @@ import { useAtom, useAtomValue } from 'jotai';
 import { Text } from '@fluentui/react-components';
 import { isDefined } from '@freik/typechk';
 
-import { AnonymousPose, isPoseName, isRef, PoseName } from '../../server/types';
+import { isPoseName, isRef } from '../../CodeTypeCheck';
+import { AnonymousPose, PoseName } from '../../CodeTypes';
 import { HeadingRefDisplay } from '../PathsDataDisplay';
 import { getColorFor } from '../state/API';
 import {

@@ -1,9 +1,6 @@
 import { expect, test } from 'bun:test';
 
 import {
-  BezierType,
-  chkTeamPaths,
-  FacingType,
   isAnonymousBezier,
   isAnonymousFacing,
   isAnonymousPose,
@@ -21,7 +18,9 @@ import {
   isRef,
   isTangentFacing,
   isValueRef,
-} from '../types';
+} from '../../CodeTypeCheck';
+import { BezierType, FacingType } from '../../CodeTypes';
+import { chkTeamPaths } from '../../IpcTypeCheck';
 
 test('Parsed file types validation', () => {
   const aRef = 'asdf';

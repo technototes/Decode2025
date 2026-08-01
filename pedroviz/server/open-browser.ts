@@ -1,4 +1,4 @@
-import * as child_proc from 'child_process';
+import * as child_proc from 'node:child_process';
 
 type BufStr = string | Buffer;
 

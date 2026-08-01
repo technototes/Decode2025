@@ -1,6 +1,6 @@
 import { isArray } from '@freik/typechk';
 
-import { ValueName, ValueRef } from '../../server/types';
+import { ValueName, ValueRef } from '../../CodeTypes';
 import { HasItem, ValidateState, ValidationData, ValidData } from '../types';
 
 const validName: RegExp = /^[A-Za-z_][a-zA-Z0-9_]*$/;

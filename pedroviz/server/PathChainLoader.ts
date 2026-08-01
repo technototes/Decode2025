@@ -30,7 +30,12 @@ import {
   MakeError,
 } from '@freik/typechk';
 
-import { ForEachPathChainIndex } from './full-database';
+import {
+  EmptyParsedClass,
+  isAnonymousValue,
+  isRadiansRef,
+  isRef,
+} from '../CodeTypeCheck';
 import {
   AnonymousBezier,
   AnonymousFacing,
@@ -39,16 +44,12 @@ import {
   BezierName,
   BezierRef,
   BezierType,
-  EmptyParsedClass,
   FacingLinear,
   FacingPiece,
   FacingReversible,
   FacingSimple,
   FacingType,
   HeadingRef,
-  isAnonymousValue,
-  isRadiansRef,
-  isRef,
   NamedBezier,
   NamedPathChain,
   NamedPose,
@@ -61,7 +62,8 @@ import {
   RadiansRef,
   ValueName,
   ValueRef,
-} from './types';
+} from '../CodeTypes';
+import { ForEachPathChainIndex } from './full-database';
 
 type PCContext = { pathChainFields: string[] };
 type PCInfo = PCContext & ParsedClass;

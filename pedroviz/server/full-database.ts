@@ -6,16 +6,10 @@ import {
   MakeError,
 } from '@freik/typechk';
 
+import { ParsedClass } from '../CodeTypes';
+import { Path, PathDatabase, PathDBKey, Team, TeamPaths } from '../IpcTypes';
 import { GetTeamPaths } from './getpaths';
 import { anyItems, MakeParsedClass } from './PathChainLoader';
-import {
-  ParsedClass,
-  Path,
-  PathDatabase,
-  PathDBKey,
-  Team,
-  TeamPaths,
-} from './types';
 import { getProjectFilePath } from './utility';
 
 const teampaths: Map<Team, Path[]> = new Map();

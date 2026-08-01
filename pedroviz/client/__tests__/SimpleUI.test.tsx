@@ -20,25 +20,19 @@ import { Pickle } from '@freik/typechk';
 
 import '@testing-library/jest-dom';
 
-import { ThemeAtom } from 'client/state/SavedSettings';
-
-import { makeKey } from '../../server/full-database';
+import { EmptyParsedClass } from '../../CodeTypeCheck';
 import {
   AnonymousBezier,
   BezierName,
   BezierType,
-  EmptyParsedClass,
   FacingType,
   ParsedClass,
-  Path,
   PathChainName,
-  PathDBKey,
-  PathDBValue,
   PoseName,
-  Team,
-  TeamPaths,
   ValueName,
-} from '../../server/types';
+} from '../../CodeTypes';
+import { Path, PathDBKey, PathDBValue, Team, TeamPaths } from '../../IpcTypes';
+import { makeKey } from '../../server/full-database';
 import { Strings } from '../constants';
 import { PathsDataDisplay } from '../PathsDataDisplay';
 import { PathSelector } from '../PathSelector';
@@ -56,6 +50,7 @@ import {
   SelectedTeamAtom,
   ValueAtomFamily,
 } from '../state/Atoms';
+import { ThemeAtom } from '../state/SavedSettings';
 import { getStore } from '../state/Storage';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 

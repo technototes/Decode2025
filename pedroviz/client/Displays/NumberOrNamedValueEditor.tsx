@@ -14,10 +14,12 @@ import {
   Text,
 } from '@fluentui/react-components';
 import { EditRegular } from '@fluentui/react-icons';
+import { GetValueAsString } from 'client/ExpressionEval';
 
-import { isIntValue, isValueName, ValueRef } from '../../server/types';
+import { isIntValue, isValueName } from '../../CodeTypeCheck';
+import { ValueRef } from '../../CodeTypes';
 import { BlurAtom } from '../state/Atoms';
-import { GetValueAsString, HasItem, HasKeys, ValidateState } from '../types';
+import { HasItem, HasKeys, ValidateState } from '../types';
 import {
   CheckValidValueOrName,
   IsValidJavaIdentifier,

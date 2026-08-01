@@ -1,7 +1,7 @@
 import fs, { promises as fsp } from 'node:fs';
 import path from 'node:path';
 
-import { Path, Team, TeamPaths } from './types';
+import { Path, Team, TeamPaths } from '../IpcTypes';
 import { firstFtcSrc, isDirectory } from './utility';
 
 export async function GetTeamPaths() {

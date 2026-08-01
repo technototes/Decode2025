@@ -1,9 +1,8 @@
 import { expect, test } from 'bun:test';
-import path from 'path';
+import path from 'node:path';
 
-import { isError } from 'node_modules/@freik/typechk/lib/esm';
+import { isError } from '@freik/typechk';
 
-import { MakeParsedClass } from '../PathChainLoader';
 import {
   BezierName,
   BezierType,
@@ -11,7 +10,8 @@ import {
   PathChainName,
   PoseName,
   ValueName,
-} from '../types';
+} from '../../CodeTypes';
+import { MakeParsedClass } from '../PathChainLoader';
 import { firstFtcSrc, getProjectFilePath } from '../utility';
 import { LoadPath } from '../web-interface';
 

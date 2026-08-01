@@ -2,17 +2,12 @@ import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
+import { AnonymousPathChain } from 'CodeTypes';
 import { Expandable } from '@freik/fluent9-tools';
 import { isDefined, isUndefined } from '@freik/typechk';
 
-import {
-  AnonymousFacing,
-  FacingType,
-  HeadingRef,
-  isRadiansRef,
-  isRef,
-  PoseRef,
-} from '../server/types';
+import { isRadiansRef, isRef } from '../CodeTypeCheck';
+import { AnonymousFacing, FacingType, HeadingRef, PoseRef } from '../CodeTypes';
 import { NamedPoseList } from './Displays/PoseDisplay';
 import {
   AnonymousValueDisplay,
@@ -28,9 +23,7 @@ import {
   MappedPathChainsAtom,
   SelectedClassAtom,
   SelectedFileAtom,
-  SelectedParsedClassAtom,
 } from './state/Atoms';
-import { AnonymousPathChain } from './types';
 import { ItemWithStyle } from './ui-tools/types';
 
 export function HeadingRefDisplay({

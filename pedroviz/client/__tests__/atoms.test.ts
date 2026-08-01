@@ -2,16 +2,11 @@ import { beforeEach, describe, expect, test } from 'bun:test';
 import { useAtom, useAtomValue } from 'jotai';
 
 import { act, renderHook } from '@testing-library/react';
-import { Pickle } from 'node_modules/@freik/typechk/lib/esm';
+import { Pickle } from '@freik/typechk';
 
+import { EmptyParsedClass } from '../../CodeTypeCheck';
+import { Path, PathDBKey, PathDBValue, Team } from '../../IpcTypes';
 import { makeKey } from '../../server/full-database';
-import {
-  EmptyParsedClass,
-  Path,
-  PathDBKey,
-  PathDBValue,
-  Team,
-} from '../../server/types';
 import {
   ClearCache,
   SelectedFileAtom,

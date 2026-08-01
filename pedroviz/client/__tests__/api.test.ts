@@ -1,15 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 
-import {
-  calcBezierRef,
-  calcHeadingRef,
-  calcPoseRef,
-  calcPoseRefHeading,
-  calcValue,
-  calcValueRef,
-} from 'client/ExpressionEval';
 import { isError, isNumber, isString } from '@freik/typechk';
 
+import { EmptyParsedClass } from '../../CodeTypeCheck';
 import {
   AnonymousBezier,
   AnonymousPose,
@@ -17,7 +10,6 @@ import {
   BezierName,
   BezierRef,
   BezierType,
-  EmptyParsedClass,
   FacingType,
   HeadingRef,
   NamedBezier,
@@ -29,7 +21,15 @@ import {
   PoseRef,
   ValueName,
   ValueRef,
-} from '../../server/types';
+} from '../../CodeTypes';
+import {
+  calcBezierRef,
+  calcHeadingRef,
+  calcPoseRef,
+  calcPoseRefHeading,
+  calcValue,
+  calcValueRef,
+} from '../ExpressionEval';
 import { LoadAndIndexFile, SavePath } from '../state/API';
 
 function mkValNm(name: string): ValueName {

@@ -1,18 +1,6 @@
 import { isDefined, isUndefined } from '@freik/typechk';
 
 import {
-  AnonymousFacing,
-  AnonymousValue,
-  BezierRef,
-  FacingConstant,
-  FacingLinear,
-  FacingPiece,
-  FacingPieceWise,
-  FacingPoint,
-  FacingReversed,
-  FacingReversible,
-  FacingSimple,
-  HeadingRef,
   isAnonymousValue,
   isConstantFacing,
   isDoubleValue,
@@ -25,14 +13,28 @@ import {
   isReversedFacing,
   isReversibleFacing,
   isTangentFacing,
+  isValueName,
+} from '../CodeTypeCheck';
+import {
+  AnonymousFacing,
+  AnonymousValue,
+  BezierRef,
+  FacingConstant,
+  FacingLinear,
+  FacingPiece,
+  FacingPieceWise,
+  FacingPoint,
+  FacingReversed,
+  FacingReversible,
+  FacingSimple,
+  HeadingRef,
   ParsedClass,
   PoseName,
   PoseRef,
   RadiansRef,
   ValueName,
   ValueRef,
-} from '../server/types';
-import { GetNameLookup } from './state/IndexedFile';
+} from '../CodeTypes';
 import {
   ConcreteConstantHeading,
   ConcreteHeading,
@@ -45,7 +47,8 @@ import {
   ConcreteSimpleHeading,
   ConcreteTangentHeading,
   Point,
-} from './types';
+} from './ConcreteEvalTypes';
+import { GetNameLookup } from './state/IndexedFile';
 
 // Very dumb canstants lookup table
 export function readConstant(name: string): number | undefined {
@@ -311,4 +314,14 @@ function mkPiecewise(
   ctx: ParsedClass,
 ): ConcretePiecewiseHeading {
   return { type: 'L', pieces: head.pieces.map((fp) => mkPiece(fp, ctx)) };
+}
+export function GetValueAsString(vr: ValueRef): string {
+  if (isValueName(vr)) {
+    return vr;
+  }
+  if (isIntValue(vr)) {
+    return vr.int.toFixed(0);
+  }
+  // Even in *radians* this is about .57 of a degree, so 2 decimal places seems good enough
+  return vr.double.toFixed(2);
 }

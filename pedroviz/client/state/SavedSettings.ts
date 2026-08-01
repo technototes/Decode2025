@@ -1,7 +1,7 @@
-import { atom, useAtom, useAtomValue } from 'jotai';
+import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-import { CtrlPtStyles, PathRenderOptions } from 'client/types';
+import { CtrlPtStyles, PathRenderOptions } from '../types';
 
 export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
   'theme',

@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { Point } from '../types';
+import { Point } from '../ConcreteEvalTypes';
 import {
   bezierDerivative,
   bezierLength,

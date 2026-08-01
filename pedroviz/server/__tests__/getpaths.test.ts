@@ -1,12 +1,12 @@
 import { expect, test } from 'bun:test';
-import path from 'path';
+import path from 'node:path';
 
+import { Path, Team } from '../../IpcTypes';
 import {
   getPathFiles,
   getRelativeRepoRoot,
   getTeamDirectories,
 } from '../getpaths';
-import { Path, Team } from '../types';
 
 function getTestRepoPath(): string {
   return path.resolve(__dirname, 'test-repo-root');

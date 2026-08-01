@@ -3,28 +3,26 @@ import { atomFamily } from 'jotai-family';
 import { focusAtom } from 'jotai-optics';
 import { atomWithStorage } from 'jotai/utils';
 
-import { ForEachPathChainIndex } from 'server/full-database';
 import { ErrorOr, isError } from '@freik/typechk';
 
 import {
+  AnonymousPathChain,
   BezierName,
   BezierRef,
   NamedBezier,
   NamedPose,
   NamedValue,
   ParsedClass,
-  Path,
   PathChainName,
-  PathDatabase,
-  PathDBKey,
   PoseName,
   PoseRef,
   RadiansRef,
-  Team,
   ValueName,
   ValueRef,
-} from '../../server/types';
-import { AnonymousPathChain, OneFileIndex } from '../types';
+} from '../../CodeTypes';
+import { Path, PathDatabase, PathDBKey, Team } from '../../IpcTypes';
+import { ForEachPathChainIndex } from '../../server/full-database';
+import { OneFileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetFullDb, LoadAndIndexFile, UpdateIndexFile } from './API';
 import { EmptyMappedFile, GetNameLookup, MakeFileIndex } from './IndexedFile';

@@ -25,7 +25,7 @@ import {
   RadiansRef,
   ValueName,
   ValueRef,
-} from '../../server/types';
+} from '../../CodeTypes';
 import { MappedValuesAtom, ValueAtomFamily } from '../state/Atoms';
 import { ValidateState, ValidationData, ValidData } from '../types';
 import { CheckValidName } from './Validation';
