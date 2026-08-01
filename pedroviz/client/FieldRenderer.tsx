@@ -78,7 +78,7 @@ export function FieldRenderer(): ReactElement {
         ),
       );
     },
-    [],
+    [opts, theme, pathChains, colors],
   );
 
   return (

@@ -219,7 +219,7 @@ export function Settings(): ReactElement {
                 stepPage={1}
                 min={0.5}
                 max={4}
-              />{' '}
+              />
               <span />
               <Label htmlFor="headingCountId">Heading Indicator Count</Label>
               <SpinButton
@@ -241,7 +241,7 @@ export function Settings(): ReactElement {
                 stepPage={1}
                 min={0.1}
                 max={2}
-              />{' '}
+              />
               <span />
               <Label htmlFor="headingThicknessId">Heading thickness</Label>
               <SpinButton
@@ -290,7 +290,7 @@ export function Settings(): ReactElement {
                   }
                 />
                 <WeatherMoonFilled />
-              </span>{' '}
+              </span>
               <span />
               <Label htmlFor="resetPrefsId">Reset preferences</Label>
               <span>

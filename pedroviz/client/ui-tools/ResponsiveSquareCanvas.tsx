@@ -84,7 +84,7 @@ export function ResponsiveSquareCanvas({
     canvas.style.height = `${size}px`;
 
     render(ctx, size, dpr);
-  }, [canvasRef, size]);
+  }, [canvasRef, size, render]);
 
   return (
     <div
