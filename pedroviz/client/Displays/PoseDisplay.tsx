@@ -76,7 +76,12 @@ export function AnonymousPoseHeader({
     <>
       <Text size={400}>X</Text>
       <Text size={400}>Y</Text>
-      {!noHeading && <Text size={400}>Heading</Text>}
+      {!noHeading && (
+        <>
+          <Text size={400}>Heading</Text>
+          <Text size={400}>Units</Text>
+        </>
+      )}
     </>
   );
 }
@@ -106,7 +111,7 @@ export function NamedPoseList(): ReactElement {
   const gridStyle: CSSProperties = {
     display: 'grid',
     columnGap: '10pt',
-    gridTemplateColumns: '1fr auto auto auto',
+    gridTemplateColumns: '1fr auto auto auto auto',
     justifyItems: 'end',
     justifySelf: 'start',
   };

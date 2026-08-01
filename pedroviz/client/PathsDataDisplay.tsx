@@ -34,12 +34,27 @@ export function HeadingRefDisplay({
     if (isRadiansRef(item)) {
       return <RadiansRefDisplay item={item} {...props} />;
     } else if (isRef(item)) {
-      return <GeneralRefDisplay item={item} {...props} />;
+      return (
+        <>
+          <GeneralRefDisplay item={item} {...props} />
+          <Text>&nbsp;</Text>
+        </>
+      );
     } else {
-      return <AnonymousValueDisplay item={item} {...props} />;
+      return (
+        <>
+          <AnonymousValueDisplay item={item} {...props} />
+          <Text>&nbsp;</Text>
+        </>
+      );
     }
   }
-  return <>&nbsp;</>;
+  return (
+    <>
+      <Text>&nbsp;</Text>
+      <Text>&nbsp;</Text>
+    </>
+  );
 }
 
 function InlinePoseRefDisplay({ pose }: { pose: PoseRef }): ReactElement {
