@@ -308,7 +308,7 @@ export function PathsDataDisplay({
   const selFile = useAtomValue(SelectedFileAtom);
   const selClass = useAtomValue(SelectedClassAtom);
   if (selFile.length === 0 || selClass.length === 0) {
-    return <div>Please select a file & class to view.</div>;
+    return <Text size={600}>Please select a file & class to view.</Text>;
   }
   return (
     <>
@@ -321,7 +321,7 @@ export function PathsDataDisplay({
         <NamedPoseList />
         {/* <NewPose /> */}
       </Expandable>
-      <Expandable label="Curves" indent={20}>
+      <Expandable label="Curves & Lines" indent={20}>
         <NamedBezierList />
         {/* <Button style={{ margin: 10 }} disabled>
           New Curve

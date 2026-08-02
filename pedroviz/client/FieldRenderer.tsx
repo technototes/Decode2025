@@ -15,6 +15,7 @@ import {
   ColorsAtom,
   MappedFileAtom,
   MappedPathChainsAtom,
+  NamedPathChainsAtom,
 } from './state/Atoms';
 import { PathRenderOptionsAtom, ThemeAtom } from './state/SavedSettings';
 import { CtrlPtStyles, PathRenderOptions } from './types';
@@ -34,18 +35,14 @@ export function FieldRenderer(): ReactElement {
   const theme = useAtomValue(ThemeAtom);
 
   const colors = useAtomValue(ColorsAtom);
-  const pathChains = useAtomValue(MappedPathChainsAtom);
+  const allPCs = useAtomValue(NamedPathChainsAtom);
   const file = useAtomValue(MappedFileAtom);
-  const points = [
-    ...pathChains
-      .entries()
-      .flatMap(([, apc]) =>
-        apc.paths.map((br): [Point[], ConcreteHeading] => [
-          calcBezierRef(br, file.container),
-          calcFacing(apc.heading, file.container),
-        ]),
-      ),
-  ];
+  const points = allPCs.flatMap((npc) =>
+    npc.paths.map((br): [Point[], ConcreteHeading] => [
+      calcBezierRef(br, file.container),
+      calcFacing(npc.pathHeading, file.container),
+    ]),
+  );
 
   const bgStyle = opts.ShowField
     ? {
@@ -78,7 +75,7 @@ export function FieldRenderer(): ReactElement {
         ),
       );
     },
-    [opts, theme, pathChains, colors],
+    [opts, theme, allPCs, colors],
   );
 
   return (

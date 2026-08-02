@@ -27,7 +27,7 @@ export function UnnamedValueDisplay({
   ...props
 }: ItemWithStyle<ValueRef | RadiansRef>): ReactElement {
   return isRadiansRef(item) ? (
-    <RadiansRefDisplay item={item} />
+    <RadiansRefDisplay item={item} {...props} />
   ) : (
     <>
       <ValueRefDisplay item={item} />
@@ -47,7 +47,7 @@ export function EditableValueRef({
   setRef: (val: ValueName) => void;
   style?: CSSProperties;
 }): ReactElement {
-  const validRefs = useAtomValue(MappedValuesAtom);
+  const validRefs = useAtomValue(ValuesLookupAtom);
   const [curVal, setCurVal] = useState(initial);
   let { message: validNameMessage, state: nameValidationState } =
     CheckValidName(validRefs, curVal, true);
@@ -124,7 +124,7 @@ function getNumber(val: AnonymousValue): number {
 /*
 export function NamedValueElem({ name }: { name: ValueName }): ReactElement {
   const [item, setItem] = useAtom(ValueAtomFamily(name));
-  const names = useAtomValue(MappedValuesAtom);
+  const names = useAtomValue(ValuesLooukpAtom);
   const type = isRadiansRef(item)
     ? 'degrees'
     : isIntValue(item)

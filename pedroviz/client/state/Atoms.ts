@@ -1,8 +1,9 @@
 import { atom, WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai-family';
 import { focusAtom } from 'jotai-optics';
-import { atomWithStorage } from 'jotai/utils';
+import { atomWithStorage, selectAtom, splitAtom, unwrap } from 'jotai/utils';
 
+import { EmptyParsedClass } from 'CodeTypeCheck';
 import { ErrorOr, isError } from '@freik/typechk';
 
 import {
@@ -10,6 +11,7 @@ import {
   BezierName,
   BezierRef,
   NamedBezier,
+  NamedPathChain,
   NamedPose,
   NamedValue,
   ParsedClass,
@@ -141,20 +143,20 @@ export const SelectedClassAtom = atomWithStorage(
 );
 
 export const SelectedParsedClassAtom = atom(
-  async (get): Promise<undefined | ParsedClass> => {
+  async (get): Promise<ParsedClass> => {
     const db = await get(FullDatabaseAtom);
     const key = await get(SelectedDBKeyAtom);
     const className = await get(SelectedClassAtom);
     const val = db.get(key);
     if (!val) {
-      return;
+      return EmptyParsedClass;
     }
     const which = val[0].indexOf(className);
     if (which < 0) {
-      return;
+      return EmptyParsedClass;
     }
     // Scan the DAG of ParsedClasses to find the selected one.
-    let res: ParsedClass | undefined;
+    let res: ParsedClass = EmptyParsedClass;
     ForEachPathChainIndex(val[1], (pc) => {
       if (pc.name === className) {
         res = pc;
@@ -163,6 +165,14 @@ export const SelectedParsedClassAtom = atom(
     });
     return res;
   },
+  async (get, set, val: ParsedClass) => {
+    // TODO:
+  },
+);
+
+const UnwrappedParsedClass = unwrap(
+  SelectedParsedClassAtom,
+  () => EmptyParsedClass,
 );
 
 const MappedFileBackingAtom = atom(0);
@@ -195,10 +205,19 @@ export const MappedFileAtom = atom(
 
 type MapAtom<Str, T> = WritableAtom<Promise<Map<Str, T>>, [Map<Str, T>], void>;
 
-export const NamedValuesAtom = atom(async (get): Promise<NamedValue[]> => {
-  const index = await get(SelectedParsedClassAtom);
-  return index ? index.values : [];
-});
+export const NamedValuesAtom = selectAtom(
+  UnwrappedParsedClass,
+  (pc) => pc.values,
+);
+
+export const ValuesLookupAtom = atom(
+  (get): Map<ValueName, ValueRef | RadiansRef> => {
+    const nvs = get(NamedValuesAtom);
+    return new Map((nvs || []).map(({ name, value }) => [name, value]));
+  },
+);
+
+export const SplitValuesAtom = splitAtom(NamedValuesAtom);
 
 export const MappedValuesAtom: MapAtom<ValueName, ValueRef | RadiansRef> =
   focusAtom(MappedFileAtom, (optic) => optic.prop('namedValues'));
@@ -218,6 +237,12 @@ export const NamedBeziersAtom = atom(async (get): Promise<NamedBezier[]> => {
   return index ? index.beziers : [];
 });
 
+export const NamedPathChainsAtom = atom(
+  async (get): Promise<NamedPathChain[]> => {
+    const index = await get(SelectedParsedClassAtom);
+    return index?.pathChains || [];
+  },
+);
 export const MappedBeziersAtom: MapAtom<BezierName, BezierRef> = focusAtom(
   MappedFileAtom,
   (optic) => optic.prop('namedBeziers'),

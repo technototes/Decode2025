@@ -11,8 +11,8 @@ import { getColorFor } from '../state/API';
 import {
   ColorsAtom,
   MappedPosesAtom,
-  MappedValuesAtom,
   PoseAtomFamily,
+  ValuesLookupAtom,
 } from '../state/Atoms';
 import { HasKeys } from '../types';
 import { ItemWithStyle } from '../ui-tools/types';
@@ -30,7 +30,7 @@ export function AnonymousPoseDisplay({
   setPose,
 }: AnonymousPoseDisplayProps): ReactElement {
   // const colors = usAtomValue(ColorsAtom);
-  const names = useAtomValue(MappedValuesAtom);
+  const names = useAtomValue(ValuesLookupAtom);
 
   const style = {/* color: colors[getColorFor(pose)]*/};
   /*
@@ -91,7 +91,7 @@ export function NamedPoseItem({
   style,
 }: ItemWithStyle<PoseName>): ReactElement {
   const [pose, setPose] = useAtom(PoseAtomFamily(item));
-  const names = useAtomValue(MappedValuesAtom);
+  const names = useAtomValue(ValuesLookupAtom);
   if (isPoseName(pose)) {
     return <Text>{pose}</Text>;
   } else if (isDefined(pose)) {
