@@ -2,6 +2,7 @@ import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
+import { GetValueAsString } from 'client/ExpressionEval';
 
 import { isDoubleValue, isRadiansRef, isRef } from '../../CodeTypeCheck';
 import {
@@ -18,11 +19,7 @@ export function AnonymousValueDisplay({
   item,
   ...props
 }: ItemWithStyle<AnonymousValue>): ReactElement {
-  if (isDoubleValue(item)) {
-    return <Text {...props}>{item.double.toFixed(2)}</Text>;
-  } else {
-    return <Text {...props}>{item.int.toFixed(0)}</Text>;
-  }
+  return <Text {...props}>{GetValueAsString(item)}</Text>;
 }
 
 export function UnnamedValueDisplay({

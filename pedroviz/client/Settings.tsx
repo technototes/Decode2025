@@ -17,7 +17,6 @@ import {
   SpinButtonChangeEvent,
   SpinButtonOnChangeData,
   Switch,
-  Text,
 } from '@fluentui/react-components';
 import {
   SettingsFilled,
@@ -171,30 +170,29 @@ export function Settings(): ReactElement {
         <DialogBody>
           <DialogTitle style={{ textAlign: 'center' }}>Settings</DialogTitle>
           <DialogContent>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.5fr 1fr .4fr 1.5fr 1fr',
-                rowGap: 5,
-                columnGap: 1,
-                margin: 10,
-                alignItems: 'center',
-              }}>
-              <Label htmlFor="showFieldId">Show field image</Label>
+            <div className="settings">
+              <Label className="left-label" htmlFor="showFieldId">
+                Show field image
+              </Label>
               <Switch
+                className="left-field"
                 id="showFieldId"
                 checked={showField}
                 onChange={(_, data) => setShowField(data.checked)}
               />
-              <span />
-              <Label htmlFor="showCoordsId">Show field coordinates</Label>
+              <Label className="right-label" htmlFor="showCoordsId">
+                Show field coordinates
+              </Label>
               <Switch
                 id="showCoordsId"
                 checked={showCoords}
                 onChange={(_, data) => setShowCoords(data.checked)}
               />
-              <Label htmlFor="pathThicknessId">Path Thickness</Label>
+              <Label className="left-label" htmlFor="pathThicknessId">
+                Path Thickness
+              </Label>
               <SpinButton
+                className="left-field"
                 id="pathThicknessId"
                 value={pathThickness}
                 onChange={changePathThickness}
@@ -203,15 +201,19 @@ export function Settings(): ReactElement {
                 min={0}
                 max={2}
               />
-              <span />
-              <Label htmlFor="showBotHeadingId">Show robot heading</Label>
+              <Label className="right-label" htmlFor="showBotHeadingId">
+                Show robot heading
+              </Label>
               <Switch
                 id="showBotHeadingId"
                 checked={showBotHeading}
                 onChange={(_, data) => setShowBotHeading(data.checked)}
               />
-              <Label htmlFor="ctrlPtSizeId">CtrlPt Size</Label>
+              <Label className="left-label" htmlFor="ctrlPtSizeId">
+                CtrlPt Size
+              </Label>
               <SpinButton
+                className="left-field"
                 id="ctrlPtSizeId"
                 value={ctrlPtSize}
                 onChange={changeCtrlPtSize}
@@ -220,8 +222,9 @@ export function Settings(): ReactElement {
                 min={0.5}
                 max={4}
               />
-              <span />
-              <Label htmlFor="headingCountId">Heading Indicator Count</Label>
+              <Label className="right-label" htmlFor="headingCountId">
+                Heading Indicator Count
+              </Label>
               <SpinButton
                 id="headingCountId"
                 disabled={!showBotHeading}
@@ -232,8 +235,11 @@ export function Settings(): ReactElement {
                 min={1}
                 max={25}
               />
-              <Label htmlFor="ctrlPtThicknessId">CtrlPt Thickness</Label>
+              <Label className="left-label" htmlFor="ctrlPtThicknessId">
+                CtrlPt Thickness
+              </Label>
               <SpinButton
+                className="left-field"
                 id="ctrlPtThicknessId"
                 value={ctrlPtThickness}
                 onChange={changeCtrlPtThickness}
@@ -242,8 +248,9 @@ export function Settings(): ReactElement {
                 min={0.1}
                 max={2}
               />
-              <span />
-              <Label htmlFor="headingThicknessId">Heading thickness</Label>
+              <Label className="right-label" htmlFor="headingThicknessId">
+                Heading thickness
+              </Label>
               <SpinButton
                 id="headingThicknessId"
                 disabled={!showBotHeading}
@@ -254,8 +261,11 @@ export function Settings(): ReactElement {
                 min={0.1}
                 max={2}
               />
-              <Label htmlFor="ctrlPtStyleId">CtrlPt Style</Label>
+              <Label className="left-label" htmlFor="ctrlPtStyleId">
+                CtrlPt Style
+              </Label>
               <Dropdown
+                className="left-field"
                 style={{ minWidth: 50 }}
                 id="ctrlPtStyleId"
                 value={ctrlPtName}
@@ -267,8 +277,9 @@ export function Settings(): ReactElement {
                   </Option>
                 ))}
               </Dropdown>
-              <span />
-              <Label htmlFor="headingLengthId">Heading length</Label>
+              <Label className="right-label" htmlFor="headingLengthId">
+                Heading length
+              </Label>
               <SpinButton
                 id="headingLengthId"
                 disabled={!showBotHeading}
@@ -279,8 +290,10 @@ export function Settings(): ReactElement {
                 min={1}
                 max={25}
               />
-              <Label htmlFor="setThemeId">Theme</Label>
-              <span>
+              <Label id="setThemeLabelId" htmlFor="setThemeId">
+                Theme
+              </Label>
+              <span id="setThemeSpanId">
                 <WeatherSunnyRegular />
                 <Switch
                   id="setThemeId"
@@ -291,8 +304,9 @@ export function Settings(): ReactElement {
                 />
                 <WeatherMoonFilled />
               </span>
-              <span />
-              <Label htmlFor="resetPrefsId">Reset preferences</Label>
+              <Label className="right-label" htmlFor="resetPrefsId">
+                Reset preferences
+              </Label>
               <span>
                 <Button
                   id="resetPrefsId"
@@ -302,7 +316,6 @@ export function Settings(): ReactElement {
                   }}>
                   {Strings.Reset}
                 </Button>
-                <span />
               </span>
             </div>
           </DialogContent>
