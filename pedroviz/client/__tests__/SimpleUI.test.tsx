@@ -44,11 +44,11 @@ import {
   MappedBeziersAtom,
   MappedPathChainsAtom,
   MappedPosesAtom,
-  MappedValuesAtom,
   PoseAtomFamily,
   SelectedFileAtom,
   SelectedTeamAtom,
   ValueAtomFamily,
+  ValuesLookupAtom,
 } from '../state/Atoms';
 import { ThemeAtom } from '../state/SavedSettings';
 import { getStore } from '../state/Storage';
@@ -332,7 +332,7 @@ describe('SchemaAtom tests', () => {
     await act(async () => {
       expect(await store.get(SelectedFileAtom)).toBe('path3.java' as Path);
     });
-    expect(await store.get(MappedValuesAtom)).toBeDefined();
+    expect(await store.get(ValuesLookupAtom)).toBeDefined();
     expect(await store.get(MappedPosesAtom)).toBeDefined();
     expect(await store.get(MappedBeziersAtom)).toBeDefined();
     expect(await store.get(MappedPathChainsAtom)).toBeDefined();
@@ -341,7 +341,7 @@ describe('SchemaAtom tests', () => {
     );
     await waitFor(async () => {
       expect(
-        (await store.get(MappedValuesAtom)).has('valX' as ValueName),
+        (await store.get(ValuesLookupAtom)).has('valX' as ValueName),
       ).toBeTrue();
       expect(
         (await store.get(MappedPosesAtom)).has('poseX' as PoseName),

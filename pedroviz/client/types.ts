@@ -1,3 +1,5 @@
+import { PathDatabase } from 'IpcTypes';
+
 import {
   AnonymousPathChain,
   BezierName,
@@ -60,6 +62,7 @@ export type NameLookup = {
     pc: PathChainName,
     context: ParsedClass,
   ) => AnonymousPathChain | undefined;
+  db: () => PathDatabase;
 };
 
 export type HasItem<T> = {

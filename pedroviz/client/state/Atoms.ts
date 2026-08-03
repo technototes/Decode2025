@@ -1,9 +1,16 @@
 import { atom, WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai-family';
 import { focusAtom } from 'jotai-optics';
-import { atomWithStorage, selectAtom, splitAtom, unwrap } from 'jotai/utils';
+import {
+  atomWithRefresh,
+  atomWithStorage,
+  selectAtom,
+  splitAtom,
+  unwrap,
+} from 'jotai/utils';
 
 import { EmptyParsedClass } from 'CodeTypeCheck';
+import { SaveDatabase } from 'server/web-interface';
 import { ErrorOr, isError } from '@freik/typechk';
 
 import {
@@ -24,9 +31,9 @@ import {
 } from '../../CodeTypes';
 import { Path, PathDatabase, PathDBKey, Team } from '../../IpcTypes';
 import { ForEachPathChainIndex } from '../../server/full-database';
-import { OneFileIndex } from '../types';
+import { NameLookup, OneFileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
-import { GetFullDb, LoadAndIndexFile, UpdateIndexFile } from './API';
+import { GetFullDb, LoadAndIndexFile, PutFullDb, UpdateIndexFile } from './API';
 import { EmptyMappedFile, GetNameLookup, MakeFileIndex } from './IndexedFile';
 import { ThemeAtom } from './SavedSettings';
 
@@ -43,23 +50,34 @@ export const ColorForNumber = atomFamily((index: number) =>
 
 export const BlurAtom = atom('');
 let dbCache: PathDatabase | null = null;
-export const FullDatabaseAtom = atom(async () => {
-  if (dbCache === null) {
-    dbCache = await GetFullDb();
-  }
-  return dbCache;
-});
+export const FullDatabaseAtom = atomWithRefresh(
+  async () => {
+    if (dbCache === null) {
+      dbCache = await GetFullDb();
+    }
+    return dbCache;
+  },
+  async (get, set, val: PathDatabase) => {
+    // TODO: Send the DB back to the server
+    await PutFullDb(val);
+  },
+);
 
-export const IndexedDatabaseAtom = atom(async (get) => {
-  const db = await get(FullDatabaseAtom);
-  const index = GetNameLookup();
-  for (const [, [, pc]] of db) {
-    ForEachPathChainIndex(pc, (file) =>
-      index.registerIndex(MakeFileIndex(file)),
-    );
-  }
-  return index;
-});
+export const IndexedDatabaseAtom = atomWithRefresh(
+  async (get) => {
+    const db = await get(FullDatabaseAtom);
+    const index = GetNameLookup();
+    for (const [, [, pc]] of db) {
+      ForEachPathChainIndex(pc, (file) =>
+        index.registerIndex(MakeFileIndex(file)),
+      );
+    }
+    return index;
+  },
+  async (get, set, val: NameLookup) => {
+    const db = await get(FullDatabaseAtom);
+  },
+);
 
 export function ClearCache() {
   dbCache = null;
@@ -165,9 +183,7 @@ export const SelectedParsedClassAtom = atom(
     });
     return res;
   },
-  async (get, set, val: ParsedClass) => {
-    // TODO:
-  },
+  async (get, set, val: ParsedClass) => {},
 );
 
 const UnwrappedParsedClass = unwrap(
@@ -205,19 +221,25 @@ export const MappedFileAtom = atom(
 
 type MapAtom<Str, T> = WritableAtom<Promise<Map<Str, T>>, [Map<Str, T>], void>;
 
-export const NamedValuesAtom = selectAtom(
-  UnwrappedParsedClass,
-  (pc) => pc.values,
+export const ValuesAtoms = Object.freeze(
+  (() => {
+    const List = selectAtom(UnwrappedParsedClass, (pc) => pc.values);
+    const Lookup = atom((get): Map<ValueName, ValueRef | RadiansRef> => {
+      const nvs = get(NamedValuesAtom);
+      return new Map((nvs || []).map(({ name, value }) => [name, value]));
+    });
+    const Items = splitAtom(List, (nv) => nv.name);
+    return {
+      List,
+      Lookup,
+      Items,
+    };
+  })(),
 );
 
-export const ValuesLookupAtom = atom(
-  (get): Map<ValueName, ValueRef | RadiansRef> => {
-    const nvs = get(NamedValuesAtom);
-    return new Map((nvs || []).map(({ name, value }) => [name, value]));
-  },
-);
-
-export const SplitValuesAtom = splitAtom(NamedValuesAtom);
+export const NamedValuesAtom = ValuesAtoms.List;
+export const ValuesLookupAtom = ValuesAtoms.Lookup;
+export const SplitValuesAtom = ValuesAtoms.Items;
 
 export const MappedValuesAtom: MapAtom<ValueName, ValueRef | RadiansRef> =
   focusAtom(MappedFileAtom, (optic) => optic.prop('namedValues'));

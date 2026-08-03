@@ -26,7 +26,7 @@ import {
   ValueName,
   ValueRef,
 } from '../../CodeTypes';
-import { MappedValuesAtom, ValueAtomFamily } from '../state/Atoms';
+import { ValueAtomFamily, ValuesLookupAtom } from '../state/Atoms';
 import { ValidateState, ValidationData, ValidData } from '../types';
 import { CheckValidName } from './Validation';
 
@@ -38,7 +38,7 @@ export function NewValue(): ReactElement {
   const [valStr, setValStr] = useState('0.000');
   const [varStr, setVarStr] = useState('');
   const [valType, setValType] = useState<ValType>('double');
-  const allNames = useAtomValue(MappedValuesAtom);
+  const allNames = useAtomValue(ValuesLookupAtom);
   const setNamedValue = useAtomCallback((_, set, val: ValueRef | RadiansRef) =>
     set(ValueAtomFamily(name), val),
   );

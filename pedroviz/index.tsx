@@ -3,7 +3,12 @@ import { serve } from 'bun';
 import index from './index.html';
 import { main } from './server/main';
 import { SavePath } from './server/savepath';
-import { LoadClassList, LoadDatabase, LoadPath } from './server/web-interface';
+import {
+  LoadClassList,
+  LoadDatabase,
+  LoadPath,
+  SaveDatabase,
+} from './server/web-interface';
 
 const server = serve({
   routes: {
@@ -34,6 +39,9 @@ const server = serve({
         decodeURIComponent(req.params.data),
       ),
     '/api/db': async (req) => LoadDatabase(),
+    '/api/putdb': {
+      PUT: async (req) => SaveDatabase(JSON.stringify(await req.json())),
+    },
   },
 
   development: process.env.NODE_ENV !== 'production' && {

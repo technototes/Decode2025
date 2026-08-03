@@ -3,6 +3,7 @@ import { createStore } from 'jotai';
 import {
   hasStrField,
   isDefined,
+  Pickle,
   SafelyUnpickle,
   typecheck,
 } from '@freik/typechk';
@@ -40,4 +41,17 @@ export async function fetchApi<T>(
     }
   }
   return def;
+}
+
+export async function putApi(key: string, value: unknown): Promise<void> {
+  const put = await fetch('/api/' + key, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: Pickle(value),
+  });
+  if (put.ok) {
+    console.log(await put.text());
+  } else {
+    console.log(put);
+  }
 }

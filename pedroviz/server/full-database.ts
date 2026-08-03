@@ -98,6 +98,14 @@ export function GetDatabase(): PathDatabase {
   return database;
 }
 
+export function ReplaceDatabase(db: PathDatabase) {
+  database.clear();
+  db.forEach((val, key) => {
+    console.log('savin', key);
+    database.set(key, val);
+  });
+}
+
 // Interfaces to the web server to talk to the web client:
 
 export function WebGetParsedClassList(
