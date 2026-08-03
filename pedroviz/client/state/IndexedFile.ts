@@ -1,4 +1,5 @@
 import { AnonymousPathChain } from 'CodeTypes';
+import { PathDatabase } from 'IpcTypes';
 import {
   AccError,
   ErrorOr,
@@ -64,6 +65,8 @@ export function MakeFileIndex(container: ParsedClass): OneFileIndex {
 // Make a thing that can accumulate indexes (*can* in the *future*)
 function MakeNameLookup(): NameLookup {
   let indexMap: Map<string, OneFileIndex> = new Map();
+  let database: PathDatabase | undefined;
+
   const registerIndex = (index: OneFileIndex) => {
     indexMap.set(index.container.fullName, index);
   };
@@ -139,8 +142,23 @@ function MakeNameLookup(): NameLookup {
   };
   const reset = () => {
     indexMap.clear();
+    database = undefined;
   };
-  return { registerIndex, findBezier, findPath, findPose, findValue, reset };
+  const setDb = (db: PathDatabase) => {
+    database = db;
+    for (const [, pc] of db.ParsedClasses) {
+      registerIndex(pc);
+    }
+  };
+  const db = () => database;
+  return {
+    findBezier,
+    findPath,
+    findPose,
+    findValue,
+    setDb,
+    db,
+  };
 }
 
 const nameLookup = MakeNameLookup();

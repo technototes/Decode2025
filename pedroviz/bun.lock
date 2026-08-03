@@ -10,6 +10,7 @@
         "@freik/containers": "^0.4.10",
         "@freik/fluent9-tools": "^0.1.2",
         "@freik/react-tools": "^0.4.0",
+        "@freik/seqnum": "^1.3.10",
         "@freik/typechk": "^0.10.0",
         "java-parser": "^3.0.1",
         "jotai": "^2.20.2",
@@ -235,6 +236,8 @@
     "@freik/logger": ["@freik/logger@0.4.10", "", { "dependencies": { "debug": "^4.4.0" } }, "sha512-rA8LZcRjplocTyvh8xLZPG3QiZNbMYe8U+JmQYz57p/Mp9NMKYEYnX4z2G91KDbp4ugQ9oV55sI6MfZDocHGsw=="],
 
     "@freik/react-tools": ["@freik/react-tools@0.4.0", "", { "dependencies": { "@freik/logger": "0.4.10", "@freik/typechk": "0.10.0" }, "peerDependencies": { "react": "^19.2.8", "react-dom": "^19.2.8" } }, "sha512-h92TPCOvXBjVx7lF0J4bY5fGyzx08KYymRZ22CaO+GEM2HWEAuOreH+xZ13UgnlGynvILBER8AaaGZq9DIyG/w=="],
+
+    "@freik/seqnum": ["@freik/seqnum@1.3.10", "", {}, "sha512-gqIqZmWuiubvJU/YzBz2DJ5AtCXzPtXvS+9tBBP1xBafcdW907XVb1OPyRh03lgje0W1WZ8OE9qx8M2OXKI7xg=="],
 
     "@freik/typechk": ["@freik/typechk@0.10.0", "", {}, "sha512-OV3GVWbxNY8A2xebggGqmq1jgcFDMEKLuwkMAlF4XU/A8QlTH4w+Cry235c6Wh5P9E/URvzGns4aXG5mWBAc4w=="],
 

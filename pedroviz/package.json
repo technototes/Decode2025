@@ -17,6 +17,7 @@
     "@freik/containers": "^0.4.10",
     "@freik/fluent9-tools": "^0.1.2",
     "@freik/react-tools": "^0.4.0",
+    "@freik/seqnum": "^1.3.10",
     "@freik/typechk": "^0.10.0",
     "java-parser": "^3.0.1",
     "jotai": "^2.20.2",

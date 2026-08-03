@@ -9,7 +9,7 @@ import {
 
 import { chkParsedClass } from '../../CodeTypeCheck';
 import { AnonymousBezier, AnonymousPose, ParsedClass } from '../../CodeTypes';
-import { chkPathDatabase } from '../../IpcTypeCheck';
+import { chkPathDatabase, EmptyPathDatahase } from '../../IpcTypeCheck';
 import { Path, PathDatabase, Team } from '../../IpcTypes';
 import { NameLookup, OneFileIndex } from '../types';
 import { GetNameLookup, MakeFileIndex, ValidateIndex } from './IndexedFile';
@@ -37,7 +37,10 @@ export function getColorFor(
 
 // Get the entire Database from the server
 export async function GetFullDb(): Promise<PathDatabase> {
-  return await fetchApi('db', chkPathDatabase, new Map());
+  const db = await fetchApi('db', chkPathDatabase, EmptyPathDatahase);
+  const lkup = GetNameLookup();
+  lkup.setDb(db);
+  return db;
 }
 
 export async function PutFullDb(db: PathDatabase): Promise<void> {

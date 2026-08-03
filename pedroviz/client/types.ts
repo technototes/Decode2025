@@ -62,7 +62,8 @@ export type NameLookup = {
     pc: PathChainName,
     context: ParsedClass,
   ) => AnonymousPathChain | undefined;
-  db: () => PathDatabase;
+  setDb: (db: PathDatabase) => void;
+  db: () => PathDatabase | undefined;
 };
 
 export type HasItem<T> = {

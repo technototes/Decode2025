@@ -12,6 +12,8 @@ import { GetTeamPaths } from './getpaths';
 import { anyItems, MakeParsedClass } from './PathChainLoader';
 import { getProjectFilePath } from './utility';
 
+// Teams -> Paths -> Classes -> ParsedClasse
+// one   ->  many -> many, one -> one
 const teampaths: Map<Team, Path[]> = new Map();
 const database: PathDatabase = new Map();
 
