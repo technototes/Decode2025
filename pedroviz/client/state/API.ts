@@ -87,7 +87,7 @@ export async function LoadAndIndexFile(
   }
   const indexFile = await MakeFileIndex(pc);
   const lookup: NameLookup = GetNameLookup();
-  lookup.registerIndex(indexFile);
+  //lookup.registerIndex(indexFile);
   const validate = ValidateIndex(indexFile, lookup, pc);
   if (isError(validate)) {
     return MakeError(

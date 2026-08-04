@@ -7,10 +7,10 @@ import { Path } from 'IpcTypes';
 import { Strings } from './constants';
 import {
   BlurAtom,
-  ClassesForSelectedFileAtom,
-  FilesForSelectedTeamAtom,
+  ClassesForSelectedPathAtom,
+  PathsForSelectedTeamAtom,
   SelectedClassAtom,
-  SelectedFileAtom,
+  SelectedPathAtom,
   SelectedTeamAtom,
   TeamsAtom,
 } from './state/Atoms';
@@ -41,8 +41,8 @@ export function TeamSelector(): ReactElement {
 }
 
 export function FileSelector(): ReactElement {
-  let files = useAtomValue(FilesForSelectedTeamAtom);
-  const [file, setFile] = useAtom(SelectedFileAtom);
+  let files = useAtomValue(PathsForSelectedTeamAtom);
+  const [file, setFile] = useAtom(SelectedPathAtom);
   // if all the files have a common folder prefix, filter the prefix out
   let prefix = '';
   if (files.length > 0) {
@@ -68,19 +68,22 @@ export function FileSelector(): ReactElement {
   }
   return (
     <>
-      <Label className="pathLabel">File:</Label>
+      <Label className="pathLabel" htmlFor="select_a_file">
+        File:
+      </Label>
       <AutoSelector
+        id="select_a_file"
         prompt={Strings.select_a_file}
         items={files}
         selected={file.substring(prefix.length)}
-        setSelected={(item) => setFile(prefix + item)}
+        setSelected={(item) => setFile((prefix + item) as Path)}
       />
     </>
   );
 }
 
 export function ClassSelector(): ReactElement {
-  const classes = useAtomValue(ClassesForSelectedFileAtom);
+  const classes = useAtomValue(ClassesForSelectedPathAtom);
   const [classSel, setClass] = useAtom(SelectedClassAtom);
   useEffect(() => {
     if (classes.length === 1) {

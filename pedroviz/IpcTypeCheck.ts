@@ -1,19 +1,21 @@
 import { ParsedClass } from 'CodeTypes';
-import {
-  chkMultiMapOf,
-  MakeMultiMap,
-} from 'node_modules/@freik/containers/lib/esm';
+import { chkMultiMapOf, MakeMultiMap } from '@freik/containers';
 import {
   chkMapOf,
   chkObjectOfExactType,
-  isArrayOfString,
-  isRecordOf,
   isString,
   typecheck,
 } from '@freik/typechk';
 
 import { chkParsedClass } from './CodeTypeCheck';
-import { ClassKey, Path, PathDatabase, PathKey, Team } from './IpcTypes';
+import {
+  ClassKey,
+  ClassName,
+  Path,
+  PathDatabase,
+  PathKey,
+  Team,
+} from './IpcTypes';
 
 export function getPathKey(team: Team, path: Path): PathKey {
   return `${team}*${path}` as PathKey;
@@ -36,9 +38,9 @@ export function getClassKey(pathKey: PathKey, className: string): ClassKey {
   return `${pathKey};${className}` as ClassKey;
 }
 
-export function ClassFromKey(classKey: ClassKey): string {
+export function ClassFromKey(classKey: ClassKey): ClassName {
   const elems = classKey.split(';');
-  return elems.pop() || '';
+  return (elems.pop() || '') as ClassName;
 }
 
 export function chkClassKey(obj: unknown): obj is ClassKey {

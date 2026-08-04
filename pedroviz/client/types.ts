@@ -50,8 +50,6 @@ export type OneFileIndex = {
 };
 
 export type NameLookup = {
-  registerIndex: (index: OneFileIndex) => void;
-  reset: () => void;
   findValue: (
     val: ValueName,
     context: ParsedClass,

@@ -20,7 +20,6 @@ import {
   isValueRef,
 } from '../../CodeTypeCheck';
 import { BezierType, FacingType } from '../../CodeTypes';
-import { chkTeamPaths } from '../../IpcTypeCheck';
 
 test('Parsed file types validation', () => {
   const aRef = 'asdf';
@@ -29,8 +28,6 @@ test('Parsed file types validation', () => {
   expect(isRef(notARef)).toBeFalse();
   const aTeamPath = { path: ['path1', 'path2/path3'] };
   const notATeamPath = { path: 1 };
-  expect(chkTeamPaths(aTeamPath)).toBeTrue();
-  expect(chkTeamPaths(notATeamPath)).toBeFalse();
   const anonValI = { int: 1 };
   const anonValD = { double: 1.5 };
   const anonValR = { radians: { double: 23.3 } };

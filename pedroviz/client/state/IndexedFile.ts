@@ -145,9 +145,10 @@ function MakeNameLookup(): NameLookup {
     database = undefined;
   };
   const setDb = (db: PathDatabase) => {
+    reset();
     database = db;
     for (const [, pc] of db.ParsedClasses) {
-      registerIndex(pc);
+      registerIndex(MakeFileIndex(pc));
     }
   };
   const db = () => database;

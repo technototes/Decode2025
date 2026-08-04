@@ -22,7 +22,7 @@ import {
   MappedBeziersAtom,
   MappedPathChainsAtom,
   SelectedClassAtom,
-  SelectedFileAtom,
+  SelectedPathAtom,
 } from './state/Atoms';
 import { ItemWithStyle } from './ui-tools/types';
 
@@ -305,7 +305,7 @@ export function PathsDataDisplay({
 }: {
   expand?: boolean;
 }): ReactElement {
-  const selFile = useAtomValue(SelectedFileAtom);
+  const selFile = useAtomValue(SelectedPathAtom);
   const selClass = useAtomValue(SelectedClassAtom);
   if (selFile.length === 0 || selClass.length === 0) {
     return <Text size={600}>Please select a file & class to view.</Text>;

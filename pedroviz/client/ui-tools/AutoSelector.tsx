@@ -13,12 +13,14 @@ import { isString } from '@freik/typechk';
 
 // Show a selection, unless there are no items, then disable the selector entirely
 export function AutoSelector({
+  id,
   prompt,
   items,
   selected,
   setSelected,
   default: defItem,
 }: {
+  id?: string;
   prompt: string;
   items: string[];
   selected: string;
@@ -39,7 +41,7 @@ export function AutoSelector({
   return (
     <Menu>
       <MenuTrigger>
-        <Button disabled={items.length === 0}>
+        <Button disabled={items.length === 0} id={id}>
           {selectedItem}
           <ChevronDown16Regular style={{ marginLeft: 10 }} />
         </Button>

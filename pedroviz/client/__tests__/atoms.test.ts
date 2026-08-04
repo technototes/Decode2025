@@ -2,14 +2,15 @@ import { beforeEach, describe, expect, test } from 'bun:test';
 import { useAtom, useAtomValue } from 'jotai';
 
 import { act, renderHook } from '@testing-library/react';
+import { ParsedClass } from 'CodeTypes';
+import { MakeMultiMap } from '@freik/containers';
 import { Pickle } from '@freik/typechk';
 
 import { EmptyParsedClass } from '../../CodeTypeCheck';
-import { Path, PathDBKey, PathDBValue, Team } from '../../IpcTypes';
-import { makeKey } from '../../server/full-database';
+import { ClassKey, Path, PathDatabase, PathKey, Team } from '../../IpcTypes';
 import {
   ClearCache,
-  SelectedFileAtom,
+  SelectedPathAtom,
   SelectedTeamAtom,
   TeamsAtom,
 } from '../state/Atoms';
@@ -23,13 +24,30 @@ const status = {
   status: 200,
   headers: { 'Content-Type': 'application/json' },
 };
-
-const database = new Map<PathDBKey, PathDBValue>([
-  [makeKey('team1' as Team, 'path1.java' as Path), [[], EmptyParsedClass]],
-  [makeKey('team1' as Team, 'path2.java' as Path), [[], EmptyParsedClass]],
-  [makeKey('team2' as Team, 'path3.java' as Path), [[], EmptyParsedClass]],
-  [makeKey('team2' as Team, 'path4.java' as Path), [[], EmptyParsedClass]],
-]);
+const database: PathDatabase = {
+  TeamPaths: MakeMultiMap<Team, PathKey>([
+    [
+      'team1' as Team,
+      ['team1*path1.java' as PathKey, 'team1*path2.java' as PathKey],
+    ],
+    [
+      'team2' as Team,
+      ['team2*path3.java' as PathKey, 'team2*path4.java' as PathKey],
+    ],
+  ]),
+  PathClasses: MakeMultiMap<PathKey, ClassKey>([
+    ['team1*path1.java' as PathKey, ['team1*path1.java;' as ClassKey]],
+    ['team1*path2.java' as PathKey, ['team1*path2.java;' as ClassKey]],
+    ['team2*path3.java' as PathKey, ['team2*path3.java;' as ClassKey]],
+    ['team2*path4.java' as PathKey, ['team2*path4.java;' as ClassKey]],
+  ]),
+  ParsedClasses: new Map<ClassKey, ParsedClass>([
+    ['team1*path1.java;' as ClassKey, EmptyParsedClass],
+    ['team1*path2.java;' as ClassKey, EmptyParsedClass],
+    ['team2*path3.java;' as ClassKey, EmptyParsedClass],
+    ['team2*path4.java;' as ClassKey, EmptyParsedClass],
+  ]),
+};
 
 async function MyFetchFunc(
   key: string | URL | Request,
@@ -61,11 +79,11 @@ describe('Atom Capabilities', () => {
     );
     expect(selectedTeam.result.current).toEqual('team1' as Team);
     const setFile = await act(() =>
-      renderHook(() => useAtom(SelectedFileAtom)),
+      renderHook(() => useAtom(SelectedPathAtom)),
     );
     await act(() => setFile.result.current[1]('path1.java'));
     const selectedFile = await act(() =>
-      renderHook(() => useAtomValue(SelectedFileAtom)),
+      renderHook(() => useAtomValue(SelectedPathAtom)),
     );
     expect(selectedFile.result.current).toEqual('path1.java' as Path);
     await act(() => setTeam.result.current[1]('team2'));
