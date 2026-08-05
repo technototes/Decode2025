@@ -338,4 +338,3 @@ function makeItemFromNameFamily<Str, T>(theAtom: MapAtom<Str, T>) {
 
 export const ValueAtomFamily = makeItemFromNameFamily(MappedValuesAtom);
 export const PoseAtomFamily = makeItemFromNameFamily(MappedPosesAtom);
-export const BezierAtomFamily = makeItemFromNameFamily(MappedBeziersAtom);

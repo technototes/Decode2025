@@ -11,7 +11,7 @@ import {
 const theStore = createStore();
 
 export type MyStore = typeof theStore;
-export type MaybeStore = MyStore | undefined;
+// export type MaybeStore = MyStore | undefined;
 
 export function getStore(curStore?: MyStore): MyStore {
   return curStore || theStore;

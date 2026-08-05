@@ -9,10 +9,11 @@
     "types": "tsc --noEmit",
     "pvdev": "bun --hot index.tsx",
     "pvbld": "bun build ./index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
-    "pvstart": "NODE_ENV=production bun index.tsx"
+    "pvstart": "NODE_ENV=production bun index.tsx",
+    "dead": "ts-prune"
   },
   "dependencies": {
-    "@fluentui/react-components": "^9.74.4",
+    "@fluentui/react-components": "^9.74.5",
     "@fluentui/react-icons": "^2.0.334",
     "@freik/containers": "^0.4.10",
     "@freik/fluent9-tools": "^0.1.2",
@@ -37,6 +38,7 @@
     "@types/react-dom": "^19.2.4",
     "prettier": "^3.9.6",
     "prettier-plugin-java": "^2.10.3",
+    "ts-prune": "^0.10.3",
     "typescript": "^7.0.2"
   },
   "prettier": {
