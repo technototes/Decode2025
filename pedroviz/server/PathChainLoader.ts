@@ -917,7 +917,11 @@ function getPathChain(node: BlockStatementCstNode): NamedPathChain | undefined {
   if (pathHeading === null) {
     return;
   }
-  return { name: fieldName as PathChainName, paths: chain, pathHeading };
+  return {
+    name: fieldName as PathChainName,
+    paths: chain,
+    heading: pathHeading,
+  };
 }
 
 function getPathChainHelper(

@@ -87,27 +87,27 @@ export function ClearCache() {
   dbCache = null;
 }
 
-export const TeamPaths = selectAtom(
+export const TeamPathsSelect = selectAtom(
   FullDatabaseAtom,
   async (db) => (await db).TeamPaths,
 );
-export const PathClasses = selectAtom(
+export const PathClassesSelect = selectAtom(
   FullDatabaseAtom,
   async (db) => (await db).PathClasses,
 );
-export const ParsedClasses = selectAtom(
+export const ParsedClassesSelect = selectAtom(
   FullDatabaseAtom,
   async (db) => (await db).ParsedClasses,
 );
 
 export const TeamsAtom = atom(async (get): Promise<Team[]> => {
-  const tp = await get(TeamPaths);
+  const tp = await get(TeamPathsSelect);
   return [...tp.keys()];
 });
 
 export const PathKeysForTeamFamily = atomFamily((team: Team) =>
   atom(async (get): Promise<Set<PathKey>> => {
-    return (await get(TeamPaths)).get(team) || new Set();
+    return (await get(TeamPathsSelect)).get(team) || new Set();
   }),
 );
 
@@ -121,7 +121,7 @@ export const PathsForTeamFamily = atomFamily((team: Team) =>
 
 export const ClassKeysForPathKeyFamily = atomFamily((pk: PathKey) =>
   atom(async (get): Promise<Set<ClassKey>> => {
-    return (await get(PathClasses)).get(pk) || new Set();
+    return (await get(PathClassesSelect)).get(pk) || new Set();
   }),
 );
 
@@ -211,13 +211,6 @@ export const ClassesForSelectedPathAtom = atom(
   },
 );
 
-/*
-export const SelectedDBKeyAtom = atom(async (get): Promise<PathDBKey> => {
-  const team = await get(SelectedTeamAtom);
-  const file = await get(SelectedPathAtom);
-  return `${team}*${file}` as PathDBKey;
-});
-*/
 export const SelectedClassKeyAtom = atomWithStorage(
   'selectedClass',
   '' as ClassKey,
@@ -329,8 +322,6 @@ export const MappedBeziersAtom: MapAtom<BezierName, BezierRef> = focusAtom(
   MappedFileAtom,
   (optic) => optic.prop('namedBeziers'),
 );
-export const MappedPathChainsAtom: MapAtom<PathChainName, AnonymousPathChain> =
-  focusAtom(MappedFileAtom, (optic) => optic.prop('namedPathChains'));
 
 function makeItemFromNameFamily<Str, T>(theAtom: MapAtom<Str, T>) {
   return atomFamily((name: Str) =>
@@ -348,4 +339,3 @@ function makeItemFromNameFamily<Str, T>(theAtom: MapAtom<Str, T>) {
 export const ValueAtomFamily = makeItemFromNameFamily(MappedValuesAtom);
 export const PoseAtomFamily = makeItemFromNameFamily(MappedPosesAtom);
 export const BezierAtomFamily = makeItemFromNameFamily(MappedBeziersAtom);
-export const PathChainAtomFamily = makeItemFromNameFamily(MappedPathChainsAtom);

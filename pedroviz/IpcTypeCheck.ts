@@ -1,4 +1,3 @@
-import { ParsedClass } from 'CodeTypes';
 import { chkMultiMapOf, MakeMultiMap } from '@freik/containers';
 import {
   chkMapOf,
@@ -8,6 +7,7 @@ import {
 } from '@freik/typechk';
 
 import { chkParsedClass } from './CodeTypeCheck';
+import { ParsedClass } from './CodeTypes';
 import {
   ClassKey,
   ClassName,

@@ -42,7 +42,6 @@ import {
   ColorForNumber,
   ColorsAtom,
   MappedBeziersAtom,
-  MappedPathChainsAtom,
   MappedPosesAtom,
   PathsForSelectedTeamAtom,
   PoseAtomFamily,
@@ -132,7 +131,7 @@ const fullParsedClass: ParsedClass = {
     {
       name: 'pc1' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      pathHeading: { type: FacingType.Tangent },
+      heading: { type: FacingType.Tangent },
     },
     {
       name: 'pc2' as PathChainName,
@@ -143,7 +142,7 @@ const fullParsedClass: ParsedClass = {
           points: ['pose1' as PoseName, 'pose3' as PoseName],
         },
       ],
-      pathHeading: { type: FacingType.Constant, heading: 'pose3' as PoseName },
+      heading: { type: FacingType.Constant, heading: 'pose3' as PoseName },
     },
     {
       name: 'pc3' as PathChainName,
@@ -158,7 +157,7 @@ const fullParsedClass: ParsedClass = {
           ],
         },
       ],
-      pathHeading: {
+      heading: {
         type: FacingType.Linear,
         start: 'pose2' as PoseName,
         end: { radians: { int: 135 } },
@@ -354,7 +353,6 @@ describe('SchemaAtom tests', () => {
     expect(await store.get(ValuesLookupAtom)).toBeDefined();
     expect(await store.get(MappedPosesAtom)).toBeDefined();
     expect(await store.get(MappedBeziersAtom)).toBeDefined();
-    expect(await store.get(MappedPathChainsAtom)).toBeDefined();
     await act(() =>
       store.set(ValueAtomFamily('valX' as ValueName), { int: 42 }),
     );

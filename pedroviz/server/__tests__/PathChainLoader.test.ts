@@ -176,7 +176,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
   expect(paths.pathChains[0]).toEqual({
     name: 'Path1' as PathChainName,
     paths: ['start_to_step1' as BezierName],
-    pathHeading: {
+    heading: {
       type: FacingType.Linear,
       start: 'start' as PoseName,
       end: 'step1' as PoseName,
@@ -190,7 +190,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
         points: ['step1' as PoseName, 'step2' as PoseName],
       },
     ],
-    pathHeading: {
+    heading: {
       type: FacingType.Linear,
       start: {
         radians: { int: 90 },
@@ -201,7 +201,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
   expect(paths.pathChains[2]).toEqual({
     name: 'Path3' as PathChainName,
     paths: ['step2_to_step3' as BezierName],
-    pathHeading: {
+    heading: {
       type: FacingType.Linear,
       start: 'step_mid' as PoseName,
       end: 'step3' as PoseName,
@@ -215,7 +215,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
         points: ['step3' as PoseName, 'step4' as PoseName],
       },
     ],
-    pathHeading: { type: FacingType.Constant, heading: 'one80' as ValueName },
+    heading: { type: FacingType.Constant, heading: 'one80' as ValueName },
   });
   expect(paths.pathChains[4]).toEqual({
     name: 'AnotherPath' as PathChainName,
@@ -238,7 +238,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
       },
       'step4_to_start' as BezierName,
     ],
-    pathHeading: {
+    heading: {
       type: FacingType.Linear,
       start: { radians: 'step' as ValueName },
       end: 'radRef' as PoseName,

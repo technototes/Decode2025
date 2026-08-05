@@ -2,8 +2,8 @@ import { ReactElement, useEffect } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
 import { Label, Text } from '@fluentui/react-components';
-import { Path } from 'IpcTypes';
 
+import { Path } from '../IpcTypes';
 import { Strings } from './constants';
 import {
   BlurAtom,

@@ -2,7 +2,6 @@ import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
-import { GetValueAsString } from 'client/ExpressionEval';
 
 import { isDoubleValue, isRadiansRef, isRef } from '../../CodeTypeCheck';
 import {
@@ -12,6 +11,7 @@ import {
   ValueName,
   ValueRef,
 } from '../../CodeTypes';
+import { GetValueAsString } from '../ExpressionEval';
 import { NamedValuesAtom } from '../state/Atoms';
 import { ItemWithStyle } from '../ui-tools/types';
 

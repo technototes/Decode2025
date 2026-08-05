@@ -207,7 +207,7 @@ export const isAnonymousFacing: typecheck<AnonymousFacing> = (
 export const isNamedPathChain = chkObjectOfExactType<NamedPathChain>({
   name: isString,
   paths: chkArrayOf(isBezierRef),
-  pathHeading: isAnonymousFacing,
+  heading: isAnonymousFacing,
 });
 
 export const isPathChainHelper = chkObjectOfExactType<PathChainHelper>({

@@ -1,5 +1,3 @@
-import { PathDatabase } from 'IpcTypes';
-
 import {
   AnonymousPathChain,
   BezierName,
@@ -12,6 +10,7 @@ import {
   ValueName,
   ValueRef,
 } from '../CodeTypes';
+import { PathDatabase } from '../IpcTypes';
 
 export const CtrlPtStyles = Object.freeze({
   Circle: 'o',

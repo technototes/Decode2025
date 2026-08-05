@@ -2,12 +2,17 @@ import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
-import { AnonymousPathChain } from 'CodeTypes';
 import { Expandable } from '@freik/fluent9-tools';
 import { isDefined, isUndefined } from '@freik/typechk';
 
 import { isRadiansRef, isRef } from '../CodeTypeCheck';
-import { AnonymousFacing, FacingType, HeadingRef, PoseRef } from '../CodeTypes';
+import {
+  AnonymousFacing,
+  FacingType,
+  HeadingRef,
+  NamedPathChain,
+  PoseRef,
+} from '../CodeTypes';
 import { NamedPoseList } from './Displays/PoseDisplay';
 import {
   AnonymousValueDisplay,
@@ -20,8 +25,8 @@ import { getColorFor } from './state/API';
 import {
   ColorsAtom,
   MappedBeziersAtom,
-  MappedPathChainsAtom,
   SelectedClassAtom,
+  SelectedParsedClassAtom,
   SelectedPathAtom,
 } from './state/Atoms';
 import { ItemWithStyle } from './ui-tools/types';
@@ -193,15 +198,15 @@ export function NamedPathChainDisplay({
   chain,
   rowdata,
 }: {
-  chain: [string, AnonymousPathChain];
+  chain: NamedPathChain;
   rowdata: NestedRowData;
 }): ReactElement {
   const colors = useAtomValue(ColorsAtom);
   // This renders into a container grid that's 3 columns wide
   return (
     <>
-      <Text style={rowSpan(1, rowdata)}>{chain[0]}</Text>
-      {chain[1].paths.map((br, index) => {
+      <Text style={rowSpan(1, rowdata)}>{chain.name}</Text>
+      {chain.paths.map((br, index) => {
         /*const anonBez = getBezier(br);
         const color = getColorFor(anonBez);*/
         if (isRef(br)) {
@@ -233,13 +238,13 @@ export function NamedPathChainDisplay({
           );
         }
       })}
-      <HeadingTypeDisplay heading={chain[1].heading} />
+      <HeadingTypeDisplay heading={chain.heading} />
     </>
   );
 }
 
 export function PathChainList(): ReactElement {
-  const items = useAtomValue(MappedPathChainsAtom);
+  const items = useAtomValue(SelectedParsedClassAtom);
   // I need to collect row spans for:
   // 1- The name, a running total of all prior path chains, plus a total count
   //    of this path's chains.
@@ -247,7 +252,7 @@ export function PathChainList(): ReactElement {
   //    the prior rows, plus the count of the current curve's control points
   let count = 1;
   let nestedRowData: NestedRowData[] = [];
-  for (const [_, pc] of items) {
+  for (const pc of items.pathChains) {
     const children: RowData[] = [];
     const offset = count;
     for (const b of pc.paths) {
@@ -278,15 +283,13 @@ export function PathChainList(): ReactElement {
         Paths
       </Text>
       {[
-        ...items
-          .entries()
-          .map((pc, index) => (
-            <NamedPathChainDisplay
-              key={pc[0]}
-              chain={pc}
-              rowdata={nestedRowData[index]!}
-            />
-          )),
+        items.pathChains.map((pc, index) => (
+          <NamedPathChainDisplay
+            key={pc.name}
+            chain={pc}
+            rowdata={nestedRowData[index]!}
+          />
+        )),
       ]}
     </div>
   );

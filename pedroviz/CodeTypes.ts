@@ -74,12 +74,6 @@ export type AnonymousFacing =
 
 // No such thing as an anonymous PathChain
 export type PathChainName = Nominal<string, 'PathChain'>;
-// Also: I'm not yet handling global vs. last heading modifiers
-export type NamedPathChain = {
-  name: PathChainName;
-  paths: BezierRef[];
-  pathHeading: AnonymousFacing;
-};
 
 export type PathChainHelper = {
   name: string; // This should just be a simple variable name
@@ -90,6 +84,9 @@ export type AnonymousPathChain = {
   paths: BezierRef[];
   heading: AnonymousFacing;
 };
+
+// Also: I'm not yet handling global vs. last heading modifiers
+export type NamedPathChain = { name: PathChainName } & AnonymousPathChain;
 
 export type ClassContainer = { fileName: string } | { className: string };
 

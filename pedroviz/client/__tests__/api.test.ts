@@ -146,7 +146,7 @@ const fullParsedClass: ParsedClass = {
     {
       name: 'pc1' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      pathHeading: { type: FacingType.Tangent },
+      heading: { type: FacingType.Tangent },
     },
     {
       name: 'pc2' as PathChainName,
@@ -157,7 +157,7 @@ const fullParsedClass: ParsedClass = {
           points: ['pose1' as PoseName, 'pose3' as PoseName],
         },
       ],
-      pathHeading: { type: FacingType.Constant, heading: 'pose3' as PoseName },
+      heading: { type: FacingType.Constant, heading: 'pose3' as PoseName },
     },
     {
       name: 'pc3' as PathChainName,
@@ -172,7 +172,7 @@ const fullParsedClass: ParsedClass = {
           ],
         },
       ],
-      pathHeading: {
+      heading: {
         type: FacingType.Linear,
         start: 'pose2' as PoseName,
         end: { radians: { int: 135 } },
@@ -218,7 +218,7 @@ const danglingPC: ParsedClass = {
     {
       name: 'danglingBezRef' as PathChainName,
       paths: ['noBez' as BezierName],
-      pathHeading: {
+      heading: {
         type: FacingType.Constant,
         heading: 'noHeading' as ValueName,
       },
@@ -226,7 +226,7 @@ const danglingPC: ParsedClass = {
     {
       name: 'danglingBezRef2' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      pathHeading: {
+      heading: {
         type: FacingType.Constant,
         heading: { radians: 'nospot' as ValueName },
       },

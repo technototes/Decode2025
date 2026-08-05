@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test';
 import path from 'node:path';
 
-import { chkPathKey } from 'IpcTypeCheck';
-import { isMultiMapOf } from 'node_modules/@freik/containers/lib/esm';
-import { isString } from 'node_modules/@freik/typechk/lib/esm';
+import { isMultiMapOf } from '@freik/containers';
+import { isString } from '@freik/typechk';
 
+import { chkPathKey } from '../../IpcTypeCheck';
 import { Path, Team } from '../../IpcTypes';
 import {
   getPathFiles,

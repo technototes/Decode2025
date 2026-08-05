@@ -1,9 +1,9 @@
 import fs, { promises as fsp } from 'node:fs';
 import path from 'node:path';
 
-import { getPathKey } from 'IpcTypeCheck';
-import { MakeMultiMap } from 'node_modules/@freik/containers/lib/esm';
+import { MakeMultiMap } from '@freik/containers';
 
+import { getPathKey } from '../IpcTypeCheck';
 import { Path, PathKey, Team, TeamPaths } from '../IpcTypes';
 import { firstFtcSrc, isDirectory } from './utility';
 

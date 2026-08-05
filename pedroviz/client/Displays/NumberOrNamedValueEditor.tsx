@@ -14,10 +14,10 @@ import {
   Text,
 } from '@fluentui/react-components';
 import { EditRegular } from '@fluentui/react-icons';
-import { GetValueAsString } from 'client/ExpressionEval';
 
 import { isIntValue, isValueName } from '../../CodeTypeCheck';
 import { ValueRef } from '../../CodeTypes';
+import { GetValueAsString } from '../ExpressionEval';
 import { BlurAtom } from '../state/Atoms';
 import { HasItem, HasKeys, ValidateState } from '../types';
 import {

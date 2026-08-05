@@ -1,7 +1,5 @@
 import { expect, test } from 'bun:test';
 
-import { chkPathKey } from 'IpcTypeCheck';
-
 import {
   getFacingType,
   isAnonymousBezier,
@@ -26,6 +24,7 @@ import {
   isValueRef,
 } from '../../CodeTypeCheck';
 import { BezierType, FacingPieceWise, FacingType } from '../../CodeTypes';
+import { chkPathKey } from '../../IpcTypeCheck';
 
 test('Parsed file types validation', () => {
   const aRef = 'asdf';
@@ -135,7 +134,7 @@ test('Parsed file types validation', () => {
   const npc = {
     name: 'path1',
     paths: [anonBezC, 'bezRef'],
-    pathHeading: tangHead,
+    heading: tangHead,
   };
   expect(isNamedPathChain(npc)).toBeTrue();
   expect(isNamedPathChain({ ...npc, headings: [1] })).toBeFalse();

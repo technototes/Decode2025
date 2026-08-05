@@ -3,12 +3,7 @@ import { serve } from 'bun';
 import index from './index.html';
 import { main } from './server/main';
 import { SavePath } from './server/savepath';
-import {
-  LoadClassList,
-  LoadDatabase,
-  LoadPath,
-  SaveDatabase,
-} from './server/web-interface';
+import { LoadDatabase, LoadPath, SaveDatabase } from './server/web-interface';
 
 const server = serve({
   routes: {
@@ -24,11 +19,6 @@ const server = serve({
     ),
     '/api/loadpath/:team/:path': async (req) =>
       LoadPath(
-        decodeURIComponent(req.params.team),
-        decodeURIComponent(req.params.path),
-      ),
-    '/api/getclasslist/:team/:path': async (req) =>
-      LoadClassList(
         decodeURIComponent(req.params.team),
         decodeURIComponent(req.params.path),
       ),

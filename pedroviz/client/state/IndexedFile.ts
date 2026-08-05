@@ -1,5 +1,3 @@
-import { AnonymousPathChain } from 'CodeTypes';
-import { PathDatabase } from 'IpcTypes';
 import {
   AccError,
   ErrorOr,
@@ -14,6 +12,7 @@ import { EmptyParsedClass, isRadiansRef, isRef } from '../../CodeTypeCheck';
 import {
   AnonymousBezier,
   AnonymousFacing,
+  AnonymousPathChain,
   AnonymousPose,
   BezierName,
   BezierRef,
@@ -29,6 +28,7 @@ import {
   ValueName,
   ValueRef,
 } from '../../CodeTypes';
+import { PathDatabase } from '../../IpcTypes';
 import { readConstant } from '../ExpressionEval';
 import { NameLookup, OneFileIndex } from '../types';
 import { ValidRes } from './API';
@@ -46,7 +46,7 @@ export function MakeFileIndex(container: ParsedClass): OneFileIndex {
   const namedPathChains = new Map<PathChainName, AnonymousPathChain>(
     container.pathChains.map((npc) => [
       npc.name,
-      { paths: npc.paths, heading: npc.pathHeading },
+      { paths: npc.paths, heading: npc.heading },
     ]),
   );
   const staticShortcuts = new Map<string, string>(

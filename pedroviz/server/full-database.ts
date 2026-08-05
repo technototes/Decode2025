@@ -1,19 +1,13 @@
+import { MakeMultiMap } from '@freik/containers';
+import { ErrorOr, isError, isUndefined, MakeError } from '@freik/typechk';
+
+import { ParsedClass } from '../CodeTypes';
 import {
   ClassFromKey,
   getClassKey,
   getPathKey,
   PathFromKey,
-} from 'IpcTypeCheck';
-import { MakeMultiMap } from '@freik/containers';
-import {
-  ErrorOr,
-  isDefined,
-  isError,
-  isUndefined,
-  MakeError,
-} from '@freik/typechk';
-
-import { ParsedClass } from '../CodeTypes';
+} from '../IpcTypeCheck';
 import {
   ClassKey,
   ClassName,
@@ -21,14 +15,14 @@ import {
   PathDatabase,
   PathKey,
   Team,
-  TeamPaths,
 } from '../IpcTypes';
 import { GetTeamPaths } from './getpaths';
 import { anyItems, MakeParsedClass } from './PathChainLoader';
 import { getProjectFilePath } from './utility';
 
-// Teams -> Paths -> Classes -> ParsedClasse
-// one   ->  many -> many, one -> one
+// Teams -> Paths -> Classes   -> ParsedClasse
+// one   -> many  -> many, one -> one
+
 const teampaths: Map<Team, Path[]> = new Map();
 const database: PathDatabase = {
   TeamPaths: MakeMultiMap<Team, PathKey>(),
@@ -104,15 +98,9 @@ export function ReplaceDatabase(db: PathDatabase) {
   database.TeamPaths = db.TeamPaths;
   database.PathClasses = db.PathClasses;
   database.ParsedClasses = db.ParsedClasses;
-  console.log('DB Replaced!');
 }
 
-// Interfaces to the web server to talk to the web client:
-
-export function WebGetParsedClassList(
-  team: Team,
-  path: Path,
-): ErrorOr<ClassName[]> {
+function GetParsedClassList(team: Team, path: Path): ErrorOr<ClassName[]> {
   const res = database.PathClasses.get(getPathKey(team, path));
   if (isUndefined(res)) {
     return MakeError(`List: ${team}:${path} no Pedro pathing classes found`);
@@ -120,11 +108,13 @@ export function WebGetParsedClassList(
   return [...res.keys()].map(ClassFromKey);
 }
 
+// Interfaces to the web server to talk to the web client:
+
 export function WebGetParsedClassRoot(
   team: Team,
   path: Path,
 ): ErrorOr<ParsedClass> {
-  const list = WebGetParsedClassList(team, path);
+  const list = GetParsedClassList(team, path);
   if (isError(list)) {
     return list;
   }

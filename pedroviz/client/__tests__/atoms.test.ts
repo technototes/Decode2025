@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, test } from 'bun:test';
 import { useAtom, useAtomValue } from 'jotai';
 
 import { act, renderHook } from '@testing-library/react';
-import { ParsedClass } from 'CodeTypes';
 import { MakeMultiMap } from '@freik/containers';
 import { Pickle } from '@freik/typechk';
 
 import { EmptyParsedClass } from '../../CodeTypeCheck';
+import { ParsedClass } from '../../CodeTypes';
 import { ClassKey, Path, PathDatabase, PathKey, Team } from '../../IpcTypes';
 import {
   ClearCache,
