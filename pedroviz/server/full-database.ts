@@ -94,6 +94,12 @@ export function GetDatabase(): PathDatabase {
   return database;
 }
 
+export function ResetDatabase() {
+  database.TeamPaths.clear();
+  database.PathClasses.clear();
+  database.ParsedClasses.clear();
+}
+
 export function ReplaceDatabase(db: PathDatabase) {
   database.TeamPaths = db.TeamPaths;
   database.PathClasses = db.PathClasses;
