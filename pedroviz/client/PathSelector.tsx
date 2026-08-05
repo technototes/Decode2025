@@ -24,9 +24,6 @@ export function TeamSelector(): ReactElement {
       setTeam(teams[0]!);
     }
   }, [teams, setTeam]);
-  if (teams.length === 1) {
-    return <Label className="pathLabel">Robot: {teams[0]!}</Label>;
-  }
   return (
     <>
       <Label className="pathLabel">Robot:</Label>
@@ -63,9 +60,6 @@ export function FileSelector(): ReactElement {
       setFile(files[0]!);
     }
   }, [files, setFile]);
-  if (files.length === 1) {
-    return <Label className="pathLabel">File: {files[0]}</Label>;
-  }
   return (
     <>
       <Label className="pathLabel" htmlFor="select_a_file">
@@ -90,9 +84,6 @@ export function ClassSelector(): ReactElement {
       setClass(classes[0]!);
     }
   }, [classes, setClass]);
-  if (classes.length === 1) {
-    return <Label className="pathLabel">Class: {classes[0]}</Label>;
-  }
   return (
     <>
       <Label className="pathLabel">Class:</Label>

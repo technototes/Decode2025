@@ -38,14 +38,21 @@ export function AutoSelector({
       setSelected(defItem);
     }
   }, [items, selected, defItem, setSelected]);
-  return (
+  const trigger = (
+    <Button
+      disabled={items.length === 0}
+      id={id}
+      appearance={items.length === 1 ? 'subtle' : 'secondary'}>
+      {selectedItem}
+      <ChevronDown16Regular style={{ marginLeft: 10 }} />
+    </Button>
+  );
+
+  return items.length === 1 ? (
+    trigger
+  ) : (
     <Menu>
-      <MenuTrigger>
-        <Button disabled={items.length === 0} id={id}>
-          {selectedItem}
-          <ChevronDown16Regular style={{ marginLeft: 10 }} />
-        </Button>
-      </MenuTrigger>
+      <MenuTrigger>{trigger}</MenuTrigger>
       <MenuPopover>
         <MenuList>
           {items.map((val) => (
