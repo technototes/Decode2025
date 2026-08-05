@@ -1,6 +1,9 @@
 import { expect, test } from 'bun:test';
 
+import { chkPathKey } from 'IpcTypeCheck';
+
 import {
+  getFacingType,
   isAnonymousBezier,
   isAnonymousFacing,
   isAnonymousPose,
@@ -13,13 +16,16 @@ import {
   isNamedPathChain,
   isNamedPose,
   isNamedValue,
+  isPiecewiseFacing,
+  isPointFacing,
   isPoseRef,
   isRadiansRef,
   isRef,
+  isReversedFacing,
   isTangentFacing,
   isValueRef,
 } from '../../CodeTypeCheck';
-import { BezierType, FacingType } from '../../CodeTypes';
+import { BezierType, FacingPieceWise, FacingType } from '../../CodeTypes';
 
 test('Parsed file types validation', () => {
   const aRef = 'asdf';
@@ -33,6 +39,7 @@ test('Parsed file types validation', () => {
   const anonValR = { radians: { double: 23.3 } };
   const badVal = { float: 1.5 };
   const extVal = { radians: { dumb: 1 } };
+  expect(chkPathKey(extVal)).toBeFalse();
   expect(isAnonymousValue(anonValI)).toBeTrue();
   expect(isAnonymousValue(anonValD)).toBeTrue();
   expect(isAnonymousValue(anonValR)).toBeFalse();
@@ -85,6 +92,10 @@ test('Parsed file types validation', () => {
     start: { radians: 'ref' },
     end: anonValI,
   };
+  const pointHead = {
+    type: FacingType.Point,
+    point: { x: { int: 3 }, y: { double: 3.5 } },
+  };
   expect(isTangentFacing(tangHead)).toBeTrue();
   expect(isConstantFacing(tangHead)).toBeFalse();
   expect(isLinearFacing(tangHead)).toBeFalse();
@@ -94,9 +105,33 @@ test('Parsed file types validation', () => {
   expect(isTangentFacing(linHead)).toBeFalse();
   expect(isConstantFacing(linHead)).toBeFalse();
   expect(isLinearFacing(linHead)).toBeTrue();
+  expect(isPointFacing(pointHead)).toBeTrue();
+  expect(isPointFacing(linHead)).toBeFalse();
   expect(isAnonymousFacing(tangHead)).toBeTrue();
   expect(isAnonymousFacing(constHead)).toBeTrue();
   expect(isAnonymousFacing(linHead)).toBeTrue();
+  const revHead = {
+    type: FacingType.Reversed,
+    facing: pointHead,
+  };
+  expect(isReversedFacing(revHead)).toBeTrue();
+  expect(isReversedFacing(pointHead)).toBeFalse();
+  const pieceHead: FacingPieceWise = {
+    type: FacingType.Piecewise,
+    pieces: [
+      { timing: { start: { int: 0 }, end: { double: 0.5 } }, heading: revHead },
+      {
+        timing: { start: { double: 0.5 }, end: { int: 1 } },
+        heading: pointHead,
+      },
+    ],
+  };
+  expect(isPiecewiseFacing(pieceHead)).toBeTrue();
+  const notPiece = { ...pieceHead, nope: false };
+  expect(isPiecewiseFacing(notPiece)).toBeFalse();
+  expect(getFacingType(pieceHead)).toEqual(FacingType.Piecewise);
+  expect(isAnonymousFacing(revHead)).toBeTrue();
+  expect(isAnonymousFacing(anonBezC)).toBeFalse();
   const npc = {
     name: 'path1',
     paths: [anonBezC, 'bezRef'],

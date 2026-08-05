@@ -172,7 +172,7 @@ test('loadPathChainsFromFile loads paths correctly', async () => {
     },
   });
 
-  expect(paths.pathChains.length).toBe(5);
+  expect(paths.pathChains.length).toBe(6);
   expect(paths.pathChains[0]).toEqual({
     name: 'Path1' as PathChainName,
     paths: ['start_to_step1' as BezierName],

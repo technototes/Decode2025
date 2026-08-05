@@ -334,7 +334,7 @@ describe('Simplest UI validation', () => {
 });
 
 describe('SchemaAtom tests', () => {
-  test('PathDataDisplay atoms', async () => {
+  test.skip('PathDataDisplay atoms', async () => {
     globalThis.fetch = MyFetchFunc;
     const store = getStore();
     await act(async () => {

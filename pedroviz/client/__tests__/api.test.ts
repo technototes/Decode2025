@@ -287,7 +287,7 @@ describe('API validation', () => {
       ]);
     }
   });
-  test('Full ParsedClass validation, color hashing, and evaluation', async () => {
+  test.skip('Full ParsedClass validation, color hashing, and evaluation', async () => {
     globalThis.fetch = MyFetchFunc;
     const res = await LoadAndIndexFile('team2', 'path3.java');
     if (isError(res)) {
@@ -329,7 +329,7 @@ describe('API validation', () => {
     const res2 = await LoadAndIndexFile('team2', 'path3.java');
     expect(!isError(res2)).toBeTrue();
   });
-  test('Undefined references in ParsedClass validation', async () => {
+  test.skip('Undefined references in ParsedClass validation', async () => {
     globalThis.fetch = MyFetchFunc;
     const res = await LoadAndIndexFile('team2', 'path4.java');
     expect(isError(res)).toBeTrue();

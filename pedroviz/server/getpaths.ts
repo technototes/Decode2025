@@ -7,7 +7,7 @@ import { MakeMultiMap } from 'node_modules/@freik/containers/lib/esm';
 import { Path, PathKey, Team, TeamPaths } from '../IpcTypes';
 import { firstFtcSrc, isDirectory } from './utility';
 
-export async function GetTeamPaths() {
+export async function GetTeamPaths(): Promise<TeamPaths> {
   const repoRoot = await getRelativeRepoRoot(
     Bun.fileURLToPath(new URL('.', import.meta.url)),
   );

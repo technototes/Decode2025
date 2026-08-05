@@ -194,20 +194,14 @@ export const isPiecewiseFacing = chkObjectOfExactType<FacingPieceWise>({
 export const isAnonymousFacing: typecheck<AnonymousFacing> = (
   obj: unknown,
 ): obj is AnonymousFacing => {
-  if (
-    chkAnyOf(
-      isTangentFacing,
-      isConstantFacing,
-      isLinearFacing,
-      isPointFacing,
-      isPiecewiseFacing,
-      isReversedFacing,
-    )
-  ) {
-    return true;
-  }
-  console.log('Anonymous failure:', obj);
-  return false;
+  return chkAnyOf(
+    isTangentFacing,
+    isConstantFacing,
+    isLinearFacing,
+    isPointFacing,
+    isPiecewiseFacing,
+    isReversedFacing,
+  )(obj);
 };
 
 export const isNamedPathChain = chkObjectOfExactType<NamedPathChain>({
