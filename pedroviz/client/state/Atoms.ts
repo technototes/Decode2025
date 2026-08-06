@@ -41,7 +41,6 @@ import {
   PathKey,
   Team,
 } from '../../IpcTypes';
-import { ForEachPathChainIndex } from '../../server/full-database';
 import { NameLookup, OneFileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetFullDb, LoadAndIndexFile, PutFullDb, UpdateIndexFile } from './API';
@@ -79,6 +78,8 @@ export const IndexedDatabaseAtom = atomWithRefresh(
     return index;
   },
   async (get, set, val: NameLookup) => {
+    // TODO: This ain't done, not in the least
+    console.error('NYI: IndexedDatabaseAtom set');
     const db = await get(FullDatabaseAtom);
   },
 );

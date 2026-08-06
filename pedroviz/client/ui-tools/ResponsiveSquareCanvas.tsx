@@ -23,6 +23,7 @@ export type ResponsiveSquareCanvasProps = {
     devicePixelRatio: number,
   ) => void;
 };
+
 function translateX(x: 'left' | 'center' | 'right') {
   switch (x) {
     case 'left':
@@ -33,6 +34,7 @@ function translateX(x: 'left' | 'center' | 'right') {
       return 'end';
   }
 }
+
 function translateY(y: 'top' | 'middle' | 'bottom') {
   switch (y) {
     case 'top':

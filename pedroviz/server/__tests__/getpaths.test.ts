@@ -1,5 +1,5 @@
-import { describe, expect, test } from 'bun:test';
 import path from 'node:path';
+import { describe, expect, test } from 'bun:test';
 
 import { isMultiMapOf } from '@freik/containers';
 import { isString } from '@freik/typechk';

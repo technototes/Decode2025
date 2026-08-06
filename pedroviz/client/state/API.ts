@@ -4,7 +4,6 @@ import {
   isError,
   isString,
   MakeError,
-  Pickle,
 } from '@freik/typechk';
 
 import { chkParsedClass } from '../../CodeTypeCheck';
@@ -45,13 +44,6 @@ export async function GetFullDb(): Promise<PathDatabase> {
 
 export async function PutFullDb(db: PathDatabase): Promise<void> {
   return putApi('putdb', db);
-  /*
-  await fetch('/api/putdb', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: Pickle(db);
-  });
-  */
 }
 
 // last loaded file, I guess?

@@ -54,6 +54,8 @@
       "@ianvs/prettier-plugin-sort-imports"
     ],
     "importOrder": [
+      "^bun:.*$",
+      "^node:.*$",
       "^react$",
       "^react-dom$",
       "^react-dom/client$",

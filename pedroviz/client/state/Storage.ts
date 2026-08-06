@@ -25,11 +25,17 @@ export async function fetchApi<T>(
   def: T,
 ): Promise<T> {
   const fetched = await fetch('/api/' + key);
+  let res = '';
   if (fetched.ok) {
-    const res = await fetched.text();
-    const try2 = SafelyUnpickle(res, chk);
-    if (isDefined(try2)) {
-      return try2;
+    try {
+      res = await fetched.text();
+      const try2 = SafelyUnpickle(res, chk);
+      if (isDefined(try2)) {
+        return try2;
+      }
+    } catch {
+      console.error('Received malformed message from server:', res);
+      return def;
     }
     try {
       const val = JSON.parse(res);

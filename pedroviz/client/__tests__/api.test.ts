@@ -30,7 +30,7 @@ import {
   calcValue,
   calcValueRef,
 } from '../ExpressionEval';
-import { LoadAndIndexFile, SavePath } from '../state/API';
+import { getColorFor, LoadAndIndexFile, SavePath } from '../state/API';
 
 function mkValNm(name: string): ValueName {
   return name as ValueName;
@@ -341,6 +341,18 @@ describe('API validation', () => {
         'Loaded file team2/path4.java has dangling references.',
       );
     }
+  });
+  test('Color hashing', async () => {
+    const color1 = getColorFor('test-string');
+    expect(color1).toBeDefined();
+    const color2 = getColorFor('test-string2');
+    expect(color2).toBeDefined();
+    expect(color1).not.toEqual(color2);
+    const pose: AnonymousPose = { x: { int: 1 }, y: { int: 2 } };
+    const color3 = getColorFor(pose);
+    expect(color3).not.toEqual(color1);
+    expect(color3).not.toEqual(color2);
+    expect(getColorFor('test-string2')).toEqual(color2);
   });
   test('Need to implement a real "save" feature', async () => {
     // Probably add a test for this, yeah?

@@ -315,6 +315,7 @@ function mkPiecewise(
 ): ConcretePiecewiseHeading {
   return { type: 'L', pieces: head.pieces.map((fp) => mkPiece(fp, ctx)) };
 }
+
 export function GetValueAsString(vr: ValueRef): string {
   if (isValueName(vr)) {
     return vr;
