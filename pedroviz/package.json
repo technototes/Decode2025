@@ -10,7 +10,7 @@
     "pvdev": "bun --hot index.tsx",
     "pvbld": "bun build ./index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
     "pvstart": "NODE_ENV=production bun index.tsx",
-    "dead": "ts-prune"
+    "dead": "knip"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.74.5",
@@ -36,9 +36,9 @@
     "@types/bun": "1.3.14",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "knip": "^6.32.0",
     "prettier": "^3.9.6",
     "prettier-plugin-java": "^2.10.3",
-    "ts-prune": "^0.10.3",
     "typescript": "^7.0.2"
   },
   "prettier": {
@@ -67,6 +67,16 @@
       "^(?!.*[.]css$)[./].*$",
       "",
       ".css$"
+    ]
+  },
+  "knip": {
+    "entry": [
+      "index.tsx",
+      "client/frontend.tsx"
+    ],
+    "ignore": [
+      "client/__tests__/**/*",
+      "server/__tests__/**/*"
     ]
   }
 }

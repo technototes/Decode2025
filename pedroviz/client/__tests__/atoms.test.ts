@@ -14,13 +14,22 @@ import {
 import { EmptyParsedClass } from '../../CodeTypeCheck';
 import { ParsedClass } from '../../CodeTypes';
 import { chkPathDatabase } from '../../IpcTypeCheck';
-import { ClassKey, Path, PathDatabase, PathKey, Team } from '../../IpcTypes';
 import {
+  ClassKey,
+  ClassName,
+  Path,
+  PathDatabase,
+  PathKey,
+  Team,
+} from '../../IpcTypes';
+import {
+  ClassKeysForSelectedPathAtom,
   ClearCache,
   FullDatabaseAtom,
   IndexedDatabaseAtom,
   PathKeysForSelectedTeamAtom,
   PathsForSelectedTeamAtom,
+  SelectedClassAtom,
   SelectedPathAtom,
   SelectedTeamAtom,
   TeamsAtom,
@@ -86,7 +95,7 @@ async function MyFetchFunc(
 MyFetchFunc.preconnect = () => {};
 
 describe('Atom Capabilities', () => {
-  test('Team/Path interactions', async () => {
+  test('Team/Path/Class interactions', async () => {
     globalThis.fetch = MyFetchFunc;
     const teams = await act(() => renderHook(() => useAtomValue(TeamsAtom)));
     const paths = teams.result.current;
@@ -130,6 +139,26 @@ describe('Atom Capabilities', () => {
       renderHook(() => useAtom(SelectedPathAtom)),
     );
     expect(selPath.result.current[0]).toEqual('' as Path);
+    selPath.result.current[1]('path3.java');
+    const selPath2 = await act(() =>
+      renderHook(() => useAtomValue(SelectedPathAtom)),
+    );
+    expect(selPath2.result.current).toEqual('path3.java' as Path);
+    const selClassKeys = await act(() =>
+      renderHook(() => useAtomValue(ClassKeysForSelectedPathAtom)),
+    );
+    expect(selClassKeys.result.current).toEqual(
+      new Set(['team2*path3.java;c' as ClassKey]),
+    );
+    const selClass = await act(() =>
+      renderHook(() => useAtom(SelectedClassAtom)),
+    );
+    expect(selClass.result.current[0]).toEqual('' as ClassName);
+    selClass.result.current[1]('c');
+    const selClass2 = await act(() =>
+      renderHook(() => useAtomValue(SelectedClassAtom)),
+    );
+    expect(selClass2.result.current).toEqual('c' as ClassName);
   });
   test('Database interactions', async () => {
     globalThis.fetch = MyFetchFunc;

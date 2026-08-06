@@ -76,12 +76,12 @@ export const IndexedDatabaseAtom = atomWithRefresh(
     const index = GetNameLookup();
     index.setDb(db);
     return index;
-  },
+  } /*
   async (get, set, val: NameLookup) => {
     // TODO: This ain't done, not in the least
     console.error('NYI: IndexedDatabaseAtom set');
     const db = await get(FullDatabaseAtom);
-  },
+  },*/,
 );
 
 export function ClearCache() {
@@ -146,7 +146,7 @@ export const PathsForSelectedTeamAtom = atom(async (get): Promise<Path[]> => {
   return await get(PathsForTeamFamily(selTeam));
 });
 
-export const ClassKeysFoSelectedPathAtom = atom(
+export const ClassKeysForSelectedPathAtom = atom(
   async (get): Promise<Set<ClassKey>> => {
     const pathKey = get(SelectedPathKeyAtom);
     return get(ClassKeysForPathKeyFamily(pathKey));
