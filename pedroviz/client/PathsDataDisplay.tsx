@@ -314,7 +314,7 @@ export function PathsDataDisplay({
     return <Text size={600}>Please select a file & class to view.</Text>;
   }
   return (
-    <>
+    <div>
       {/* <FileInfo /> */}
       <Expandable label="Values" indent={20}>
         <NamedValueList />
@@ -336,6 +336,6 @@ export function PathsDataDisplay({
           New Path
         </Button> */}
       </Expandable>
-    </>
+    </div>
   );
 }
