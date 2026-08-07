@@ -45,6 +45,7 @@ import {
   MappedPosesAtom,
   PathsForSelectedTeamAtom,
   PoseAtomFamily,
+  SelectedClassAtom,
   SelectedPathAtom,
   SelectedTeamAtom,
   ValueAtomFamily,
@@ -187,16 +188,16 @@ const database: PathDatabase = {
     ],
   ]),
   PathClasses: MakeMultiMap<PathKey, ClassKey>([
-    ['team1*path1.java' as PathKey, ['team1*path1.java;' as ClassKey]],
-    ['team1*path2.java' as PathKey, ['team1*path2.java;' as ClassKey]],
-    ['team2*path3.java' as PathKey, ['team2*path3.java;' as ClassKey]],
-    ['team2*path4.java' as PathKey, ['team2*path4.java;' as ClassKey]],
+    ['team1*path1.java' as PathKey, ['team1*path1.java;a' as ClassKey]],
+    ['team1*path2.java' as PathKey, ['team1*path2.java;b' as ClassKey]],
+    ['team2*path3.java' as PathKey, ['team2*path3.java;c' as ClassKey]],
+    ['team2*path4.java' as PathKey, ['team2*path4.java;d' as ClassKey]],
   ]),
   ParsedClasses: new Map<ClassKey, ParsedClass>([
-    ['team1*path1.java;' as ClassKey, EmptyParsedClass],
-    ['team1*path2.java;' as ClassKey, EmptyParsedClass],
-    ['team2*path3.java;' as ClassKey, fullParsedClass],
-    ['team2*path4.java;' as ClassKey, EmptyParsedClass],
+    ['team1*path1.java;a' as ClassKey, EmptyParsedClass],
+    ['team1*path2.java;b' as ClassKey, EmptyParsedClass],
+    ['team2*path3.java;c' as ClassKey, fullParsedClass],
+    ['team2*path4.java;d' as ClassKey, EmptyParsedClass],
   ]),
 };
 
@@ -333,7 +334,7 @@ describe('Simplest UI validation', () => {
 });
 
 describe('SchemaAtom tests', () => {
-  test.skip('PathDataDisplay atoms', async () => {
+  test('PathDataDisplay atoms', async () => {
     globalThis.fetch = MyFetchFunc;
     const store = getStore();
     await act(async () => {
@@ -346,6 +347,7 @@ describe('SchemaAtom tests', () => {
     await act(async () => {
       await store.set(SelectedTeamAtom, 'team2');
       await store.set(SelectedPathAtom, 'path3.java');
+      await store.set(SelectedClassAtom, 'c');
     });
     await act(async () => {
       expect(await store.get(SelectedPathAtom)).toBe('path3.java' as Path);
@@ -353,7 +355,7 @@ describe('SchemaAtom tests', () => {
     expect(await store.get(ValuesLookupAtom)).toBeDefined();
     expect(await store.get(MappedPosesAtom)).toBeDefined();
     expect(await store.get(MappedBeziersAtom)).toBeDefined();
-    await act(() =>
+    /*await act(() =>
       store.set(ValueAtomFamily('valX' as ValueName), { int: 42 }),
     );
     await waitFor(async () => {
@@ -369,6 +371,6 @@ describe('SchemaAtom tests', () => {
         x: 'valX' as ValueName,
         y: 'valX' as ValueName,
       }),
-    );
+    );*/
   });
 });

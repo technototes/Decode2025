@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { ValueName } from 'CodeTypes';
-
+import { ValueName } from '../../CodeTypes';
 import {
   CheckValidName,
   CheckValidValueOrName,

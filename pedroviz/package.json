@@ -5,7 +5,7 @@
   "license": "CC0-1.0",
   "type": "module",
   "scripts": {
-    "format": "prettier -w \"*.ts*\" \"client/**/*.tsx\"  \"client/**/*.ts\" \"server/**/*.ts\" \"*.md\" \"*.json\" \"*.html\"",
+    "format": "prettier -w \"*.ts*\" \"client/**/*.tsx\"  \"client/**/*.ts\" \"server/**/*.ts\" \"*.md\" \"*.json\" \"*.html\" \"server/**/*.java\"",
     "types": "tsc --noEmit",
     "pvdev": "bun --hot index.tsx",
     "pvbld": "bun build ./index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
@@ -18,7 +18,6 @@
     "@freik/containers": "^0.4.10",
     "@freik/fluent9-tools": "^0.1.2",
     "@freik/react-tools": "^0.4.0",
-    "@freik/seqnum": "^1.3.10",
     "@freik/typechk": "^0.10.0",
     "java-parser": "^3.0.1",
     "jotai": "^2.20.2",
@@ -41,6 +40,7 @@
     "prettier-plugin-java": "^2.10.3",
     "typescript": "^7.0.2"
   },
+  " //-1": "Configuration stuff for Prettier:",
   "prettier": {
     "printWidth": 80,
     "trailingComma": "all",
@@ -51,6 +51,7 @@
     "bracketSameLine": true,
     "arrowParens": "always",
     "plugins": [
+      "prettier-plugin-java",
       "@ianvs/prettier-plugin-sort-imports"
     ],
     "importOrder": [
@@ -67,8 +68,19 @@
       "^(?!.*[.]css$)[./].*$",
       "",
       ".css$"
+    ],
+    "overrides": [
+      {
+        "files": "*.java",
+        "options": {
+          "tabWidth": 4,
+          "printWidth": 100,
+          "arrowParens": "avoid"
+        }
+      }
     ]
   },
+  " //-2": "Configuration stuff for knip:",
   "knip": {
     "entry": [
       "index.tsx",

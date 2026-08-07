@@ -1,28 +1,8 @@
-import {
-  CSSProperties,
-  ReactElement,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 
-export type ResponsiveAnchor = {
-  x: 'left' | 'center' | 'right';
-  y: 'top' | 'middle' | 'bottom';
-};
+import { ResponsiveAnchor, ResponsiveSquareCanvasProps } from '../types';
 
 const defaultAnchor: ResponsiveAnchor = { x: 'center', y: 'middle' };
-
-export type ResponsiveSquareCanvasProps = {
-  anchor?: ResponsiveAnchor;
-  style?: CSSProperties;
-  className?: string;
-  render: (
-    ctx: CanvasRenderingContext2D,
-    size: number,
-    devicePixelRatio: number,
-  ) => void;
-};
 
 function translateX(x: 'left' | 'center' | 'right') {
   switch (x) {
@@ -98,6 +78,7 @@ export function ResponsiveSquareCanvas({
         height: '100%',
         justifyContent: translateX(fieldAnchor.x),
         alignItems: translateY(fieldAnchor.y),
+        overflow: 'hidden',
       }}>
       {size > 0 && (
         <canvas style={style} className={className ?? ''} ref={canvasRef} />

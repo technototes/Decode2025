@@ -5,7 +5,6 @@ import {
   atomWithRefresh,
   atomWithStorage,
   selectAtom,
-  splitAtom,
   unwrap,
 } from 'jotai/utils';
 
@@ -13,14 +12,13 @@ import { ErrorOr, isError } from '@freik/typechk';
 
 import { EmptyParsedClass } from '../../CodeTypeCheck';
 import {
-  AnonymousPathChain,
   BezierName,
   BezierRef,
   NamedBezier,
   NamedPathChain,
   NamedPose,
+  NamedValue,
   ParsedClass,
-  PathChainName,
   PoseName,
   PoseRef,
   RadiansRef,
@@ -41,7 +39,7 @@ import {
   PathKey,
   Team,
 } from '../../IpcTypes';
-import { NameLookup, OneFileIndex } from '../types';
+import { OneFileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetFullDb, LoadAndIndexFile, PutFullDb, UpdateIndexFile } from './API';
 import { EmptyMappedFile, GetNameLookup } from './IndexedFile';
@@ -246,7 +244,7 @@ const UnwrappedParsedClass = unwrap(
 );
 
 const MappedFileBackingAtom = atom(0);
-export const MappedFileAtom = atom(
+const MappedFileAtom = atom(
   async (get) => {
     const team = await get(SelectedTeamAtom);
     const file = await get(SelectedPathAtom);
@@ -273,30 +271,21 @@ export const MappedFileAtom = atom(
   },
 );
 
+export const NamedValuesAtom = selectAtom(
+  UnwrappedParsedClass,
+  (pc) => pc.values,
+);
+export const ValuesLookupAtom = atom((get): Map<ValueName, NamedValue> => {
+  const nvs = get(NamedValuesAtom);
+  return new Map((nvs || []).map((nv) => [nv.name, nv]));
+});
+
 type MapAtom<Str, T> = WritableAtom<Promise<Map<Str, T>>, [Map<Str, T>], void>;
 
-export const ValuesAtoms = Object.freeze(
-  (() => {
-    const List = selectAtom(UnwrappedParsedClass, (pc) => pc.values);
-    const Lookup = atom((get): Map<ValueName, ValueRef | RadiansRef> => {
-      const nvs = get(NamedValuesAtom);
-      return new Map((nvs || []).map(({ name, value }) => [name, value]));
-    });
-    const Items = splitAtom(List, (nv) => nv.name);
-    return {
-      List,
-      Lookup,
-      Items,
-    };
-  })(),
+const MappedValuesAtom: MapAtom<ValueName, ValueRef | RadiansRef> = focusAtom(
+  MappedFileAtom,
+  (optic) => optic.prop('namedValues'),
 );
-
-export const NamedValuesAtom = ValuesAtoms.List;
-export const ValuesLookupAtom = ValuesAtoms.Lookup;
-export const SplitValuesAtom = ValuesAtoms.Items;
-
-export const MappedValuesAtom: MapAtom<ValueName, ValueRef | RadiansRef> =
-  focusAtom(MappedFileAtom, (optic) => optic.prop('namedValues'));
 
 export const NamedPosesAtom = atom(async (get): Promise<NamedPose[]> => {
   const index = await get(SelectedParsedClassAtom);

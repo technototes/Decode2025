@@ -1,3 +1,5 @@
+import { CSSProperties } from 'react';
+
 import {
   AnonymousPathChain,
   BezierName,
@@ -96,3 +98,19 @@ export function ValidationResult(
 ): ValidationData {
   return { message, state };
 }
+
+export type ResponsiveAnchor = {
+  x: 'left' | 'center' | 'right';
+  y: 'top' | 'middle' | 'bottom';
+};
+
+export type ResponsiveSquareCanvasProps = {
+  anchor?: ResponsiveAnchor;
+  style?: CSSProperties;
+  className?: string;
+  render: (
+    ctx: CanvasRenderingContext2D,
+    size: number,
+    devicePixelRatio: number,
+  ) => void;
+};

@@ -11,7 +11,11 @@ import {
   Point,
 } from './ConcreteEvalTypes';
 import { calcBezierRef, calcFacing } from './ExpressionEval';
-import { ColorsAtom, MappedFileAtom, NamedPathChainsAtom } from './state/Atoms';
+import {
+  ColorsAtom,
+  NamedPathChainsAtom,
+  SelectedParsedClassAtom,
+} from './state/Atoms';
 import { PathRenderOptionsAtom, ThemeAtom } from './state/SavedSettings';
 import { CtrlPtStyles, PathRenderOptions } from './types';
 import { bezierLength, deCasteljau } from './ui-tools/bezier';
@@ -31,11 +35,11 @@ export function FieldRenderer(): ReactElement {
 
   const colors = useAtomValue(ColorsAtom);
   const allPCs = useAtomValue(NamedPathChainsAtom);
-  const file = useAtomValue(MappedFileAtom);
+  const file = useAtomValue(SelectedParsedClassAtom);
   const points = allPCs.flatMap((npc) =>
     npc.paths.map((br): [Point[], ConcreteHeading] => [
-      calcBezierRef(br, file.container),
-      calcFacing(npc.heading, file.container),
+      calcBezierRef(br, file),
+      calcFacing(npc.heading, file),
     ]),
   );
 
@@ -70,7 +74,7 @@ export function FieldRenderer(): ReactElement {
         ),
       );
     },
-    [opts, theme, allPCs, colors],
+    [opts, theme, allPCs, colors, points],
   );
 
   return (
