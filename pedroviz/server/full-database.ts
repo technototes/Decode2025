@@ -1,5 +1,11 @@
 import { MakeMultiMap } from '@freik/containers';
-import { ErrorOr, isError, isUndefined, MakeError } from '@freik/typechk';
+import {
+  ErrorOr,
+  isError,
+  isUndefined,
+  MakeError,
+  Pickle,
+} from '@freik/typechk';
 
 import { ParsedClass } from '../CodeTypes';
 import {
@@ -67,7 +73,8 @@ function RegisterTopLevelParsedClass(
   if (!anyItems(pc)) {
     return;
   }
-  console.log('Registering', team, path, classList, pc.fullName);
+  // console.log('Registering', team, path, classList, pc.fullName);
+  // console.log(Pickle(pc));
   const pathKey = getPathKey(team, path);
   database.TeamPaths.set(team, pathKey);
   ForEachPathChainIndex(pc, (pc) => {

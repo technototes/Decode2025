@@ -57,7 +57,7 @@ export const chkPathDatabase: typecheck<PathDatabase> = chkObjectOfExactType({
   ParsedClasses: chkMapOf(chkClassKey, chkParsedClass),
 });
 
-export const EmptyPathDatahase: PathDatabase = Object.freeze({
+export const EmptyPathDatabase: PathDatabase = Object.freeze({
   TeamPaths: MakeMultiMap<Team, PathKey>(),
   PathClasses: MakeMultiMap<PathKey, ClassKey>(),
   ParsedClasses: new Map<ClassKey, ParsedClass>(),

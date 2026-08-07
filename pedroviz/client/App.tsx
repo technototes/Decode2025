@@ -8,6 +8,8 @@ import {
 } from '@fluentui/react-components';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 
+import { Strings } from './constants';
+import { FieldRenderer } from './FieldRenderer';
 import { PathsDataDisplay } from './PathsDataDisplay';
 import { PathSelector } from './PathSelector';
 import { Settings } from './Settings';
@@ -16,27 +18,28 @@ import { getStore } from './state/Storage';
 
 import './index.css';
 
-import { FieldRenderer } from './FieldRenderer';
-
 export function MyApp(): ReactElement {
   return (
-    <Suspense>
-      <Group className="main">
-        <Panel className="sidebar">
-          <div className="header-left">
-            <PathSelector />
-          </div>
-          <div className="header-right">
-            <Settings />
-          </div>
-          <PathsDataDisplay />
-        </Panel>
-        <Separator id="view-separator" />
-        <Panel className="display">
-          <FieldRenderer />
-        </Panel>
-      </Group>
-    </Suspense>
+    <div className="app">
+      <Suspense>
+        <div className="header-left">
+          <PathSelector />
+        </div>
+        <div className="header-center">{Strings.Viz4Pedro}</div>
+        <div className="header-right">
+          <Settings />
+        </div>
+        <Group className="main">
+          <Panel className="sidebar">
+            <PathsDataDisplay />
+          </Panel>
+          <Separator id="view-separator" />
+          <Panel className="display">
+            <FieldRenderer />
+          </Panel>
+        </Group>
+      </Suspense>
+    </div>
   );
 }
 

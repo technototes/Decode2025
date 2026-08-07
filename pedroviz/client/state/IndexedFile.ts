@@ -62,7 +62,7 @@ export function MakeFileIndex(container: ParsedClass): OneFileIndex {
   };
 }
 
-// Make a thing that can accumulate indexes (*can* in the *future*)
+// Make a thing that accumulates indexes
 function MakeNameLookup(): NameLookup {
   let indexMap: Map<string, OneFileIndex> = new Map();
   let database: PathDatabase | undefined;
@@ -170,8 +170,8 @@ export function GetNameLookup(): NameLookup {
 export function ValidateIndex(
   fileIndex: OneFileIndex,
   lkup: NameLookup,
-  context: ParsedClass,
 ): ErrorOr<true> {
+  const context = fileIndex.container;
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
     if (isRef(vr)) {
       if (!lkup.findValue(vr, context)) {
