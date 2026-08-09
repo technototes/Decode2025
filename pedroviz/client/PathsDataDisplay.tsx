@@ -1,4 +1,4 @@
-import { CSSProperties, Fragment, ReactElement } from 'react';
+import { CSSProperties, Fragment, ReactElement, Suspense } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
@@ -317,21 +317,29 @@ export function PathsDataDisplay({
     <div>
       {/* <FileInfo /> */}
       <Expandable label="Values" indent={20}>
-        <NamedValueList />
+        <Suspense>
+          <NamedValueList />
+        </Suspense>
         {/* <NewValue /> */}
       </Expandable>
       <Expandable label="Poses" indent={20}>
-        <NamedPoseList />
+        <Suspense>
+          <NamedPoseList />
+        </Suspense>
         {/* <NewPose /> */}
       </Expandable>
       <Expandable label="Curves & Lines" indent={20}>
-        <NamedBezierList />
+        <Suspense>
+          <NamedBezierList />
+        </Suspense>
         {/* <Button style={{ margin: 10 }} disabled>
           New Curve
         </Button> */}
       </Expandable>
       <Expandable label="Paths" indent={20}>
-        <PathChainList />
+        <Suspense>
+          <PathChainList />
+        </Suspense>
         {/* <Button style={{ margin: 10 }} disabled>
           New Path
         </Button> */}

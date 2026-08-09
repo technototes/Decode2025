@@ -21,24 +21,28 @@ import './index.css';
 export function MyApp(): ReactElement {
   return (
     <div className="app">
-      <Suspense>
-        <div className="header-left">
+      <div className="header-left">
+        <Suspense>
           <PathSelector />
-        </div>
-        <div className="header-center">{Strings.Viz4Pedro}</div>
-        <div className="header-right">
-          <Settings />
-        </div>
-        <Group className="main">
-          <Panel className="sidebar">
+        </Suspense>
+      </div>
+      <div className="header-center">{Strings.Viz4Pedro}</div>
+      <div className="header-right">
+        <Settings />
+      </div>
+      <Group className="main">
+        <Panel className="sidebar">
+          <Suspense>
             <PathsDataDisplay />
-          </Panel>
-          <Separator id="view-separator" />
-          <Panel className="display">
+          </Suspense>
+        </Panel>
+        <Separator id="view-separator" />
+        <Panel className="display">
+          <Suspense>
             <FieldRenderer />
-          </Panel>
-        </Group>
-      </Suspense>
+          </Suspense>
+        </Panel>
+      </Group>
     </div>
   );
 }
