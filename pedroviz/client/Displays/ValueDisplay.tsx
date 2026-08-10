@@ -1,11 +1,27 @@
 import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { Text } from '@fluentui/react-components';
+import {
+  createTableColumn,
+  DataGrid,
+  DataGridBody,
+  DataGridCell,
+  DataGridHeader,
+  DataGridHeaderCell,
+  DataGridRow,
+  TableColumnDefinition,
+  Text,
+} from '@fluentui/react-components';
 
-import { isDoubleValue, isRadiansRef, isRef } from '../../CodeTypeCheck';
+import {
+  isDoubleValue,
+  isRadiansRef,
+  isRef,
+  isValueRef,
+} from '../../CodeTypeCheck';
 import {
   AnonymousValue,
+  NamedValue,
   PoseName,
   RadiansRef,
   ValueName,
@@ -236,6 +252,23 @@ export function RadiansRefDisplay({
   return <MathToRadianDisplay item={item.radians} {...props} />;
 }
 
+const columns: TableColumnDefinition<NamedValue>[] = [
+  createTableColumn<NamedValue>({
+    columnId: 'name',
+    compare: (a, b) => a.name.localeCompare(b.name),
+    renderHeaderCell: () => 'Name',
+    renderCell: (nv) => nv.name,
+  }),
+  createTableColumn<NamedValue>({
+    columnId: 'value',
+    renderHeaderCell: () => 'Value',
+    renderCell: (nv) =>
+      isValueRef(nv.value)
+        ? GetValueAsString(nv.value)
+        : `${GetValueAsString(nv.value.radians)} degrees`,
+  }),
+];
+
 export function NamedValueList(): ReactElement {
   const items = useAtomValue(NamedValuesAtom);
   const gridStyle: CSSProperties = {
@@ -248,16 +281,40 @@ export function NamedValueList(): ReactElement {
   };
 
   return (
-    <div style={gridStyle}>
-      <Text size={400}>Name</Text>
-      <Text size={400}>Value</Text>
-      <Text size={400}>Units</Text>
-      {items.map((val) => (
-        <Fragment key={val.name}>
-          <Text>{val.name}</Text>
-          <UnnamedValueDisplay key={val.name} item={val.value} />
-        </Fragment>
-      ))}
-    </div>
+    <>
+      {/* <div style={gridStyle}>
+        <Text size={400}>Name</Text>
+        <Text size={400}>Value</Text>
+        <Text size={400}>Units</Text>
+        {items.map((val) => (
+          <Fragment key={val.name}>
+            <Text>{val.name}</Text>
+            <UnnamedValueDisplay key={val.name} item={val.value} />
+          </Fragment>
+        ))}
+      </div> */}
+      <DataGrid
+        items={items}
+        columns={columns}
+        sortable
+        getRowId={(itm: NamedValue) => itm.name}>
+        <DataGridHeader>
+          <DataGridRow>
+            {({ renderHeaderCell }) => (
+              <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+            )}
+          </DataGridRow>
+        </DataGridHeader>
+        <DataGridBody<NamedValue>>
+          {({ item, rowId }) => (
+            <DataGridRow<NamedValue> key={rowId}>
+              {({ renderCell, columnId }) => (
+                <DataGridCell>{renderCell(item)}</DataGridCell>
+              )}
+            </DataGridRow>
+          )}
+        </DataGridBody>
+      </DataGrid>
+    </>
   );
 }
