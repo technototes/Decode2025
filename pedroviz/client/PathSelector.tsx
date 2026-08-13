@@ -1,13 +1,14 @@
 import { ReactElement, useEffect } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 
-import { Label, Text } from '@fluentui/react-components';
+import { Button, Label, Text } from '@fluentui/react-components';
 
 import { Path } from '../IpcTypes';
 import { Strings } from './constants';
 import {
   BlurAtom,
   ClassesForSelectedPathAtom,
+  FullDatabaseAtom,
   PathsForSelectedTeamAtom,
   SelectedClassAtom,
   SelectedPathAtom,
@@ -25,7 +26,7 @@ export function TeamSelector(): ReactElement {
     }
   }, [teams, setTeam]);
   return (
-    <span>
+    <>
       <Label className="pathLabel">Robot:</Label>
       <AutoSelector
         prompt={Strings.select_a_bot}
@@ -33,7 +34,7 @@ export function TeamSelector(): ReactElement {
         selected={team}
         setSelected={setTeam}
       />
-    </span>
+    </>
   );
 }
 
@@ -61,7 +62,7 @@ export function FileSelector(): ReactElement {
     }
   }, [files, setFile]);
   return (
-    <span>
+    <>
       <Label className="pathLabel" htmlFor="select_a_file">
         File:
       </Label>
@@ -72,7 +73,7 @@ export function FileSelector(): ReactElement {
         selected={file.substring(prefix.length)}
         setSelected={(item) => setFile((prefix + item) as Path)}
       />
-    </span>
+    </>
   );
 }
 
@@ -85,7 +86,7 @@ export function ClassSelector(): ReactElement {
     }
   }, [classes, setClass]);
   return (
-    <span>
+    <>
       <Label className="pathLabel">Class:</Label>
       <AutoSelector
         prompt={Strings.select_a_class}
@@ -93,12 +94,13 @@ export function ClassSelector(): ReactElement {
         selected={classSel}
         setSelected={setClass}
       />
-    </span>
+    </>
   );
 }
 
 export function PathSelector(): ReactElement {
   const blur = useAtomValue(BlurAtom);
+  const rescanCode = useSetAtom(FullDatabaseAtom);
   return (
     <>
       <TeamSelector />
@@ -106,6 +108,7 @@ export function PathSelector(): ReactElement {
       <ClassSelector />
       &nbsp;
       <Text>{blur}</Text>
+      <Button onClick={() => rescanCode()}>Rescan Source</Button>
     </>
   );
 }

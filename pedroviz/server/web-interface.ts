@@ -3,8 +3,8 @@ import { isDefined, isError, Pickle, SafelyUnpickle } from '@freik/typechk';
 import { chkPathDatabase } from '../IpcTypeCheck';
 import { Path, Team } from '../IpcTypes';
 import {
-  GetDatabase,
   ReplaceDatabase,
+  RescanSourceCode,
   WebGetParsedClassRoot,
 } from './full-database';
 
@@ -19,7 +19,7 @@ export async function LoadPath(team: string, path: string): Promise<Response> {
 }
 
 export async function LoadDatabase(): Promise<Response> {
-  return Response.json(JSON.parse(Pickle(GetDatabase())));
+  return Response.json(JSON.parse(Pickle(await RescanSourceCode())));
 }
 
 export async function SaveDatabase(flattenedDb: string): Promise<Response> {

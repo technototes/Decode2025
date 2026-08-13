@@ -20,7 +20,7 @@ public class MoarTestPaths {
     public MoarTestPaths(Follower follower) {
         Path1 = follower
             .pathBuilder()
-            .addPath(new BezierLine(new Pose(5, 5), new Pose(5, 75)))
+            .addPath(new BezierLine(new Pose(5, 5), new Pose(25, 95)))
             .setHeadingInterpolation(HeadingInterpolator.reversedLinear(-0.1, 0.1))
             .build();
     }
