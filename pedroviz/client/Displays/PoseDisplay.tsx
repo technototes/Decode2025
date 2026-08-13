@@ -4,14 +4,15 @@ import { useAtom, useAtomValue } from 'jotai';
 import { Text } from '@fluentui/react-components';
 import { isDefined } from '@freik/typechk';
 
-import { AnonymousPose, isPoseName, isRef, PoseName } from '../../server/types';
+import { isPoseName, isRef } from '../../CodeTypeCheck';
+import { AnonymousPose, PoseName } from '../../CodeTypes';
 import { HeadingRefDisplay } from '../PathsDataDisplay';
 import { getColorFor } from '../state/API';
 import {
   ColorsAtom,
   MappedPosesAtom,
-  MappedValuesAtom,
   PoseAtomFamily,
+  ValuesLookupAtom,
 } from '../state/Atoms';
 import { HasKeys } from '../types';
 import { ItemWithStyle } from '../ui-tools/types';
@@ -29,7 +30,7 @@ export function AnonymousPoseDisplay({
   setPose,
 }: AnonymousPoseDisplayProps): ReactElement {
   // const colors = usAtomValue(ColorsAtom);
-  const names = useAtomValue(MappedValuesAtom);
+  const names = useAtomValue(ValuesLookupAtom);
 
   const style = {/* color: colors[getColorFor(pose)]*/};
   /*
@@ -75,7 +76,12 @@ export function AnonymousPoseHeader({
     <>
       <Text size={400}>X</Text>
       <Text size={400}>Y</Text>
-      {!noHeading && <Text size={400}>Heading</Text>}
+      {!noHeading && (
+        <>
+          <Text size={400}>Heading</Text>
+          <Text size={400}>Units</Text>
+        </>
+      )}
     </>
   );
 }
@@ -85,7 +91,7 @@ export function NamedPoseItem({
   style,
 }: ItemWithStyle<PoseName>): ReactElement {
   const [pose, setPose] = useAtom(PoseAtomFamily(item));
-  const names = useAtomValue(MappedValuesAtom);
+  const names = useAtomValue(ValuesLookupAtom);
   if (isPoseName(pose)) {
     return <Text>{pose}</Text>;
   } else if (isDefined(pose)) {
@@ -105,7 +111,7 @@ export function NamedPoseList(): ReactElement {
   const gridStyle: CSSProperties = {
     display: 'grid',
     columnGap: '10pt',
-    gridTemplateColumns: '1fr auto auto auto',
+    gridTemplateColumns: '1fr auto auto auto auto',
     justifyItems: 'end',
     justifySelf: 'start',
   };

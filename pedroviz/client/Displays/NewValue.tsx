@@ -25,9 +25,9 @@ import {
   RadiansRef,
   ValueName,
   ValueRef,
-} from '../../server/types';
-import { MappedValuesAtom, ValueAtomFamily } from '../state/Atoms';
-import { ValidationData, ValidData } from '../types';
+} from '../../CodeTypes';
+import { ValueAtomFamily, ValuesLookupAtom } from '../state/Atoms';
+import { ValidateState, ValidationData, ValidData } from '../types';
 import { CheckValidName } from './Validation';
 
 type ValType = 'int' | 'double' | 'degrees';
@@ -38,7 +38,7 @@ export function NewValue(): ReactElement {
   const [valStr, setValStr] = useState('0.000');
   const [varStr, setVarStr] = useState('');
   const [valType, setValType] = useState<ValType>('double');
-  const allNames = useAtomValue(MappedValuesAtom);
+  const allNames = useAtomValue(ValuesLookupAtom);
   const setNamedValue = useAtomCallback((_, set, val: ValueRef | RadiansRef) =>
     set(ValueAtomFamily(name), val),
   );
@@ -47,10 +47,13 @@ export function NewValue(): ReactElement {
     if (valType !== 'int' && isNaN(Number.parseFloat(vl))) {
       return {
         message: 'Please enter a valid floating point number',
-        state: 'error',
+        state: ValidateState.Error,
       };
     } else if (valType === 'int' && isNaN(Number.parseInt(vl))) {
-      return { message: 'Please enter a valid integer', state: 'error' };
+      return {
+        message: 'Please enter a valid integer',
+        state: ValidateState.Error,
+      };
     }
     return ValidData;
   };

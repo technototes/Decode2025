@@ -1,19 +1,27 @@
 import fs, { promises as fsp } from 'node:fs';
 import path from 'node:path';
 
-import { Path, Team, TeamPaths } from './types';
+import { MakeMultiMap } from '@freik/containers';
+
+import { getPathKey } from '../IpcTypeCheck';
+import { Path, PathKey, Team, TeamPaths } from '../IpcTypes';
 import { firstFtcSrc, isDirectory } from './utility';
 
-export async function GetTeamPaths() {
+export async function GetTeamPaths(): Promise<TeamPaths> {
   const repoRoot = await getRelativeRepoRoot(
     Bun.fileURLToPath(new URL('.', import.meta.url)),
   );
   // Get the list of all team code roots
   const teamDirs = await getTeamDirectories(repoRoot);
   // Next, look for paths in each team directory
-  const filePaths: TeamPaths = {};
+  const filePaths: TeamPaths = MakeMultiMap<Team, PathKey>();
   for (const teamName of teamDirs) {
-    filePaths[teamName] = await getPathFiles(repoRoot, teamName);
+    filePaths.add(
+      teamName,
+      (await getPathFiles(repoRoot, teamName)).map((val) =>
+        getPathKey(teamName, val),
+      ),
+    );
   }
   return filePaths;
 }

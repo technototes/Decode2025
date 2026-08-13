@@ -1,17 +1,18 @@
-import { CSSProperties, Fragment, ReactElement } from 'react';
+import { CSSProperties, Fragment, ReactElement, Suspense } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
 import { Expandable } from '@freik/fluent9-tools';
 import { isDefined, isUndefined } from '@freik/typechk';
 
+import { isRadiansRef, isRef } from '../CodeTypeCheck';
 import {
   AnonymousFacing,
+  FacingType,
   HeadingRef,
-  isRadiansRef,
-  isRef,
+  NamedPathChain,
   PoseRef,
-} from '../server/types';
+} from '../CodeTypes';
 import { NamedPoseList } from './Displays/PoseDisplay';
 import {
   AnonymousValueDisplay,
@@ -24,12 +25,10 @@ import { getColorFor } from './state/API';
 import {
   ColorsAtom,
   MappedBeziersAtom,
-  MappedPathChainsAtom,
   SelectedClassAtom,
-  SelectedFileAtom,
   SelectedParsedClassAtom,
+  SelectedPathAtom,
 } from './state/Atoms';
-import { AnonymousPathChain } from './types';
 import { ItemWithStyle } from './ui-tools/types';
 
 export function HeadingRefDisplay({
@@ -40,12 +39,27 @@ export function HeadingRefDisplay({
     if (isRadiansRef(item)) {
       return <RadiansRefDisplay item={item} {...props} />;
     } else if (isRef(item)) {
-      return <GeneralRefDisplay item={item} {...props} />;
+      return (
+        <>
+          <GeneralRefDisplay item={item} {...props} />
+          <Text>&nbsp;</Text>
+        </>
+      );
     } else {
-      return <AnonymousValueDisplay item={item} {...props} />;
+      return (
+        <>
+          <AnonymousValueDisplay item={item} {...props} />
+          <Text>&nbsp;</Text>
+        </>
+      );
     }
   }
-  return <>&nbsp;</>;
+  return (
+    <>
+      <Text>&nbsp;</Text>
+      <Text>&nbsp;</Text>
+    </>
+  );
 }
 
 function InlinePoseRefDisplay({ pose }: { pose: PoseRef }): ReactElement {
@@ -137,21 +151,21 @@ function HeadingTypeDisplay({
     return <></>;
   }
   switch (heading.type) {
-    case 'constant':
+    case FacingType.Constant:
       return (
         <>
           <Text {...props}>Constant heading</Text>
           <HeadingRefDisplay item={heading.heading} {...props} />
         </>
       );
-    case 'tangent':
+    case FacingType.Tangent:
       return (
         <>
           <Text {...props}>Tangent heading</Text>
           <span>&nbsp;</span>
         </>
       );
-    case 'linear':
+    case FacingType.Linear:
       return (
         <>
           <Text {...props}>Linear heading</Text>
@@ -162,7 +176,7 @@ function HeadingTypeDisplay({
           </span>
         </>
       );
-    case 'point':
+    case FacingType.Point:
       return (
         <>
           <Text {...props}>Point heading</Text>
@@ -171,9 +185,9 @@ function HeadingTypeDisplay({
           </span>
         </>
       );
-    case 'reversed':
+    case FacingType.Reversed:
       return <Text {...props}>Reversed...[TODO!]</Text>;
-    case 'piecewise':
+    case FacingType.Piecewise:
       return <Text {...props}>Piecewise heading...[TODO!]</Text>;
   }
 }
@@ -184,15 +198,15 @@ export function NamedPathChainDisplay({
   chain,
   rowdata,
 }: {
-  chain: [string, AnonymousPathChain];
+  chain: NamedPathChain;
   rowdata: NestedRowData;
 }): ReactElement {
   const colors = useAtomValue(ColorsAtom);
   // This renders into a container grid that's 3 columns wide
   return (
     <>
-      <Text style={rowSpan(1, rowdata)}>{chain[0]}</Text>
-      {chain[1].paths.map((br, index) => {
+      <Text style={rowSpan(1, rowdata)}>{chain.name}</Text>
+      {chain.paths.map((br, index) => {
         /*const anonBez = getBezier(br);
         const color = getColorFor(anonBez);*/
         if (isRef(br)) {
@@ -224,13 +238,13 @@ export function NamedPathChainDisplay({
           );
         }
       })}
-      <HeadingTypeDisplay heading={chain[1].heading} />
+      <HeadingTypeDisplay heading={chain.heading} />
     </>
   );
 }
 
 export function PathChainList(): ReactElement {
-  const items = useAtomValue(MappedPathChainsAtom);
+  const items = useAtomValue(SelectedParsedClassAtom);
   // I need to collect row spans for:
   // 1- The name, a running total of all prior path chains, plus a total count
   //    of this path's chains.
@@ -238,7 +252,7 @@ export function PathChainList(): ReactElement {
   //    the prior rows, plus the count of the current curve's control points
   let count = 1;
   let nestedRowData: NestedRowData[] = [];
-  for (const [_, pc] of items) {
+  for (const pc of items.pathChains) {
     const children: RowData[] = [];
     const offset = count;
     for (const b of pc.paths) {
@@ -269,15 +283,13 @@ export function PathChainList(): ReactElement {
         Paths
       </Text>
       {[
-        ...items
-          .entries()
-          .map((pc, index) => (
-            <NamedPathChainDisplay
-              key={pc[0]}
-              chain={pc}
-              rowdata={nestedRowData[index]!}
-            />
-          )),
+        items.pathChains.map((pc, index) => (
+          <NamedPathChainDisplay
+            key={pc.name}
+            chain={pc}
+            rowdata={nestedRowData[index]!}
+          />
+        )),
       ]}
     </div>
   );
@@ -296,34 +308,42 @@ export function PathsDataDisplay({
 }: {
   expand?: boolean;
 }): ReactElement {
-  const selFile = useAtomValue(SelectedFileAtom);
+  const selFile = useAtomValue(SelectedPathAtom);
   const selClass = useAtomValue(SelectedClassAtom);
   if (selFile.length === 0 || selClass.length === 0) {
-    return <div>Please select a file & class to view.</div>;
+    return <Text size={600}>Please select a file & class to view.</Text>;
   }
   return (
-    <>
+    <div>
       {/* <FileInfo /> */}
       <Expandable label="Values" indent={20}>
-        <NamedValueList />
+        <Suspense>
+          <NamedValueList />
+        </Suspense>
         {/* <NewValue /> */}
       </Expandable>
       <Expandable label="Poses" indent={20}>
-        <NamedPoseList />
+        <Suspense>
+          <NamedPoseList />
+        </Suspense>
         {/* <NewPose /> */}
       </Expandable>
-      <Expandable label="Curves" indent={20}>
-        <NamedBezierList />
+      <Expandable label="Curves & Lines" indent={20}>
+        <Suspense>
+          <NamedBezierList />
+        </Suspense>
         {/* <Button style={{ margin: 10 }} disabled>
           New Curve
         </Button> */}
       </Expandable>
       <Expandable label="Paths" indent={20}>
-        <PathChainList />
+        <Suspense>
+          <PathChainList />
+        </Suspense>
         {/* <Button style={{ margin: 10 }} disabled>
           New Path
         </Button> */}
       </Expandable>
-    </>
+    </div>
   );
 }

@@ -8,35 +8,18 @@ import {
   MakeError,
 } from '@freik/typechk';
 
+import { EmptyParsedClass, isRadiansRef, isRef } from '../../CodeTypeCheck';
 import {
   AnonymousBezier,
   AnonymousFacing,
+  AnonymousPathChain,
   AnonymousPose,
-  AnonymousValue,
   BezierName,
   BezierRef,
-  EmptyParsedClass,
-  FacingConstant,
-  FacingLinear,
+  BezierType,
   FacingPiece,
-  FacingPieceWise,
-  FacingPoint,
-  FacingReversed,
-  FacingSimple,
+  FacingType,
   HeadingRef,
-  isAnonymousValue,
-  isConstantFacing,
-  isDoubleValue,
-  isIntValue,
-  isLinearFacing,
-  isPiecewiseFacing,
-  isPointFacing,
-  isRadiansRef,
-  isRef,
-  isReversedFacing,
-  isReversibleFacing,
-  isSimpleFacing,
-  isTangentFacing,
   ParsedClass,
   PathChainName,
   PoseName,
@@ -44,24 +27,10 @@ import {
   RadiansRef,
   ValueName,
   ValueRef,
-} from '../../server/types';
-import {
-  AnonymousPathChain,
-  chkConcreteTangentHeading,
-  ConcreteConstantHeading,
-  ConcreteHeadingType,
-  ConcreteLinearHeading,
-  ConcretePiece,
-  ConcretePieceWiseHeading,
-  ConcretePointHeading,
-  ConcreteReversedHeading,
-  ConcreteReversibleHeadingType,
-  ConcreteSimpleHeadingType,
-  ConcreteTangentHeading,
-  NameLookup,
-  OneFileIndex,
-  Point,
-} from '../types';
+} from '../../CodeTypes';
+import { PathDatabase } from '../../IpcTypes';
+import { readConstant } from '../ExpressionEval';
+import { NameLookup, OneFileIndex } from '../types';
 import { ValidRes } from './API';
 
 export function MakeFileIndex(container: ParsedClass): OneFileIndex {
@@ -77,7 +46,7 @@ export function MakeFileIndex(container: ParsedClass): OneFileIndex {
   const namedPathChains = new Map<PathChainName, AnonymousPathChain>(
     container.pathChains.map((npc) => [
       npc.name,
-      { paths: npc.paths, heading: npc.pathHeading },
+      { paths: npc.paths, heading: npc.heading },
     ]),
   );
   const staticShortcuts = new Map<string, string>(
@@ -93,9 +62,11 @@ export function MakeFileIndex(container: ParsedClass): OneFileIndex {
   };
 }
 
-// Make a thing that can accumulate indexes (*can* in the *future*)
+// Make a thing that accumulates indexes
 function MakeNameLookup(): NameLookup {
   let indexMap: Map<string, OneFileIndex> = new Map();
+  let database: PathDatabase | undefined;
+
   const registerIndex = (index: OneFileIndex) => {
     indexMap.set(index.container.fullName, index);
   };
@@ -171,8 +142,24 @@ function MakeNameLookup(): NameLookup {
   };
   const reset = () => {
     indexMap.clear();
+    database = undefined;
   };
-  return { registerIndex, findBezier, findPath, findPose, findValue, reset };
+  const setDb = (db: PathDatabase) => {
+    reset();
+    database = db;
+    for (const [, pc] of db.ParsedClasses) {
+      registerIndex(MakeFileIndex(pc));
+    }
+  };
+  const db = () => database;
+  return {
+    findBezier,
+    findPath,
+    findPose,
+    findValue,
+    setDb,
+    db,
+  };
 }
 
 const nameLookup = MakeNameLookup();
@@ -183,15 +170,16 @@ export function GetNameLookup(): NameLookup {
 export function ValidateIndex(
   fileIndex: OneFileIndex,
   lkup: NameLookup,
-  context: ParsedClass,
 ): ErrorOr<true> {
+  const context = fileIndex.container;
   function checkValueRef(vr: ValueRef, id: string): ValidRes {
     if (isRef(vr)) {
       if (!lkup.findValue(vr, context)) {
-        // TODO: This should trigger cross file lookup
-        return MakeError(
-          `${id}'s "${vr}" value reference appears to be undefined.`,
-        );
+        if (isUndefined(readConstant(vr))) {
+          return MakeError(
+            `${id}'s "${vr}" value reference appears to be undefined.`,
+          );
+        }
       }
     }
     return true;
@@ -234,9 +222,9 @@ export function ValidateIndex(
     curve.points.forEach((pr, index) => {
       res = AccError(checkPoseRef(pr, `${id}'s element ${index}`), res);
     });
-    if (curve.type === 'line' && curve.points.length !== 2) {
+    if (curve.type === BezierType.Line && curve.points.length !== 2) {
       return AccError(res, MakeError(`${id}'s line doesn't have 2 points`));
-    } else if (curve.type === 'curve' && curve.points.length < 2) {
+    } else if (curve.type === BezierType.Curve && curve.points.length < 2) {
       return AccError(
         res,
         MakeError(`${id}'s line doesn't have enough points`),
@@ -259,30 +247,65 @@ export function ValidateIndex(
     apc: AnonymousPathChain,
     id: string,
   ): ValidRes {
-    let res: ValidRes = true;
-    if (isConstantFacing(apc.heading)) {
-      res = checkHeadingRef(
-        apc.heading.heading,
-        `${id}'s constant heading ref`,
-      );
-    } else if (isLinearFacing(apc.heading)) {
-      res = checkHeadingRef(apc.heading.start, `${id}'s start heading ref`);
-      res = AccError(
-        checkHeadingRef(apc.heading.end, `${id}'s end heading ref`),
-        res,
-      );
-    } else if (isTangentFacing(apc.heading)) {
-      // Nothing to see here...
-    } else {
-      // TODO: Handing reverse, point, and piecewise
-      console.error(
-        'NYI: Not checking the heading interpolator used by this path chain!',
-        apc.heading,
-      );
-    }
+    let res = validateFacing(apc.heading, id);
     apc.paths.forEach((br, index) => {
       res = AccError(checkBezierRef(br, `${id}'s path element ${index}`), res);
     });
+    return res;
+  }
+
+  function validatePieces(pieces: FacingPiece[], id: string): ValidRes {
+    let res: ValidRes = true;
+    pieces.forEach((piece, idx) => {
+      res = AccError(
+        checkValueRef(piece.timing.start, `${id}'s timing start #${idx}`),
+        res,
+      );
+      res = AccError(
+        checkValueRef(piece.timing.end, `${id}'s timing end #${idx}`),
+        res,
+      );
+      res = AccError(
+        validateFacing(piece.heading, `${id}'s heading #${idx}`),
+        res,
+      );
+    });
+    return res;
+  }
+
+  function validateFacing(heading: AnonymousFacing, id: string): ValidRes {
+    let res: ValidRes = true;
+    switch (heading.type) {
+      case FacingType.Constant:
+        res = checkHeadingRef(heading.heading, `${id}'s constant heading ref`);
+        break;
+      case FacingType.Linear:
+        res = checkHeadingRef(heading.start, `${id}'s start heading ref`);
+        res = AccError(
+          checkHeadingRef(heading.end, `${id}'s end heading ref`),
+          res,
+        );
+        break;
+      case FacingType.Tangent:
+        break; // Nothing to see here...
+      case FacingType.Reversed:
+        res = validateFacing(
+          heading.facing,
+          `${id}'s reversed heading interpolator`,
+        );
+        break;
+      case FacingType.Point:
+        res = checkPoseRef(heading.point, `${id}'s point heading interpolator`);
+        break;
+      case FacingType.Piecewise:
+        res = validatePieces(
+          heading.pieces,
+          `${id}'s Piecewise heading interpolator`,
+        );
+        break;
+      default:
+        console.error('NYI: Unknown heading interpolator type', heading);
+    }
     return res;
   }
 
@@ -328,243 +351,6 @@ export function ValidateIndex(
     return res;
   }
   return true;
-}
-
-function cerr(nm: string, set: Set<string>): Error {
-  return new Error(
-    `Circular reference for ${nm} (${[...set.keys()].join(', ')} cause the cycle)`,
-  );
-}
-
-export function calcValueRef(
-  vr: ValueRef | RadiansRef,
-  ctx: ParsedClass,
-  circ?: Set<string>,
-): number {
-  let av = vr;
-  const lkup = GetNameLookup();
-  const seen = new Set<string>(circ ?? []);
-  while (isRef(av)) {
-    if (seen.has(av)) {
-      throw cerr(av, seen);
-    }
-    seen.add(av);
-    const maybe = lkup.findValue(av as ValueName, ctx);
-    if (isUndefined(maybe)) {
-      throw new Error(`Invalid ValueRef ${vr} through ${av}`);
-    }
-    av = maybe;
-  }
-  /* This shouldn't ever occur
-  if (isUndefined(av)) {
-    throw new Error(`Invalid ValueRef ${vr}`);
-  }
-  */
-  return calcValue(av, ctx, seen);
-}
-
-export function calcPoseRefHeading(
-  pr: PoseRef,
-  ctx: ParsedClass,
-  circ?: Set<string>,
-): number {
-  let ap = pr;
-  const seen = new Set<string>(circ ?? []);
-  const lkup = GetNameLookup();
-  while (isRef(ap)) {
-    if (seen.has(ap)) {
-      throw cerr(ap, seen);
-    }
-    seen.add(ap);
-    const maybe = lkup.findPose(ap, ctx);
-    if (isUndefined(maybe)) {
-      throw new Error(`Invalid PoseRef heading ${pr} through ${ap}`);
-    }
-    ap = maybe;
-  }
-  if (isUndefined(ap)) {
-    throw new Error(`Invalid PoseRef ${pr}`);
-  }
-  if (isUndefined(ap.heading)) {
-    throw new Error(`No heading for Pose ${ap} from PoseRef ${pr}`);
-  }
-  return calcHeadingRef(ap.heading, ctx, seen);
-}
-
-export function calcPoseRef(
-  pr: PoseRef,
-  ctx: ParsedClass,
-  circ?: Set<string>,
-): Point {
-  let ap = pr;
-  const lkup = GetNameLookup();
-  const seen = new Set<string>(circ ?? []);
-  while (isRef(ap)) {
-    if (seen.has(ap)) {
-      throw cerr(ap, seen);
-    }
-    seen.add(ap);
-    const maybe = lkup.findPose(ap, ctx);
-    if (isUndefined(maybe)) {
-      throw new Error(`Invalid PoseRef ${pr} through ${ap}`);
-    }
-    ap = maybe;
-  }
-  if (isUndefined(ap)) {
-    throw new Error(`Invalid PoseRef ${pr}`);
-  }
-  return { x: calcValueRef(ap.x, ctx, seen), y: calcValueRef(ap.y, ctx, seen) };
-}
-
-export function calcBezierRef(
-  br: BezierRef,
-  ctx: ParsedClass,
-  circ?: Set<string>,
-): Point[] {
-  const lkup = GetNameLookup();
-  let ab = br;
-  const seen = new Set<string>(circ ?? []);
-  while (isRef(ab)) {
-    if (seen.has(ab)) {
-      throw cerr(ab, seen);
-    }
-    seen.add(ab);
-    const maybe = lkup.findBezier(ab, ctx);
-    if (isUndefined(maybe)) {
-      throw new Error(`Invalid BezierRef ${br} through ${ab}`);
-    }
-    ab = maybe;
-  }
-  /*
-  if (isUndefined(ab)) {
-    throw new Error(`Invalid BezierRef ${br}`);
-  }
-  */
-  return ab.points.map((p) => calcPoseRef(p, ctx, seen));
-}
-
-export function calcHeadingRef(
-  hr: HeadingRef,
-  ctx: ParsedClass,
-  circ?: Set<string>,
-): number {
-  if (isRef(hr)) {
-    // Either a PoseName, AnonymousValue, or ValueName;
-    if (isAnonymousValue(hr)) {
-      return calcValueRef(hr, ctx, circ);
-    }
-    const lkup = GetNameLookup();
-    const val = lkup.findValue(hr as ValueName, ctx);
-    if (isDefined(val)) {
-      return calcValueRef(val, ctx, circ);
-    }
-    const pose = lkup.findPose(hr as PoseName, ctx);
-    if (isDefined(pose)) {
-      return calcPoseRefHeading(pose, ctx, circ);
-    }
-    throw new Error(`Missing heading for ${hr}`);
-  } else if (isRadiansRef(hr)) {
-    return (Math.PI * calcValueRef(hr.radians, ctx, circ)) / 180.0;
-  } else {
-    return calcValueRef(hr, ctx, circ);
-  }
-}
-
-// Evaluation from the parsed code representation:
-export function calcValue(
-  av: AnonymousValue | RadiansRef,
-  ctx: ParsedClass,
-  circ?: Set<string>,
-): number {
-  if (isDoubleValue(av)) {
-    return av.double;
-  } else if (isIntValue(av)) {
-    return av.int;
-  } else {
-    const lkup = GetNameLookup();
-    return (Math.PI * calcValueRef(av.radians, ctx, circ)) / 180.0;
-  }
-}
-
-function mkTangent(): ConcreteTangentHeading {
-  return { type: 'T' };
-}
-
-function mkConstant(
-  heading: FacingConstant,
-  ctx: ParsedClass,
-): ConcreteConstantHeading {
-  return { type: 'C', heading: calcHeadingRef(heading.heading, ctx) };
-}
-
-function mkLinear(
-  heading: FacingLinear,
-  ctx: ParsedClass,
-): ConcreteLinearHeading {
-  return {
-    type: 'I',
-    headings: [
-      calcHeadingRef(heading.start, ctx),
-      calcHeadingRef(heading.end, ctx),
-    ],
-  };
-}
-
-function mkPoint(heading: FacingPoint, ctx: ParsedClass): ConcretePointHeading {
-  return { type: 'P', heading: calcPoseRef(heading.point, ctx) };
-}
-
-function mkReversible(
-  heading: FacingSimple,
-  ctx: ParsedClass,
-): ConcreteReversibleHeadingType {
-  if (isTangentFacing(heading)) {
-    return mkTangent();
-  } else if (isConstantFacing(heading)) {
-    return mkConstant(heading, ctx);
-  } else if (isLinearFacing(heading)) {
-    return mkLinear(heading, ctx);
-  } else if (isPointFacing(heading)) {
-    return mkPoint(heading, ctx);
-  }
-  throw new Error('Unknown simple Facing type');
-}
-
-function mkReversed(
-  heading: FacingReversed,
-  ctx: ParsedClass,
-): ConcreteReversedHeading {
-  const revheading = mkReversible(heading.facing, ctx);
-  return { type: 'R', heading: revheading };
-}
-
-function mkPiece(piece: FacingPiece, ctx: ParsedClass): ConcretePiece {
-  return {
-    start: calcValueRef(piece.timing.start, ctx),
-    end: calcValueRef(piece.timing.end, ctx),
-    heading: mkReversible(piece.heading, ctx),
-  };
-}
-
-function mkPiecewise(
-  head: FacingPieceWise,
-  ctx: ParsedClass,
-): ConcretePieceWiseHeading {
-  return { type: 'L', pieces: head.pieces.map((fp) => mkPiece(fp, ctx)) };
-}
-
-export function calcFacing(
-  heading: AnonymousFacing,
-  ctx: ParsedClass,
-): ConcreteHeadingType {
-  if (isReversibleFacing(heading)) {
-    return mkReversible(heading, ctx);
-  } else if (isReversedFacing(heading)) {
-    return mkReversed(heading, ctx);
-  } else if (isPiecewiseFacing(heading)) {
-    return mkPiecewise(heading, ctx);
-  }
-  return mkTangent();
 }
 
 export const EmptyMappedFile: OneFileIndex = {

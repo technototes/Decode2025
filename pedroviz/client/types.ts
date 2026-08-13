@@ -1,18 +1,9 @@
-import {
-  chkAnyOf,
-  chkArrayOf,
-  chkObjectOfExactType,
-  chkTupleOf,
-  isNumber,
-  typecheck,
-} from '@freik/typechk';
+import { CSSProperties } from 'react';
 
 import {
-  AnonymousFacing,
+  AnonymousPathChain,
   BezierName,
   BezierRef,
-  isIntValue,
-  isValueName,
   ParsedClass,
   PathChainName,
   PoseName,
@@ -20,9 +11,18 @@ import {
   RadiansRef,
   ValueName,
   ValueRef,
-} from '../server/types';
+} from '../CodeTypes';
+import { PathDatabase } from '../IpcTypes';
 
-export type CtrlPtStyles = 'o' | 't' | 's' | '+' | 'x' | 'z';
+export const CtrlPtStyles = Object.freeze({
+  Circle: 'o',
+  Triangle: 't',
+  Square: 's',
+  Crosshair: '+',
+  X: 'x',
+  None: 'z',
+} as const);
+export type CtrlPtStyles = (typeof CtrlPtStyles)[keyof typeof CtrlPtStyles];
 
 export type PathRenderOptions = {
   ShowField: boolean;
@@ -41,98 +41,6 @@ export type PathRenderOptions = {
   };
 };
 
-export type AnonymousPathChain = {
-  paths: BezierRef[];
-  heading: AnonymousFacing;
-};
-
-export type Point = { x: number; y: number };
-export const chkPoint = chkObjectOfExactType({ x: isNumber, y: isNumber });
-
-export type ConcreteTangentHeading = { type: 'T' };
-export type ConcreteConstantHeading = {
-  type: 'C';
-  heading: number;
-};
-export type ConcreteLinearHeading = {
-  type: 'I';
-  headings: [number, number];
-};
-export type ConcretePointHeading = {
-  type: 'P';
-  heading: Point;
-};
-export type ConcreteReversedHeading = {
-  type: 'R';
-  heading: ConcreteReversibleHeadingType;
-};
-export type ConcretePiece = {
-  start: number;
-  end: number;
-  heading: ConcreteSimpleHeadingType;
-};
-export type ConcretePieceWiseHeading = {
-  type: 'L';
-  pieces: ConcretePiece[];
-};
-export type ConcreteReversibleHeadingType =
-  | ConcreteTangentHeading
-  | ConcreteConstantHeading
-  | ConcreteLinearHeading
-  | ConcretePointHeading;
-export type ConcreteSimpleHeadingType =
-  ConcreteReversibleHeadingType | ConcreteReversedHeading;
-export type ConcreteHeadingType =
-  ConcreteSimpleHeadingType | ConcretePieceWiseHeading;
-
-export const chkConcreteTangentHeading =
-  chkObjectOfExactType<ConcreteTangentHeading>({
-    type: (t: unknown): t is 'T' => t === 'T',
-  });
-export const chkConcreteConstantHeading =
-  chkObjectOfExactType<ConcreteConstantHeading>({
-    type: (t: unknown): t is 'C' => t === 'C',
-    heading: isNumber,
-  });
-export const chkConcreteLinearHeading =
-  chkObjectOfExactType<ConcreteLinearHeading>({
-    type: (t: unknown): t is 'I' => t === 'I',
-    headings: chkTupleOf(isNumber, isNumber),
-  });
-export const chkConcretePointHeading =
-  chkObjectOfExactType<ConcretePointHeading>({
-    type: (t: unknown): t is 'P' => t === 'P',
-    heading: chkPoint,
-  });
-export const chkConcreteReversibleHeadingType: typecheck<ConcreteReversibleHeadingType> =
-  chkAnyOf(
-    chkConcreteTangentHeading,
-    chkConcreteConstantHeading,
-    chkConcreteLinearHeading,
-    chkConcretePointHeading,
-  );
-export const chkConcreteReversedHeading =
-  chkObjectOfExactType<ConcreteReversedHeading>({
-    type: (t: unknown): t is 'R' => t === 'R',
-    heading: chkConcreteReversibleHeadingType,
-  });
-export const chkConcreteSimpleHeadingType: typecheck<ConcreteSimpleHeadingType> =
-  chkAnyOf(chkConcreteReversedHeading, chkConcreteReversedHeading);
-export const chkConcretePiece = chkObjectOfExactType({
-  start: isNumber,
-  end: isNumber,
-  heading: chkConcreteSimpleHeadingType,
-});
-export const chkConcretePieceWiseHeading =
-  chkObjectOfExactType<ConcretePieceWiseHeading>({
-    type: (t: unknown): t is 'R' => t === 'R',
-    pieces: chkArrayOf(chkConcretePiece),
-  });
-export const chkConcreteHeadingType = chkAnyOf(
-  chkConcretePieceWiseHeading,
-  chkConcreteSimpleHeadingType,
-);
-
 export type OneFileIndex = {
   container: ParsedClass;
   namedValues: Map<ValueName, ValueRef | RadiansRef>;
@@ -143,8 +51,6 @@ export type OneFileIndex = {
 };
 
 export type NameLookup = {
-  registerIndex: (index: OneFileIndex) => void;
-  reset: () => void;
   findValue: (
     val: ValueName,
     context: ParsedClass,
@@ -155,6 +61,8 @@ export type NameLookup = {
     pc: PathChainName,
     context: ParsedClass,
   ) => AnonymousPathChain | undefined;
+  setDb: (db: PathDatabase) => void;
+  db: () => PathDatabase | undefined;
 };
 
 export type HasItem<T> = {
@@ -165,15 +73,25 @@ export type HasKeys<T> = HasItem<T> & {
   keys: () => Iterable<T>;
 };
 
-export type ValidationState = 'error' | 'warning' | 'success' | 'none';
+export const ValidateState = Object.freeze({
+  Error: 'error',
+  Warning: 'warning',
+  Success: 'success',
+  None: 'none',
+} as const);
+export type ValidationState =
+  (typeof ValidateState)[keyof typeof ValidateState];
+
 export type ValidationData = {
   message: string;
   state: ValidationState;
 };
+
 export const ValidData: ValidationData = Object.freeze({
   message: '',
-  state: 'none',
-});
+  state: ValidateState.None,
+} as const);
+
 export function ValidationResult(
   message: string,
   state: ValidationState,
@@ -181,13 +99,18 @@ export function ValidationResult(
   return { message, state };
 }
 
-export function GetValueAsString(vr: ValueRef): string {
-  if (isValueName(vr)) {
-    return vr;
-  }
-  if (isIntValue(vr)) {
-    return vr.int.toFixed(0);
-  }
-  // Even in *radians* this is about .57 of a degree, so 2 decimal places seems good enough
-  return vr.double.toFixed(2);
-}
+export type ResponsiveAnchor = {
+  x: 'left' | 'center' | 'right';
+  y: 'top' | 'middle' | 'bottom';
+};
+
+export type ResponsiveSquareCanvasProps = {
+  anchor?: ResponsiveAnchor;
+  style?: CSSProperties;
+  className?: string;
+  render: (
+    ctx: CanvasRenderingContext2D,
+    size: number,
+    devicePixelRatio: number,
+  ) => void;
+};

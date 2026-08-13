@@ -6,19 +6,13 @@ import {
   MakeError,
 } from '@freik/typechk';
 
-import {
-  AnonymousBezier,
-  AnonymousPose,
-  chkParsedClass,
-  chkPathDatabase,
-  ParsedClass,
-  Path,
-  PathDatabase,
-  Team,
-} from '../../server/types';
+import { chkParsedClass } from '../../CodeTypeCheck';
+import { AnonymousBezier, AnonymousPose, ParsedClass } from '../../CodeTypes';
+import { chkPathDatabase, EmptyPathDatabase } from '../../IpcTypeCheck';
+import { Path, PathDatabase, Team } from '../../IpcTypes';
 import { NameLookup, OneFileIndex } from '../types';
 import { GetNameLookup, MakeFileIndex, ValidateIndex } from './IndexedFile';
-import { fetchApi } from './Storage';
+import { fetchApi, putApi } from './Storage';
 
 export type ValidRes = ErrorOr<true>;
 // Some of the logic seems a little odd, because I want the validation to fully
@@ -42,7 +36,14 @@ export function getColorFor(
 
 // Get the entire Database from the server
 export async function GetFullDb(): Promise<PathDatabase> {
-  return await fetchApi('db', chkPathDatabase, new Map());
+  const db = await fetchApi('db', chkPathDatabase, EmptyPathDatabase);
+  const lkup = GetNameLookup();
+  lkup.setDb(db);
+  return db;
+}
+
+export async function PutFullDb(db: PathDatabase): Promise<void> {
+  return putApi('putdb', db);
 }
 
 // last loaded file, I guess?
@@ -78,8 +79,8 @@ export async function LoadAndIndexFile(
   }
   const indexFile = await MakeFileIndex(pc);
   const lookup: NameLookup = GetNameLookup();
-  lookup.registerIndex(indexFile);
-  const validate = ValidateIndex(indexFile, lookup, pc);
+  //lookup.registerIndex(indexFile);
+  const validate = ValidateIndex(indexFile, lookup);
   if (isError(validate)) {
     return MakeError(
       validate,

@@ -1,17 +1,16 @@
-import { CSSProperties, ReactElement, useEffect, useId, useState } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
 import { Label, Text } from '@fluentui/react-components';
-import { Path } from 'server/types';
-import { isNumber } from '@freik/typechk';
 
+import { Path } from '../IpcTypes';
 import { Strings } from './constants';
 import {
   BlurAtom,
-  ClassesForSelectedFileAtom,
-  FilesForSelectedTeamAtom,
+  ClassesForSelectedPathAtom,
+  PathsForSelectedTeamAtom,
   SelectedClassAtom,
-  SelectedFileAtom,
+  SelectedPathAtom,
   SelectedTeamAtom,
   TeamsAtom,
 } from './state/Atoms';
@@ -25,11 +24,8 @@ export function TeamSelector(): ReactElement {
       setTeam(teams[0]!);
     }
   }, [teams, setTeam]);
-  if (teams.length === 1) {
-    return <Label className="pathLabel">Robot: {teams[0]!}</Label>;
-  }
   return (
-    <>
+    <span>
       <Label className="pathLabel">Robot:</Label>
       <AutoSelector
         prompt={Strings.select_a_bot}
@@ -37,13 +33,13 @@ export function TeamSelector(): ReactElement {
         selected={team}
         setSelected={setTeam}
       />
-    </>
+    </span>
   );
 }
 
 export function FileSelector(): ReactElement {
-  let files = useAtomValue(FilesForSelectedTeamAtom);
-  const [file, setFile] = useAtom(SelectedFileAtom);
+  let files = useAtomValue(PathsForSelectedTeamAtom);
+  const [file, setFile] = useAtom(SelectedPathAtom);
   // if all the files have a common folder prefix, filter the prefix out
   let prefix = '';
   if (files.length > 0) {
@@ -64,35 +60,32 @@ export function FileSelector(): ReactElement {
       setFile(files[0]!);
     }
   }, [files, setFile]);
-  if (files.length === 1) {
-    return <Label className="pathLabel">File: {files[0]}</Label>;
-  }
   return (
-    <>
-      <Label className="pathLabel">File:</Label>
+    <span>
+      <Label className="pathLabel" htmlFor="select_a_file">
+        File:
+      </Label>
       <AutoSelector
+        id="select_a_file"
         prompt={Strings.select_a_file}
         items={files}
         selected={file.substring(prefix.length)}
-        setSelected={(item) => setFile(prefix + item)}
+        setSelected={(item) => setFile((prefix + item) as Path)}
       />
-    </>
+    </span>
   );
 }
 
 export function ClassSelector(): ReactElement {
-  const classes = useAtomValue(ClassesForSelectedFileAtom);
+  const classes = useAtomValue(ClassesForSelectedPathAtom);
   const [classSel, setClass] = useAtom(SelectedClassAtom);
   useEffect(() => {
     if (classes.length === 1) {
       setClass(classes[0]!);
     }
   }, [classes, setClass]);
-  if (classes.length === 1) {
-    return <Label className="pathLabel">Class: {classes[0]}</Label>;
-  }
   return (
-    <>
+    <span>
       <Label className="pathLabel">Class:</Label>
       <AutoSelector
         prompt={Strings.select_a_class}
@@ -100,7 +93,7 @@ export function ClassSelector(): ReactElement {
         selected={classSel}
         setSelected={setClass}
       />
-    </>
+    </span>
   );
 }
 

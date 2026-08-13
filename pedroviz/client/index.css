@@ -58,12 +58,13 @@ body {
 
 #view-separator {
   background: linear-gradient(to right, #fff 0%, #000 45%, #000 55%, #fff 100%);
-  opacity: 0.2;
+  opacity: 0.5;
   transition: opacity 0.2s;
-  width: 1px;
+  width: 3px;
 }
+
 #view-separator:hover {
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .pathLabel {
@@ -71,20 +72,10 @@ body {
   margin-right: 5;
 }
 
-/* Square canvas area */
-.field {
-  border: 2px solid #666;
-  box-sizing: border-box;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
 .col3div {
   display: grid;
   grid-template-columns: auto 1fr 4fr 1fr 4fr;
 }
-
 .col1 {
   grid-column: 1;
 }
@@ -94,9 +85,28 @@ body {
 .col3 {
   grid-column: 5;
 }
-
 .vcentered {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.settings {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.4fr 1.5fr 1fr;
+  row-gap: 5;
+  column-gap: 1;
+  margin: 10;
+  align-items: center;
+}
+.left-label {
+  grid-column: 1;
+}
+.left-field {
+  grid-column: 2;
+}
+.right-label {
+  grid-column: 4;
+}
+.right-field {
+  grid-column: 5;
 }

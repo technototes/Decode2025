@@ -11,6 +11,6 @@ export async function main(url: URL) {
   // Delay to let some stuff get moving. This is annoying, but
   // necessary, AFAICT.
   // Comment these out while developing, as it's annoying with constant re-launches
-  await sleep(1500);
-  OpenBrowser(url.toString());
+  // await sleep(1500);
+  // OpenBrowser(url.toString());
 }

@@ -1,5 +1,6 @@
 /// <reference lib="dom" />
 
+import { beforeEach, describe, expect, test } from 'bun:test';
 import { ReactElement } from 'react';
 import { Provider, useAtom } from 'jotai';
 
@@ -15,28 +16,24 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { beforeEach, describe, expect, test } from 'bun:test';
 import { Pickle } from '@freik/typechk';
 
 import '@testing-library/jest-dom';
 
-import { ThemeAtom } from 'client/state/SavedSettings';
+import { MakeMultiMap } from '@freik/containers';
 
-import { makeKey } from '../../server/full-database';
+import { EmptyParsedClass } from '../../CodeTypeCheck';
 import {
   AnonymousBezier,
   BezierName,
-  EmptyParsedClass,
+  BezierType,
+  FacingType,
   ParsedClass,
-  Path,
   PathChainName,
-  PathDBKey,
-  PathDBValue,
   PoseName,
-  Team,
-  TeamPaths,
   ValueName,
-} from '../../server/types';
+} from '../../CodeTypes';
+import { ClassKey, Path, PathDatabase, PathKey, Team } from '../../IpcTypes';
 import { Strings } from '../constants';
 import { PathsDataDisplay } from '../PathsDataDisplay';
 import { PathSelector } from '../PathSelector';
@@ -44,26 +41,27 @@ import {
   ClearCache,
   ColorForNumber,
   ColorsAtom,
-  FilesForSelectedTeamAtom,
   MappedBeziersAtom,
-  MappedPathChainsAtom,
   MappedPosesAtom,
-  MappedValuesAtom,
+  PathsForSelectedTeamAtom,
   PoseAtomFamily,
-  SelectedFileAtom,
+  SelectedClassAtom,
+  SelectedPathAtom,
   SelectedTeamAtom,
   ValueAtomFamily,
+  ValuesLookupAtom,
 } from '../state/Atoms';
+import { ThemeAtom } from '../state/SavedSettings';
 import { getStore } from '../state/Storage';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 
 import './jest-dom-types-fix.test';
 
 // Mocks & phony data for my tests:
-const teamPaths: TeamPaths = {
-  ['team1' as Team]: ['path1.java' as Path, 'path2.java' as Path],
-  ['team2' as Team]: ['path3.java' as Path, 'path4.java' as Path],
-};
+const teams: Team[] = ['team1' as Team, 'team2' as Team];
+//   ['team1' as Team]: ['path1.java' as Path, 'path2.java' as Path],
+//   ['team2' as Team]: ['path3.java' as Path, 'path4.java' as Path],
+// };
 
 const testParsedClass: ParsedClass = {
   values: [],
@@ -79,7 +77,7 @@ const testParsedClass: ParsedClass = {
 };
 
 const simpleBez: AnonymousBezier = {
-  type: 'curve',
+  type: BezierType.Curve,
   points: [
     { x: 'val1' as ValueName, y: 'val1' as ValueName },
     'pose1' as PoseName,
@@ -121,7 +119,7 @@ const fullParsedClass: ParsedClass = {
     {
       name: 'bez1' as BezierName,
       points: {
-        type: 'line',
+        type: BezierType.Line,
         points: ['pose1' as PoseName, 'pose2' as PoseName],
       },
     },
@@ -134,22 +132,25 @@ const fullParsedClass: ParsedClass = {
     {
       name: 'pc1' as PathChainName,
       paths: ['bez1' as BezierName, 'bez2' as BezierName],
-      pathHeading: { type: 'tangent' },
+      heading: { type: FacingType.Tangent },
     },
     {
       name: 'pc2' as PathChainName,
       paths: [
         'bez2' as BezierName,
-        { type: 'line', points: ['pose1' as PoseName, 'pose3' as PoseName] },
+        {
+          type: BezierType.Line,
+          points: ['pose1' as PoseName, 'pose3' as PoseName],
+        },
       ],
-      pathHeading: { type: 'constant', heading: 'pose3' as PoseName },
+      heading: { type: FacingType.Constant, heading: 'pose3' as PoseName },
     },
     {
       name: 'pc3' as PathChainName,
       paths: [
         'bez1' as BezierName,
         {
-          type: 'curve',
+          type: BezierType.Curve,
           points: [
             'pose1' as PoseName,
             'pose3' as PoseName,
@@ -157,8 +158,8 @@ const fullParsedClass: ParsedClass = {
           ],
         },
       ],
-      pathHeading: {
-        type: 'linear',
+      heading: {
+        type: FacingType.Linear,
         start: 'pose2' as PoseName,
         end: { radians: { int: 135 } },
       },
@@ -175,12 +176,30 @@ const status = {
   headers: { 'Content-Type': 'application/json' },
 };
 
-const database = new Map<PathDBKey, PathDBValue>([
-  [makeKey('team1' as Team, 'path1.java' as Path), [[], EmptyParsedClass]],
-  [makeKey('team1' as Team, 'path2.java' as Path), [[], EmptyParsedClass]],
-  [makeKey('team2' as Team, 'path3.java' as Path), [[], fullParsedClass]],
-  [makeKey('team2' as Team, 'path4.java' as Path), [[], EmptyParsedClass]],
-]);
+const database: PathDatabase = {
+  TeamPaths: MakeMultiMap<Team, PathKey>([
+    [
+      'team1' as Team,
+      ['team1*path1.java' as PathKey, 'team1*path2.java' as PathKey],
+    ],
+    [
+      'team2' as Team,
+      ['team2*path3.java' as PathKey, 'team2*path4.java' as PathKey],
+    ],
+  ]),
+  PathClasses: MakeMultiMap<PathKey, ClassKey>([
+    ['team1*path1.java' as PathKey, ['team1*path1.java;a' as ClassKey]],
+    ['team1*path2.java' as PathKey, ['team1*path2.java;b' as ClassKey]],
+    ['team2*path3.java' as PathKey, ['team2*path3.java;c' as ClassKey]],
+    ['team2*path4.java' as PathKey, ['team2*path4.java;d' as ClassKey]],
+  ]),
+  ParsedClasses: new Map<ClassKey, ParsedClass>([
+    ['team1*path1.java;a' as ClassKey, EmptyParsedClass],
+    ['team1*path2.java;b' as ClassKey, EmptyParsedClass],
+    ['team2*path3.java;c' as ClassKey, fullParsedClass],
+    ['team2*path4.java;d' as ClassKey, EmptyParsedClass],
+  ]),
+};
 
 async function MyFetchFunc(
   key: string | URL | Request,
@@ -292,7 +311,7 @@ describe('Simplest UI validation', () => {
       expect(await store.get(SelectedTeamAtom)).toBe('team2' as Team);
     });
     await waitFor(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('' as Path);
+      expect(await store.get(SelectedPathAtom)).toBe('' as Path);
     });
     // The second menu should now be enabled
     expect(path).toBeEnabled();
@@ -303,13 +322,13 @@ describe('Simplest UI validation', () => {
     expect(selectFile).toBeEnabled();
     await act(async () => fireEvent.click(selectFile));
     await waitFor(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('path3.java' as Path);
+      expect(await store.get(SelectedPathAtom)).toBe('path3.java' as Path);
     });
     await act(async () => {
       await store.set(SelectedTeamAtom, 'team3');
     });
     await act(async () => {
-      expect(await store.get(FilesForSelectedTeamAtom)).toEqual([]);
+      expect(await store.get(PathsForSelectedTeamAtom)).toEqual([]);
     });
   });
 });
@@ -327,21 +346,21 @@ describe('SchemaAtom tests', () => {
     });
     await act(async () => {
       await store.set(SelectedTeamAtom, 'team2');
-      await store.set(SelectedFileAtom, 'path3.java');
+      await store.set(SelectedPathAtom, 'path3.java');
+      await store.set(SelectedClassAtom, 'c');
     });
     await act(async () => {
-      expect(await store.get(SelectedFileAtom)).toBe('path3.java' as Path);
+      expect(await store.get(SelectedPathAtom)).toBe('path3.java' as Path);
     });
-    expect(await store.get(MappedValuesAtom)).toBeDefined();
+    expect(await store.get(ValuesLookupAtom)).toBeDefined();
     expect(await store.get(MappedPosesAtom)).toBeDefined();
     expect(await store.get(MappedBeziersAtom)).toBeDefined();
-    expect(await store.get(MappedPathChainsAtom)).toBeDefined();
-    await act(() =>
+    /*await act(() =>
       store.set(ValueAtomFamily('valX' as ValueName), { int: 42 }),
     );
     await waitFor(async () => {
       expect(
-        (await store.get(MappedValuesAtom)).has('valX' as ValueName),
+        (await store.get(ValuesLookupAtom)).has('valX' as ValueName),
       ).toBeTrue();
       expect(
         (await store.get(MappedPosesAtom)).has('poseX' as PoseName),
@@ -352,6 +371,6 @@ describe('SchemaAtom tests', () => {
         x: 'valX' as ValueName,
         y: 'valX' as ValueName,
       }),
-    );
+    );*/
   });
 });

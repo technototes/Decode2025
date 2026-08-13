@@ -14,6 +14,7 @@ public class PathsLiveHere {
     public static double dist = 8.0;
 
     public static Pose start = new Pose(org, org, Math.toRadians(0));
+    // Steps 1 through 3 don't parse properly, cuz I don't handle math [yet]...
     public static Pose step1 = new Pose(org + dist, org, Math.toRadians(90));
     public static Pose step2 = new Pose(org + dist, org + dist, Math.toRadians(0));
     public static Pose step3 = new Pose(org, org + dist, Math.toRadians(-45));

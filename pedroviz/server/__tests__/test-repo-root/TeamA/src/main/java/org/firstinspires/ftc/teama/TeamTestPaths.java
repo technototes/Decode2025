@@ -37,6 +37,7 @@ public class TeamTestPaths {
     public PathChain Path3;
     public PathChain Path4;
     public PathChain AnotherPath;
+    public PathChain yapc;
 
     public TeamTestPaths(Follower follower) {
         Path1 = follower
@@ -69,6 +70,37 @@ public class TeamTestPaths {
             .addPath(new BezierCurve(step1, step2, step3, step4))
             .addPath(step4_to_start)
             .setLinearHeadingInterpolation(Math.toRadians(step), radRef)
+            .build();
+
+        yapc = follower
+            .pathBuilder()
+            .addPath(start_to_step1)
+            .addPath(step4_to_start)
+            .setHeadingInterpolation(
+                HeadingInterpolator.piecewise(
+                    new HeadingInterpolator.PiecewiseNode(0, .2, HeadingInterpolator.tangent),
+                    new HeadingInterpolator.PiecewiseNode(
+                        .2,
+                        .4,
+                        HeadingInterpolator.facingPoint(5, 5)
+                    ),
+                    new HeadingInterpolator.PiecewiseNode(
+                        .4,
+                        .6,
+                        HeadingInterpolator.constant(Math.toRadians(90))
+                    ),
+                    new HeadingInterpolator.PiecewiseNode(
+                        .6,
+                        .8,
+                        HeadingInterpolator.linear(Math.toRadians(90), Math.PI)
+                    ),
+                    new HeadingInterpolator.PiecewiseNode(
+                        .8,
+                        1,
+                        HeadingInterpolator.reversedLinear(Math.PI, Math.toRadians(90))
+                    )
+                )
+            )
             .build();
     }
 }

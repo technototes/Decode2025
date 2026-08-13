@@ -1,38 +1,40 @@
+import { MakeMultiMap } from '@freik/containers';
 import {
   ErrorOr,
-  isDefined,
   isError,
   isUndefined,
   MakeError,
+  Pickle,
 } from '@freik/typechk';
 
-import { GetTeamPaths } from './getpaths';
-import { anyItems, MakeParsedClass } from './PathChainLoader';
+import { ParsedClass } from '../CodeTypes';
 import {
-  ParsedClass,
+  ClassFromKey,
+  getClassKey,
+  getPathKey,
+  PathFromKey,
+} from '../IpcTypeCheck';
+import {
+  ClassKey,
+  ClassName,
   Path,
   PathDatabase,
-  PathDBKey,
+  PathKey,
   Team,
-  TeamPaths,
-} from './types';
+} from '../IpcTypes';
+import { GetTeamPaths } from './getpaths';
+import { anyItems, MakeParsedClass } from './PathChainLoader';
 import { getProjectFilePath } from './utility';
 
+// Teams -> Paths -> Classes   -> ParsedClasse
+// one   -> many  -> many, one -> one
+
 const teampaths: Map<Team, Path[]> = new Map();
-const database: PathDatabase = new Map();
-
-export function makeKey(team: Team, path: Path): PathDBKey {
-  return `${team}*${path}` as PathDBKey;
-}
-
-export function getTeamPath(dbKey: PathDBKey): [Team, Path] {
-  const items = dbKey.split('*');
-  if (items.length === 2) {
-    return items as [Team, Path];
-  }
-  console.error('Invalid key provided: ', dbKey);
-  return ['team', 'path'] as [Team, Path];
-}
+const database: PathDatabase = {
+  TeamPaths: MakeMultiMap<Team, PathKey>(),
+  PathClasses: MakeMultiMap<PathKey, ClassKey>(),
+  ParsedClasses: new Map<ClassKey, ParsedClass>(),
+};
 
 export function ForEachPathChainIndex(
   top: ParsedClass,
@@ -62,7 +64,7 @@ async function GetPathChainIndex(
   return [list, pc];
 }
 
-function RegisterPathChainIndex(
+function RegisterTopLevelParsedClass(
   team: Team,
   path: Path,
   classList: string[],
@@ -71,61 +73,71 @@ function RegisterPathChainIndex(
   if (!anyItems(pc)) {
     return;
   }
-  console.log('Registering', team, path, classList, pc.fullName);
-  const paths = teampaths.get(team);
-  if (isDefined(paths)) {
-    paths.push(path);
-  } else {
-    teampaths.set(team, [path]);
-  }
-  database.set(makeKey(team, path), [classList, pc]);
+  // console.log('Registering', team, path, classList, pc.fullName);
+  // console.log(Pickle(pc));
+  const pathKey = getPathKey(team, path);
+  database.TeamPaths.set(team, pathKey);
+  ForEachPathChainIndex(pc, (pc) => {
+    const classKey = getClassKey(pathKey, pc.name);
+    database.PathClasses.set(pathKey, classKey);
+    database.ParsedClasses.set(classKey, pc);
+  });
 }
 
 export async function PopulateDatabase() {
-  const teamPaths: TeamPaths = await GetTeamPaths();
-  for (const team of Object.keys(teamPaths) as Team[]) {
-    for (const path of teamPaths[team]!) {
+  const teamPaths = await GetTeamPaths();
+  for (const [team, pki] of teamPaths) {
+    for (const pathKey of pki) {
+      const path = PathFromKey(pathKey);
       const pci = await GetPathChainIndex(team, path);
       if (!isError(pci)) {
-        RegisterPathChainIndex(team, path, pci[0], pci[1]);
+        RegisterTopLevelParsedClass(team, path, pci[0], pci[1]);
       }
     }
   }
-}
-
-export function GetAllIndexContent(): [Team, Path, string[]][] {
-  return [...database.entries()].map(([key, [classes]]) => {
-    const [team, path] = getTeamPath(key);
-    return [team, path, classes];
-  });
 }
 
 export function GetDatabase(): PathDatabase {
   return database;
 }
 
-// Interfaces to the web server to talk to the web client:
+export function ResetDatabase() {
+  database.TeamPaths.clear();
+  database.PathClasses.clear();
+  database.ParsedClasses.clear();
+}
 
-export function WebGetParsedClassList(
-  team: Team,
-  path: Path,
-): ErrorOr<string[]> {
-  const res = database.get(makeKey(team, path));
+export function ReplaceDatabase(db: PathDatabase) {
+  database.TeamPaths = db.TeamPaths;
+  database.PathClasses = db.PathClasses;
+  database.ParsedClasses = db.ParsedClasses;
+}
+
+function GetParsedClassList(team: Team, path: Path): ErrorOr<ClassName[]> {
+  const res = database.PathClasses.get(getPathKey(team, path));
   if (isUndefined(res)) {
     return MakeError(`List: ${team}:${path} no Pedro pathing classes found`);
   }
-  return res[0];
+  return [...res.keys()].map(ClassFromKey);
 }
+
+// Interfaces to the web server to talk to the web client:
 
 export function WebGetParsedClassRoot(
   team: Team,
   path: Path,
 ): ErrorOr<ParsedClass> {
-  const res = database.get(makeKey(team, path));
+  const list = GetParsedClassList(team, path);
+  if (isError(list)) {
+    return list;
+  }
+  const shortest = list.reduce((pv, cv) => (pv.length < cv.length ? pv : cv));
+  const classKey = getClassKey(getPathKey(team, path), shortest);
+  const res = database.ParsedClasses.get(classKey);
   if (isUndefined(res)) {
     return MakeError(`Root: ${team}:${path} no Pedro pathing classes found`);
   }
-  return res[1];
+  return res;
 }
 
 /*

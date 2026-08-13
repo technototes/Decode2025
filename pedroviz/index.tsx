@@ -3,7 +3,7 @@ import { serve } from 'bun';
 import index from './index.html';
 import { main } from './server/main';
 import { SavePath } from './server/savepath';
-import { LoadClassList, LoadDatabase, LoadPath } from './server/web-interface';
+import { LoadDatabase, LoadPath, SaveDatabase } from './server/web-interface';
 
 const server = serve({
   routes: {
@@ -22,11 +22,6 @@ const server = serve({
         decodeURIComponent(req.params.team),
         decodeURIComponent(req.params.path),
       ),
-    '/api/getclasslist/:team/:path': async (req) =>
-      LoadClassList(
-        decodeURIComponent(req.params.team),
-        decodeURIComponent(req.params.path),
-      ),
     '/api/savepath/:team/:path/:data': async (req) =>
       SavePath(
         decodeURIComponent(req.params.team),
@@ -34,6 +29,9 @@ const server = serve({
         decodeURIComponent(req.params.data),
       ),
     '/api/db': async (req) => LoadDatabase(),
+    '/api/putdb': {
+      PUT: async (req) => SaveDatabase(JSON.stringify(await req.json())),
+    },
   },
 
   development: process.env.NODE_ENV !== 'production' && {

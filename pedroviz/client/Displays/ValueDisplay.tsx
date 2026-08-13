@@ -1,18 +1,33 @@
 import { CSSProperties, Fragment, ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { Text } from '@fluentui/react-components';
+import {
+  createTableColumn,
+  DataGrid,
+  DataGridBody,
+  DataGridCell,
+  DataGridHeader,
+  DataGridHeaderCell,
+  DataGridRow,
+  TableColumnDefinition,
+  Text,
+} from '@fluentui/react-components';
 
 import {
-  AnonymousValue,
   isDoubleValue,
   isRadiansRef,
   isRef,
+  isValueRef,
+} from '../../CodeTypeCheck';
+import {
+  AnonymousValue,
+  NamedValue,
   PoseName,
   RadiansRef,
   ValueName,
   ValueRef,
-} from '../../server/types';
+} from '../../CodeTypes';
+import { GetValueAsString } from '../ExpressionEval';
 import { NamedValuesAtom } from '../state/Atoms';
 import { ItemWithStyle } from '../ui-tools/types';
 
@@ -20,11 +35,7 @@ export function AnonymousValueDisplay({
   item,
   ...props
 }: ItemWithStyle<AnonymousValue>): ReactElement {
-  if (isDoubleValue(item)) {
-    return <Text {...props}>{item.double.toFixed(2)}</Text>;
-  } else {
-    return <Text {...props}>{item.int.toFixed(0)}</Text>;
-  }
+  return <Text {...props}>{GetValueAsString(item)}</Text>;
 }
 
 export function UnnamedValueDisplay({
@@ -32,7 +43,7 @@ export function UnnamedValueDisplay({
   ...props
 }: ItemWithStyle<ValueRef | RadiansRef>): ReactElement {
   return isRadiansRef(item) ? (
-    <RadiansRefDisplay item={item} />
+    <RadiansRefDisplay item={item} {...props} />
   ) : (
     <>
       <ValueRefDisplay item={item} />
@@ -52,7 +63,7 @@ export function EditableValueRef({
   setRef: (val: ValueName) => void;
   style?: CSSProperties;
 }): ReactElement {
-  const validRefs = useAtomValue(MappedValuesAtom);
+  const validRefs = useAtomValue(ValuesLookupAtom);
   const [curVal, setCurVal] = useState(initial);
   let { message: validNameMessage, state: nameValidationState } =
     CheckValidName(validRefs, curVal, true);
@@ -81,14 +92,6 @@ export function EditableValueRef({
     </Field>
   );
 }
-
-import {
-  Combobox,
-  makeStyles,
-  Option,
-  useId,
-} from "@fluentui/react-components";
-import type { ComboboxProps } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
   root: {
@@ -137,7 +140,7 @@ function getNumber(val: AnonymousValue): number {
 /*
 export function NamedValueElem({ name }: { name: ValueName }): ReactElement {
   const [item, setItem] = useAtom(ValueAtomFamily(name));
-  const names = useAtomValue(MappedValuesAtom);
+  const names = useAtomValue(ValuesLooukpAtom);
   const type = isRadiansRef(item)
     ? 'degrees'
     : isIntValue(item)
@@ -249,6 +252,23 @@ export function RadiansRefDisplay({
   return <MathToRadianDisplay item={item.radians} {...props} />;
 }
 
+const columns: TableColumnDefinition<NamedValue>[] = [
+  createTableColumn<NamedValue>({
+    columnId: 'name',
+    compare: (a, b) => a.name.localeCompare(b.name),
+    renderHeaderCell: () => 'Name',
+    renderCell: (nv) => nv.name,
+  }),
+  createTableColumn<NamedValue>({
+    columnId: 'value',
+    renderHeaderCell: () => 'Value',
+    renderCell: (nv) =>
+      isValueRef(nv.value)
+        ? GetValueAsString(nv.value)
+        : `${GetValueAsString(nv.value.radians)} degrees`,
+  }),
+];
+
 export function NamedValueList(): ReactElement {
   const items = useAtomValue(NamedValuesAtom);
   const gridStyle: CSSProperties = {
@@ -261,16 +281,40 @@ export function NamedValueList(): ReactElement {
   };
 
   return (
-    <div style={gridStyle}>
-      <Text size={400}>Name</Text>
-      <Text size={400}>Value</Text>
-      <Text size={400}>Units</Text>
-      {items.map((val) => (
-        <Fragment key={val.name}>
-          <Text>{val.name}</Text>
-          <UnnamedValueDisplay key={val.name} item={val.value} />
-        </Fragment>
-      ))}
-    </div>
+    <>
+      {/* <div style={gridStyle}>
+        <Text size={400}>Name</Text>
+        <Text size={400}>Value</Text>
+        <Text size={400}>Units</Text>
+        {items.map((val) => (
+          <Fragment key={val.name}>
+            <Text>{val.name}</Text>
+            <UnnamedValueDisplay key={val.name} item={val.value} />
+          </Fragment>
+        ))}
+      </div> */}
+      <DataGrid
+        items={items}
+        columns={columns}
+        sortable
+        getRowId={(itm: NamedValue) => itm.name}>
+        <DataGridHeader>
+          <DataGridRow>
+            {({ renderHeaderCell }) => (
+              <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+            )}
+          </DataGridRow>
+        </DataGridHeader>
+        <DataGridBody<NamedValue>>
+          {({ item, rowId }) => (
+            <DataGridRow<NamedValue> key={rowId}>
+              {({ renderCell, columnId }) => (
+                <DataGridCell>{renderCell(item)}</DataGridCell>
+              )}
+            </DataGridRow>
+          )}
+        </DataGridBody>
+      </DataGrid>
+    </>
   );
 }
