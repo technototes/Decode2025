@@ -33,11 +33,12 @@ const chkConcreteConstantHeading =
     heading: isNumber,
   });
 
-const chkConcreteLinearHeading = chkObjectOfExactType<ConcreteLinearHeading>({
-  type: (t: unknown): t is typeof ConcreteHeadingType.Linear =>
-    t === ConcreteHeadingType.Linear,
-  headings: chkTupleOf(isNumber, isNumber),
-});
+export const chkConcreteLinearHeading =
+  chkObjectOfExactType<ConcreteLinearHeading>({
+    type: (t: unknown): t is typeof ConcreteHeadingType.Linear =>
+      t === ConcreteHeadingType.Linear,
+    headings: chkTupleOf(isNumber, isNumber),
+  });
 
 const chkConcretePointHeading = chkObjectOfExactType<ConcretePointHeading>({
   type: (t: unknown): t is typeof ConcreteHeadingType.Point =>

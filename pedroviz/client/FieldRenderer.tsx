@@ -3,7 +3,10 @@ import { useAtomValue } from 'jotai';
 
 import { isDefined } from '@freik/typechk';
 
-import { chkConcreteSimpleHeading } from './ConcreteEvalTypeCheck';
+import {
+  chkConcreteLinearHeading,
+  chkConcreteSimpleHeading,
+} from './ConcreteEvalTypeCheck';
 import {
   ConcreteHeading,
   ConcreteHeadingType,
@@ -418,20 +421,59 @@ function calcSimpleHeading(
         y: Math.sin(heading.heading),
       };
     case ConcreteHeadingType.Linear:
-      const radians =
-        (heading.headings[0] + (heading.headings[1] - heading.headings[0])) *
-        percent;
+      const radians = linearRangeRadians(
+        heading.headings[0],
+        heading.headings[1],
+        percent,
+      );
       return { x: Math.cos(radians), y: Math.sin(radians) };
     case ConcreteHeadingType.Point:
       return ptDiff(point, heading.heading);
     case ConcreteHeadingType.Reverse:
       // Get the target point, then flip it the other direction
-      const toReverse = calcSimpleHeading(
-        heading.heading,
-        point,
-        tangent,
-        percent,
-      );
-      return ptDiff(point, ptDiff(toReverse, point));
+      // TODO: Fix this; it only reverses for Constant, Tangent, and Point.
+      // For Linear, it's supposed to go the 'other' direction.
+      const lin = chkConcreteLinearHeading(heading.heading);
+      let pct = lin ? -percent : percent;
+      const toReverse = calcSimpleHeading(heading.heading, point, tangent, pct);
+      return lin ? toReverse : ptDiff(point, ptDiff(toReverse, point));
   }
+}
+
+function CloseTo(a: number, b: number): boolean {
+  return Math.abs(a - b) < 1e-7;
+}
+
+function normalizeRadian(a) {
+  const result = a % (2 * Math.PI);
+  return result >= 0 ? result : result + 2 * Math.PI;
+}
+
+function linearRangeRadians(
+  start: number,
+  end: number,
+  percent: number,
+): number {
+  // First, push the values until they're all positive:
+  const s = normalizeRadian(start);
+  const e = normalizeRadian(end);
+  let range = Math.abs(e - s);
+  if (range > Math.PI && percent >= 0) {
+    range = Math.PI * 2 - range;
+  } else if (range < Math.PI && percent < 0) {
+    range = Math.PI * 2 - range;
+  }
+  if (CloseTo(s, (285 * Math.PI) / 180)) {
+    console.log(s);
+  }
+  const flipped = !CloseTo(normalizeRadian(s + range), e);
+  const target = normalizeRadian(
+    s + range * (flipped ? -1 : 1) * Math.abs(percent),
+  );
+  const sd = Math.round((s * 180) / Math.PI);
+  const ed = Math.round((e * 180) / Math.PI);
+  const td = Math.round((target * 180) / Math.PI);
+  const r = Math.round((180 * range) / Math.PI);
+  console.log('s', sd, 'e', ed, 't', td, 'range', r);
+  return target;
 }
