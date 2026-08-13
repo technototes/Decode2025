@@ -84,7 +84,8 @@ function RegisterTopLevelParsedClass(
   });
 }
 
-export async function PopulateDatabase() {
+export async function RescanSourceCode(): Promise<PathDatabase> {
+  ResetDatabase();
   const teamPaths = await GetTeamPaths();
   for (const [team, pki] of teamPaths) {
     for (const pathKey of pki) {
@@ -95,6 +96,7 @@ export async function PopulateDatabase() {
       }
     }
   }
+  return GetDatabase();
 }
 
 export function GetDatabase(): PathDatabase {

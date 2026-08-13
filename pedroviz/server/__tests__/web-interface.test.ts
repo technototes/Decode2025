@@ -5,7 +5,7 @@ import { Pickle, Unpickle } from '@freik/typechk';
 
 import { chkPathDatabase } from '../../IpcTypeCheck';
 import { Team } from '../../IpcTypes';
-import { PopulateDatabase, ResetDatabase } from '../full-database';
+import { RescanSourceCode, ResetDatabase } from '../full-database';
 import { LoadDatabase, LoadPath, SaveDatabase } from '../web-interface';
 
 describe('The basic web interfaces', () => {
@@ -22,7 +22,7 @@ describe('The basic web interfaces', () => {
       return false;
     }
     expect(data.TeamPaths.size()).toEqual(0);
-    await PopulateDatabase();
+    await RescanSourceCode();
     const dbRes2 = await LoadDatabase();
     expect(dbRes2.ok).toBeTrue();
     expect(dbRes2.status).toEqual(200);
@@ -37,7 +37,7 @@ describe('The basic web interfaces', () => {
   });
   test('LoadPath', async () => {
     ResetDatabase();
-    await PopulateDatabase();
+    await RescanSourceCode();
     const res = await LoadPath('LearnBot', 'TestPaths.java');
     expect(res.ok).toBeTrue();
     expect(res.status).toEqual(200);
@@ -48,7 +48,7 @@ describe('The basic web interfaces', () => {
   });
   test('SaveDatabase', async () => {
     ResetDatabase();
-    await PopulateDatabase();
+    await RescanSourceCode();
     const dbRes2 = await LoadDatabase();
     expect(dbRes2.ok).toBeTrue();
     expect(dbRes2.status).toEqual(200);
