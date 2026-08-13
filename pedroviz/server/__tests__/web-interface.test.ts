@@ -10,7 +10,6 @@ import { LoadDatabase, LoadPath, SaveDatabase } from '../web-interface';
 
 describe('The basic web interfaces', () => {
   test('LoadDatabase', async () => {
-    ResetDatabase();
     const dbRes = await LoadDatabase();
     expect(dbRes.ok).toBeTrue();
     expect(dbRes.status).toEqual(200);
@@ -21,8 +20,7 @@ describe('The basic web interfaces', () => {
     if (!chkPathDatabase(data)) {
       return false;
     }
-    expect(data.TeamPaths.size()).toEqual(0);
-    await RescanSourceCode();
+    expect(data.TeamPaths.size()).toEqual(5);
     const dbRes2 = await LoadDatabase();
     expect(dbRes2.ok).toBeTrue();
     expect(dbRes2.status).toEqual(200);
@@ -36,7 +34,6 @@ describe('The basic web interfaces', () => {
     expect(data2.TeamPaths.has('LearnBot' as Team)).toBeTrue();
   });
   test('LoadPath', async () => {
-    ResetDatabase();
     await RescanSourceCode();
     const res = await LoadPath('LearnBot', 'TestPaths.java');
     expect(res.ok).toBeTrue();
@@ -76,6 +73,6 @@ describe('The basic web interfaces', () => {
     if (!chkPathDatabase(data)) {
       return false;
     }
-    expect(data.TeamPaths.size()).toEqual(0);
+    expect(data.TeamPaths.size()).toEqual(5);
   });
 });

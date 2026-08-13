@@ -1,16 +1,25 @@
 import { CSSProperties, ReactElement } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
-import { Text } from '@fluentui/react-components';
+import {
+  createTableColumn,
+  DataGrid,
+  DataGridBody,
+  DataGridCell,
+  DataGridHeader,
+  DataGridHeaderCell,
+  DataGridRow,
+  TableColumnDefinition,
+  Text,
+} from '@fluentui/react-components';
+import { GetValueAsString } from 'client/ExpressionEval';
 import { isDefined } from '@freik/typechk';
 
-import { isPoseName, isRef } from '../../CodeTypeCheck';
-import { AnonymousPose, PoseName } from '../../CodeTypes';
-import { HeadingRefDisplay } from '../PathsDataDisplay';
-import { getColorFor } from '../state/API';
+import { isPoseName } from '../../CodeTypeCheck';
+import { AnonymousPose, NamedPose, PoseName } from '../../CodeTypes';
+import { HeadingRefDisplay, HeadingRefForSorting } from '../PathsDataDisplay';
 import {
-  ColorsAtom,
-  MappedPosesAtom,
+  NamedPosesAtom,
   PoseAtomFamily,
   ValuesLookupAtom,
 } from '../state/Atoms';
@@ -105,29 +114,81 @@ export function NamedPoseItem({
   return <></>;
 }
 
+const columns: TableColumnDefinition<NamedPose>[] = [
+  createTableColumn<NamedPose>({
+    columnId: 'name',
+    compare: (a, b) => a.name.localeCompare(b.name),
+    renderHeaderCell: () => <Text weight="semibold">Name</Text>,
+    renderCell: (nv) => <code>{nv.name}</code>,
+  }),
+  createTableColumn<NamedPose>({
+    columnId: 'X',
+    compare: (a, b) => {
+      const av: string = isPoseName(a.pose)
+        ? a.pose
+        : GetValueAsString(a.pose.x);
+      const bv: string = isPoseName(b.pose)
+        ? b.pose
+        : GetValueAsString(b.pose.x);
+      return av.localeCompare(bv);
+    },
+    renderHeaderCell: () => <Text weight="semibold">X</Text>,
+    renderCell: (np) => (
+      <code>{isPoseName(np.pose) ? np.pose : GetValueAsString(np.pose.x)}</code>
+    ),
+  }),
+  createTableColumn<NamedPose>({
+    columnId: 'Y',
+    compare: (a, b) => {
+      const av: string = isPoseName(a.pose) ? '' : GetValueAsString(a.pose.y);
+      const bv: string = isPoseName(b.pose) ? '' : GetValueAsString(b.pose.y);
+      return av.localeCompare(bv);
+    },
+    renderHeaderCell: () => <Text weight="semibold">Y</Text>,
+    renderCell: (np) => (
+      <code>{isPoseName(np.pose) ? '' : GetValueAsString(np.pose.y)}</code>
+    ),
+  }),
+  createTableColumn<NamedPose>({
+    columnId: 'Heading',
+    compare: (a, b) => {
+      const av = isPoseName(a.pose) ? '' : HeadingRefForSorting(a.pose.heading);
+      const bv = isPoseName(b.pose) ? '' : HeadingRefForSorting(b.pose.heading);
+      return av.localeCompare(bv);
+    },
+    renderHeaderCell: () => <Text weight="semibold">Heading</Text>,
+    renderCell: (np) => {
+      if (!isPoseName(np.pose) && isDefined(np.pose.heading)) {
+        return <HeadingRefDisplay item={np.pose.heading} />;
+      }
+    },
+  }),
+];
+
 export function NamedPoseList(): ReactElement {
-  const items = useAtomValue(MappedPosesAtom);
-  const colors = useAtomValue(ColorsAtom);
-  const gridStyle: CSSProperties = {
-    display: 'grid',
-    columnGap: '10pt',
-    gridTemplateColumns: '1fr auto auto auto auto',
-    justifyItems: 'end',
-    justifySelf: 'start',
-  };
+  const poses = useAtomValue(NamedPosesAtom);
   return (
-    <div style={gridStyle}>
-      <Text size={400}>Name</Text>
-      <AnonymousPoseHeader />
-      {[
-        ...items.entries().map(([name, pose]) => {
-          if (!isRef(pose)) {
-            const color = getColorFor(pose);
-            const style = { color: colors[color % colors.length] };
-            return <NamedPoseItem style={style} key={name} item={name} />;
-          }
-        }),
-      ]}
-    </div>
+    <DataGrid
+      items={poses}
+      columns={columns}
+      sortable
+      getRowId={(itm: NamedPose) => itm.name}>
+      <DataGridHeader>
+        <DataGridRow>
+          {({ renderHeaderCell }) => (
+            <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+          )}
+        </DataGridRow>
+      </DataGridHeader>
+      <DataGridBody<NamedPose>>
+        {({ item, rowId }) => (
+          <DataGridRow<NamedPose> key={rowId}>
+            {({ renderCell }) => (
+              <DataGridCell>{renderCell(item)}</DataGridCell>
+            )}
+          </DataGridRow>
+        )}
+      </DataGridBody>
+    </DataGrid>
   );
 }

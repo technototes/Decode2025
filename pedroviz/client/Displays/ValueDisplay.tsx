@@ -1,4 +1,4 @@
-import { CSSProperties, Fragment, ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
 import {
@@ -35,7 +35,7 @@ export function AnonymousValueDisplay({
   item,
   ...props
 }: ItemWithStyle<AnonymousValue>): ReactElement {
-  return <Text {...props}>{GetValueAsString(item)}</Text>;
+  return <code {...props}>{GetValueAsString(item)}</code>;
 }
 
 export function UnnamedValueDisplay({
@@ -216,7 +216,7 @@ export function GeneralRefDisplay({
   item,
   ...props
 }: ItemWithStyle<ValueName | PoseName>) {
-  return <Text {...props}>{item}</Text>;
+  return <code {...props}>{item}</code>;
 }
 
 export function ValueRefDisplay({
@@ -237,7 +237,7 @@ function MathToRadianDisplay({
   return (
     <>
       <ValueRefDisplay item={item} {...props} />
-      <Text {...props}> degrees</Text>
+      <Text {...props}>&nbsp;degrees</Text>
     </>
   );
 }
@@ -249,7 +249,7 @@ export function RadiansRefDisplay({
   return <MathToRadianDisplay item={item.radians} {...props} />;
 }
 
-function GetVal(ref: NamedValue) {
+export function GetVal(ref: NamedValue) {
   return GetValueAsString(
     isValueRef(ref.value) ? ref.value : ref.value.radians,
   );

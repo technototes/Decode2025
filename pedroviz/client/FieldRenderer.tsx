@@ -444,7 +444,7 @@ function CloseTo(a: number, b: number): boolean {
   return Math.abs(a - b) < 1e-7;
 }
 
-function normalizeRadian(a) {
+function normalizeRadian(a: number) {
   const result = a % (2 * Math.PI);
   return result >= 0 ? result : result + 2 * Math.PI;
 }

@@ -5,7 +5,7 @@ import { Text } from '@fluentui/react-components';
 import { Expandable } from '@freik/fluent9-tools';
 import { isDefined, isUndefined } from '@freik/typechk';
 
-import { isRadiansRef, isRef } from '../CodeTypeCheck';
+import { isPoseName, isRadiansRef, isRef } from '../CodeTypeCheck';
 import {
   AnonymousFacing,
   FacingType,
@@ -21,6 +21,7 @@ import {
   RadiansRefDisplay,
   ValueRefDisplay,
 } from './Displays/ValueDisplay';
+import { GetValueAsString } from './ExpressionEval';
 import { getColorFor } from './state/API';
 import {
   ColorsAtom,
@@ -31,6 +32,16 @@ import {
 } from './state/Atoms';
 import { ItemWithStyle } from './ui-tools/types';
 
+export function HeadingRefForSorting(item: HeadingRef | undefined): string {
+  if (isRadiansRef(item)) {
+    return GetValueAsString(item.radians) + ' degrees';
+  }
+  if (isPoseName(item)) {
+    return item + '.getHeading()';
+  }
+  return isDefined(item) ? GetValueAsString(item) : '';
+}
+
 export function HeadingRefDisplay({
   item,
   ...props
@@ -39,27 +50,12 @@ export function HeadingRefDisplay({
     if (isRadiansRef(item)) {
       return <RadiansRefDisplay item={item} {...props} />;
     } else if (isRef(item)) {
-      return (
-        <>
-          <GeneralRefDisplay item={item} {...props} />
-          <Text>&nbsp;</Text>
-        </>
-      );
+      return <GeneralRefDisplay item={item} {...props} />;
     } else {
-      return (
-        <>
-          <AnonymousValueDisplay item={item} {...props} />
-          <Text>&nbsp;</Text>
-        </>
-      );
+      return <AnonymousValueDisplay item={item} {...props} />;
     }
   }
-  return (
-    <>
-      <Text>&nbsp;</Text>
-      <Text>&nbsp;</Text>
-    </>
-  );
+  return <> </>;
 }
 
 function InlinePoseRefDisplay({ pose }: { pose: PoseRef }): ReactElement {
@@ -316,19 +312,19 @@ export function PathsDataDisplay({
   return (
     <div>
       {/* <FileInfo /> */}
-      <Expandable label="Values" indent={20}>
+      <Expandable label={<Text weight="bold">Values</Text>} indent={20}>
         <Suspense>
           <NamedValueList />
         </Suspense>
         {/* <NewValue /> */}
       </Expandable>
-      <Expandable label="Poses" indent={20}>
+      <Expandable label={<Text weight="bold">Poses</Text>} indent={20}>
         <Suspense>
           <NamedPoseList />
         </Suspense>
         {/* <NewPose /> */}
       </Expandable>
-      <Expandable label="Curves & Lines" indent={20}>
+      <Expandable label={<Text weight="bold">Curves & Lines</Text>} indent={20}>
         <Suspense>
           <NamedBezierList />
         </Suspense>
@@ -336,7 +332,7 @@ export function PathsDataDisplay({
           New Curve
         </Button> */}
       </Expandable>
-      <Expandable label="Paths" indent={20}>
+      <Expandable label={<Text weight="bold">Full Paths</Text>} indent={20}>
         <Suspense>
           <PathChainList />
         </Suspense>
