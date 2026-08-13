@@ -45,10 +45,7 @@ export function UnnamedValueDisplay({
   return isRadiansRef(item) ? (
     <RadiansRefDisplay item={item} {...props} />
   ) : (
-    <>
-      <ValueRefDisplay item={item} />
-      <Text>&nbsp;</Text>
-    </>
+    <ValueRefDisplay item={item} {...props} />
   );
 }
 
@@ -252,69 +249,62 @@ export function RadiansRefDisplay({
   return <MathToRadianDisplay item={item.radians} {...props} />;
 }
 
+function GetVal(ref: NamedValue) {
+  return GetValueAsString(
+    isValueRef(ref.value) ? ref.value : ref.value.radians,
+  );
+}
+
 const columns: TableColumnDefinition<NamedValue>[] = [
   createTableColumn<NamedValue>({
     columnId: 'name',
     compare: (a, b) => a.name.localeCompare(b.name),
-    renderHeaderCell: () => 'Name',
-    renderCell: (nv) => nv.name,
+    renderHeaderCell: () => <Text weight="bold">Name</Text>,
+    renderCell: (nv) => <code>{nv.name}</code>,
   }),
   createTableColumn<NamedValue>({
     columnId: 'value',
-    renderHeaderCell: () => 'Value',
+    compare: (a, b) => {
+      const av = GetVal(a);
+      const bv = GetVal(b);
+      return av.localeCompare(bv);
+    },
+    renderHeaderCell: () => <Text weight="bold">Value</Text>,
     renderCell: (nv) =>
-      isValueRef(nv.value)
-        ? GetValueAsString(nv.value)
-        : `${GetValueAsString(nv.value.radians)} degrees`,
+      isValueRef(nv.value) ? (
+        <code>{GetVal(nv)}</code>
+      ) : (
+        <span>
+          <code>{GetVal(nv)}</code>&nbsp;degrees
+        </span>
+      ),
   }),
 ];
 
 export function NamedValueList(): ReactElement {
   const items = useAtomValue(NamedValuesAtom);
-  const gridStyle: CSSProperties = {
-    display: 'grid',
-    columnGap: '10pt',
-    gridTemplateColumns: '1fr auto auto',
-    justifyItems: 'end',
-    justifySelf: 'start',
-    alignItems: 'center',
-  };
-
   return (
-    <>
-      {/* <div style={gridStyle}>
-        <Text size={400}>Name</Text>
-        <Text size={400}>Value</Text>
-        <Text size={400}>Units</Text>
-        {items.map((val) => (
-          <Fragment key={val.name}>
-            <Text>{val.name}</Text>
-            <UnnamedValueDisplay key={val.name} item={val.value} />
-          </Fragment>
-        ))}
-      </div> */}
-      <DataGrid
-        items={items}
-        columns={columns}
-        sortable
-        getRowId={(itm: NamedValue) => itm.name}>
-        <DataGridHeader>
-          <DataGridRow>
-            {({ renderHeaderCell }) => (
-              <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+    <DataGrid
+      items={items}
+      columns={columns}
+      sortable
+      getRowId={(itm: NamedValue) => itm.name}>
+      <DataGridHeader>
+        <DataGridRow>
+          {({ renderHeaderCell }) => (
+            <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+          )}
+        </DataGridRow>
+      </DataGridHeader>
+      <DataGridBody<NamedValue>>
+        {({ item, rowId }) => (
+          <DataGridRow<NamedValue> key={rowId}>
+            {({ renderCell, columnId }) => (
+              <DataGridCell>{renderCell(item)}</DataGridCell>
             )}
           </DataGridRow>
-        </DataGridHeader>
-        <DataGridBody<NamedValue>>
-          {({ item, rowId }) => (
-            <DataGridRow<NamedValue> key={rowId}>
-              {({ renderCell, columnId }) => (
-                <DataGridCell>{renderCell(item)}</DataGridCell>
-              )}
-            </DataGridRow>
-          )}
-        </DataGridBody>
-      </DataGrid>
-    </>
+        )}
+      </DataGridBody>
+    </DataGrid>
   );
 }

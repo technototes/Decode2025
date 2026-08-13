@@ -463,17 +463,9 @@ function linearRangeRadians(
   } else if (range < Math.PI && percent < 0) {
     range = Math.PI * 2 - range;
   }
-  if (CloseTo(s, (285 * Math.PI) / 180)) {
-    console.log(s);
-  }
   const flipped = !CloseTo(normalizeRadian(s + range), e);
   const target = normalizeRadian(
     s + range * (flipped ? -1 : 1) * Math.abs(percent),
   );
-  const sd = Math.round((s * 180) / Math.PI);
-  const ed = Math.round((e * 180) / Math.PI);
-  const td = Math.round((target * 180) / Math.PI);
-  const r = Math.round((180 * range) / Math.PI);
-  console.log('s', sd, 'e', ed, 't', td, 'range', r);
   return target;
 }
