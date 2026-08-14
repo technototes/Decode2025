@@ -402,7 +402,24 @@ function drawHeadingLine(
   ctx.strokeStyle = color;
   ctx.moveTo(point.x, point.y);
   const displacement = magnitude(targetPoint, opts.Heading.Length);
-  ctx.lineTo(point.x + displacement.x, point.y + displacement.y);
+  const endx = point.x + displacement.x;
+  const endy = point.y + displacement.y;
+  ctx.lineTo(endx, endy);
+  ctx.stroke();
+  // Draw a little arrow point:
+  const angle = Math.atan2(displacement.y, displacement.x);
+  const headSize = opts.Heading.Length * opts.Heading.ArrowPercent;
+  ctx.beginPath();
+  ctx.lineCap = 'square';
+  ctx.moveTo(
+    endx - headSize * Math.cos(angle - opts.Heading.ArrowAngle),
+    endy - headSize * Math.sin(angle - opts.Heading.ArrowAngle),
+  );
+  ctx.lineTo(endx, endy);
+  ctx.lineTo(
+    endx - headSize * Math.cos(angle + opts.Heading.ArrowAngle),
+    endy - headSize * Math.sin(angle + opts.Heading.ArrowAngle),
+  );
   ctx.stroke();
 }
 

@@ -21,6 +21,8 @@ export const PathRenderOptionsAtom = atomWithStorage<PathRenderOptions>(
       Count: 6,
       Length: 5,
       Thickness: 0.5,
+      ArrowAngle: 0.31416,
+      ArrowPercent: 0.15,
     },
     ControlPoint: {
       Thickness: 0.4,

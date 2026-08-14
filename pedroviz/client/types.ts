@@ -33,6 +33,8 @@ export type PathRenderOptions = {
     Count: number;
     Length: number;
     Thickness: number;
+    ArrowAngle: number;
+    ArrowPercent: number;
   };
   ControlPoint: {
     Thickness: number;
