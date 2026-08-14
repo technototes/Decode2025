@@ -16,11 +16,10 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import { MakeMultiMap } from '@freik/containers';
 import { Pickle } from '@freik/typechk';
 
 import '@testing-library/jest-dom';
-
-import { MakeMultiMap } from '@freik/containers';
 
 import { EmptyParsedClass } from '../../CodeTypeCheck';
 import {

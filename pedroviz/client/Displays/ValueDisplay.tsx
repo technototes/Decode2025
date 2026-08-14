@@ -264,10 +264,10 @@ function MathToRadianDisplay({
   ...props
 }: ItemWithStyle<ValueRef>): ReactElement {
   return (
-    <>
+    <span>
       <ValueRefDisplay item={item} {...props} />
       <Text {...props}>&nbsp;degrees</Text>
-    </>
+    </span>
   );
 }
 
@@ -317,6 +317,7 @@ export function NamedValueList(): ReactElement {
       items={items}
       columns={columns}
       sortable
+      resizableColumns
       getRowId={(itm: NamedValue) => itm.name}>
       <DataGridHeader>
         <DataGridRow>

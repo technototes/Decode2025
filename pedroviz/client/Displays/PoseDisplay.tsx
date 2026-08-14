@@ -195,6 +195,7 @@ export function NamedPoseList(): ReactElement {
       items={poses}
       columns={columns}
       sortable
+      resizableColumns
       getRowId={(itm: NamedPose) => itm.name}>
       <DataGridHeader>
         <DataGridRow>
