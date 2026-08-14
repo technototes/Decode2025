@@ -12,15 +12,18 @@ import {
   TableColumnDefinition,
   Text,
 } from '@fluentui/react-components';
+import { isDefined } from '@freik/typechk';
 
 import {
   isDoubleValue,
+  isPoseName,
   isRadiansRef,
   isRef,
   isValueRef,
 } from '../../CodeTypeCheck';
 import {
   AnonymousValue,
+  HeadingRef,
   NamedValue,
   PoseName,
   RadiansRef,
@@ -30,6 +33,32 @@ import {
 import { GetValueAsString } from '../ExpressionEval';
 import { NamedValuesAtom } from '../state/Atoms';
 import { ItemWithStyle } from '../ui-tools/types';
+
+export function HeadingRefForSorting(item: HeadingRef | undefined): string {
+  if (isRadiansRef(item)) {
+    return GetValueAsString(item.radians) + ' degrees';
+  }
+  if (isPoseName(item)) {
+    return item + '.getHeading()';
+  }
+  return isDefined(item) ? GetValueAsString(item) : '';
+}
+
+export function HeadingRefDisplay({
+  item,
+  ...props
+}: ItemWithStyle<HeadingRef>): ReactElement {
+  if (isDefined(item)) {
+    if (isRadiansRef(item)) {
+      return <RadiansRefDisplay item={item} {...props} />;
+    } else if (isRef(item)) {
+      return <GeneralRefDisplay item={item} {...props} />;
+    } else {
+      return <AnonymousValueDisplay item={item} {...props} />;
+    }
+  }
+  return <> </>;
+}
 
 export function AnonymousValueDisplay({
   item,

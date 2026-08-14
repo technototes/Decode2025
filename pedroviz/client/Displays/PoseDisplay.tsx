@@ -1,4 +1,4 @@
-import { CSSProperties, ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
 import {
@@ -15,10 +15,10 @@ import {
 import { GetValueAsString } from 'client/ExpressionEval';
 import { isDefined } from '@freik/typechk';
 
-import { isPoseName } from '../../CodeTypeCheck';
-import { AnonymousPose, NamedPose, PoseName } from '../../CodeTypes';
-import { HeadingRefDisplay, HeadingRefForSorting } from '../PathsDataDisplay';
+import { isPoseName, isRef } from '../../CodeTypeCheck';
+import { AnonymousPose, NamedPose, PoseName, PoseRef } from '../../CodeTypes';
 import {
+  ColorsAtom,
   NamedPosesAtom,
   PoseAtomFamily,
   ValuesLookupAtom,
@@ -27,6 +27,29 @@ import { HasKeys } from '../types';
 import { ItemWithStyle } from '../ui-tools/types';
 import { NumberOrNamedValue } from './NumberOrNamedValueEditor';
 import { ValRefFromString } from './Validation';
+import {
+  HeadingRefDisplay,
+  HeadingRefForSorting,
+  ValueRefDisplay,
+} from './ValueDisplay';
+
+export function InlinePoseRefDisplay({
+  pose,
+}: {
+  pose: PoseRef;
+}): ReactElement {
+  const colors = useAtomValue(ColorsAtom);
+  /*const ap = isRef(pose) ? getPose(pose) : pose;
+  const color = getColorFor(ap);*/
+  // const style = { color: colors[color % colors.length] };
+  return isRef(pose) ? (
+    <Text style={{/*style*/}}>{pose}</Text>
+  ) : (
+    <Text style={{/*style*/}}>
+      (<ValueRefDisplay item={pose.x} />, <ValueRefDisplay item={pose.y} />)
+    </Text>
+  );
+}
 
 export type AnonymousPoseDisplayProps = {
   pose: AnonymousPose;

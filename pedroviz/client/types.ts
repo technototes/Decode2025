@@ -114,3 +114,5 @@ export type ResponsiveSquareCanvasProps = {
     devicePixelRatio: number,
   ) => void;
 };
+
+export type RowData = { offset: number; size: number };
