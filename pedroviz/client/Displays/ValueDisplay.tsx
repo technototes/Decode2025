@@ -1,4 +1,4 @@
-import { CSSProperties, Fragment, ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { useAtomValue } from 'jotai';
 
 import {
@@ -12,15 +12,18 @@ import {
   TableColumnDefinition,
   Text,
 } from '@fluentui/react-components';
+import { isDefined } from '@freik/typechk';
 
 import {
   isDoubleValue,
+  isPoseName,
   isRadiansRef,
   isRef,
   isValueRef,
 } from '../../CodeTypeCheck';
 import {
   AnonymousValue,
+  HeadingRef,
   NamedValue,
   PoseName,
   RadiansRef,
@@ -31,11 +34,37 @@ import { GetValueAsString } from '../ExpressionEval';
 import { NamedValuesAtom } from '../state/Atoms';
 import { ItemWithStyle } from '../ui-tools/types';
 
+export function HeadingRefForSorting(item: HeadingRef | undefined): string {
+  if (isRadiansRef(item)) {
+    return GetValueAsString(item.radians) + ' degrees';
+  }
+  if (isPoseName(item)) {
+    return item + '.getHeading()';
+  }
+  return isDefined(item) ? GetValueAsString(item) : '';
+}
+
+export function HeadingRefDisplay({
+  item,
+  ...props
+}: ItemWithStyle<HeadingRef>): ReactElement {
+  if (isDefined(item)) {
+    if (isRadiansRef(item)) {
+      return <RadiansRefDisplay item={item} {...props} />;
+    } else if (isRef(item)) {
+      return <GeneralRefDisplay item={item} {...props} />;
+    } else {
+      return <AnonymousValueDisplay item={item} {...props} />;
+    }
+  }
+  return <> </>;
+}
+
 export function AnonymousValueDisplay({
   item,
   ...props
 }: ItemWithStyle<AnonymousValue>): ReactElement {
-  return <Text {...props}>{GetValueAsString(item)}</Text>;
+  return <code {...props}>{GetValueAsString(item)}</code>;
 }
 
 export function UnnamedValueDisplay({
@@ -45,10 +74,7 @@ export function UnnamedValueDisplay({
   return isRadiansRef(item) ? (
     <RadiansRefDisplay item={item} {...props} />
   ) : (
-    <>
-      <ValueRefDisplay item={item} />
-      <Text>&nbsp;</Text>
-    </>
+    <ValueRefDisplay item={item} {...props} />
   );
 }
 
@@ -219,7 +245,7 @@ export function GeneralRefDisplay({
   item,
   ...props
 }: ItemWithStyle<ValueName | PoseName>) {
-  return <Text {...props}>{item}</Text>;
+  return <code {...props}>{item}</code>;
 }
 
 export function ValueRefDisplay({
@@ -238,10 +264,10 @@ function MathToRadianDisplay({
   ...props
 }: ItemWithStyle<ValueRef>): ReactElement {
   return (
-    <>
+    <span>
       <ValueRefDisplay item={item} {...props} />
-      <Text {...props}> degrees</Text>
-    </>
+      <Text {...props}>&nbsp;degrees</Text>
+    </span>
   );
 }
 
@@ -252,69 +278,63 @@ export function RadiansRefDisplay({
   return <MathToRadianDisplay item={item.radians} {...props} />;
 }
 
+export function GetVal(ref: NamedValue) {
+  return GetValueAsString(
+    isValueRef(ref.value) ? ref.value : ref.value.radians,
+  );
+}
+
 const columns: TableColumnDefinition<NamedValue>[] = [
   createTableColumn<NamedValue>({
     columnId: 'name',
     compare: (a, b) => a.name.localeCompare(b.name),
-    renderHeaderCell: () => 'Name',
-    renderCell: (nv) => nv.name,
+    renderHeaderCell: () => <Text weight="bold">Name</Text>,
+    renderCell: (nv) => <code>{nv.name}</code>,
   }),
   createTableColumn<NamedValue>({
     columnId: 'value',
-    renderHeaderCell: () => 'Value',
+    compare: (a, b) => {
+      const av = GetVal(a);
+      const bv = GetVal(b);
+      return av.localeCompare(bv);
+    },
+    renderHeaderCell: () => <Text weight="bold">Value</Text>,
     renderCell: (nv) =>
-      isValueRef(nv.value)
-        ? GetValueAsString(nv.value)
-        : `${GetValueAsString(nv.value.radians)} degrees`,
+      isValueRef(nv.value) ? (
+        <code>{GetVal(nv)}</code>
+      ) : (
+        <span>
+          <code>{GetVal(nv)}</code>&nbsp;degrees
+        </span>
+      ),
   }),
 ];
 
 export function NamedValueList(): ReactElement {
   const items = useAtomValue(NamedValuesAtom);
-  const gridStyle: CSSProperties = {
-    display: 'grid',
-    columnGap: '10pt',
-    gridTemplateColumns: '1fr auto auto',
-    justifyItems: 'end',
-    justifySelf: 'start',
-    alignItems: 'center',
-  };
-
   return (
-    <>
-      {/* <div style={gridStyle}>
-        <Text size={400}>Name</Text>
-        <Text size={400}>Value</Text>
-        <Text size={400}>Units</Text>
-        {items.map((val) => (
-          <Fragment key={val.name}>
-            <Text>{val.name}</Text>
-            <UnnamedValueDisplay key={val.name} item={val.value} />
-          </Fragment>
-        ))}
-      </div> */}
-      <DataGrid
-        items={items}
-        columns={columns}
-        sortable
-        getRowId={(itm: NamedValue) => itm.name}>
-        <DataGridHeader>
-          <DataGridRow>
-            {({ renderHeaderCell }) => (
-              <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+    <DataGrid
+      items={items}
+      columns={columns}
+      sortable
+      resizableColumns
+      getRowId={(itm: NamedValue) => itm.name}>
+      <DataGridHeader>
+        <DataGridRow>
+          {({ renderHeaderCell }) => (
+            <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+          )}
+        </DataGridRow>
+      </DataGridHeader>
+      <DataGridBody<NamedValue>>
+        {({ item, rowId }) => (
+          <DataGridRow<NamedValue> key={rowId}>
+            {({ renderCell, columnId }) => (
+              <DataGridCell>{renderCell(item)}</DataGridCell>
             )}
           </DataGridRow>
-        </DataGridHeader>
-        <DataGridBody<NamedValue>>
-          {({ item, rowId }) => (
-            <DataGridRow<NamedValue> key={rowId}>
-              {({ renderCell, columnId }) => (
-                <DataGridCell>{renderCell(item)}</DataGridCell>
-              )}
-            </DataGridRow>
-          )}
-        </DataGridBody>
-      </DataGrid>
-    </>
+        )}
+      </DataGridBody>
+    </DataGrid>
   );
 }

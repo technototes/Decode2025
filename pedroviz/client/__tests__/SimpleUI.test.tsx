@@ -16,11 +16,10 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import { MakeMultiMap } from '@freik/containers';
 import { Pickle } from '@freik/typechk';
 
 import '@testing-library/jest-dom';
-
-import { MakeMultiMap } from '@freik/containers';
 
 import { EmptyParsedClass } from '../../CodeTypeCheck';
 import {
@@ -42,13 +41,11 @@ import {
   ColorForNumber,
   ColorsAtom,
   MappedBeziersAtom,
-  MappedPosesAtom,
+  NamedPosesAtom,
   PathsForSelectedTeamAtom,
-  PoseAtomFamily,
   SelectedClassAtom,
   SelectedPathAtom,
   SelectedTeamAtom,
-  ValueAtomFamily,
   ValuesLookupAtom,
 } from '../state/Atoms';
 import { ThemeAtom } from '../state/SavedSettings';
@@ -353,7 +350,7 @@ describe('SchemaAtom tests', () => {
       expect(await store.get(SelectedPathAtom)).toBe('path3.java' as Path);
     });
     expect(await store.get(ValuesLookupAtom)).toBeDefined();
-    expect(await store.get(MappedPosesAtom)).toBeDefined();
+    expect(await store.get(NamedPosesAtom)).toBeDefined();
     expect(await store.get(MappedBeziersAtom)).toBeDefined();
     /*await act(() =>
       store.set(ValueAtomFamily('valX' as ValueName), { int: 42 }),
