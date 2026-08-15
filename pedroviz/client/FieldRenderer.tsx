@@ -1,8 +1,10 @@
 import { CSSProperties, ReactElement, useCallback } from 'react';
 import { useAtomValue } from 'jotai';
 
+import { tokens } from '@fluentui/tokens';
 import { isDefined } from '@freik/typechk';
 
+import { BezierRef, ParsedClass, PoseRef } from '../CodeTypes';
 import {
   chkConcreteLinearHeading,
   chkConcreteSimpleHeading,
@@ -13,14 +15,21 @@ import {
   ConcreteSimpleHeading,
   Point,
 } from './ConcreteEvalTypes';
-import { calcBezierRef, calcFacing } from './ExpressionEval';
+import { calcBezierRef, calcFacing, calcPoseRef } from './ExpressionEval';
 import {
   ColorsAtom,
+  FocusedCurveAtom,
+  FocusedPoseAtom,
   NamedPathChainsAtom,
   SelectedParsedClassAtom,
 } from './state/Atoms';
 import { PathRenderOptionsAtom, ThemeAtom } from './state/SavedSettings';
-import { CtrlPtStyles, PathRenderOptions } from './types';
+import {
+  ControlPointStyle,
+  CtrlPtStyles,
+  HeadingStyle,
+  PathRenderOptions,
+} from './types';
 import { bezierLength, deCasteljau } from './ui-tools/bezier';
 import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
 
@@ -39,6 +48,10 @@ export function FieldRenderer(): ReactElement {
   const colors = useAtomValue(ColorsAtom);
   const allPCs = useAtomValue(NamedPathChainsAtom);
   const file = useAtomValue(SelectedParsedClassAtom);
+
+  const focusedPose = useAtomValue(FocusedPoseAtom);
+  const focusedCurve = useAtomValue(FocusedCurveAtom);
+
   const points = allPCs.flatMap((npc) =>
     npc.paths.map((br): [Point[], ConcreteHeading] => [
       calcBezierRef(br, file),
@@ -76,8 +89,15 @@ export function FieldRenderer(): ReactElement {
           opts,
         ),
       );
+
+      if (isDefined(focusedPose)) {
+        drawFocusedPose(opts, ctx, focusedPose.pose, file);
+      }
+      if (isDefined(focusedCurve)) {
+        drawFocusedCurve(opts, ctx, focusedCurve.points, file);
+      }
     },
-    [opts, theme, allPCs, colors, points],
+    [opts, theme, allPCs, colors, points, focusedPose, focusedCurve],
   );
 
   return (
@@ -87,6 +107,68 @@ export function FieldRenderer(): ReactElement {
       render={renderField}
     />
   );
+}
+
+function drawFocusedCurve(
+  opts: PathRenderOptions,
+  ctx: CanvasRenderingContext2D,
+  focusedCurve: BezierRef,
+  file: ParsedClass,
+) {
+  const br = calcBezierRef(focusedCurve, file);
+  const pro: PathRenderOptions = {
+    ...opts,
+    PathThickness: 1,
+    Heading: { ...opts.Heading, Display: false },
+    ControlPoint: {
+      Thickness: 1,
+      Size: 3,
+      Style: getContrastingStyle(opts.ControlPoint.Style),
+    },
+  };
+  renderCurve(ctx, br, '#fff', pro);
+}
+
+function drawFocusedPose(
+  opts: PathRenderOptions,
+  ctx: CanvasRenderingContext2D,
+  focusedPose: PoseRef,
+  file: ParsedClass,
+) {
+  const style: ControlPointStyle = {
+    Thickness: 0.5,
+    Style: getContrastingStyle(opts.ControlPoint.Style),
+    Size: 8,
+  };
+  const pt = calcPoseRef(focusedPose, file);
+  ctx.beginPath();
+  ctx.strokeStyle = tokens.colorNeutralForeground1; // TODO: Update this
+  drawPoint(ctx, pt, style);
+  ctx.stroke();
+  if (isDefined(pt.h)) {
+    const hstyle: HeadingStyle = {
+      Display: true,
+      Count: 0,
+      Length: 10,
+      Thickness: 0.5,
+      ArrowAngle: 0.6,
+      ArrowPercent: 0.15,
+    };
+    drawHeadingLine(ctx, hstyle, tokens.colorNeutralForeground1, pt, {
+      x: Math.cos(pt.h),
+      y: Math.sin(pt.h),
+    });
+  }
+}
+
+function getContrastingStyle(s: CtrlPtStyles): CtrlPtStyles {
+  switch (s) {
+    case CtrlPtStyles.Crosshair:
+    case CtrlPtStyles.X:
+      return CtrlPtStyles.Square;
+    default:
+      return CtrlPtStyles.Crosshair;
+  }
 }
 
 function outlineText(
@@ -181,15 +263,14 @@ function ptDistance(a: Point, b: Point): number {
   return Math.sqrt(delta.x * delta.x + delta.y * delta.y);
 }
 
-function renderPath(
+function renderCurve(
   ctx: CanvasRenderingContext2D,
   curveControlPoints: Point[],
-  heading: ConcreteHeading | false,
   color: string,
   opts: PathRenderOptions,
-) {
+): [number, Point[]] {
   if (curveControlPoints.length < 2) {
-    return;
+    return [0, []];
   }
   const len = bezierLength(curveControlPoints);
   const pts: Point[] = [];
@@ -225,6 +306,17 @@ function renderPath(
     );
     ctx.stroke();
   }
+  return [approxLen, pts];
+}
+
+function renderPath(
+  ctx: CanvasRenderingContext2D,
+  curveControlPoints: Point[],
+  heading: ConcreteHeading | false,
+  color: string,
+  opts: PathRenderOptions,
+) {
+  const [approxLen, pts] = renderCurve(ctx, curveControlPoints, color, opts);
   if (
     opts.ControlPoint.Style != 'z' &&
     opts.ControlPoint.Size > 1e-10 &&
@@ -250,6 +342,43 @@ function renderPath(
       */
 }
 
+function drawPoint(
+  ctx: CanvasRenderingContext2D,
+  pt: Point,
+  style: ControlPointStyle,
+) {
+  ctx.lineWidth = style.Thickness;
+  const half = style.Size / 2;
+  const shape = style.Style;
+  switch (shape) {
+    case CtrlPtStyles.Circle:
+      ctx.moveTo(pt.x + half, pt.y);
+      ctx.arc(pt.x, pt.y, half, 0, 2 * Math.PI);
+      break;
+    case CtrlPtStyles.Square:
+      ctx.rect(pt.x - half, pt.y - half, style.Size, style.Size);
+      break;
+    case CtrlPtStyles.X:
+      ctx.moveTo(pt.x - half, pt.y - half);
+      ctx.lineTo(pt.x + half, pt.y + half);
+      ctx.moveTo(pt.x - half, pt.y + half);
+      ctx.lineTo(pt.x + half, pt.y - half);
+      break;
+    case CtrlPtStyles.Triangle:
+      ctx.moveTo(pt.x - half, pt.y - half);
+      ctx.lineTo(pt.x, pt.y + half);
+      ctx.lineTo(pt.x + half, pt.y - half);
+      ctx.closePath();
+      break;
+    case CtrlPtStyles.Crosshair:
+      ctx.moveTo(pt.x - half, pt.y);
+      ctx.lineTo(pt.x + half, pt.y);
+      ctx.moveTo(pt.x, pt.y + half);
+      ctx.lineTo(pt.x, pt.y - half);
+      break;
+  }
+}
+
 function drawControlPoints(
   ctx: CanvasRenderingContext2D,
   opts: PathRenderOptions,
@@ -257,44 +386,9 @@ function drawControlPoints(
   color: string,
 ) {
   ctx.beginPath();
-  ctx.lineWidth = opts.ControlPoint.Thickness;
-  const half = opts.ControlPoint.Size / 2;
-  const shape = opts.ControlPoint.Style;
+  ctx.strokeStyle = color;
   for (const pt of curveControlPoints) {
-    ctx.strokeStyle = color;
-    // TODO: Support more point display styles
-    switch (shape) {
-      case CtrlPtStyles.Circle:
-        ctx.moveTo(pt.x + half, pt.y);
-        ctx.arc(pt.x, pt.y, half, 0, 2 * Math.PI);
-        break;
-      case CtrlPtStyles.Square:
-        ctx.rect(
-          pt.x - half,
-          pt.y - half,
-          opts.ControlPoint.Size,
-          opts.ControlPoint.Size,
-        );
-        break;
-      case CtrlPtStyles.X:
-        ctx.moveTo(pt.x - half, pt.y - half);
-        ctx.lineTo(pt.x + half, pt.y + half);
-        ctx.moveTo(pt.x - half, pt.y + half);
-        ctx.lineTo(pt.x + half, pt.y - half);
-        break;
-      case CtrlPtStyles.Triangle:
-        ctx.moveTo(pt.x - half, pt.y - half);
-        ctx.lineTo(pt.x, pt.y + half);
-        ctx.lineTo(pt.x + half, pt.y - half);
-        ctx.closePath();
-        break;
-      case CtrlPtStyles.Crosshair:
-        ctx.moveTo(pt.x - half, pt.y);
-        ctx.lineTo(pt.x + half, pt.y);
-        ctx.moveTo(pt.x, pt.y + half);
-        ctx.lineTo(pt.x, pt.y - half);
-        break;
-    }
+    drawPoint(ctx, pt, opts.ControlPoint);
   }
   ctx.stroke();
 }
@@ -355,7 +449,7 @@ function drawHeadingLines(
     if (isDefined(point)) {
       // Draw the heading line at this location.
       // Include the tangent, and the portion of the overall path that's complete.
-      drawHeadingLine(
+      drawPathHeadingLine(
         ctx,
         color,
         point,
@@ -368,7 +462,7 @@ function drawHeadingLines(
   }
 }
 
-function drawHeadingLine(
+function drawPathHeadingLine(
   ctx: CanvasRenderingContext2D,
   color: string,
   point: Point,
@@ -396,29 +490,39 @@ function drawHeadingLine(
       }
     }
   }
+  drawHeadingLine(ctx, opts.Heading, color, point, targetPoint);
+}
+
+function drawHeadingLine(
+  ctx: CanvasRenderingContext2D,
+  style: HeadingStyle,
+  color: string,
+  point: Point,
+  targetPoint: Point,
+) {
   ctx.beginPath();
   ctx.lineCap = 'round';
-  ctx.lineWidth = opts.Heading.Thickness;
+  ctx.lineWidth = style.Thickness;
   ctx.strokeStyle = color;
   ctx.moveTo(point.x, point.y);
-  const displacement = magnitude(targetPoint, opts.Heading.Length);
+  const displacement = magnitude(targetPoint, style.Length);
   const endx = point.x + displacement.x;
   const endy = point.y + displacement.y;
   ctx.lineTo(endx, endy);
   ctx.stroke();
   // Draw a little arrow point:
   const angle = Math.atan2(displacement.y, displacement.x);
-  const headSize = opts.Heading.Length * opts.Heading.ArrowPercent;
+  const headSize = style.Length * style.ArrowPercent;
   ctx.beginPath();
   ctx.lineCap = 'square';
   ctx.moveTo(
-    endx - headSize * Math.cos(angle - opts.Heading.ArrowAngle),
-    endy - headSize * Math.sin(angle - opts.Heading.ArrowAngle),
+    endx - headSize * Math.cos(angle - style.ArrowAngle),
+    endy - headSize * Math.sin(angle - style.ArrowAngle),
   );
   ctx.lineTo(endx, endy);
   ctx.lineTo(
-    endx - headSize * Math.cos(angle + opts.Heading.ArrowAngle),
-    endy - headSize * Math.sin(angle + opts.Heading.ArrowAngle),
+    endx - headSize * Math.cos(angle + style.ArrowAngle),
+    endy - headSize * Math.sin(angle + style.ArrowAngle),
   );
   ctx.stroke();
 }
@@ -447,9 +551,8 @@ function calcSimpleHeading(
     case ConcreteHeadingType.Point:
       return ptDiff(point, heading.heading);
     case ConcreteHeadingType.Reverse:
-      // Get the target point, then flip it the other direction
-      // TODO: Fix this; it only reverses for Constant, Tangent, and Point.
-      // For Linear, it's supposed to go the 'other' direction.
+      // Get the target point, then flip it the other direction, unless it's linear.
+      // For Linear, it travels the opposite direction of the normal linear heading.
       const lin = chkConcreteLinearHeading(heading.heading);
       let pct = lin ? -percent : percent;
       const toReverse = calcSimpleHeading(heading.heading, point, tangent, pct);

@@ -142,7 +142,15 @@ export function calcPoseRef(
   if (isUndefined(ap)) {
     throw new Error(`Invalid PoseRef ${pr}`);
   }
-  return { x: calcValueRef(ap.x, ctx, seen), y: calcValueRef(ap.y, ctx, seen) };
+  let h: number | undefined;
+  if (isDefined(ap.heading)) {
+    h = calcHeadingRef(ap.heading, ctx, circ);
+  }
+  return {
+    x: calcValueRef(ap.x, ctx, seen),
+    y: calcValueRef(ap.y, ctx, seen),
+    h,
+  };
 }
 
 export function calcBezierRef(

@@ -24,23 +24,27 @@ export const CtrlPtStyles = Object.freeze({
 } as const);
 export type CtrlPtStyles = (typeof CtrlPtStyles)[keyof typeof CtrlPtStyles];
 
+export type ControlPointStyle = {
+  Thickness: number;
+  Size: number;
+  Style: CtrlPtStyles;
+};
+
+export type HeadingStyle = {
+  Display: boolean;
+  Count: number;
+  Length: number;
+  Thickness: number;
+  ArrowAngle: number;
+  ArrowPercent: number;
+};
+
 export type PathRenderOptions = {
   ShowField: boolean;
   PathThickness: number;
   ShowCoords: boolean;
-  Heading: {
-    Display: boolean;
-    Count: number;
-    Length: number;
-    Thickness: number;
-    ArrowAngle: number;
-    ArrowPercent: number;
-  };
-  ControlPoint: {
-    Thickness: number;
-    Size: number;
-    Style: CtrlPtStyles;
-  };
+  Heading: HeadingStyle;
+  ControlPoint: ControlPointStyle;
 };
 
 export type OneFileIndex = {

@@ -73,6 +73,8 @@ describe('storage atoms', () => {
         PathThickness: 0.1,
         ShowCoords: true,
         Heading: {
+          ArrowAngle: 0.31416,
+          ArrowPercent: 0.15,
           Display: true,
           Count: 6,
           Length: 5,
@@ -155,6 +157,8 @@ describe('storage atoms', () => {
     expect(pro.result.current).toEqual(
       update({
         Heading: {
+          ArrowAngle: 0.31416,
+          ArrowPercent: 0.15,
           Display: false,
           Count: 6,
           Length: 5,
@@ -175,6 +179,8 @@ describe('storage atoms', () => {
     expect(pro.result.current).toEqual(
       update({
         Heading: {
+          ArrowAngle: 0.31416,
+          ArrowPercent: 0.15,
           Display: false,
           Count: 17,
           Length: 5,
@@ -195,6 +201,8 @@ describe('storage atoms', () => {
     expect(pro.result.current).toEqual(
       update({
         Heading: {
+          ArrowAngle: 0.31416,
+          ArrowPercent: 0.15,
           Display: false,
           Count: 17,
           Length: 10,
@@ -215,6 +223,8 @@ describe('storage atoms', () => {
     expect(pro.result.current).toEqual(
       update({
         Heading: {
+          ArrowAngle: 0.31416,
+          ArrowPercent: 0.15,
           Display: false,
           Count: 17,
           Length: 10,

@@ -1,4 +1,4 @@
-export type Point = { x: number; y: number };
+export type Point = { x: number; y: number; h?: number };
 
 export const ConcreteHeadingType = Object.freeze({
   Tangent: 'T',
