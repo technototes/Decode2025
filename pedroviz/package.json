@@ -15,6 +15,7 @@
   "dependencies": {
     "@fluentui/react-components": "^9.74.6",
     "@fluentui/react-icons": "^2.0.337",
+    "@fluentui/tokens": "^1.0.0-alpha.24",
     "@freik/containers": "^0.4.10",
     "@freik/fluent9-tools": "^0.2.0",
     "@freik/react-tools": "^0.4.0",

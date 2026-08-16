@@ -146,10 +146,6 @@ function isPiecewiseFacingType(
   return type === FacingType.Piecewise;
 }
 
-export function getFacingType(facing: AnonymousFacing): FacingType {
-  return facing.type;
-}
-
 export const isTangentFacing = chkObjectOfExactType<FacingTangent>({
   type: isTangentFacingType,
 });

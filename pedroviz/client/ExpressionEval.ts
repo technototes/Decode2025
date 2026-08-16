@@ -60,7 +60,7 @@ export function readConstant(name: string): number | undefined {
   }
 }
 
-export function calcValueRef(
+/*export*/ function calcValueRef(
   vr: ValueRef | RadiansRef,
   ctx: ParsedClass,
   circ?: Set<string>,
@@ -92,7 +92,7 @@ export function calcValueRef(
   return calcValue(av, ctx, seen);
 }
 
-export function calcPoseRefHeading(
+/*export*/ function calcPoseRefHeading(
   pr: PoseRef,
   ctx: ParsedClass,
   circ?: Set<string>,
@@ -180,7 +180,7 @@ export function calcBezierRef(
   return ab.points.map((p) => calcPoseRef(p, ctx, seen));
 }
 
-export function calcHeadingRef(
+/*export*/ function calcHeadingRef(
   hr: HeadingRef,
   ctx: ParsedClass,
   circ?: Set<string>,
@@ -211,7 +211,7 @@ export function calcHeadingRef(
   }
 }
 
-export function calcValue(
+/*export*/ function calcValue(
   av: AnonymousValue | RadiansRef,
   ctx: ParsedClass,
   circ?: Set<string>,
