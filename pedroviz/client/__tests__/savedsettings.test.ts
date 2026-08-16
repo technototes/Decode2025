@@ -4,19 +4,19 @@ import { useAtom, useAtomValue } from 'jotai';
 import { act, renderHook } from '@testing-library/react';
 
 import {
-  CtrlPtSizeAtom,
-  CtrlPtStyleAtom,
-  CtrlPtThicknessAtom,
-  HeadingCountAtom,
-  HeadingLengthAtom,
-  HeadingThicknessAtom,
-  PathRenderOptionsAtom,
+  DisplayOptionsAtom,
+  PathHeadingCountAtom,
+  PathHeadingLengthAtom,
+  PathHeadingThicknessAtom,
+  PathPointSizeAtom,
+  PathPointStyleAtom,
+  PathPointThicknessAtom,
   PathThicknessAtom,
-  ShowBotHeadingAtom,
   ShowFieldAtom,
   ShowFieldKeyAtom,
+  ShowPathHeadingAtom,
 } from '../state/SavedSettings';
-import { CtrlPtStyles, PathRenderOptions } from '../types';
+import { CtrlPtStyles, DisplayOptions } from '../types';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 // or global.IS_REACT_ACT_ENVIRONMENT = true; depending on your environment
@@ -64,7 +64,7 @@ function update(update: Prefs): Prefs {
 describe('storage atoms', () => {
   test('Team/Path interactions', async () => {
     let pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
+      renderHook(() => useAtomValue(DisplayOptionsAtom)),
     );
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
@@ -85,17 +85,15 @@ describe('storage atoms', () => {
           Size: 2,
           Style: CtrlPtStyles.Circle,
         },
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const ctlPtSize = await act(() =>
-      renderHook(() => useAtom(CtrlPtSizeAtom)),
+      renderHook(() => useAtom(PathPointSizeAtom)),
     );
     expect(ctlPtSize.result).toBeDefined();
     expect(ctlPtSize.result.current[0]).toEqual(2);
     ctlPtSize.result.current[1](3);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
@@ -104,17 +102,15 @@ describe('storage atoms', () => {
           Size: 3,
           Style: CtrlPtStyles.Circle,
         },
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const ctlPtStyle = await act(() =>
-      renderHook(() => useAtom(CtrlPtStyleAtom)),
+      renderHook(() => useAtom(PathPointStyleAtom)),
     );
     expect(ctlPtStyle.result).toBeDefined();
     expect(ctlPtStyle.result.current[0]).toEqual(CtrlPtStyles.Circle);
     ctlPtStyle.result.current[1](CtrlPtStyles.Square);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
@@ -123,17 +119,15 @@ describe('storage atoms', () => {
           Size: 3,
           Style: CtrlPtStyles.Square,
         },
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const ctlPtThickness = await act(() =>
-      renderHook(() => useAtom(CtrlPtThicknessAtom)),
+      renderHook(() => useAtom(PathPointThicknessAtom)),
     );
     expect(ctlPtThickness.result).toBeDefined();
     expect(ctlPtThickness.result.current[0]).toEqual(0.4);
     ctlPtThickness.result.current[1](1.5);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
@@ -142,17 +136,15 @@ describe('storage atoms', () => {
           Size: 3,
           Style: CtrlPtStyles.Square,
         },
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const showBotHeading = await act(() =>
-      renderHook(() => useAtom(ShowBotHeadingAtom)),
+      renderHook(() => useAtom(ShowPathHeadingAtom)),
     );
     expect(showBotHeading.result).toBeDefined();
     expect(showBotHeading.result.current[0]).toEqual(true);
     showBotHeading.result.current[1](false);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
@@ -164,17 +156,15 @@ describe('storage atoms', () => {
           Length: 5,
           Thickness: 0.5,
         },
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const headingCount = await act(() =>
-      renderHook(() => useAtom(HeadingCountAtom)),
+      renderHook(() => useAtom(PathHeadingCountAtom)),
     );
     expect(headingCount.result).toBeDefined();
     expect(headingCount.result.current[0]).toEqual(6);
     headingCount.result.current[1](17);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
@@ -186,17 +176,15 @@ describe('storage atoms', () => {
           Length: 5,
           Thickness: 0.5,
         },
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const headingLength = await act(() =>
-      renderHook(() => useAtom(HeadingLengthAtom)),
+      renderHook(() => useAtom(PathHeadingLengthAtom)),
     );
     expect(headingLength.result).toBeDefined();
     expect(headingLength.result.current[0]).toEqual(5);
     headingLength.result.current[1](10);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
@@ -208,17 +196,15 @@ describe('storage atoms', () => {
           Length: 10,
           Thickness: 0.5,
         },
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const headingThickness = await act(() =>
-      renderHook(() => useAtom(HeadingThicknessAtom)),
+      renderHook(() => useAtom(PathHeadingThicknessAtom)),
     );
     expect(headingThickness.result).toBeDefined();
     expect(headingThickness.result.current[0]).toEqual(0.5);
     headingThickness.result.current[1](1.0);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
@@ -230,7 +216,7 @@ describe('storage atoms', () => {
           Length: 10,
           Thickness: 1.0,
         },
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const pathThickness = await act(() =>
       renderHook(() => useAtom(PathThicknessAtom)),
@@ -238,27 +224,23 @@ describe('storage atoms', () => {
     expect(pathThickness.result).toBeDefined();
     expect(pathThickness.result.current[0]).toEqual(0.1);
     pathThickness.result.current[1](0.2);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
         PathThickness: 0.2,
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const showField = await act(() => renderHook(() => useAtom(ShowFieldAtom)));
     expect(showField.result).toBeDefined();
     expect(showField.result.current[0]).toEqual(true);
     showField.result.current[1](false);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
         ShowField: false,
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
     const showFieldKey = await act(() =>
       renderHook(() => useAtom(ShowFieldKeyAtom)),
@@ -266,14 +248,12 @@ describe('storage atoms', () => {
     expect(showFieldKey.result).toBeDefined();
     expect(showFieldKey.result.current[0]).toEqual(true);
     showFieldKey.result.current[1](false);
-    pro = await act(() =>
-      renderHook(() => useAtomValue(PathRenderOptionsAtom)),
-    );
+    pro = await act(() => renderHook(() => useAtomValue(DisplayOptionsAtom)));
     expect(pro.result).toBeDefined();
     expect(pro.result.current).toEqual(
       update({
         ShowCoords: false,
-      }) as PathRenderOptions,
+      }) as DisplayOptions,
     );
   });
 });

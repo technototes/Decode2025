@@ -23,12 +23,22 @@ import {
   NamedPathChainsAtom,
   SelectedParsedClassAtom,
 } from './state/Atoms';
-import { PathRenderOptionsAtom, ThemeAtom } from './state/SavedSettings';
+import {
+  CurveOptionsAtom,
+  PathCurveOptionsAtom,
+  PathHeadingCountAtom,
+  PathHeadingOptionsAtom,
+  PoseOptionsAtom,
+  ShowFieldAtom,
+  ShowFieldKeyAtom,
+  ShowPathHeadingAtom,
+  ThemeAtom,
+} from './state/SavedSettings';
 import {
   ControlPointStyle,
   CtrlPtStyles,
+  CurveStyle,
   HeadingStyle,
-  PathRenderOptions,
 } from './types';
 import { bezierLength, deCasteljau } from './ui-tools/bezier';
 import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
@@ -42,8 +52,17 @@ const baseStyle: CSSProperties = {
 };
 
 export function FieldRenderer(): ReactElement {
-  const opts = useAtomValue(PathRenderOptionsAtom);
   const theme = useAtomValue(ThemeAtom);
+  const showCoords = useAtomValue(ShowFieldKeyAtom);
+  const showField = useAtomValue(ShowFieldAtom);
+
+  const showPathHeadings = useAtomValue(ShowPathHeadingAtom);
+  const pathHeadingCount = useAtomValue(PathHeadingCountAtom);
+  const pathCurveStyle = useAtomValue(PathCurveOptionsAtom);
+  const pathHeadingStyle = useAtomValue(PathHeadingOptionsAtom);
+
+  const curveOpts = useAtomValue(CurveOptionsAtom);
+  const poseOpts = useAtomValue(PoseOptionsAtom);
 
   const colors = useAtomValue(ColorsAtom);
   const allPCs = useAtomValue(NamedPathChainsAtom);
@@ -59,7 +78,7 @@ export function FieldRenderer(): ReactElement {
     ]),
   );
 
-  const bgStyle = opts.ShowField
+  const bgStyle = showField
     ? {
         ...baseStyle,
         backgroundImage: `url('/assets/field-${theme}.jpg')`,
@@ -76,7 +95,7 @@ export function FieldRenderer(): ReactElement {
       // ctx.scale(dpr * scale, -dpr * scale);
       // or just a single line of code:
       ctx.setTransform(dpr * scale, 0, 0, -dpr * scale, 0, size * dpr);
-      if (opts.ShowCoords) {
+      if (showCoords) {
         renderCoordinateLegend(ctx, dpr, scale, theme);
       }
 
@@ -84,20 +103,39 @@ export function FieldRenderer(): ReactElement {
         renderPath(
           ctx,
           ctrlPoints,
-          opts.Heading.Display ? facing : false,
+          showPathHeadings ? facing : false,
           colors[index % colors.length]!,
-          opts,
+          pathHeadingCount,
+          pathHeadingStyle,
+          pathCurveStyle,
         ),
       );
 
       if (isDefined(focusedPose)) {
-        drawFocusedPose(opts, ctx, focusedPose.pose, file);
+        drawFocusedPose(poseOpts, ctx, focusedPose.pose, file);
       }
       if (isDefined(focusedCurve)) {
-        drawFocusedCurve(opts, ctx, focusedCurve.points, file);
+        drawFocusedCurve(curveOpts, ctx, focusedCurve.points, file);
       }
     },
-    [opts, theme, allPCs, colors, points, focusedPose, focusedCurve],
+    [
+      showCoords,
+      theme,
+      showPathHeadings,
+      pathHeadingCount,
+      pathHeadingStyle,
+      pathCurveStyle,
+      focusedCurve,
+      focusedPose,
+      poseOpts,
+      curveOpts,
+      allPCs,
+      colors,
+      points,
+      focusedPose,
+      focusedCurve,
+      file,
+    ],
   );
 
   return (
@@ -110,64 +148,37 @@ export function FieldRenderer(): ReactElement {
 }
 
 function drawFocusedCurve(
-  opts: PathRenderOptions,
+  opts: CurveStyle,
   ctx: CanvasRenderingContext2D,
   focusedCurve: BezierRef,
   file: ParsedClass,
 ) {
   const br = calcBezierRef(focusedCurve, file);
-  const pro: PathRenderOptions = {
-    ...opts,
-    PathThickness: 1,
-    Heading: { ...opts.Heading, Display: false },
-    ControlPoint: {
-      Thickness: 1,
-      Size: 3,
-      Style: getContrastingStyle(opts.ControlPoint.Style),
-    },
-  };
-  renderCurve(ctx, br, '#fff', pro);
+  renderCurve(ctx, br, '#fff', opts);
 }
 
 function drawFocusedPose(
-  opts: PathRenderOptions,
+  poseStyle: { Points: ControlPointStyle; Headings: HeadingStyle },
   ctx: CanvasRenderingContext2D,
   focusedPose: PoseRef,
   file: ParsedClass,
 ) {
-  const style: ControlPointStyle = {
-    Thickness: 0.5,
-    Style: getContrastingStyle(opts.ControlPoint.Style),
-    Size: 8,
-  };
   const pt = calcPoseRef(focusedPose, file);
   ctx.beginPath();
   ctx.strokeStyle = tokens.colorNeutralForeground1; // TODO: Update this
-  drawPoint(ctx, pt, style);
+  drawPoint(ctx, pt, poseStyle.Points);
   ctx.stroke();
   if (isDefined(pt.h)) {
-    const hstyle: HeadingStyle = {
-      Display: true,
-      Count: 0,
-      Length: 10,
-      Thickness: 0.5,
-      ArrowAngle: 0.6,
-      ArrowPercent: 0.15,
-    };
-    drawHeadingLine(ctx, hstyle, tokens.colorNeutralForeground1, pt, {
-      x: Math.cos(pt.h),
-      y: Math.sin(pt.h),
-    });
-  }
-}
-
-function getContrastingStyle(s: CtrlPtStyles): CtrlPtStyles {
-  switch (s) {
-    case CtrlPtStyles.Crosshair:
-    case CtrlPtStyles.X:
-      return CtrlPtStyles.Square;
-    default:
-      return CtrlPtStyles.Crosshair;
+    drawHeadingLine(
+      ctx,
+      poseStyle.Headings,
+      tokens.colorNeutralForeground1,
+      pt,
+      {
+        x: Math.cos(pt.h),
+        y: Math.sin(pt.h),
+      },
+    );
   }
 }
 
@@ -267,7 +278,7 @@ function renderCurve(
   ctx: CanvasRenderingContext2D,
   curveControlPoints: Point[],
   color: string,
-  opts: PathRenderOptions,
+  opts: CurveStyle,
 ): [number, Point[]] {
   if (curveControlPoints.length < 2) {
     return [0, []];
@@ -277,11 +288,11 @@ function renderCurve(
   for (let t = 0; t <= 1.0; t += 1 / len) {
     pts.push(deCasteljau(curveControlPoints, t));
   }
-  const drawPath = opts.PathThickness > 1e-10;
+  const drawPath = opts.Thickness > 1e-10;
   if (drawPath) {
     ctx.beginPath();
   }
-  ctx.lineWidth = opts.PathThickness;
+  ctx.lineWidth = opts.Thickness;
   ctx.strokeStyle = color;
   let approxLen = 0;
   if (drawPath) {
@@ -314,15 +325,22 @@ function renderPath(
   curveControlPoints: Point[],
   heading: ConcreteHeading | false,
   color: string,
-  opts: PathRenderOptions,
+  headingCount: number,
+  headingStyle: HeadingStyle,
+  curveStyle: CurveStyle,
 ) {
-  const [approxLen, pts] = renderCurve(ctx, curveControlPoints, color, opts);
+  const [approxLen, pts] = renderCurve(
+    ctx,
+    curveControlPoints,
+    color,
+    curveStyle,
+  );
   if (
-    opts.ControlPoint.Style != 'z' &&
-    opts.ControlPoint.Size > 1e-10 &&
-    opts.ControlPoint.Thickness > 1e-10
+    curveStyle.ControlPoint.Style != 'z' &&
+    curveStyle.ControlPoint.Size > 1e-10 &&
+    curveStyle.ControlPoint.Thickness > 1e-10
   ) {
-    drawControlPoints(ctx, opts, curveControlPoints, color);
+    drawControlPoints(ctx, curveStyle.ControlPoint, curveControlPoints, color);
   }
   if (heading) {
     drawHeadingLines(
@@ -331,7 +349,8 @@ function renderPath(
       approxLen,
       [...pts, curveControlPoints[curveControlPoints.length - 1]!],
       heading,
-      opts,
+      headingCount,
+      headingStyle,
     );
   }
 
@@ -381,14 +400,14 @@ function drawPoint(
 
 function drawControlPoints(
   ctx: CanvasRenderingContext2D,
-  opts: PathRenderOptions,
+  opts: ControlPointStyle,
   curveControlPoints: Point[],
   color: string,
 ) {
   ctx.beginPath();
   ctx.strokeStyle = color;
   for (const pt of curveControlPoints) {
-    drawPoint(ctx, pt, opts.ControlPoint);
+    drawPoint(ctx, pt, opts);
   }
   ctx.stroke();
 }
@@ -415,21 +434,18 @@ function drawHeadingLines(
   len: number,
   pts: Point[],
   heading: ConcreteHeading,
-  opts: PathRenderOptions,
+  headingCount: number,
+  headingStyle: HeadingStyle,
 ) {
   // for "n" points, I'm not drawing starting/ending headings, so I actually want to split
   // the length into count + 1 pieces, and find the point in between each piece
-  const pieceLen = len / (opts.Heading.Count + 1);
-  if (opts.Heading.Count <= 0 || pts.length < 3 || pieceLen < 1) {
+  const pieceLen = len / (headingCount + 1);
+  if (headingCount <= 0 || pts.length < 3 || pieceLen < 1) {
     return;
   }
   let curPtIndex = 1;
   let lastDelta: Point = { x: 0, y: 0 };
-  for (
-    let pos = 0;
-    pos < opts.Heading.Count && curPtIndex < pts.length;
-    pos++
-  ) {
+  for (let pos = 0; pos < headingCount && curPtIndex < pts.length; pos++) {
     let pathPos = pieceLen * (pos + 1);
     // Walk the length of the path, until we find the heading-draw point
     let point: Point | undefined;
@@ -454,9 +470,9 @@ function drawHeadingLines(
         color,
         point,
         lastDelta,
-        (pos + 1) / (opts.Heading.Count + 1),
+        (pos + 1) / (headingCount + 1),
         heading,
-        opts,
+        headingStyle,
       );
     }
   }
@@ -469,7 +485,7 @@ function drawPathHeadingLine(
   tangent: Point,
   percentage: number,
   heading: ConcreteHeading,
-  opts: PathRenderOptions,
+  opts: HeadingStyle,
 ) {
   let targetPoint: Point = { x: 0, y: 0 };
   if (chkConcreteSimpleHeading(heading)) {
@@ -490,7 +506,7 @@ function drawPathHeadingLine(
       }
     }
   }
-  drawHeadingLine(ctx, opts.Heading, color, point, targetPoint);
+  drawHeadingLine(ctx, opts, color, point, targetPoint);
 }
 
 function drawHeadingLine(

@@ -31,20 +31,35 @@ export type ControlPointStyle = {
 };
 
 export type HeadingStyle = {
-  Display: boolean;
-  Count: number;
   Length: number;
   Thickness: number;
   ArrowAngle: number;
   ArrowPercent: number;
 };
 
-export type PathRenderOptions = {
-  ShowField: boolean;
-  PathThickness: number;
-  ShowCoords: boolean;
-  Heading: HeadingStyle;
+export type CurveStyle = {
+  Thickness: number;
+  ShowPoints: boolean;
   ControlPoint: ControlPointStyle;
+};
+
+export type PathStyle = {
+  HeadingCount: number;
+  Heading: HeadingStyle;
+  Curves: CurveStyle;
+};
+
+export type DisplayOptions = {
+  GranularSettings: boolean;
+  ShowField: boolean;
+  ShowCoords: boolean;
+  DarkMode: boolean;
+  Poses: {
+    Points: ControlPointStyle;
+    Headings: HeadingStyle;
+  };
+  Curves: CurveStyle;
+  Paths: PathStyle;
 };
 
 export type OneFileIndex = {

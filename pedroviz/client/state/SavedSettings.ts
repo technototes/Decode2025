@@ -1,155 +1,210 @@
 import { atom } from 'jotai';
+import { focusAtom } from 'jotai-optics';
 import { atomWithStorage } from 'jotai/utils';
 
-import { CtrlPtStyles, PathRenderOptions } from '../types';
+import {
+  ControlPointStyle,
+  CtrlPtStyles,
+  CurveStyle,
+  DisplayOptions,
+  HeadingStyle,
+  PathStyle,
+} from '../types';
 
-export const ThemeAtom = atomWithStorage<'dark' | 'light'>(
-  'theme',
-  'light',
-  undefined,
-  { getOnInit: true },
-);
-
-export const PathRenderOptionsAtom = atomWithStorage<PathRenderOptions>(
-  'PathRenderOptions',
-  {
-    ShowField: true,
-    PathThickness: 0.1,
-    ShowCoords: true,
-    Heading: {
-      Display: true,
-      Count: 6,
-      Length: 5,
-      Thickness: 0.5,
-      ArrowAngle: 0.31416,
-      ArrowPercent: 0.15,
-    },
+const defaultPathStyle: PathStyle = {
+  HeadingCount: 6,
+  Heading: {
+    Length: 5,
+    Thickness: 0.5,
+    ArrowAngle: 0.31416,
+    ArrowPercent: 0.15,
+  },
+  Curves: {
+    Thickness: 0.2,
+    ShowPoints: true,
     ControlPoint: {
       Thickness: 0.4,
       Size: 2,
       Style: CtrlPtStyles.Circle,
     },
   },
+};
+
+function getContrastingStyle(s: CtrlPtStyles): CtrlPtStyles {
+  switch (s) {
+    case CtrlPtStyles.Crosshair:
+    case CtrlPtStyles.X:
+      return CtrlPtStyles.Square;
+    default:
+      return CtrlPtStyles.Crosshair;
+  }
+}
+
+function autoControlPoint(opts: ControlPointStyle): ControlPointStyle {
+  return {
+    Thickness: opts.Thickness * 2,
+    Size: opts.Size * 1.5,
+    Style: getContrastingStyle(opts.Style),
+  };
+}
+
+function autoHeading(opts: HeadingStyle): HeadingStyle {
+  return {
+    Length: opts.Length * 1.5,
+    Thickness: opts.Thickness * 2,
+    ArrowAngle: opts.ArrowAngle,
+    ArrowPercent: opts.ArrowPercent,
+  };
+}
+
+function autoCurves(opts: CurveStyle): CurveStyle {
+  return {
+    Thickness: opts.Thickness * 2,
+    ShowPoints: opts.ShowPoints,
+    ControlPoint: autoControlPoint(opts.ControlPoint),
+  };
+}
+
+const DisplayOptionsAtom = atomWithStorage<DisplayOptions>(
+  'DisplayOptions',
+  {
+    GranularSettings: false,
+    ShowField: true,
+    ShowCoords: true,
+    DarkMode: true,
+    Poses: {
+      Points: autoControlPoint(defaultPathStyle.Curves.ControlPoint),
+      Headings: autoHeading(defaultPathStyle.Heading),
+    },
+    Curves: autoCurves(defaultPathStyle.Curves),
+    Paths: defaultPathStyle,
+  },
   undefined,
   { getOnInit: true },
 );
 
-export const CtrlPtSizeAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.ControlPoint.Size;
-  },
-  (get, set, val: number) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.ControlPoint.Size = val;
-    set(PathRenderOptionsAtom, newVal);
-  },
+export type ThemeType = 'dark' | 'light';
+
+const DarkThemeAtom = focusAtom(DisplayOptionsAtom, (optic) =>
+  optic.prop('DarkMode'),
+);
+export const ThemeAtom = atom<ThemeType, [ThemeType], void>(
+  (get) => (get(DarkThemeAtom) ? 'dark' : 'light'),
+  (_get, set, val: ThemeType) => set(DarkThemeAtom, val === 'dark'),
+);
+export const ShowFieldAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('ShowField'),
+);
+export const ShowFieldKeyAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('ShowCoords'),
 );
 
-export const CtrlPtStyleAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.ControlPoint.Style;
-  },
-  (get, set, val: CtrlPtStyles) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.ControlPoint.Style = val;
-    set(PathRenderOptionsAtom, newVal);
-  },
+export const GranularSettingsAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('GranularSettings'),
+);
+const PathOptionsAtom = focusAtom(DisplayOptionsAtom, (o) => o.prop('Paths'));
+export const PathCurveOptionsAtom = focusAtom(PathOptionsAtom, (o) =>
+  o.prop('Curves'),
+);
+const PathPointOptionsAtom = focusAtom(PathCurveOptionsAtom, (o) =>
+  o.prop('ControlPoint'),
+);
+export const PathHeadingOptionsAtom = focusAtom(PathOptionsAtom, (o) =>
+  o.prop('Heading'),
+);
+export const PathPointSizeAtom = focusAtom(PathPointOptionsAtom, (o) =>
+  o.prop('Size'),
+);
+export const PathPointStyleAtom = focusAtom(PathPointOptionsAtom, (o) =>
+  o.prop('Style'),
+);
+export const PathPointThicknessAtom = focusAtom(PathPointOptionsAtom, (o) =>
+  o.prop('Thickness'),
+);
+export const PathThicknessAtom = focusAtom(PathCurveOptionsAtom, (o) =>
+  o.prop('Thickness'),
 );
 
-export const CtrlPtThicknessAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.ControlPoint.Thickness;
-  },
-  (get, set, val: number) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.ControlPoint.Thickness = val;
-    set(PathRenderOptionsAtom, newVal);
-  },
+export const PathHeadingCountAtom = focusAtom(PathOptionsAtom, (o) =>
+  o.prop('HeadingCount'),
 );
-
-export const ShowBotHeadingAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.Heading.Display;
-  },
+export const PathHeadingLengthAtom = focusAtom(PathHeadingOptionsAtom, (o) =>
+  o.prop('Length'),
+);
+export const PathHeadingThicknessAtom = focusAtom(PathHeadingOptionsAtom, (o) =>
+  o.prop('Thickness'),
+);
+export const ShowPathHeadingAtom = atom(
+  (get) => get(PathHeadingCountAtom) > 0,
   (get, set, val: boolean) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.Heading.Display = val;
-    set(PathRenderOptionsAtom, newVal);
+    const hc = get(PathHeadingCountAtom);
+    if (val === hc > 0) return;
+    set(PathHeadingCountAtom, Math.abs(hc) * (val ? 1 : -1));
+  },
+);
+const RawCurveOptionsAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('Curves'),
+);
+export const CurveOptionsAtom = atom(
+  (get) => {
+    return get(GranularSettingsAtom)
+      ? get(RawCurveOptionsAtom)
+      : autoCurves(get(PathCurveOptionsAtom));
+  },
+  (get, set, val: CurveStyle) => {
+    const opts = structuredClone(get(DisplayOptionsAtom));
+    opts.Curves = val;
+    set(RawCurveOptionsAtom, val);
   },
 );
 
-export const HeadingCountAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.Heading.Count;
-  },
-  (get, set, val: number) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.Heading.Count = val;
-    set(PathRenderOptionsAtom, newVal);
-  },
+const RawCurveThicknessAtom = focusAtom(RawCurveOptionsAtom, (o) =>
+  o.prop('Thickness'),
+);
+const RawCurveShowPointAtom = focusAtom(RawCurveOptionsAtom, (o) =>
+  o.prop('ShowPoints'),
+);
+const RawCurvePointSizeAtom = focusAtom(RawCurveOptionsAtom, (o) =>
+  o.prop('ControlPoint').prop('Size'),
+);
+const RawCurvePointStyleAtom = focusAtom(RawCurveOptionsAtom, (o) =>
+  o.prop('ControlPoint').prop('Style'),
+);
+const RawCurvePointThicknessAtom = focusAtom(RawCurveOptionsAtom, (o) =>
+  o.prop('ControlPoint').prop('Thickness'),
 );
 
-export const HeadingLengthAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.Heading.Length;
-  },
-  (get, set, val: number) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.Heading.Length = val;
-    set(PathRenderOptionsAtom, newVal);
-  },
+const RawPoseOptionsAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('Poses'),
 );
 
-export const HeadingThicknessAtom = atom(
+export const PoseOptionsAtom = atom(
   (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.Heading.Thickness;
+    return get(GranularSettingsAtom)
+      ? get(RawPoseOptionsAtom)
+      : {
+          Points: autoControlPoint(get(PathPointOptionsAtom)),
+          Headings: autoHeading(get(PathHeadingOptionsAtom)),
+        };
   },
-  (get, set, val: number) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.Heading.Thickness = val;
-    set(PathRenderOptionsAtom, newVal);
+  (get, set, val: CurveStyle) => {
+    const opts = structuredClone(get(DisplayOptionsAtom));
+    opts.Curves = val;
+    set(RawCurveOptionsAtom, val);
   },
 );
-
-export const PathThicknessAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.PathThickness;
-  },
-  (get, set, val: number) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.PathThickness = val;
-    set(PathRenderOptionsAtom, newVal);
-  },
+const RawPosePointSizeAtom = focusAtom(RawPoseOptionsAtom, (o) =>
+  o.prop('Points').prop('Size'),
 );
-
-export const ShowFieldAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.ShowField;
-  },
-  (get, set, val: boolean) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.ShowField = val;
-    set(PathRenderOptionsAtom, newVal);
-  },
+const RawPosePointStyleAtom = focusAtom(RawPoseOptionsAtom, (o) =>
+  o.prop('Points').prop('Style'),
 );
-
-export const ShowFieldKeyAtom = atom(
-  (get) => {
-    const opts = get(PathRenderOptionsAtom);
-    return opts.ShowCoords;
-  },
-  (get, set, val: boolean) => {
-    const newVal = structuredClone(get(PathRenderOptionsAtom));
-    newVal.ShowCoords = val;
-    set(PathRenderOptionsAtom, newVal);
-  },
+const RawPosePointThicknessAtom = focusAtom(RawPoseOptionsAtom, (o) =>
+  o.prop('Points').prop('Thickness'),
+);
+const RawPoseHeadingLengthAtom = focusAtom(RawPoseOptionsAtom, (o) =>
+  o.prop('Headings').prop('Length'),
+);
+const RawPoseHeadingThicknessAtom = focusAtom(RawPoseOptionsAtom, (o) =>
+  o.prop('Headings').prop('Thickness'),
 );

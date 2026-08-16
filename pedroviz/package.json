@@ -23,9 +23,10 @@
     "jotai": "^2.20.2",
     "jotai-family": "^1.1.0",
     "jotai-optics": "^0.4.0",
+    "optics-ts": "^2.4.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-resizable-panels": "^4.12.2"
+    "react-resizable-panels": "^4.12.3"
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "^20.11.2",

@@ -78,46 +78,46 @@ export const isValueRef: typecheck<ValueRef> = chkAnyOf(
 export const isRadiansRef = chkObjectOfExactType<RadiansRef>({
   radians: isValueRef,
 });
-export const isNamedValue = chkObjectOfExactType<NamedValue>({
+/*export*/ const isNamedValue = chkObjectOfExactType<NamedValue>({
   name: isString,
   value: chkAnyOf(isValueRef, isRadiansRef),
 });
 
-export const isHeadingRef: typecheck<HeadingRef> = chkAnyOf(
+/*export*/ const isHeadingRef: typecheck<HeadingRef> = chkAnyOf(
   isValueRef,
   isRadiansRef,
 );
 
 export const isPoseName: typecheck<PoseName> = isString as typecheck<PoseName>;
-export const isAnonymousPose = chkObjectOfExactType<AnonymousPose>(
+/*export*/ const isAnonymousPose = chkObjectOfExactType<AnonymousPose>(
   {
     x: isValueRef,
     y: isValueRef,
   },
   { heading: isHeadingRef },
 );
-export const isNamedPose = chkObjectOfExactType<NamedPose>({
+/*export*/ const isNamedPose = chkObjectOfExactType<NamedPose>({
   name: isString,
   pose: isAnonymousPose,
 });
-export const isPoseRef: typecheck<PoseRef> = chkAnyOf(
+/*export*/ const isPoseRef: typecheck<PoseRef> = chkAnyOf(
   isPoseName,
   isAnonymousPose,
 );
 function isBezierTypeName(t: unknown): t is BezierType {
   return t === BezierType.Line || t === BezierType.Curve;
 }
-export const isBezierName: typecheck<BezierName> =
+/*export*/ const isBezierName: typecheck<BezierName> =
   isString as typecheck<BezierName>;
-export const isAnonymousBezier = chkObjectOfExactType<AnonymousBezier>({
+/*export*/ const isAnonymousBezier = chkObjectOfExactType<AnonymousBezier>({
   type: isBezierTypeName,
   points: chkArrayOf(isPoseRef),
 });
-export const isNamedBezier = chkObjectOfExactType<NamedBezier>({
+/*export*/ const isNamedBezier = chkObjectOfExactType<NamedBezier>({
   name: isString,
   points: isAnonymousBezier,
 });
-export const isBezierRef: typecheck<BezierRef> = chkAnyOf(
+/*export*/ const isBezierRef: typecheck<BezierRef> = chkAnyOf(
   isBezierName,
   isAnonymousBezier,
 );
@@ -172,7 +172,7 @@ export const isReversibleFacing: typecheck<FacingReversible> = chkAnyOf(
   isLinearFacing,
   isPointFacing,
 );
-export const isFacingTiming = chkObjectOfExactType<FacingTiming>({
+/*export*/ const isFacingTiming = chkObjectOfExactType<FacingTiming>({
   start: isValueRef,
   end: isValueRef,
 });
@@ -181,8 +181,11 @@ export const isReversedFacing: typecheck<FacingReversed> =
     type: isReversedFacingType,
     facing: isReversibleFacing,
   });
-export const isSimpleFacing = chkAnyOf(isReversibleFacing, isReversedFacing);
-export const isPiecewiseEntry: typecheck<FacingPiece> =
+/*export*/ const isSimpleFacing = chkAnyOf(
+  isReversibleFacing,
+  isReversedFacing,
+);
+/*export*/ const isPiecewiseEntry: typecheck<FacingPiece> =
   chkObjectOfExactType<FacingPiece>({
     timing: isFacingTiming,
     heading: isSimpleFacing,
@@ -191,7 +194,7 @@ export const isPiecewiseFacing = chkObjectOfExactType<FacingPieceWise>({
   type: isPiecewiseFacingType,
   pieces: chkArrayOf(isPiecewiseEntry),
 });
-export const isAnonymousFacing: typecheck<AnonymousFacing> = (
+/*export*/ const isAnonymousFacing: typecheck<AnonymousFacing> = (
   obj: unknown,
 ): obj is AnonymousFacing => {
   return chkAnyOf(
@@ -204,18 +207,18 @@ export const isAnonymousFacing: typecheck<AnonymousFacing> = (
   )(obj);
 };
 
-export const isNamedPathChain = chkObjectOfExactType<NamedPathChain>({
+/*export*/ const isNamedPathChain = chkObjectOfExactType<NamedPathChain>({
   name: isString,
   paths: chkArrayOf(isBezierRef),
   heading: isAnonymousFacing,
 });
 
-export const isPathChainHelper = chkObjectOfExactType<PathChainHelper>({
+/*export*/ const isPathChainHelper = chkObjectOfExactType<PathChainHelper>({
   name: isString,
   staticType: isString,
 });
 
-export const isClassContainer: typecheck<ClassContainer> = chkAnyOf(
+/*export*/ const isClassContainer: typecheck<ClassContainer> = chkAnyOf(
   chkFieldOf('fileName', isString),
   chkFieldOf('className', isString),
 );

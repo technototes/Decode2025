@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useState } from 'react';
-import { useAtom } from 'jotai';
+import { useAtom, WritableAtom } from 'jotai';
 
 import {
   Button,
@@ -26,16 +26,16 @@ import {
 
 import { Strings } from './constants';
 import {
-  CtrlPtSizeAtom,
-  CtrlPtStyleAtom,
-  CtrlPtThicknessAtom,
-  HeadingCountAtom,
-  HeadingLengthAtom,
-  HeadingThicknessAtom,
+  PathHeadingCountAtom,
+  PathHeadingLengthAtom,
+  PathHeadingThicknessAtom,
+  PathPointSizeAtom,
+  PathPointStyleAtom,
+  PathPointThicknessAtom,
   PathThicknessAtom,
-  ShowBotHeadingAtom,
   ShowFieldAtom,
   ShowFieldKeyAtom,
+  ShowPathHeadingAtom,
   ThemeAtom,
 } from './state/SavedSettings';
 import { CtrlPtStyles } from './types';
@@ -66,90 +66,48 @@ const ctrlPtStyles: CtrlPtStyles[] = [
   CtrlPtStyles.None,
 ];
 
+function useSpinnerAtom(
+  atom: WritableAtom<number, [number], void>,
+): [
+  number,
+  (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => void,
+] {
+  const [val, setVal] = useAtom(atom);
+  const callback = useCallback(
+    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+      if (
+        data.value !== undefined &&
+        data.value !== null &&
+        !Number.isNaN(data.value)
+      ) {
+        setVal(data.value);
+      }
+    },
+    [setVal],
+  );
+  return [val, callback];
+}
+
 export function Settings(): ReactElement {
   const [theTheme, setTheme] = useAtom(ThemeAtom);
   const [showField, setShowField] = useAtom(ShowFieldAtom);
-  const [showBotHeading, setShowBotHeading] = useAtom(ShowBotHeadingAtom);
-  const [pathThickness, setPathThickness] = useAtom(PathThicknessAtom);
+  const [showBotHeading, setShowBotHeading] = useAtom(ShowPathHeadingAtom);
   const [showCoords, setShowCoords] = useAtom(ShowFieldKeyAtom);
-  const changePathThickness = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setPathThickness(data.value);
-      }
-    },
-    [setPathThickness],
+  const [pathThickness, changePathThickness] =
+    useSpinnerAtom(PathThicknessAtom);
+  const [ctrlPtThickness, changeCtrlPtThickness] = useSpinnerAtom(
+    PathPointThicknessAtom,
   );
-  const [ctrlPtThickness, setCtrlPtThickness] = useAtom(CtrlPtThicknessAtom);
-  const changeCtrlPtThickness = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setCtrlPtThickness(data.value);
-      }
-    },
-    [setCtrlPtThickness],
+  const [ctrlPtSize, changeCtrlPtSize] = useSpinnerAtom(PathPointSizeAtom);
+  const [headingLength, changeHeadingLength] = useSpinnerAtom(
+    PathHeadingLengthAtom,
   );
-  const [ctrlPtSize, setCtrlPtSize] = useAtom(CtrlPtSizeAtom);
-  const changeCtrlPtSize = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setCtrlPtSize(data.value);
-      }
-    },
-    [setCtrlPtSize],
+  const [headingCount, changeHeadingCount] =
+    useSpinnerAtom(PathHeadingCountAtom);
+  const [headingThickness, changeHeadingThickness] = useSpinnerAtom(
+    PathHeadingThicknessAtom,
   );
-  const [headingLength, setHeadingLength] = useAtom(HeadingLengthAtom);
-  const changeHeadingLength = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setHeadingLength(data.value);
-      }
-    },
-    [setHeadingLength],
-  );
-  const [headingCount, setHeadingCount] = useAtom(HeadingCountAtom);
-  const changeHeadingCount = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setHeadingCount(Math.round(data.value));
-      }
-    },
-    [setHeadingCount],
-  );
-  const [headingThickness, setHeadingThickness] = useAtom(HeadingThicknessAtom);
-  const changeHeadingThickness = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setHeadingThickness(data.value);
-      }
-    },
-    [setHeadingThickness],
-  );
-  const [ctrlPtStyle, setCtrlPtStyle] = useAtom(CtrlPtStyleAtom);
+  const [ctrlPtStyle, setCtrlPtStyle] = useAtom(PathPointStyleAtom);
   const [ctrlPtName, setCtrlPtName] = useState(getName(ctrlPtStyle));
   const onOptionSelect: DropdownProps['onOptionSelect'] = useCallback(
     (ev, data) => {
