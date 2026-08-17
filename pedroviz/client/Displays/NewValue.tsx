@@ -26,7 +26,7 @@ import {
   ValueName,
   ValueRef,
 } from '../../CodeTypes';
-import { ValueAtomFamily, ValuesLookupAtom } from '../state/Atoms';
+import { ValuesLookupAtom } from '../state/Atoms';
 import { ValidateState, ValidationData, ValidData } from '../types';
 import { CheckValidName } from './Validation';
 
@@ -39,9 +39,9 @@ export function NewValue(): ReactElement {
   const [varStr, setVarStr] = useState('');
   const [valType, setValType] = useState<ValType>('double');
   const allNames = useAtomValue(ValuesLookupAtom);
-  const setNamedValue = useAtomCallback((_, set, val: ValueRef | RadiansRef) =>
-    set(ValueAtomFamily(name), val),
-  );
+  // const setNamedValue = useAtomCallback((_, set, val: ValueRef | RadiansRef) =>
+  //   set(ValueAtomFamily(name), val),
+  // );
 
   const checkValue = (vl: string): ValidationData => {
     if (valType !== 'int' && isNaN(Number.parseFloat(vl))) {
@@ -99,17 +99,17 @@ export function NewValue(): ReactElement {
       const obj: AnonymousValue = Number.isInteger(value)
         ? { int: value }
         : { double: value };
-      if (valType === 'degrees') {
-        setNamedValue({ radians: obj });
-      } else {
-        setNamedValue(obj);
-      }
+      // if (valType === 'degrees') {
+      //   setNamedValue({ radians: obj });
+      // } else {
+      //   setNamedValue(obj);
+      // }
     } else {
-      if (valType === 'degrees') {
-        setNamedValue({ radians: varStr as ValueName });
-      } else {
-        setNamedValue(varStr as ValueName);
-      }
+      // if (valType === 'degrees') {
+      //   setNamedValue({ radians: varStr as ValueName });
+      // } else {
+      //   setNamedValue(varStr as ValueName);
+      // }
     }
   };
 

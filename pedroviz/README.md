@@ -17,7 +17,7 @@ and edit PedroPath's. The _reasons_ for this as opposed to just using
 - [x] Read paths from code
 - [x] Display those paths on the canvas.
 - [x] Highlight hovered-over paths/curves/points
-  - [ ] Highlight the hovered path in the PathChain list
+  - [ ] Highlight the hovered path/curve/point in the PathChain list
 - [ ] Animate the robot along the path
   - [ ] Specify robot dimensions
 - [x] Put the field graphic under the canvas

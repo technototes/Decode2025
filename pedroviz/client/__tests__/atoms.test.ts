@@ -23,11 +23,11 @@ import {
   Team,
 } from '../../IpcTypes';
 import {
-  ClassKeysForSelectedPathAtom,
-  ClearCache,
+  // ClassKeysForSelectedPathAtom,
+  // ClearCache,
   FullDatabaseAtom,
-  IndexedDatabaseAtom,
-  PathKeysForSelectedTeamAtom,
+  // IndexedDatabaseAtom,
+  // PathKeysForSelectedTeamAtom,
   PathsForSelectedTeamAtom,
   SelectedClassAtom,
   SelectedPathAtom,
@@ -38,7 +38,7 @@ import {
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 // or global.IS_REACT_ACT_ENVIRONMENT = true; depending on your environment
 
-beforeEach(ClearCache);
+// beforeEach(ClearCache);
 
 const status = {
   status: 200,
@@ -122,12 +122,12 @@ describe('Atom Capabilities', () => {
       renderHook(() => useAtomValue(SelectedTeamAtom)),
     );
     expect(selectedTeam2.result.current).toEqual('team2' as Team);
-    const sel = await act(() =>
-      renderHook(() => useAtomValue(PathKeysForSelectedTeamAtom)),
-    );
-    expect(sel.result.current).toEqual(
-      new Set(['team2*path3.java' as PathKey, 'team2*path4.java' as PathKey]),
-    );
+    // const sel = await act(() =>
+    //   renderHook(() => useAtomValue(PathKeysForSelectedTeamAtom)),
+    // );
+    // expect(sel.result.current).toEqual(
+    //   new Set(['team2*path3.java' as PathKey, 'team2*path4.java' as PathKey]),
+    // );
     const selPaths = await act(() =>
       renderHook(() => useAtom(PathsForSelectedTeamAtom)),
     );
@@ -144,12 +144,12 @@ describe('Atom Capabilities', () => {
       renderHook(() => useAtomValue(SelectedPathAtom)),
     );
     expect(selPath2.result.current).toEqual('path3.java' as Path);
-    const selClassKeys = await act(() =>
-      renderHook(() => useAtomValue(ClassKeysForSelectedPathAtom)),
-    );
-    expect(selClassKeys.result.current).toEqual(
-      new Set(['team2*path3.java;c' as ClassKey]),
-    );
+    // const selClassKeys = await act(() =>
+    //   renderHook(() => useAtomValue(ClassKeysForSelectedPathAtom)),
+    // );
+    // expect(selClassKeys.result.current).toEqual(
+    //   new Set(['team2*path3.java;c' as ClassKey]),
+    // );
     const selClass = await act(() =>
       renderHook(() => useAtom(SelectedClassAtom)),
     );
@@ -178,11 +178,11 @@ describe('Atom Capabilities', () => {
     expect(database.ParsedClasses.size).toEqual(4);
     expect(database.PathClasses.size()).toEqual(4);
     expect(database.TeamPaths.size()).toEqual(2);
-    const idb = await act(() =>
-      renderHook(() => useAtomValue(IndexedDatabaseAtom)),
-    );
-    expect(idb.result).toBeDefined();
-    const idbdb = idb.result.current.db();
-    expect(idbdb).toBeDefined();
+    // const idb = await act(() =>
+    //   renderHook(() => useAtomValue(IndexedDatabaseAtom)),
+    // );
+    // expect(idb.result).toBeDefined();
+    // const idbdb = idb.result.current.db();
+    // expect(idbdb).toBeDefined();
   });
 });

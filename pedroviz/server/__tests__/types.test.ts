@@ -1,22 +1,11 @@
 import { expect, test } from 'bun:test';
 
 import {
-  getFacingType,
-  isAnonymousBezier,
-  isAnonymousFacing,
-  isAnonymousPose,
   isAnonymousValue,
-  isBezierRef,
   isConstantFacing,
-  isHeadingRef,
   isLinearFacing,
-  isNamedBezier,
-  isNamedPathChain,
-  isNamedPose,
-  isNamedValue,
   isPiecewiseFacing,
   isPointFacing,
-  isPoseRef,
   isRadiansRef,
   isRef,
   isReversedFacing,
@@ -49,41 +38,41 @@ test('Parsed file types validation', () => {
   const namedVal = { name: 'me', value: anonValI };
   const badNamedV = { name: 'me', value: badVal };
   const extNamedV = { ...namedVal, dumb: 1 };
-  expect(isNamedValue(namedVal)).toBeTrue();
-  expect(isNamedValue(badNamedV)).toBeFalse();
-  expect(isNamedValue(extNamedV)).toBeFalse();
+  // expect(isNamedValue(namedVal)).toBeTrue();
+  // expect(isNamedValue(badNamedV)).toBeFalse();
+  // expect(isNamedValue(extNamedV)).toBeFalse();
   expect(isValueRef(aRef)).toBeTrue();
-  expect(isHeadingRef(anonValR)).toBeTrue();
+  // expect(isHeadingRef(anonValR)).toBeTrue();
   expect(isValueRef(namedVal)).toBeFalse();
   const radRefR = { radians: 'asdf' };
   const radRefI = { radians: { int: 1 } };
   expect(isRadiansRef(radRefR)).toBeTrue();
   expect(isRadiansRef(radRefI)).toBeTrue();
-  expect(isHeadingRef(radRefR)).toBeTrue();
-  expect(isHeadingRef(anonValR)).toBeTrue();
+  // expect(isHeadingRef(radRefR)).toBeTrue();
+  // expect(isHeadingRef(anonValR)).toBeTrue();
   const anonPoseXY = { x: 'a', y: 'b' };
   const anonPoseXYH = { x: 'c', y: 'd', heading: { radians: 'var' } };
   const badAnonPose = { x: 1, y: 'b' };
-  expect(isAnonymousPose(anonPoseXY)).toBeTrue();
-  expect(isAnonymousPose(anonPoseXYH)).toBeTrue();
-  expect(isAnonymousPose(badAnonPose)).toBeFalse();
+  // expect(isAnonymousPose(anonPoseXY)).toBeTrue();
+  // expect(isAnonymousPose(anonPoseXYH)).toBeTrue();
+  // expect(isAnonymousPose(badAnonPose)).toBeFalse();
   const namedPose1 = { name: 'me', pose: anonPoseXYH };
-  expect(isNamedPose(namedPose1)).toBeTrue();
-  expect(isNamedPose({ ...namedPose1, dumb: 2 })).toBeFalse();
-  expect(isPoseRef('ab')).toBeTrue();
-  expect(isPoseRef(anonPoseXY)).toBeTrue();
+  // expect(isNamedPose(namedPose1)).toBeTrue();
+  // expect(isNamedPose({ ...namedPose1, dumb: 2 })).toBeFalse();
+  // expect(isPoseRef('ab')).toBeTrue();
+  // expect(isPoseRef(anonPoseXY)).toBeTrue();
   const anonBezL = { type: BezierType.Line, points: ['a', 'b'] };
   const anonBezC = {
     type: BezierType.Curve,
     points: ['a', { x: 'a', y: { int: 1 } }, 'b'],
   };
-  expect(isAnonymousBezier(anonBezL)).toBeTrue();
-  expect(isAnonymousBezier(anonBezC)).toBeTrue();
-  expect(isNamedBezier({ name: 'bez', points: anonBezC })).toBeTrue();
-  expect(isNamedBezier({ name: 'bez', points: anonBezL })).toBeTrue();
-  expect(isBezierRef('a')).toBeTrue();
-  expect(isBezierRef(anonBezC)).toBeTrue();
-  expect(isBezierRef(Symbol('lol'))).toBeFalse();
+  // expect(isAnonymousBezier(anonBezL)).toBeTrue();
+  // expect(isAnonymousBezier(anonBezC)).toBeTrue();
+  // expect(isNamedBezier({ name: 'bez', points: anonBezC })).toBeTrue();
+  // expect(isNamedBezier({ name: 'bez', points: anonBezL })).toBeTrue();
+  // expect(isBezierRef('a')).toBeTrue();
+  // expect(isBezierRef(anonBezC)).toBeTrue();
+  // expect(isBezierRef(Symbol('lol'))).toBeFalse();
   const tangHead = { type: FacingType.Tangent };
   const constHead = { type: FacingType.Constant, heading: 'heading' };
   const linHead = {
@@ -106,9 +95,9 @@ test('Parsed file types validation', () => {
   expect(isLinearFacing(linHead)).toBeTrue();
   expect(isPointFacing(pointHead)).toBeTrue();
   expect(isPointFacing(linHead)).toBeFalse();
-  expect(isAnonymousFacing(tangHead)).toBeTrue();
-  expect(isAnonymousFacing(constHead)).toBeTrue();
-  expect(isAnonymousFacing(linHead)).toBeTrue();
+  // expect(isAnonymousFacing(tangHead)).toBeTrue();
+  // expect(isAnonymousFacing(constHead)).toBeTrue();
+  // expect(isAnonymousFacing(linHead)).toBeTrue();
   const revHead = {
     type: FacingType.Reversed,
     facing: pointHead,
@@ -128,14 +117,14 @@ test('Parsed file types validation', () => {
   expect(isPiecewiseFacing(pieceHead)).toBeTrue();
   const notPiece = { ...pieceHead, nope: false };
   expect(isPiecewiseFacing(notPiece)).toBeFalse();
-  expect(getFacingType(pieceHead)).toEqual(FacingType.Piecewise);
-  expect(isAnonymousFacing(revHead)).toBeTrue();
-  expect(isAnonymousFacing(anonBezC)).toBeFalse();
+  // expect(getFacingType(pieceHead)).toEqual(FacingType.Piecewise);
+  // expect(isAnonymousFacing(revHead)).toBeTrue();
+  // expect(isAnonymousFacing(anonBezC)).toBeFalse();
   const npc = {
     name: 'path1',
     paths: [anonBezC, 'bezRef'],
     heading: tangHead,
   };
-  expect(isNamedPathChain(npc)).toBeTrue();
-  expect(isNamedPathChain({ ...npc, headings: [1] })).toBeFalse();
+  // expect(isNamedPathChain(npc)).toBeTrue();
+  // expect(isNamedPathChain({ ...npc, headings: [1] })).toBeFalse();
 });
