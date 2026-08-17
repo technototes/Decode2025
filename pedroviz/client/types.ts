@@ -49,10 +49,16 @@ export type PathStyle = {
   Curves: CurveStyle;
 };
 
+export type BotDrawStyle = {
+  Shape: 'circle' | 'triangle' | 'rectangle' | 'trapdezoid';
+  Width: number;
+  Depth: number;
+};
+
 export type DisplayOptions = {
   GranularSettings: boolean;
-  ShowField: boolean;
-  ShowCoords: boolean;
+  FieldVisibility: number;
+  CoordinateVisibility: number;
   DarkMode: boolean;
   Poses: {
     Points: ControlPointStyle;
@@ -60,6 +66,7 @@ export type DisplayOptions = {
   };
   Curves: CurveStyle;
   Paths: PathStyle;
+  BotDrawing: BotDrawStyle;
 };
 
 export type OneFileIndex = {
@@ -125,15 +132,17 @@ export type ResponsiveAnchor = {
   y: 'top' | 'middle' | 'bottom';
 };
 
+export type CanvasRenderFunc = (
+  ctx: CanvasRenderingContext2D,
+  devicePixelRatio: number,
+) => void;
+
 export type ResponsiveSquareCanvasProps = {
   anchor?: ResponsiveAnchor;
   style?: CSSProperties;
   className?: string;
-  render: (
-    ctx: CanvasRenderingContext2D,
-    size: number,
-    devicePixelRatio: number,
-  ) => void;
+  render: CanvasRenderFunc;
+  animate?: CanvasRenderFunc;
 };
 
 export type RowData = { offset: number; size: number };

@@ -3,6 +3,7 @@ import { focusAtom } from 'jotai-optics';
 import { atomWithStorage } from 'jotai/utils';
 
 import {
+  BotDrawStyle,
   ControlPointStyle,
   CtrlPtStyles,
   CurveStyle,
@@ -19,6 +20,7 @@ const defaultPathStyle: PathStyle = {
     ArrowAngle: 0.31416,
     ArrowPercent: 0.15,
   },
+
   Curves: {
     Thickness: 0.2,
     ShowPoints: true,
@@ -28,6 +30,12 @@ const defaultPathStyle: PathStyle = {
       Style: CtrlPtStyles.Circle,
     },
   },
+};
+
+const defaultBotStyle: BotDrawStyle = {
+  Shape: 'rectangle',
+  Width: 14,
+  Depth: 17,
 };
 
 function getContrastingStyle(s: CtrlPtStyles): CtrlPtStyles {
@@ -43,7 +51,7 @@ function getContrastingStyle(s: CtrlPtStyles): CtrlPtStyles {
 function autoControlPoint(opts: ControlPointStyle): ControlPointStyle {
   return {
     Thickness: opts.Thickness * 2,
-    Size: opts.Size * 1.5,
+    Size: opts.Size * 2.5,
     Style: getContrastingStyle(opts.Style),
   };
 }
@@ -65,12 +73,12 @@ function autoCurves(opts: CurveStyle): CurveStyle {
   };
 }
 
-const DisplayOptionsAtom = atomWithStorage<DisplayOptions>(
+export const DisplayOptionsAtom = atomWithStorage<DisplayOptions>(
   'DisplayOptions',
   {
     GranularSettings: false,
-    ShowField: true,
-    ShowCoords: true,
+    FieldVisibility: 1.0,
+    CoordinateVisibility: 1.0,
     DarkMode: true,
     Poses: {
       Points: autoControlPoint(defaultPathStyle.Curves.ControlPoint),
@@ -78,6 +86,7 @@ const DisplayOptionsAtom = atomWithStorage<DisplayOptions>(
     },
     Curves: autoCurves(defaultPathStyle.Curves),
     Paths: defaultPathStyle,
+    BotDrawing: defaultBotStyle,
   },
   undefined,
   { getOnInit: true },
@@ -92,11 +101,28 @@ export const ThemeAtom = atom<ThemeType, [ThemeType], void>(
   (get) => (get(DarkThemeAtom) ? 'dark' : 'light'),
   (_get, set, val: ThemeType) => set(DarkThemeAtom, val === 'dark'),
 );
-export const ShowFieldAtom = focusAtom(DisplayOptionsAtom, (o) =>
-  o.prop('ShowField'),
+const RawFieldVisibilityAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('FieldVisibility'),
 );
-export const ShowFieldKeyAtom = focusAtom(DisplayOptionsAtom, (o) =>
-  o.prop('ShowCoords'),
+export const FieldVisibilityAtom = atom(
+  (get) => 100 * get(RawFieldVisibilityAtom),
+  (_, set, val: number) => {
+    set(RawFieldVisibilityAtom, Math.max(0, Math.min(1, val / 100)));
+  },
+);
+export const FieldVizPercentAtom = atom((get) => get(RawFieldVisibilityAtom));
+
+const RawCoordinateVisibilityAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('CoordinateVisibility'),
+);
+export const CoordinateVisibilityAtom = atom(
+  (get) => 100 * get(RawCoordinateVisibilityAtom),
+  (_, set, val: number) => {
+    set(RawCoordinateVisibilityAtom, Math.max(0, Math.min(1, val / 100)));
+  },
+);
+export const CoordVizPercentAtom = atom((get) =>
+  get(RawCoordinateVisibilityAtom),
 );
 
 export const GranularSettingsAtom = focusAtom(DisplayOptionsAtom, (o) =>

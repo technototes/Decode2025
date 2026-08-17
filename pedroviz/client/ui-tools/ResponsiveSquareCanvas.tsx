@@ -1,4 +1,9 @@
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { useAtomValue } from 'node_modules/jotai/esm/react.mjs';
+
+import { FieldConfigHashAtom } from 'client/state/Atoms';
+import { FieldVizPercentAtom, ThemeAtom } from 'client/state/SavedSettings';
+import { isNull, isUndefined } from 'node_modules/@freik/typechk/lib/esm';
 
 import { ResponsiveAnchor, ResponsiveSquareCanvasProps } from '../types';
 
@@ -26,47 +31,116 @@ function translateY(y: 'top' | 'middle' | 'bottom') {
   }
 }
 
+function getObjectPos(anchor: ResponsiveAnchor): string {
+  const x = anchor.x === 'center' ? '50%' : anchor.x;
+  const y = anchor.y === 'middle' ? '50%' : anchor.y;
+  return `${x} ${y}`;
+}
+
 export function ResponsiveSquareCanvas({
   anchor,
   style,
   className,
   render,
+  animate,
 }: ResponsiveSquareCanvasProps): ReactElement {
   const fieldAnchor: ResponsiveAnchor = anchor || defaultAnchor;
+  const theme = useAtomValue(ThemeAtom);
+  const redrawField = useAtomValue(FieldConfigHashAtom);
+  const fieldViz = useAtomValue(FieldVizPercentAtom);
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [size, setSize] = useState(0);
+  const mainRef = useRef<HTMLCanvasElement>(null);
+  const cacheRef = useRef<HTMLCanvasElement>(null); // Offscreen cache
+  const requestRef = useRef<number>(null);
+  const observerRef = useRef<ResizeObserver>(null);
 
-  // Make the canvas resize
+  // Okay, so to enable animation without re-rendering the whole canvas,
+  // we create a memory image to blit for every animation frame.
+
+  // First, create the cached canvas:
   useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry) {
-        const { width, height } = entry.contentRect;
-        // Floor the value to prevent fractional pixel jittering during fast drags
-        setSize(Math.floor(Math.min(width, height)));
+    if (!mainRef.current) {
+      return;
+    }
+    console.log('Created');
+    const main = mainRef.current;
+    cacheRef.current = document.createElement('canvas');
+    cacheRef.current.width = main.width;
+    cacheRef.current.height = main.height;
+  }, []);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    observerRef.current = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // Use devicePixelContentBoxSize for sharp rendering on HiDPI screens
+        // const size = entry.devicePixelContentBoxSize[0];
+        const size = entry.contentBoxSize[0];
+        if (isUndefined(size)) {
+          continue;
+        }
+        const newSize = Math.min(size.inlineSize, size.blockSize);
+
+        const main = mainRef.current;
+        const cache = cacheRef.current;
+
+        if (isNull(main) || isNull(cache)) {
+          continue;
+        }
+        // 1. Resize both canvases (this clears them)
+        main.width = newSize;
+        main.height = newSize;
+        cache.width = newSize;
+        cache.height = newSize;
+
+        // 2. Immediately redraw the background to the new cache size
+        // This ensures the cache is never empty or stretched
+        const ctx = animate ? cache.getContext('2d') : main.getContext('2d');
+        if (isNull(ctx)) {
+          continue;
+        }
+        render(ctx, window.devicePixelRatio || 1);
       }
     });
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [containerRef]);
 
-  // Rendering has a side effect, so it goes in a useEffect
+    // Observe the container using 'device-pixel-content-box' for crisp canvas rendering
+    observerRef.current.observe(element, { box: 'device-pixel-content-box' });
+
+    return () => observerRef.current?.disconnect();
+  }, [
+    animate,
+    render,
+    redrawField /* TODO: This should trigger for any changes to the paths! */,
+  ]); // Re-bind if background logic changes
+
+  // Animation Loop (Unchanged, just uses current canvas.width/height)
+  const animateFrame = () => {
+    if (!animate) return;
+    const main = mainRef.current;
+    const cache = cacheRef.current;
+    if (!main || !cache) return;
+
+    const ctx = main.getContext('2d');
+    if (isNull(ctx)) {
+      return;
+    }
+    ctx.clearRect(0, 0, main.width, main.height);
+
+    // Draw the fresh cache (which was updated on resize)
+    ctx.drawImage(cache, 0, 0);
+
+    animate(ctx, window.devicePixelRatio || 1);
+    requestRef.current = requestAnimationFrame(animateFrame);
+  };
+
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || size === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-    canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
-
-    render(ctx, size, dpr);
-  }, [canvasRef, size, render]);
+    if (animate) {
+      requestRef.current = requestAnimationFrame(animateFrame);
+      return () => cancelAnimationFrame(requestRef.current!);
+    }
+  }, [animate]);
 
   return (
     <div
@@ -80,9 +154,21 @@ export function ResponsiveSquareCanvas({
         alignItems: translateY(fieldAnchor.y),
         overflow: 'hidden',
       }}>
-      {size > 0 && (
-        <canvas style={style} className={className ?? ''} ref={canvasRef} />
-      )}
+      <img
+        src={`/assets/field-${theme}.jpg`}
+        style={{
+          objectPosition: getObjectPos(fieldAnchor),
+          opacity: fieldViz,
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+        }}
+      />
+      <canvas
+        style={{ position: 'absolute' }}
+        className={className}
+        ref={mainRef}
+      />
     </div>
   );
 }

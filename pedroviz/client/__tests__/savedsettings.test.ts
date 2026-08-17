@@ -12,8 +12,6 @@ import {
   PathPointStyleAtom,
   PathPointThicknessAtom,
   PathThicknessAtom,
-  ShowFieldAtom,
-  ShowFieldKeyAtom,
   ShowPathHeadingAtom,
 } from '../state/SavedSettings';
 import { CtrlPtStyles, DisplayOptions } from '../types';

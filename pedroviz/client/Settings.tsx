@@ -13,6 +13,7 @@ import {
   DropdownProps,
   Label,
   Option,
+  Slider,
   SpinButton,
   SpinButtonChangeEvent,
   SpinButtonOnChangeData,
@@ -26,6 +27,8 @@ import {
 
 import { Strings } from './constants';
 import {
+  CoordinateVisibilityAtom,
+  FieldVisibilityAtom,
   PathHeadingCountAtom,
   PathHeadingLengthAtom,
   PathHeadingThicknessAtom,
@@ -33,8 +36,6 @@ import {
   PathPointStyleAtom,
   PathPointThicknessAtom,
   PathThicknessAtom,
-  ShowFieldAtom,
-  ShowFieldKeyAtom,
   ShowPathHeadingAtom,
   ThemeAtom,
 } from './state/SavedSettings';
@@ -90,9 +91,9 @@ function useSpinnerAtom(
 
 export function Settings(): ReactElement {
   const [theTheme, setTheme] = useAtom(ThemeAtom);
-  const [showField, setShowField] = useAtom(ShowFieldAtom);
+  const [fieldViz, setFieldViz] = useAtom(FieldVisibilityAtom);
   const [showBotHeading, setShowBotHeading] = useAtom(ShowPathHeadingAtom);
-  const [showCoords, setShowCoords] = useAtom(ShowFieldKeyAtom);
+  const [coordViz, setCoordViz] = useAtom(CoordinateVisibilityAtom);
   const [pathThickness, changePathThickness] =
     useSpinnerAtom(PathThicknessAtom);
   const [ctrlPtThickness, changeCtrlPtThickness] = useSpinnerAtom(
@@ -129,22 +130,31 @@ export function Settings(): ReactElement {
           <DialogTitle style={{ textAlign: 'center' }}>Settings</DialogTitle>
           <DialogContent>
             <div className="settings">
-              <Label className="left-label" htmlFor="showFieldId">
-                Show field image
+              <Label className="left-label" htmlFor="fieldVisibilityId">
+                Field Visibility Level
               </Label>
-              <Switch
+              <Slider
+                aria-valuetext={`Value is ${fieldViz}%`}
+                value={fieldViz}
+                min={0}
+                max={100}
+                step={1}
+                onChange={(_, data) => setFieldViz(data.value)}
+                id="fieldVisibilityId"
                 className="left-field"
-                id="showFieldId"
-                checked={showField}
-                onChange={(_, data) => setShowField(data.checked)}
               />
-              <Label className="right-label" htmlFor="showCoordsId">
-                Show field coordinates
+              <Label className="right-label" htmlFor="coordVizId">
+                Field Key Visibility Level
               </Label>
-              <Switch
-                id="showCoordsId"
-                checked={showCoords}
-                onChange={(_, data) => setShowCoords(data.checked)}
+              <Slider
+                aria-valuetext={`Value is ${coordViz}%`}
+                value={coordViz}
+                min={0}
+                max={100}
+                step={1}
+                onChange={(_, data) => setCoordViz(data.value)}
+                id="coordVizId"
+                className="right-field"
               />
               <Label className="left-label" htmlFor="pathThicknessId">
                 Path Thickness

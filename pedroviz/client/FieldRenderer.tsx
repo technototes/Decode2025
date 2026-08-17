@@ -24,13 +24,12 @@ import {
   SelectedParsedClassAtom,
 } from './state/Atoms';
 import {
+  CoordVizPercentAtom,
   CurveOptionsAtom,
   PathCurveOptionsAtom,
   PathHeadingCountAtom,
   PathHeadingOptionsAtom,
   PoseOptionsAtom,
-  ShowFieldAtom,
-  ShowFieldKeyAtom,
   ShowPathHeadingAtom,
   ThemeAtom,
 } from './state/SavedSettings';
@@ -43,18 +42,9 @@ import {
 import { bezierLength, deCasteljau } from './ui-tools/bezier';
 import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
 
-const baseStyle: CSSProperties = {
-  border: '2px solid #666',
-  // boxSizing: 'border-box',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-};
-
 export function FieldRenderer(): ReactElement {
   const theme = useAtomValue(ThemeAtom);
-  const showCoords = useAtomValue(ShowFieldKeyAtom);
-  const showField = useAtomValue(ShowFieldAtom);
+  const coordViz = useAtomValue(CoordVizPercentAtom);
 
   const showPathHeadings = useAtomValue(ShowPathHeadingAtom);
   const pathHeadingCount = useAtomValue(PathHeadingCountAtom);
@@ -78,26 +68,22 @@ export function FieldRenderer(): ReactElement {
     ]),
   );
 
-  const bgStyle = showField
-    ? {
-        ...baseStyle,
-        backgroundImage: `url('/assets/field-${theme}.jpg')`,
-      }
-    : baseStyle;
-
   const renderField = useCallback(
-    (ctx: CanvasRenderingContext2D, size: number, dpr: number) => {
+    (ctx: CanvasRenderingContext2D, dpr: number) => {
       // Map logical 144×144 units into square
+      const size = ctx.canvas.width;
       const scale = size / 144;
 
       // Move the origin to the lower left, corner, and scale it up
       // ctx.translate(0, size * dpr);
       // ctx.scale(dpr * scale, -dpr * scale);
       // or just a single line of code:
-      ctx.setTransform(dpr * scale, 0, 0, -dpr * scale, 0, size * dpr);
-      if (showCoords) {
-        renderCoordinateLegend(ctx, dpr, scale, theme);
-      }
+      ctx.save();
+      ctx.resetTransform();
+      ctx.setTransform(scale, 0, 0, -scale, 0, size);
+      ctx.globalAlpha = coordViz;
+      renderCoordinateLegend(ctx, 1, scale, theme);
+      ctx.globalAlpha = 1.0;
 
       points.forEach(([ctrlPoints, facing], index) =>
         renderPath(
@@ -117,9 +103,10 @@ export function FieldRenderer(): ReactElement {
       if (isDefined(focusedCurve)) {
         drawFocusedCurve(curveOpts, ctx, focusedCurve.points, file);
       }
+      ctx.restore();
     },
     [
-      showCoords,
+      coordViz,
       theme,
       showPathHeadings,
       pathHeadingCount,
@@ -138,11 +125,38 @@ export function FieldRenderer(): ReactElement {
     ],
   );
 
+  let pos = 0;
+  let rot = 0;
+  let wid = 0;
+  const range = 2.5;
+  const animate = useCallback((ctx: CanvasRenderingContext2D, dpr: number) => {
+    const size = ctx.canvas.width;
+    const scale = size / 144;
+    ctx.save();
+    ctx.resetTransform();
+    ctx.setTransform(scale, 0, 0, -scale, 0, size);
+
+    ctx.strokeStyle = 'lightblue';
+    ctx.fillStyle = 'yellow';
+    const x = 15 * Math.cos(pos) + 40 * Math.sin(rot);
+    const y = 40 * Math.sin(pos) + 15 * Math.cos(rot);
+    ctx.beginPath();
+    ctx.lineWidth = 0.2 + Math.abs(range / 2 - wid);
+    ctx.moveTo(72, 72);
+    ctx.lineTo(72 + x, 72 + y);
+    ctx.stroke();
+    ctx.fillRect(70 + x, 70 + y, 4, 4);
+    pos = (pos + 0.07) % (Math.PI * 2);
+    rot = (rot + 0.03) % (Math.PI * 2);
+    wid = (wid + 0.01) % range;
+    ctx.restore();
+  }, []);
+
   return (
     <ResponsiveSquareCanvas
       anchor={{ x: 'right', y: 'top' }}
-      style={bgStyle}
       render={renderField}
+      animate={animate}
     />
   );
 }

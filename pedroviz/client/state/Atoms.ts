@@ -43,7 +43,7 @@ import { OneFileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetFullDb, LoadAndIndexFile, PutFullDb, UpdateIndexFile } from './API';
 import { EmptyMappedFile, GetNameLookup } from './IndexedFile';
-import { ThemeAtom } from './SavedSettings';
+import { DisplayOptionsAtom, ThemeAtom } from './SavedSettings';
 
 export const ColorsAtom = atom((get) => {
   const theme = get(ThemeAtom);
@@ -332,3 +332,11 @@ export const PoseAtomFamily = makeItemFromNameFamily(MappedPosesAtom);
 export const FocusedPoseAtom = atom<NamedPose | undefined>(undefined);
 export const FocusedCurveAtom = atom<NamedBezier | undefined>(undefined);
 /*export*/ const FocusedPathAtom = atom<NamedPathChain | undefined>(undefined);
+
+export const FieldConfigHashAtom = atom((get) => {
+  const d = get(DisplayOptionsAtom);
+  const c = get(UnwrappedParsedClass);
+  const p = get(FocusedPoseAtom);
+  const b = get(FocusedCurveAtom);
+  return JSON.stringify({ d, c, p, b });
+});
