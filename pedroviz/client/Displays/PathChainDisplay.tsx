@@ -130,14 +130,8 @@ export function PathChainList(): ReactElement {
     [npcs],
   );
   // This enables deselection
-  const maybeClearSelection = useCallback(
-    (id: PathChainName) => {
-      if (id === focusedPath?.name) {
-        setFocusedPath(undefined);
-      }
-    },
-    [focusedPath],
-  );
+  const maybeClearSelection = (id: PathChainName) =>
+    id === focusedPath?.name && setFocusedPath(undefined);
   return (
     <DataGrid
       items={npcs}

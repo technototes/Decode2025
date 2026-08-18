@@ -1,5 +1,5 @@
-import { ReactElement, useCallback, useEffect, useState } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { ReactElement, useCallback } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 
 import {
   createTableColumn,
@@ -211,6 +211,9 @@ export function NamedPoseList(): ReactElement {
     },
     [poses],
   );
+  // This enables deselection
+  const maybeClearSelection = (id: PoseName) =>
+    id === focusedPose?.name && setFocusedPose(undefined);
   return (
     <DataGrid
       items={poses}
@@ -232,7 +235,8 @@ export function NamedPoseList(): ReactElement {
         {({ item, rowId }) => (
           <DataGridRow<NamedPose>
             key={rowId}
-            selectionCell={{ radioIndicator: { 'aria-label': 'Select row' } }}>
+            selectionCell={{ radioIndicator: { 'aria-label': 'Select row' } }}
+            onClick={() => maybeClearSelection(item.name)}>
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>
             )}

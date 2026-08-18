@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useEffect, useState } from 'react';
+import { ReactElement, useCallback } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
 import {
@@ -79,6 +79,9 @@ export function NamedBezierList(): ReactElement {
     },
     [curves],
   );
+  // This enables deselection
+  const maybeClearSelection = (id: BezierName) =>
+    id === focusedCurve?.name && setFocusedCurve(undefined);
   return (
     <DataGrid
       items={curves}
@@ -100,7 +103,8 @@ export function NamedBezierList(): ReactElement {
         {({ item, rowId }) => (
           <DataGridRow<NamedBezier>
             key={rowId}
-            selectionCell={{ radioIndicator: { 'aria-label': 'Select row' } }}>
+            selectionCell={{ radioIndicator: { 'aria-label': 'Select row' } }}
+            onClick={() => maybeClearSelection(item.name)}>
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>
             )}

@@ -59,15 +59,14 @@ export function ResponsiveSquareCanvas({
 
   // First, create the cached canvas:
   useEffect(() => {
-    if (!mainRef.current) {
+    if (!mainRef.current || !animate) {
       return;
     }
-    console.log('Created');
     const main = mainRef.current;
     cacheRef.current = document.createElement('canvas');
     cacheRef.current.width = main.width;
     cacheRef.current.height = main.height;
-  }, []);
+  }, [animate]);
 
   useEffect(() => {
     const element = containerRef.current;
@@ -86,18 +85,19 @@ export function ResponsiveSquareCanvas({
         const main = mainRef.current;
         const cache = cacheRef.current;
 
-        if (isNull(main) || isNull(cache)) {
+        if (isNull(main) || (animate && isNull(cache))) {
           continue;
         }
         // 1. Resize both canvases (this clears them)
         main.width = newSize;
         main.height = newSize;
-        cache.width = newSize;
-        cache.height = newSize;
-
+        if (animate) {
+          cache!.width = newSize;
+          cache!.height = newSize;
+        }
         // 2. Immediately redraw the background to the new cache size
         // This ensures the cache is never empty or stretched
-        const ctx = animate ? cache.getContext('2d') : main.getContext('2d');
+        const ctx = animate ? cache!.getContext('2d') : main.getContext('2d');
         if (isNull(ctx)) {
           continue;
         }
@@ -165,7 +165,7 @@ export function ResponsiveSquareCanvas({
         }}
       />
       <canvas
-        style={{ position: 'absolute' }}
+        style={{ ...style, position: 'absolute' }}
         className={className}
         ref={mainRef}
       />
