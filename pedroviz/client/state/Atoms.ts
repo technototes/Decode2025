@@ -331,7 +331,7 @@ export const PoseAtomFamily = makeItemFromNameFamily(MappedPosesAtom);
 
 export const FocusedPoseAtom = atom<NamedPose | undefined>(undefined);
 export const FocusedCurveAtom = atom<NamedBezier | undefined>(undefined);
-/*export*/ const FocusedPathAtom = atom<NamedPathChain | undefined>(undefined);
+export const FocusedPathAtom = atom<NamedPathChain | undefined>(undefined);
 
 export const FieldConfigHashAtom = atom((get) => {
   const d = get(DisplayOptionsAtom);
