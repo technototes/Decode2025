@@ -91,9 +91,7 @@ function mkPCNm(name: string): PathChainName {
 
 // Mocks & phony data for my tests:
 
-const testParsedClass: ParsedClass = {
-  ...EmptyParsedClass,
-};
+const testParsedClass: ParsedClass = structuredClone(EmptyParsedClass);
 testParsedClass.values.push({
   name: 'item1' as ValueName,
   value: { int: 1 },

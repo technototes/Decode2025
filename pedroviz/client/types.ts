@@ -49,8 +49,16 @@ export type PathStyle = {
   Curves: CurveStyle;
 };
 
+export const BotShapes = Object.freeze({
+  Trapezoid: 'Trapezoid',
+  Triangle: 'Triangle',
+  Ellipse: 'Ellipse',
+  Rectangle: 'Rectangle',
+} as const);
+export type BotShapes = (typeof BotShapes)[keyof typeof BotShapes];
+
 export type BotDrawStyle = {
-  Shape: 'circle' | 'triangle' | 'rectangle' | 'trapdezoid';
+  Shape: BotShapes;
   Width: number;
   Depth: number;
 };

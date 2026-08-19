@@ -10,6 +10,7 @@ import { NamedPoseList } from './Displays/PoseDisplay';
 import { NamedValueList } from './Displays/ValueDisplay';
 import {
   FocusedCurveAtom,
+  FocusedPathAtom,
   FocusedPoseAtom,
   SelectedClassAtom,
   SelectedPathAtom,
@@ -32,6 +33,7 @@ export function PathsDataDisplay({
   const selClass = useAtomValue(SelectedClassAtom);
   const setFocusedPose = useSetAtom(FocusedPoseAtom);
   const setFocusedCurve = useSetAtom(FocusedCurveAtom);
+  const setFocusedPath = useSetAtom(FocusedPathAtom);
   if (selFile.length === 0 || selClass.length === 0) {
     return <Text size={600}>Please select a file & class to view.</Text>;
   }
@@ -64,7 +66,10 @@ export function PathsDataDisplay({
           New Curve
         </Button> */}
       </Expandable>
-      <Expandable label={<Text weight="bold">Full Paths</Text>} indent={20}>
+      <Expandable
+        label={<Text weight="bold">Full Paths</Text>}
+        indent={20}
+        onChanged={(exp: boolean) => exp || setFocusedPath(undefined)}>
         <Suspense>
           <PathChainList />
         </Suspense>

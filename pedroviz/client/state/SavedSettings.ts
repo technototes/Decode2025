@@ -4,6 +4,7 @@ import { atomWithStorage } from 'jotai/utils';
 
 import {
   BotDrawStyle,
+  BotShapes,
   ControlPointStyle,
   CtrlPtStyles,
   CurveStyle,
@@ -33,9 +34,9 @@ const defaultPathStyle: PathStyle = {
 };
 
 const defaultBotStyle: BotDrawStyle = {
-  Shape: 'rectangle',
-  Width: 14,
-  Depth: 17,
+  Shape: BotShapes.Trapezoid,
+  Width: 16 / 2,
+  Depth: 18 / 2,
 };
 
 function getContrastingStyle(s: CtrlPtStyles): CtrlPtStyles {
@@ -233,4 +234,8 @@ const RawPoseHeadingLengthAtom = focusAtom(RawPoseOptionsAtom, (o) =>
 );
 const RawPoseHeadingThicknessAtom = focusAtom(RawPoseOptionsAtom, (o) =>
   o.prop('Headings').prop('Thickness'),
+);
+
+export const BotDrawStyleAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('BotDrawing'),
 );

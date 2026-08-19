@@ -1,10 +1,10 @@
-import { CSSProperties, ReactElement, useCallback } from 'react';
+import { ReactElement, useCallback, useRef } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { tokens } from '@fluentui/tokens';
-import { isDefined } from '@freik/typechk';
+import { isDefined, isUndefined } from '@freik/typechk';
 
-import { BezierRef, ParsedClass, PoseRef } from '../CodeTypes';
+import { BezierRef, ParsedClass, PathChainName, PoseRef } from '../CodeTypes';
 import {
   chkConcreteLinearHeading,
   chkConcreteSimpleHeading,
@@ -19,11 +19,13 @@ import { calcBezierRef, calcFacing, calcPoseRef } from './ExpressionEval';
 import {
   ColorsAtom,
   FocusedCurveAtom,
+  FocusedPathAtom,
   FocusedPoseAtom,
   NamedPathChainsAtom,
   SelectedParsedClassAtom,
 } from './state/Atoms';
 import {
+  BotDrawStyleAtom,
   CoordVizPercentAtom,
   CurveOptionsAtom,
   PathCurveOptionsAtom,
@@ -34,6 +36,8 @@ import {
   ThemeAtom,
 } from './state/SavedSettings';
 import {
+  BotDrawStyle,
+  BotShapes,
   ControlPointStyle,
   CtrlPtStyles,
   CurveStyle,
@@ -41,6 +45,72 @@ import {
 } from './types';
 import { bezierLength, deCasteljau } from './ui-tools/bezier';
 import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
+
+type BotAnimationState = {
+  name: PathChainName;
+  pathIndex: number;
+  pathPoint: number;
+  count: number;
+  pathPoints: Point[][];
+};
+
+function initState(
+  state: BotAnimationState,
+  name: PathChainName | undefined,
+  path: [Point[], ConcreteHeading][],
+) {
+  state.pathPoints = path.map(([pts]) => getBezierPoints(pts));
+  state.count = 0;
+  state.name = name || ('' as PathChainName);
+  state.pathPoint = 0;
+  state.pathIndex = 0;
+}
+
+const countWrap = 4;
+const shapes: BotShapes[] = Object.values(BotShapes); //['rectangle', 'ellipse', 'trapezoid', 'triangle'];
+function nextState(state: BotAnimationState) {
+  state.count = (state.count + 1) % countWrap;
+  if (state.count !== 0) {
+    return;
+  }
+  state.pathPoint =
+    (state.pathPoint + 1) % state.pathPoints[state.pathIndex]!.length;
+  if (state.pathPoint !== 0) {
+    return;
+  }
+  state.pathIndex = (state.pathIndex + 1) % state.pathPoints.length;
+}
+
+function animateBot(
+  ctx: CanvasRenderingContext2D,
+  name: PathChainName | undefined,
+  path: [Point[], ConcreteHeading][],
+  state: BotAnimationState,
+  botStyle: BotDrawStyle,
+) {
+  if (name !== state.name) {
+    // We've got a new selected path chain to draw. Let's do calculations-n-stuff
+    initState(state, name, path);
+  }
+  // Are we in a position where the state can't be rendered?
+  if (
+    isUndefined(name) ||
+    state.pathPoints.length <= state.pathIndex ||
+    state.pathPoints[state.pathIndex]!.length <= state.pathPoint
+  ) {
+    return;
+  }
+  // Draw the robot at the current location:
+  const points = state.pathPoints[state.pathIndex]!;
+  const point = points[state.pathPoint]!;
+  ctx.strokeStyle = '#ff0000';
+  ctx.lineWidth = 1;
+  ctx.lineCap = 'round';
+  botStyle.Shape =
+    shapes[Math.floor((state.pathPoint * 12) / points.length) % 4]!;
+  drawBotShape(ctx, point, botStyle);
+  nextState(state);
+}
 
 export function FieldRenderer(): ReactElement {
   const theme = useAtomValue(ThemeAtom);
@@ -53,6 +123,7 @@ export function FieldRenderer(): ReactElement {
 
   const curveOpts = useAtomValue(CurveOptionsAtom);
   const poseOpts = useAtomValue(PoseOptionsAtom);
+  const botStyle = useAtomValue(BotDrawStyleAtom);
 
   const colors = useAtomValue(ColorsAtom);
   const allPCs = useAtomValue(NamedPathChainsAtom);
@@ -60,13 +131,26 @@ export function FieldRenderer(): ReactElement {
 
   const focusedPose = useAtomValue(FocusedPoseAtom);
   const focusedCurve = useAtomValue(FocusedCurveAtom);
+  const focusedPath = useAtomValue(FocusedPathAtom);
 
-  const points = allPCs.flatMap((npc) =>
-    npc.paths.map((br): [Point[], ConcreteHeading] => [
-      calcBezierRef(br, file),
-      calcFacing(npc.heading, file),
+  const concretePaths = new Map(
+    allPCs.map((npc) => [
+      npc.name,
+      npc.paths.map((br): [Point[], ConcreteHeading] => [
+        calcBezierRef(br, file),
+        calcFacing(npc.heading, file),
+      ]),
     ]),
   );
+
+  const points = [...concretePaths.values()].flatMap((val) => val);
+  /*allPCs.flatMap((npc) =>
+    npc.paths.map((br): [Point[], ConcreteHeading] => [
+      calcBezierRef(br, file),
+
+      calcFacing(npc.heading, file),
+    ]),
+  );*/
 
   const renderField = useCallback(
     (ctx: CanvasRenderingContext2D, dpr: number) => {
@@ -78,8 +162,6 @@ export function FieldRenderer(): ReactElement {
       // ctx.translate(0, size * dpr);
       // ctx.scale(dpr * scale, -dpr * scale);
       // or just a single line of code:
-      ctx.save();
-      ctx.resetTransform();
       ctx.setTransform(scale, 0, 0, -scale, 0, size);
       ctx.globalAlpha = coordViz;
       renderCoordinateLegend(ctx, 1, scale, theme);
@@ -103,7 +185,6 @@ export function FieldRenderer(): ReactElement {
       if (isDefined(focusedCurve)) {
         drawFocusedCurve(curveOpts, ctx, focusedCurve.points, file);
       }
-      ctx.restore();
     },
     [
       coordViz,
@@ -125,38 +206,40 @@ export function FieldRenderer(): ReactElement {
     ],
   );
 
-  let pos = 0;
-  let rot = 0;
-  let wid = 0;
-  const range = 2.5;
-  const animate = useCallback((ctx: CanvasRenderingContext2D, dpr: number) => {
-    const size = ctx.canvas.width;
-    const scale = size / 144;
-    ctx.save();
-    ctx.resetTransform();
-    ctx.setTransform(scale, 0, 0, -scale, 0, size);
-
-    ctx.strokeStyle = 'lightblue';
-    ctx.fillStyle = 'yellow';
-    const x = 15 * Math.cos(pos) + 40 * Math.sin(rot);
-    const y = 40 * Math.sin(pos) + 15 * Math.cos(rot);
-    ctx.beginPath();
-    ctx.lineWidth = 0.2 + Math.abs(range / 2 - wid);
-    ctx.moveTo(72, 72);
-    ctx.lineTo(72 + x, 72 + y);
-    ctx.stroke();
-    ctx.fillRect(70 + x, 70 + y, 4, 4);
-    pos = (pos + 0.07) % (Math.PI * 2);
-    rot = (rot + 0.03) % (Math.PI * 2);
-    wid = (wid + 0.01) % range;
-    ctx.restore();
-  }, []);
+  const animationStateRef = useRef<BotAnimationState>({
+    name: '' as PathChainName,
+    pathIndex: 0,
+    pathPoint: 0,
+    count: 60,
+    pathPoints: [],
+  });
+  const animate = useCallback(
+    (ctx: CanvasRenderingContext2D, dpr: number) => {
+      const size = ctx.canvas.width;
+      const scale = size / 144;
+      const selectedConcretePath = concretePaths.get(focusedPath!.name);
+      if (!selectedConcretePath) {
+        return;
+      }
+      ctx.save();
+      ctx.setTransform(scale, 0, 0, -scale, 0, size);
+      animateBot(
+        ctx,
+        focusedPath?.name,
+        selectedConcretePath,
+        animationStateRef.current,
+        botStyle,
+      );
+      ctx.restore();
+    },
+    [focusedPath],
+  );
 
   return (
     <ResponsiveSquareCanvas
       anchor={{ x: 'right', y: 'top' }}
       render={renderField}
-      animate={animate}
+      animate={focusedPath && animate}
     />
   );
 }
@@ -297,11 +380,7 @@ function renderCurve(
   if (curveControlPoints.length < 2) {
     return [0, []];
   }
-  const len = bezierLength(curveControlPoints);
-  const pts: Point[] = [];
-  for (let t = 0; t <= 1.0; t += 1 / len) {
-    pts.push(deCasteljau(curveControlPoints, t));
-  }
+  const pts: Point[] = getBezierPoints(curveControlPoints);
   const drawPath = opts.Thickness > 1e-10;
   if (drawPath) {
     ctx.beginPath();
@@ -332,6 +411,16 @@ function renderCurve(
     ctx.stroke();
   }
   return [approxLen, pts];
+}
+
+function getBezierPoints(curveControlPoints: Point[]) {
+  const len = bezierLength(curveControlPoints);
+  const pts: Point[] = [];
+  for (let t = 0; t <= 1.0; t += 1 / len) {
+    const h = t * Math.PI * 2;
+    pts.push({ ...deCasteljau(curveControlPoints, t), h });
+  }
+  return pts;
 }
 
 function renderPath(
@@ -373,6 +462,64 @@ function renderPath(
       const tang = bezierDerivative(curveControlPoints, 0.4);
       const mid = deCasteljau(curveControlPoints, 0.4);
       */
+}
+
+function rotPt(offs: Point): Point {
+  const cos = Math.cos(offs.h!);
+  const sin = Math.sin(offs.h!);
+  const x = offs.x * cos - offs.y * sin;
+  const y = offs.x * sin + offs.y * cos;
+  return { x, y };
+}
+
+function drawBotShape(
+  ctx: CanvasRenderingContext2D,
+  center: Point,
+  bot: BotDrawStyle,
+) {
+  const w = Math.min(bot.Width, 9);
+  const l = Math.min(bot.Depth, 9);
+  const to = w / 5; // trapezoid offset
+  ctx.beginPath();
+  const front = rotPt({ x: l, y: 0, h: center.h! });
+  const br = rotPt({ x: -l, y: -w, h: center.h });
+  const bl = rotPt({ x: -l, y: w, h: center.h });
+
+  switch (bot.Shape) {
+    case BotShapes.Rectangle:
+      {
+        const fl = rotPt({ x: l, y: w, h: center.h });
+        const fr = rotPt({ x: l, y: -w, h: center.h });
+        ctx.moveTo(center.x + fl.x, center.y + fl.y);
+        ctx.lineTo(center.x + fr.x, center.y + fr.y);
+        ctx.lineTo(center.x + br.x, center.y + br.y);
+        ctx.lineTo(center.x + bl.x, center.y + bl.y);
+        ctx.closePath();
+      }
+      break;
+    case BotShapes.Trapezoid:
+      {
+        const fl = rotPt({ x: l, y: w - to, h: center.h });
+        const fr = rotPt({ x: l, y: -w + to, h: center.h });
+        ctx.moveTo(center.x + fl.x, center.y + fl.y);
+        ctx.lineTo(center.x + fr.x, center.y + fr.y);
+        ctx.lineTo(center.x + br.x, center.y + br.y);
+        ctx.lineTo(center.x + bl.x, center.y + bl.y);
+        ctx.closePath();
+      }
+      break;
+    case BotShapes.Ellipse:
+      ctx.ellipse(center.x, center.y, l, w, center.h!, 0, Math.PI * 2);
+      break;
+    case BotShapes.Triangle:
+      ctx.moveTo(center.x + front.x, center.y + front.y);
+      ctx.lineTo(center.x + br.x, center.y + br.y);
+      ctx.lineTo(center.x + bl.x, center.y + bl.y);
+      ctx.lineTo(center.x + front.x, center.y + front.y);
+  }
+  ctx.moveTo(center.x + front.x, center.y + front.y);
+  ctx.lineTo(center.x, center.y);
+  ctx.stroke();
 }
 
 function drawPoint(
