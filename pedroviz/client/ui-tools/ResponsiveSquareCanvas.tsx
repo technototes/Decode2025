@@ -5,7 +5,11 @@ import { FieldVizPercentAtom, ThemeAtom } from 'client/state/SavedSettings';
 import { FieldConfigHashAtom } from 'client/state/UserCode';
 import { isNull, isUndefined } from 'node_modules/@freik/typechk/lib/esm';
 
-import { ResponsiveAnchor, ResponsiveSquareCanvasProps } from '../types';
+import {
+  Offset,
+  ResponsiveAnchor,
+  ResponsiveSquareCanvasProps,
+} from '../types';
 
 const defaultAnchor: ResponsiveAnchor = { x: 'center', y: 'middle' };
 
@@ -37,6 +41,37 @@ function getObjectPos(anchor: ResponsiveAnchor): string {
   return `${x} ${y}`;
 }
 
+// Absolute positioned canvas requires offsets to follow the anchor location
+function getCanvasOffset(
+  anchor: ResponsiveAnchor,
+  width: number,
+  height: number,
+): Offset {
+  const delta = Math.abs(height - width);
+  let top = 0;
+  let left = 0;
+  if (width < height) {
+    switch (anchor.y) {
+      case 'middle':
+        top = Math.floor(delta / 2);
+        break;
+      case 'bottom':
+        top = delta;
+        break;
+    }
+  } else {
+    switch (anchor.x) {
+      case 'center':
+        left = Math.floor(delta / 2);
+        break;
+      case 'right':
+        left = delta;
+        break;
+    }
+  }
+  return { top, left };
+}
+
 export function ResponsiveSquareCanvas({
   anchor,
   style,
@@ -53,19 +88,24 @@ export function ResponsiveSquareCanvas({
   const cacheRef = useRef<HTMLCanvasElement>(null); // Offscreen cache
   const requestRef = useRef<number>(null);
   const observerRef = useRef<ResizeObserver>(null);
+  const [canvasOffset, setCanvasOffset] = useState<Offset>({ top: 0, left: 0 });
 
   // Okay, so to enable animation without re-rendering the whole canvas,
   // we create a memory image to blit for every animation frame.
 
   // First, create the cached canvas:
   useEffect(() => {
-    if (!mainRef.current || !animate) {
+    if (!mainRef.current) {
       return;
     }
-    const main = mainRef.current;
-    cacheRef.current = document.createElement('canvas');
-    cacheRef.current.width = main.width;
-    cacheRef.current.height = main.height;
+    if (animate) {
+      const main = mainRef.current;
+      cacheRef.current = document.createElement('canvas');
+      cacheRef.current.width = main.width;
+      cacheRef.current.height = main.height;
+    } else {
+      cacheRef.current = null;
+    }
   }, [animate]);
 
   useEffect(() => {
@@ -95,7 +135,19 @@ export function ResponsiveSquareCanvas({
           cache!.width = newSize;
           cache!.height = newSize;
         }
-        // 2. Immediately redraw the background to the new cache size
+        // 2. Set the canvas location offsets according to the 'ResponsiveAnchor' parameter:
+        const offset = getCanvasOffset(
+          fieldAnchor,
+          size.inlineSize,
+          size.blockSize,
+        );
+        if (
+          offset.left !== canvasOffset.left ||
+          offset.top !== canvasOffset.top
+        ) {
+          setCanvasOffset(offset);
+        }
+        // 3. Immediately redraw the background to the new cache size
         // This ensures the cache is never empty or stretched
         const ctx = animate ? cache!.getContext('2d') : main.getContext('2d');
         if (isNull(ctx)) {
@@ -112,6 +164,7 @@ export function ResponsiveSquareCanvas({
   }, [
     animate,
     render,
+    fieldAnchor,
     redrawField /* TODO: This should trigger for any changes to the paths! */,
   ]); // Re-bind if background logic changes
 
@@ -147,6 +200,7 @@ export function ResponsiveSquareCanvas({
       ref={containerRef}
       style={{
         flexGrow: 1,
+        position: 'relative',
         display: 'flex',
         width: '100%',
         height: '100%',
@@ -165,7 +219,12 @@ export function ResponsiveSquareCanvas({
         }}
       />
       <canvas
-        style={{ ...style, position: 'absolute' }}
+        style={{
+          ...style,
+          position: 'absolute',
+          left: `${canvasOffset.left}px`,
+          top: `${canvasOffset.top}px`,
+        }}
         className={className}
         ref={mainRef}
       />

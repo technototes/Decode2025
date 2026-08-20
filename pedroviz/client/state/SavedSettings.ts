@@ -138,7 +138,7 @@ export const PathCurveOptionsAtom = focusAtom(PathOptionsAtom, (o) =>
 const PathPointOptionsAtom = focusAtom(PathCurveOptionsAtom, (o) =>
   o.prop('ControlPoint'),
 );
-export const PathHeadingOptionsAtom = focusAtom(PathOptionsAtom, (o) =>
+/*export*/ const PathHeadingOptionsAtom = focusAtom(PathOptionsAtom, (o) =>
   o.prop('Heading'),
 );
 export const PathPointSizeAtom = focusAtom(PathPointOptionsAtom, (o) =>
@@ -187,6 +187,7 @@ export const CurveOptionsAtom = atom(
   },
 );
 
+/*
 const RawCurveThicknessAtom = focusAtom(RawCurveOptionsAtom, (o) =>
   o.prop('Thickness'),
 );
@@ -202,6 +203,7 @@ const RawCurvePointStyleAtom = focusAtom(RawCurveOptionsAtom, (o) =>
 const RawCurvePointThicknessAtom = focusAtom(RawCurveOptionsAtom, (o) =>
   o.prop('ControlPoint').prop('Thickness'),
 );
+*/
 
 const RawPoseOptionsAtom = focusAtom(DisplayOptionsAtom, (o) =>
   o.prop('Poses'),
@@ -222,6 +224,8 @@ export const PoseOptionsAtom = atom(
     set(RawCurveOptionsAtom, val);
   },
 );
+
+/*
 const RawPosePointSizeAtom = focusAtom(RawPoseOptionsAtom, (o) =>
   o.prop('Points').prop('Size'),
 );
@@ -237,6 +241,7 @@ const RawPoseHeadingLengthAtom = focusAtom(RawPoseOptionsAtom, (o) =>
 const RawPoseHeadingThicknessAtom = focusAtom(RawPoseOptionsAtom, (o) =>
   o.prop('Headings').prop('Thickness'),
 );
+*/
 
 export const BotDrawStyleAtom = focusAtom(DisplayOptionsAtom, (o) =>
   o.prop('BotDrawing'),

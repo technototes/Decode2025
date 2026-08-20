@@ -69,7 +69,7 @@ export function animateBot(
   nextState(state);
 }
 
-export function drawBotShape(
+function drawBotShape(
   ctx: CanvasRenderingContext2D,
   center: Point,
   bot: BotDrawStyle,

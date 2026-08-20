@@ -140,6 +140,8 @@ export type ResponsiveAnchor = {
   y: 'top' | 'middle' | 'bottom';
 };
 
+export type Offset = { left: number; top: number };
+
 export type CanvasRenderFunc = (
   ctx: CanvasRenderingContext2D,
   devicePixelRatio: number,
