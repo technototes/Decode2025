@@ -2,25 +2,18 @@ import { ReactElement, useCallback, useRef } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { tokens } from '@fluentui/tokens';
-import { isDefined } from '@freik/typechk';
+import { isDefined, isUndefined } from '@freik/typechk';
 
 import { BezierRef, ParsedClass, PathChainName, PoseRef } from '../CodeTypes';
 import { animateBot, BotAnimationState } from './BotAnimation';
+import { ConcreteHeading, Point } from './ConcreteEvalTypes';
 import {
-  chkConcreteLinearHeading,
-  chkConcreteSimpleHeading,
-} from './ConcreteEvalTypeCheck';
-import {
-  ConcreteHeading,
-  ConcreteHeadingType,
-  ConcreteSimpleHeading,
-  Point,
-} from './ConcreteEvalTypes';
-import {
+  addHeadingToCurve,
+  CloseTo,
   CurveDetail,
   getCurveDetail,
-  ptDiff,
   ptDistance,
+  vector,
 } from './DrawingHelpers';
 import { calcBezierRef, calcFacing, calcPoseRef } from './ExpressionEval';
 import {
@@ -132,10 +125,10 @@ export function FieldRenderer(): ReactElement {
 
   const animationStateRef = useRef<BotAnimationState>({
     name: '' as PathChainName,
-    pathIndex: 0,
-    pathPoint: 0,
+    curveIndex: 0,
+    curvePoint: 0,
     count: 60,
-    pathPoints: [],
+    curves: [],
   });
   const animate = useCallback(
     (ctx: CanvasRenderingContext2D, dpr: number) => {
@@ -175,7 +168,8 @@ function drawFocusedCurve(
   file: ParsedClass,
 ) {
   const br = calcBezierRef(focusedCurve, file);
-  renderCurve(ctx, br, '#fff', opts);
+  const curve = getCurveDetail(br);
+  renderCurve(ctx, curve, '#fff', opts);
 }
 
 function drawFocusedPose(
@@ -195,10 +189,6 @@ function drawFocusedPose(
       poseStyle.Headings,
       tokens.colorNeutralForeground1,
       pt,
-      {
-        x: Math.cos(pt.h),
-        y: Math.sin(pt.h),
-      },
     );
   }
 }
@@ -288,26 +278,20 @@ function renderCoordinateLegend(
 
 function renderCurve(
   ctx: CanvasRenderingContext2D,
-  curveControlPoints: Point[],
+  curve: CurveDetail,
   color: string,
   opts: CurveStyle,
-): CurveDetail {
-  const { length, points } = getCurveDetail(curveControlPoints);
-  if (length > 0 && !CloseTo(opts.Thickness, 0)) {
+): void {
+  if (curve.length > 0 && !CloseTo(opts.Thickness, 0)) {
     ctx.beginPath();
     ctx.lineWidth = opts.Thickness;
     ctx.strokeStyle = color;
-    ctx.moveTo(curveControlPoints[0]!.x, curveControlPoints[0]!.y);
-    for (const pt of points) {
+    ctx.moveTo(curve.points[0]!.x, curve.points[0]!.y);
+    for (const pt of curve.points) {
       ctx.lineTo(pt.x, pt.y);
     }
-    ctx.lineTo(
-      curveControlPoints[curveControlPoints.length - 1]!.x,
-      curveControlPoints[curveControlPoints.length - 1]!.y,
-    );
     ctx.stroke();
   }
-  return { length, points };
 }
 
 function shouldDrawCurve(curveStyle: CurveStyle): boolean {
@@ -325,17 +309,8 @@ function renderPath(
   color: string,
   pathStyle: PathStyle,
 ) {
-  /*
-    headingCount: number,
-  headingStyle: HeadingStyle,
-  curveStyle: CurveStyle,
-*/
-  const { length, points } = renderCurve(
-    ctx,
-    curveControlPoints,
-    color,
-    pathStyle.Curves,
-  );
+  const curve = getCurveDetail(curveControlPoints);
+  renderCurve(ctx, curve, color, pathStyle.Curves);
   if (shouldDrawCurve(pathStyle.Curves)) {
     drawControlPoints(
       ctx,
@@ -345,22 +320,15 @@ function renderPath(
     );
   }
   if (heading) {
+    addHeadingToCurve(curve, heading);
     drawHeadingLines(
       ctx,
       color,
-      length,
-      [...points, curveControlPoints[curveControlPoints.length - 1]!],
-      heading,
+      curve,
       pathStyle.HeadingCount,
       pathStyle.Heading,
     );
   }
-
-  // These two items wil be useful for animation in the footure
-  /*
-      const tang = bezierDerivative(curveControlPoints, 0.4);
-      const mid = deCasteljau(curveControlPoints, 0.4);
-      */
 }
 
 function drawPoint(
@@ -425,90 +393,48 @@ function drawColors(ctx: CanvasRenderingContext2D, colors: string[]) {
   ctx.restore();
 }
 
-function magnitude(pt: Point, val: number): Point {
-  const mag = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
-  return { x: (pt.x * val) / mag, y: (pt.y * val) / mag };
-}
-
 function drawHeadingLines(
   ctx: CanvasRenderingContext2D,
   color: string,
-  len: number,
-  pts: Point[],
-  heading: ConcreteHeading,
+  curve: CurveDetail,
   headingCount: number,
   headingStyle: HeadingStyle,
 ) {
-  // for "n" points, I'm not drawing starting/ending headings, so I actually want to split
-  // the length into count + 1 pieces, and find the point in between each piece
-  const pieceLen = len / (headingCount + 1);
-  if (headingCount <= 0 || pts.length < 3 || pieceLen < 1) {
+  // for "n" points, I'm not drawing starting/ending headings, so I actually
+  // want to split the length into n + 1 pieces, and find the last point in
+  // between each piece
+  const pieceLen = curve.length / (headingCount + 1);
+  if (headingCount <= 0 || curve.points.length < 3) {
     return;
   }
-  let curPtIndex = 1;
-  let lastDelta: Point = { x: 0, y: 0 };
-  for (let pos = 0; pos < headingCount && curPtIndex < pts.length; pos++) {
-    let pathPos = pieceLen * (pos + 1);
-    // Walk the length of the path, until we find the heading-draw point
-    let point: Point | undefined;
-    // This is just laziness. I shouldn't need to recalculate the whole thing, but
-    // math is hard...
-    for (let curPtIndex = 1; pathPos > 0; curPtIndex++) {
-      const prev = pts[curPtIndex - 1]!;
-      const cur = pts[curPtIndex]!;
-      lastDelta = ptDiff(cur, prev);
-      const l = ptDistance(prev, cur);
-      if (l >= pathPos) {
-        const partWay = magnitude(ptDiff(cur, prev), pathPos);
-        point = { x: prev.x + partWay.x, y: prev.y + partWay.y };
-      }
-      pathPos -= l;
-    }
-    if (isDefined(point)) {
-      // Draw the heading line at this location.
-      // Include the tangent, and the portion of the overall path that's complete.
-      drawPathHeadingLine(
-        ctx,
-        color,
-        point,
-        lastDelta,
-        (pos + 1) / (headingCount + 1),
-        heading,
-        headingStyle,
-      );
-    }
-  }
-}
+  let totalDist = 0;
+  let lastPoint = curve.points[0]!;
+  let curTarget = pieceLen;
+  // Just walk the points, checking the distance to the next target.
+  for (const curPoint of curve.points) {
+    // Let's figure out how far along the curve we are...
+    const ptDist = ptDistance(lastPoint, curPoint);
+    const newDist = totalDist + ptDist;
+    if (newDist >= curTarget) {
+      // Interpolate between the two points. This looks backward
+      // because for scaling, the smaller number is the weight for
+      // the furthest away point...
+      const nextPortion = (curTarget - totalDist) / ptDist;
+      const prevPortion = (newDist - curTarget) / ptDist;
+      const avg = {
+        x: prevPortion * lastPoint.x + nextPortion * curPoint.x,
+        y: prevPortion * lastPoint.y + nextPortion * curPoint.y,
+        h: prevPortion * lastPoint.h! + nextPortion * curPoint.h!,
+      };
 
-function drawPathHeadingLine(
-  ctx: CanvasRenderingContext2D,
-  color: string,
-  point: Point,
-  tangent: Point,
-  percentage: number,
-  heading: ConcreteHeading,
-  opts: HeadingStyle,
-) {
-  let targetPoint: Point = { x: 0, y: 0 };
-  if (chkConcreteSimpleHeading(heading)) {
-    targetPoint = calcSimpleHeading(heading, point, tangent, percentage);
-  } else /* if (heading.type == ConcreteHeadingType.Piecewise)*/ {
-    // Find the piece that this percentage is contained by
-    // I think a linear search is fine, here..
-    for (const piece of heading.pieces) {
-      if (percentage <= piece.end && percentage >= piece.start) {
-        // Found the right piece, rescale percentage accordingly, and
-        // get the heading for the piece
-        targetPoint = calcSimpleHeading(
-          piece.heading,
-          point,
-          tangent,
-          (percentage - piece.start) / (piece.end - piece.start),
-        );
-      }
+      // we're progressing further from the target than the previous point, so
+      // draw the heading at the previous point
+      drawHeadingLine(ctx, headingStyle, color, avg);
+      curTarget += pieceLen;
     }
+    lastPoint = curPoint;
+    totalDist = newDist;
   }
-  drawHeadingLine(ctx, opts, color, point, targetPoint);
 }
 
 function drawHeadingLine(
@@ -516,14 +442,16 @@ function drawHeadingLine(
   style: HeadingStyle,
   color: string,
   point: Point,
-  targetPoint: Point,
 ) {
+  if (isUndefined(point.h)) {
+    return;
+  }
   ctx.beginPath();
   ctx.lineCap = 'round';
   ctx.lineWidth = style.Thickness;
   ctx.strokeStyle = color;
   ctx.moveTo(point.x, point.y);
-  const displacement = magnitude(targetPoint, style.Length);
+  const displacement = vector(point.h, style.Length);
   const endx = point.x + displacement.x;
   const endy = point.y + displacement.y;
   ctx.lineTo(endx, endy);
@@ -543,67 +471,4 @@ function drawHeadingLine(
     endy - headSize * Math.sin(angle + style.ArrowAngle),
   );
   ctx.stroke();
-}
-
-function calcSimpleHeading(
-  heading: ConcreteSimpleHeading,
-  point: Point,
-  tangent: Point,
-  percent: number,
-): Point {
-  switch (heading.type) {
-    case ConcreteHeadingType.Tangent:
-      return tangent;
-    case ConcreteHeadingType.Constant:
-      return {
-        x: Math.cos(heading.heading),
-        y: Math.sin(heading.heading),
-      };
-    case ConcreteHeadingType.Linear:
-      const radians = linearRangeRadians(
-        heading.headings[0],
-        heading.headings[1],
-        percent,
-      );
-      return { x: Math.cos(radians), y: Math.sin(radians) };
-    case ConcreteHeadingType.Point:
-      return ptDiff(point, heading.heading);
-    case ConcreteHeadingType.Reverse:
-      // Get the target point, then flip it the other direction, unless it's linear.
-      // For Linear, it travels the opposite direction of the normal linear heading.
-      const lin = chkConcreteLinearHeading(heading.heading);
-      let pct = lin ? -percent : percent;
-      const toReverse = calcSimpleHeading(heading.heading, point, tangent, pct);
-      return lin ? toReverse : ptDiff(point, ptDiff(toReverse, point));
-  }
-}
-
-function CloseTo(a: number, b: number): boolean {
-  return Math.abs(a - b) < 1e-8;
-}
-
-function normalizeRadian(a: number) {
-  const result = a % (2 * Math.PI);
-  return result >= 0 ? result : result + 2 * Math.PI;
-}
-
-function linearRangeRadians(
-  start: number,
-  end: number,
-  percent: number,
-): number {
-  // First, push the values until they're all positive:
-  const s = normalizeRadian(start);
-  const e = normalizeRadian(end);
-  let range = Math.abs(e - s);
-  if (range > Math.PI && percent >= 0) {
-    range = Math.PI * 2 - range;
-  } else if (range < Math.PI && percent < 0) {
-    range = Math.PI * 2 - range;
-  }
-  const flipped = !CloseTo(normalizeRadian(s + range), e);
-  const target = normalizeRadian(
-    s + range * (flipped ? -1 : 1) * Math.abs(percent),
-  );
-  return target;
 }
