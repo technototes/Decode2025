@@ -14,7 +14,7 @@ import {
   FocusedPoseAtom,
   SelectedClassAtom,
   SelectedPathAtom,
-} from './state/Atoms';
+} from './state/UserCode';
 
 // function FileInfo() {
 //   const pc = useAtomValue(SelectedParsedClassAtom);

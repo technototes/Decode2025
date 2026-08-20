@@ -31,7 +31,7 @@ import {
   ValueRef,
 } from '../../CodeTypes';
 import { GetValueAsString } from '../ExpressionEval';
-import { NamedValuesAtom } from '../state/Atoms';
+import { NamedValuesAtom } from '../state/UserCode';
 import { ItemWithStyle } from '../ui-tools/types';
 
 export function HeadingRefForSorting(item: HeadingRef | undefined): string {

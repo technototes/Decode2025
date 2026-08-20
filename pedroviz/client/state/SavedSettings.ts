@@ -129,7 +129,9 @@ export const CoordVizPercentAtom = atom((get) =>
 export const GranularSettingsAtom = focusAtom(DisplayOptionsAtom, (o) =>
   o.prop('GranularSettings'),
 );
-const PathOptionsAtom = focusAtom(DisplayOptionsAtom, (o) => o.prop('Paths'));
+export const PathOptionsAtom = focusAtom(DisplayOptionsAtom, (o) =>
+  o.prop('Paths'),
+);
 export const PathCurveOptionsAtom = focusAtom(PathOptionsAtom, (o) =>
   o.prop('Curves'),
 );

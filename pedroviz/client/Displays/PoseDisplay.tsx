@@ -25,7 +25,7 @@ import {
   NamedPosesAtom,
   PoseAtomFamily,
   ValuesLookupAtom,
-} from '../state/Atoms';
+} from '../state/UserCode';
 import { HasKeys } from '../types';
 import { ItemWithStyle } from '../ui-tools/types';
 import { NumberOrNamedValue } from './NumberOrNamedValueEditor';

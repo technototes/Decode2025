@@ -18,7 +18,7 @@ import { isString } from '@freik/typechk';
 
 import { isRef } from '../../CodeTypeCheck';
 import { BezierName, BezierRef, NamedBezier } from '../../CodeTypes';
-import { FocusedCurveAtom, NamedBeziersAtom } from '../state/Atoms';
+import { FocusedCurveAtom, NamedBeziersAtom } from '../state/UserCode';
 import { InlinePoseRefDisplay } from './PoseDisplay';
 
 export function InlineBezierRefDisplay({

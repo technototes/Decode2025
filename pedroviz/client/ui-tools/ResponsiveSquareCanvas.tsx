@@ -1,8 +1,8 @@
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useAtomValue } from 'node_modules/jotai/esm/react.mjs';
 
-import { FieldConfigHashAtom } from 'client/state/Atoms';
 import { FieldVizPercentAtom, ThemeAtom } from 'client/state/SavedSettings';
+import { FieldConfigHashAtom } from 'client/state/UserCode';
 import { isNull, isUndefined } from 'node_modules/@freik/typechk/lib/esm';
 
 import { ResponsiveAnchor, ResponsiveSquareCanvasProps } from '../types';

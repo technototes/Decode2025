@@ -18,7 +18,7 @@ import { EditRegular } from '@fluentui/react-icons';
 import { isIntValue, isValueName } from '../../CodeTypeCheck';
 import { ValueRef } from '../../CodeTypes';
 import { GetValueAsString } from '../ExpressionEval';
-import { BlurAtom } from '../state/Atoms';
+import { BlurAtom } from '../state/UserCode';
 import { HasItem, HasKeys, ValidateState } from '../types';
 import {
   CheckValidValueOrName,

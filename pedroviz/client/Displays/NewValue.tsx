@@ -26,7 +26,7 @@ import {
   ValueName,
   ValueRef,
 } from '../../CodeTypes';
-import { ValuesLookupAtom } from '../state/Atoms';
+import { ValuesLookupAtom } from '../state/UserCode';
 import { ValidateState, ValidationData, ValidData } from '../types';
 import { CheckValidName } from './Validation';
 

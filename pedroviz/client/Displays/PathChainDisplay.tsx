@@ -23,7 +23,7 @@ import {
   NamedPathChain,
   PathChainName,
 } from '../../CodeTypes';
-import { FocusedPathAtom, NamedPathChainsAtom } from '../state/Atoms';
+import { FocusedPathAtom, NamedPathChainsAtom } from '../state/UserCode';
 import { InlineBezierRefDisplay } from './CurveDisplay';
 import { InlinePoseRefDisplay } from './PoseDisplay';
 import { HeadingRefDisplay } from './ValueDisplay';

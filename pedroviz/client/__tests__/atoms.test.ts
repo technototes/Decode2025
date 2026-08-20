@@ -33,7 +33,7 @@ import {
   SelectedPathAtom,
   SelectedTeamAtom,
   TeamsAtom,
-} from '../state/Atoms';
+} from '../state/UserCode';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 // or global.IS_REACT_ACT_ENVIRONMENT = true; depending on your environment

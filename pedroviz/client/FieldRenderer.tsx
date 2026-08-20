@@ -2,9 +2,10 @@ import { ReactElement, useCallback, useRef } from 'react';
 import { useAtomValue } from 'jotai';
 
 import { tokens } from '@fluentui/tokens';
-import { isDefined, isUndefined } from '@freik/typechk';
+import { isDefined } from '@freik/typechk';
 
 import { BezierRef, ParsedClass, PathChainName, PoseRef } from '../CodeTypes';
+import { animateBot, BotAnimationState } from './BotAnimation';
 import {
   chkConcreteLinearHeading,
   chkConcreteSimpleHeading,
@@ -15,7 +16,22 @@ import {
   ConcreteSimpleHeading,
   Point,
 } from './ConcreteEvalTypes';
+import {
+  CurveDetail,
+  getCurveDetail,
+  ptDiff,
+  ptDistance,
+} from './DrawingHelpers';
 import { calcBezierRef, calcFacing, calcPoseRef } from './ExpressionEval';
+import {
+  BotDrawStyleAtom,
+  CoordVizPercentAtom,
+  CurveOptionsAtom,
+  PathOptionsAtom,
+  PoseOptionsAtom,
+  ShowPathHeadingAtom,
+  ThemeAtom,
+} from './state/SavedSettings';
 import {
   ColorsAtom,
   FocusedCurveAtom,
@@ -23,103 +39,22 @@ import {
   FocusedPoseAtom,
   NamedPathChainsAtom,
   SelectedParsedClassAtom,
-} from './state/Atoms';
+} from './state/UserCode';
 import {
-  BotDrawStyleAtom,
-  CoordVizPercentAtom,
-  CurveOptionsAtom,
-  PathCurveOptionsAtom,
-  PathHeadingCountAtom,
-  PathHeadingOptionsAtom,
-  PoseOptionsAtom,
-  ShowPathHeadingAtom,
-  ThemeAtom,
-} from './state/SavedSettings';
-import {
-  BotDrawStyle,
-  BotShapes,
   ControlPointStyle,
   CtrlPtStyles,
   CurveStyle,
   HeadingStyle,
+  PathStyle,
 } from './types';
-import { bezierLength, deCasteljau } from './ui-tools/bezier';
 import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
-
-type BotAnimationState = {
-  name: PathChainName;
-  pathIndex: number;
-  pathPoint: number;
-  count: number;
-  pathPoints: Point[][];
-};
-
-function initState(
-  state: BotAnimationState,
-  name: PathChainName | undefined,
-  path: [Point[], ConcreteHeading][],
-) {
-  state.pathPoints = path.map(([pts]) => getBezierPoints(pts));
-  state.count = 0;
-  state.name = name || ('' as PathChainName);
-  state.pathPoint = 0;
-  state.pathIndex = 0;
-}
-
-const countWrap = 4;
-const shapes: BotShapes[] = Object.values(BotShapes); //['rectangle', 'ellipse', 'trapezoid', 'triangle'];
-function nextState(state: BotAnimationState) {
-  state.count = (state.count + 1) % countWrap;
-  if (state.count !== 0) {
-    return;
-  }
-  state.pathPoint =
-    (state.pathPoint + 1) % state.pathPoints[state.pathIndex]!.length;
-  if (state.pathPoint !== 0) {
-    return;
-  }
-  state.pathIndex = (state.pathIndex + 1) % state.pathPoints.length;
-}
-
-function animateBot(
-  ctx: CanvasRenderingContext2D,
-  name: PathChainName | undefined,
-  path: [Point[], ConcreteHeading][],
-  state: BotAnimationState,
-  botStyle: BotDrawStyle,
-) {
-  if (name !== state.name) {
-    // We've got a new selected path chain to draw. Let's do calculations-n-stuff
-    initState(state, name, path);
-  }
-  // Are we in a position where the state can't be rendered?
-  if (
-    isUndefined(name) ||
-    state.pathPoints.length <= state.pathIndex ||
-    state.pathPoints[state.pathIndex]!.length <= state.pathPoint
-  ) {
-    return;
-  }
-  // Draw the robot at the current location:
-  const points = state.pathPoints[state.pathIndex]!;
-  const point = points[state.pathPoint]!;
-  ctx.strokeStyle = '#ff0000';
-  ctx.lineWidth = 1;
-  ctx.lineCap = 'round';
-  botStyle.Shape =
-    shapes[Math.floor((state.pathPoint * 12) / points.length) % 4]!;
-  drawBotShape(ctx, point, botStyle);
-  nextState(state);
-}
 
 export function FieldRenderer(): ReactElement {
   const theme = useAtomValue(ThemeAtom);
   const coordViz = useAtomValue(CoordVizPercentAtom);
 
   const showPathHeadings = useAtomValue(ShowPathHeadingAtom);
-  const pathHeadingCount = useAtomValue(PathHeadingCountAtom);
-  const pathCurveStyle = useAtomValue(PathCurveOptionsAtom);
-  const pathHeadingStyle = useAtomValue(PathHeadingOptionsAtom);
+  const pathStyle = useAtomValue(PathOptionsAtom);
 
   const curveOpts = useAtomValue(CurveOptionsAtom);
   const poseOpts = useAtomValue(PoseOptionsAtom);
@@ -144,13 +79,6 @@ export function FieldRenderer(): ReactElement {
   );
 
   const points = [...concretePaths.values()].flatMap((val) => val);
-  /*allPCs.flatMap((npc) =>
-    npc.paths.map((br): [Point[], ConcreteHeading] => [
-      calcBezierRef(br, file),
-
-      calcFacing(npc.heading, file),
-    ]),
-  );*/
 
   const renderField = useCallback(
     (ctx: CanvasRenderingContext2D, dpr: number) => {
@@ -159,8 +87,8 @@ export function FieldRenderer(): ReactElement {
       const scale = size / 144;
 
       // Move the origin to the lower left, corner, and scale it up
-      // ctx.translate(0, size * dpr);
-      // ctx.scale(dpr * scale, -dpr * scale);
+      // ctx.translate(0, size);
+      // ctx.scale(scale, -scale);
       // or just a single line of code:
       ctx.setTransform(scale, 0, 0, -scale, 0, size);
       ctx.globalAlpha = coordViz;
@@ -173,9 +101,7 @@ export function FieldRenderer(): ReactElement {
           ctrlPoints,
           showPathHeadings ? facing : false,
           colors[index % colors.length]!,
-          pathHeadingCount,
-          pathHeadingStyle,
-          pathCurveStyle,
+          pathStyle,
         ),
       );
 
@@ -190,9 +116,7 @@ export function FieldRenderer(): ReactElement {
       coordViz,
       theme,
       showPathHeadings,
-      pathHeadingCount,
-      pathHeadingStyle,
-      pathCurveStyle,
+      pathStyle,
       focusedCurve,
       focusedPose,
       poseOpts,
@@ -232,7 +156,7 @@ export function FieldRenderer(): ReactElement {
       );
       ctx.restore();
     },
-    [focusedPath],
+    [focusedPath, concretePaths, botStyle],
   );
 
   return (
@@ -362,65 +286,36 @@ function renderCoordinateLegend(
   ctx.restore();
 }
 
-function ptDiff(a: Point, b: Point): Point {
-  return { x: a.x - b.x, y: a.y - b.y };
-}
-
-function ptDistance(a: Point, b: Point): number {
-  const delta = ptDiff(a, b);
-  return Math.sqrt(delta.x * delta.x + delta.y * delta.y);
-}
-
 function renderCurve(
   ctx: CanvasRenderingContext2D,
   curveControlPoints: Point[],
   color: string,
   opts: CurveStyle,
-): [number, Point[]] {
-  if (curveControlPoints.length < 2) {
-    return [0, []];
-  }
-  const pts: Point[] = getBezierPoints(curveControlPoints);
-  const drawPath = opts.Thickness > 1e-10;
-  if (drawPath) {
+): CurveDetail {
+  const { length, points } = getCurveDetail(curveControlPoints);
+  if (length > 0 && !CloseTo(opts.Thickness, 0)) {
     ctx.beginPath();
-  }
-  ctx.lineWidth = opts.Thickness;
-  ctx.strokeStyle = color;
-  let approxLen = 0;
-  if (drawPath) {
+    ctx.lineWidth = opts.Thickness;
+    ctx.strokeStyle = color;
     ctx.moveTo(curveControlPoints[0]!.x, curveControlPoints[0]!.y);
-  }
-  let lastPt = curveControlPoints[0]!;
-  for (const pt of pts) {
-    approxLen += ptDistance(lastPt, pt);
-    lastPt = pt;
-    if (drawPath) {
+    for (const pt of points) {
       ctx.lineTo(pt.x, pt.y);
     }
-  }
-  approxLen += ptDistance(
-    lastPt,
-    curveControlPoints[curveControlPoints.length - 1]!,
-  );
-  if (drawPath) {
     ctx.lineTo(
       curveControlPoints[curveControlPoints.length - 1]!.x,
       curveControlPoints[curveControlPoints.length - 1]!.y,
     );
     ctx.stroke();
   }
-  return [approxLen, pts];
+  return { length, points };
 }
 
-function getBezierPoints(curveControlPoints: Point[]) {
-  const len = bezierLength(curveControlPoints);
-  const pts: Point[] = [];
-  for (let t = 0; t <= 1.0; t += 1 / len) {
-    const h = t * Math.PI * 2;
-    pts.push({ ...deCasteljau(curveControlPoints, t), h });
-  }
-  return pts;
+function shouldDrawCurve(curveStyle: CurveStyle): boolean {
+  return (
+    curveStyle.ControlPoint.Style != 'z' &&
+    !CloseTo(curveStyle.ControlPoint.Size, 0) &&
+    !CloseTo(curveStyle.ControlPoint.Thickness, 0)
+  );
 }
 
 function renderPath(
@@ -428,32 +323,36 @@ function renderPath(
   curveControlPoints: Point[],
   heading: ConcreteHeading | false,
   color: string,
-  headingCount: number,
+  pathStyle: PathStyle,
+) {
+  /*
+    headingCount: number,
   headingStyle: HeadingStyle,
   curveStyle: CurveStyle,
-) {
-  const [approxLen, pts] = renderCurve(
+*/
+  const { length, points } = renderCurve(
     ctx,
     curveControlPoints,
     color,
-    curveStyle,
+    pathStyle.Curves,
   );
-  if (
-    curveStyle.ControlPoint.Style != 'z' &&
-    curveStyle.ControlPoint.Size > 1e-10 &&
-    curveStyle.ControlPoint.Thickness > 1e-10
-  ) {
-    drawControlPoints(ctx, curveStyle.ControlPoint, curveControlPoints, color);
+  if (shouldDrawCurve(pathStyle.Curves)) {
+    drawControlPoints(
+      ctx,
+      pathStyle.Curves.ControlPoint,
+      curveControlPoints,
+      color,
+    );
   }
   if (heading) {
     drawHeadingLines(
       ctx,
       color,
-      approxLen,
-      [...pts, curveControlPoints[curveControlPoints.length - 1]!],
+      length,
+      [...points, curveControlPoints[curveControlPoints.length - 1]!],
       heading,
-      headingCount,
-      headingStyle,
+      pathStyle.HeadingCount,
+      pathStyle.Heading,
     );
   }
 
@@ -462,64 +361,6 @@ function renderPath(
       const tang = bezierDerivative(curveControlPoints, 0.4);
       const mid = deCasteljau(curveControlPoints, 0.4);
       */
-}
-
-function rotPt(offs: Point): Point {
-  const cos = Math.cos(offs.h!);
-  const sin = Math.sin(offs.h!);
-  const x = offs.x * cos - offs.y * sin;
-  const y = offs.x * sin + offs.y * cos;
-  return { x, y };
-}
-
-function drawBotShape(
-  ctx: CanvasRenderingContext2D,
-  center: Point,
-  bot: BotDrawStyle,
-) {
-  const w = Math.min(bot.Width, 9);
-  const l = Math.min(bot.Depth, 9);
-  const to = w / 5; // trapezoid offset
-  ctx.beginPath();
-  const front = rotPt({ x: l, y: 0, h: center.h! });
-  const br = rotPt({ x: -l, y: -w, h: center.h });
-  const bl = rotPt({ x: -l, y: w, h: center.h });
-
-  switch (bot.Shape) {
-    case BotShapes.Rectangle:
-      {
-        const fl = rotPt({ x: l, y: w, h: center.h });
-        const fr = rotPt({ x: l, y: -w, h: center.h });
-        ctx.moveTo(center.x + fl.x, center.y + fl.y);
-        ctx.lineTo(center.x + fr.x, center.y + fr.y);
-        ctx.lineTo(center.x + br.x, center.y + br.y);
-        ctx.lineTo(center.x + bl.x, center.y + bl.y);
-        ctx.closePath();
-      }
-      break;
-    case BotShapes.Trapezoid:
-      {
-        const fl = rotPt({ x: l, y: w - to, h: center.h });
-        const fr = rotPt({ x: l, y: -w + to, h: center.h });
-        ctx.moveTo(center.x + fl.x, center.y + fl.y);
-        ctx.lineTo(center.x + fr.x, center.y + fr.y);
-        ctx.lineTo(center.x + br.x, center.y + br.y);
-        ctx.lineTo(center.x + bl.x, center.y + bl.y);
-        ctx.closePath();
-      }
-      break;
-    case BotShapes.Ellipse:
-      ctx.ellipse(center.x, center.y, l, w, center.h!, 0, Math.PI * 2);
-      break;
-    case BotShapes.Triangle:
-      ctx.moveTo(center.x + front.x, center.y + front.y);
-      ctx.lineTo(center.x + br.x, center.y + br.y);
-      ctx.lineTo(center.x + bl.x, center.y + bl.y);
-      ctx.lineTo(center.x + front.x, center.y + front.y);
-  }
-  ctx.moveTo(center.x + front.x, center.y + front.y);
-  ctx.lineTo(center.x, center.y);
-  ctx.stroke();
 }
 
 function drawPoint(
@@ -738,7 +579,7 @@ function calcSimpleHeading(
 }
 
 function CloseTo(a: number, b: number): boolean {
-  return Math.abs(a - b) < 1e-7;
+  return Math.abs(a - b) < 1e-8;
 }
 
 function normalizeRadian(a: number) {

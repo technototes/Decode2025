@@ -36,6 +36,8 @@ import { ClassKey, Path, PathDatabase, PathKey, Team } from '../../IpcTypes';
 import { Strings } from '../constants';
 import { PathsDataDisplay } from '../PathsDataDisplay';
 import { PathSelector } from '../PathSelector';
+import { ThemeAtom } from '../state/SavedSettings';
+import { getStore } from '../state/Storage';
 import {
   // ClearCache,
   // ColorForNumber,
@@ -47,9 +49,7 @@ import {
   SelectedPathAtom,
   SelectedTeamAtom,
   ValuesLookupAtom,
-} from '../state/Atoms';
-import { ThemeAtom } from '../state/SavedSettings';
-import { getStore } from '../state/Storage';
+} from '../state/UserCode';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 
 import './jest-dom-types-fix.test';

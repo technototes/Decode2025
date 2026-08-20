@@ -14,7 +14,7 @@ import {
   SelectedPathAtom,
   SelectedTeamAtom,
   TeamsAtom,
-} from './state/Atoms';
+} from './state/UserCode';
 import { AutoSelector } from './ui-tools/AutoSelector';
 
 export function TeamSelector(): ReactElement {
