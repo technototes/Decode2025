@@ -24,21 +24,57 @@ export const CtrlPtStyles = Object.freeze({
 } as const);
 export type CtrlPtStyles = (typeof CtrlPtStyles)[keyof typeof CtrlPtStyles];
 
-export type PathRenderOptions = {
-  ShowField: boolean;
-  PathThickness: number;
-  ShowCoords: boolean;
-  Heading: {
-    Display: boolean;
-    Count: number;
-    Length: number;
-    Thickness: number;
+export type ControlPointStyle = {
+  Thickness: number;
+  Size: number;
+  Style: CtrlPtStyles;
+};
+
+export type HeadingStyle = {
+  Length: number;
+  Thickness: number;
+  ArrowAngle: number;
+  ArrowPercent: number;
+};
+
+export type CurveStyle = {
+  Thickness: number;
+  ShowPoints: boolean;
+  ControlPoint: ControlPointStyle;
+};
+
+export type PathStyle = {
+  HeadingCount: number;
+  Heading: HeadingStyle;
+  Curves: CurveStyle;
+};
+
+export const BotShapes = Object.freeze({
+  Trapezoid: 'Trapezoid',
+  Triangle: 'Triangle',
+  Ellipse: 'Ellipse',
+  Rectangle: 'Rectangle',
+} as const);
+export type BotShapes = (typeof BotShapes)[keyof typeof BotShapes];
+
+export type BotDrawStyle = {
+  Shape: BotShapes;
+  Width: number;
+  Depth: number;
+};
+
+export type DisplayOptions = {
+  GranularSettings: boolean;
+  FieldVisibility: number;
+  CoordinateVisibility: number;
+  DarkMode: boolean;
+  Poses: {
+    Points: ControlPointStyle;
+    Headings: HeadingStyle;
   };
-  ControlPoint: {
-    Thickness: number;
-    Size: number;
-    Style: CtrlPtStyles;
-  };
+  Curves: CurveStyle;
+  Paths: PathStyle;
+  BotDrawing: BotDrawStyle;
 };
 
 export type OneFileIndex = {
@@ -104,15 +140,19 @@ export type ResponsiveAnchor = {
   y: 'top' | 'middle' | 'bottom';
 };
 
+export type Offset = { left: number; top: number };
+
+export type CanvasRenderFunc = (
+  ctx: CanvasRenderingContext2D,
+  devicePixelRatio: number,
+) => void;
+
 export type ResponsiveSquareCanvasProps = {
   anchor?: ResponsiveAnchor;
   style?: CSSProperties;
   className?: string;
-  render: (
-    ctx: CanvasRenderingContext2D,
-    size: number,
-    devicePixelRatio: number,
-  ) => void;
+  render: CanvasRenderFunc;
+  animate?: CanvasRenderFunc;
 };
 
 export type RowData = { offset: number; size: number };

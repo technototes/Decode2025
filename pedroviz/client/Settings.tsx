@@ -1,5 +1,5 @@
 import { ReactElement, useCallback, useState } from 'react';
-import { useAtom } from 'jotai';
+import { useAtom, WritableAtom } from 'jotai';
 
 import {
   Button,
@@ -13,6 +13,7 @@ import {
   DropdownProps,
   Label,
   Option,
+  Slider,
   SpinButton,
   SpinButtonChangeEvent,
   SpinButtonOnChangeData,
@@ -26,16 +27,16 @@ import {
 
 import { Strings } from './constants';
 import {
-  CtrlPtSizeAtom,
-  CtrlPtStyleAtom,
-  CtrlPtThicknessAtom,
-  HeadingCountAtom,
-  HeadingLengthAtom,
-  HeadingThicknessAtom,
+  CoordinateVisibilityAtom,
+  FieldVisibilityAtom,
+  PathHeadingCountAtom,
+  PathHeadingLengthAtom,
+  PathHeadingThicknessAtom,
+  PathPointSizeAtom,
+  PathPointStyleAtom,
+  PathPointThicknessAtom,
   PathThicknessAtom,
-  ShowBotHeadingAtom,
-  ShowFieldAtom,
-  ShowFieldKeyAtom,
+  ShowPathHeadingAtom,
   ThemeAtom,
 } from './state/SavedSettings';
 import { CtrlPtStyles } from './types';
@@ -66,90 +67,48 @@ const ctrlPtStyles: CtrlPtStyles[] = [
   CtrlPtStyles.None,
 ];
 
+function useSpinnerAtom(
+  atom: WritableAtom<number, [number], void>,
+): [
+  number,
+  (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => void,
+] {
+  const [val, setVal] = useAtom(atom);
+  const callback = useCallback(
+    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
+      if (
+        data.value !== undefined &&
+        data.value !== null &&
+        !Number.isNaN(data.value)
+      ) {
+        setVal(data.value);
+      }
+    },
+    [setVal],
+  );
+  return [val, callback];
+}
+
 export function Settings(): ReactElement {
   const [theTheme, setTheme] = useAtom(ThemeAtom);
-  const [showField, setShowField] = useAtom(ShowFieldAtom);
-  const [showBotHeading, setShowBotHeading] = useAtom(ShowBotHeadingAtom);
-  const [pathThickness, setPathThickness] = useAtom(PathThicknessAtom);
-  const [showCoords, setShowCoords] = useAtom(ShowFieldKeyAtom);
-  const changePathThickness = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setPathThickness(data.value);
-      }
-    },
-    [setPathThickness],
+  const [fieldViz, setFieldViz] = useAtom(FieldVisibilityAtom);
+  const [showBotHeading, setShowBotHeading] = useAtom(ShowPathHeadingAtom);
+  const [coordViz, setCoordViz] = useAtom(CoordinateVisibilityAtom);
+  const [pathThickness, changePathThickness] =
+    useSpinnerAtom(PathThicknessAtom);
+  const [ctrlPtThickness, changeCtrlPtThickness] = useSpinnerAtom(
+    PathPointThicknessAtom,
   );
-  const [ctrlPtThickness, setCtrlPtThickness] = useAtom(CtrlPtThicknessAtom);
-  const changeCtrlPtThickness = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setCtrlPtThickness(data.value);
-      }
-    },
-    [setCtrlPtThickness],
+  const [ctrlPtSize, changeCtrlPtSize] = useSpinnerAtom(PathPointSizeAtom);
+  const [headingLength, changeHeadingLength] = useSpinnerAtom(
+    PathHeadingLengthAtom,
   );
-  const [ctrlPtSize, setCtrlPtSize] = useAtom(CtrlPtSizeAtom);
-  const changeCtrlPtSize = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setCtrlPtSize(data.value);
-      }
-    },
-    [setCtrlPtSize],
+  const [headingCount, changeHeadingCount] =
+    useSpinnerAtom(PathHeadingCountAtom);
+  const [headingThickness, changeHeadingThickness] = useSpinnerAtom(
+    PathHeadingThicknessAtom,
   );
-  const [headingLength, setHeadingLength] = useAtom(HeadingLengthAtom);
-  const changeHeadingLength = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setHeadingLength(data.value);
-      }
-    },
-    [setHeadingLength],
-  );
-  const [headingCount, setHeadingCount] = useAtom(HeadingCountAtom);
-  const changeHeadingCount = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setHeadingCount(Math.round(data.value));
-      }
-    },
-    [setHeadingCount],
-  );
-  const [headingThickness, setHeadingThickness] = useAtom(HeadingThicknessAtom);
-  const changeHeadingThickness = useCallback(
-    (_ev: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => {
-      if (
-        data.value !== undefined &&
-        data.value !== null &&
-        !Number.isNaN(data.value)
-      ) {
-        setHeadingThickness(data.value);
-      }
-    },
-    [setHeadingThickness],
-  );
-  const [ctrlPtStyle, setCtrlPtStyle] = useAtom(CtrlPtStyleAtom);
+  const [ctrlPtStyle, setCtrlPtStyle] = useAtom(PathPointStyleAtom);
   const [ctrlPtName, setCtrlPtName] = useState(getName(ctrlPtStyle));
   const onOptionSelect: DropdownProps['onOptionSelect'] = useCallback(
     (ev, data) => {
@@ -171,22 +130,31 @@ export function Settings(): ReactElement {
           <DialogTitle style={{ textAlign: 'center' }}>Settings</DialogTitle>
           <DialogContent>
             <div className="settings">
-              <Label className="left-label" htmlFor="showFieldId">
-                Show field image
+              <Label className="left-label" htmlFor="fieldVisibilityId">
+                Field Visibility Level
               </Label>
-              <Switch
+              <Slider
+                aria-valuetext={`Value is ${fieldViz}%`}
+                value={fieldViz}
+                min={0}
+                max={100}
+                step={1}
+                onChange={(_, data) => setFieldViz(data.value)}
+                id="fieldVisibilityId"
                 className="left-field"
-                id="showFieldId"
-                checked={showField}
-                onChange={(_, data) => setShowField(data.checked)}
               />
-              <Label className="right-label" htmlFor="showCoordsId">
-                Show field coordinates
+              <Label className="right-label" htmlFor="coordVizId">
+                Field Key Visibility Level
               </Label>
-              <Switch
-                id="showCoordsId"
-                checked={showCoords}
-                onChange={(_, data) => setShowCoords(data.checked)}
+              <Slider
+                aria-valuetext={`Value is ${coordViz}%`}
+                value={coordViz}
+                min={0}
+                max={100}
+                step={1}
+                onChange={(_, data) => setCoordViz(data.value)}
+                id="coordVizId"
+                className="right-field"
               />
               <Label className="left-label" htmlFor="pathThicknessId">
                 Path Thickness

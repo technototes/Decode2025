@@ -1,5 +1,5 @@
 import { ReactElement, Suspense } from 'react';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 import { Text } from '@fluentui/react-components';
 import { Expandable } from '@freik/fluent9-tools';
@@ -8,7 +8,13 @@ import { NamedBezierList } from './Displays/CurveDisplay';
 import { PathChainList } from './Displays/PathChainDisplay';
 import { NamedPoseList } from './Displays/PoseDisplay';
 import { NamedValueList } from './Displays/ValueDisplay';
-import { SelectedClassAtom, SelectedPathAtom } from './state/Atoms';
+import {
+  FocusedCurveAtom,
+  FocusedPathAtom,
+  FocusedPoseAtom,
+  SelectedClassAtom,
+  SelectedPathAtom,
+} from './state/UserCode';
 
 // function FileInfo() {
 //   const pc = useAtomValue(SelectedParsedClassAtom);
@@ -25,6 +31,9 @@ export function PathsDataDisplay({
 }): ReactElement {
   const selFile = useAtomValue(SelectedPathAtom);
   const selClass = useAtomValue(SelectedClassAtom);
+  const setFocusedPose = useSetAtom(FocusedPoseAtom);
+  const setFocusedCurve = useSetAtom(FocusedCurveAtom);
+  const setFocusedPath = useSetAtom(FocusedPathAtom);
   if (selFile.length === 0 || selClass.length === 0) {
     return <Text size={600}>Please select a file & class to view.</Text>;
   }
@@ -37,13 +46,19 @@ export function PathsDataDisplay({
         </Suspense>
         {/* <NewValue /> */}
       </Expandable>
-      <Expandable label={<Text weight="bold">Poses</Text>} indent={20}>
+      <Expandable
+        label={<Text weight="bold">Poses</Text>}
+        indent={20}
+        onChanged={(exp: boolean) => exp || setFocusedPose(undefined)}>
         <Suspense>
           <NamedPoseList />
         </Suspense>
         {/* <NewPose /> */}
       </Expandable>
-      <Expandable label={<Text weight="bold">Curves & Lines</Text>} indent={20}>
+      <Expandable
+        label={<Text weight="bold">Curves & Lines</Text>}
+        indent={20}
+        onChanged={(exp: boolean) => exp || setFocusedCurve(undefined)}>
         <Suspense>
           <NamedBezierList />
         </Suspense>
@@ -51,7 +66,10 @@ export function PathsDataDisplay({
           New Curve
         </Button> */}
       </Expandable>
-      <Expandable label={<Text weight="bold">Full Paths</Text>} indent={20}>
+      <Expandable
+        label={<Text weight="bold">Full Paths</Text>}
+        indent={20}
+        onChanged={(exp: boolean) => exp || setFocusedPath(undefined)}>
         <Suspense>
           <PathChainList />
         </Suspense>

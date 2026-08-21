@@ -1,5 +1,5 @@
-import { CSSProperties, ReactElement } from 'react';
-import { useAtomValue } from 'jotai';
+import { CSSProperties, ReactElement, useCallback } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 
 import {
   createTableColumn,
@@ -8,15 +8,22 @@ import {
   DataGridCell,
   DataGridHeader,
   DataGridHeaderCell,
+  DataGridProps,
   DataGridRow,
   TableColumnDefinition,
+  TableRowId,
   Text,
   tokens,
 } from '@fluentui/react-components';
-import { isUndefined } from '@freik/typechk';
+import { isString, isUndefined } from '@freik/typechk';
 
-import { AnonymousFacing, FacingType, NamedPathChain } from '../../CodeTypes';
-import { NamedPathChainsAtom } from '../state/Atoms';
+import {
+  AnonymousFacing,
+  FacingType,
+  NamedPathChain,
+  PathChainName,
+} from '../../CodeTypes';
+import { FocusedPathAtom, NamedPathChainsAtom } from '../state/UserCode';
 import { InlineBezierRefDisplay } from './CurveDisplay';
 import { InlinePoseRefDisplay } from './PoseDisplay';
 import { HeadingRefDisplay } from './ValueDisplay';
@@ -108,13 +115,33 @@ const columns: TableColumnDefinition<NamedPathChain>[] = [
 
 export function PathChainList(): ReactElement {
   const npcs = useAtomValue(NamedPathChainsAtom);
+  const [focusedPath, setFocusedPath] = useAtom(FocusedPathAtom);
+  const selectedRows = new Set<TableRowId>(
+    focusedPath && [focusedPath.name as TableRowId],
+  );
+  const onSelectionChange: DataGridProps['onSelectionChange'] = useCallback(
+    (e, data) => {
+      const item = data.selectedItems.values().next().value;
+      const ref = npcs.find(
+        (val) => isString(item) && val.name === (item as PathChainName),
+      );
+      setFocusedPath(ref);
+    },
+    [npcs],
+  );
+  // This enables deselection
+  const maybeClearSelection = (id: PathChainName) =>
+    id === focusedPath?.name && setFocusedPath(undefined);
   return (
     <DataGrid
       items={npcs}
       columns={columns}
       sortable
       resizableColumns
-      getRowId={(npc: NamedPathChain) => npc.name}>
+      getRowId={(npc: NamedPathChain) => npc.name}
+      selectionMode="single"
+      selectedItems={selectedRows}
+      onSelectionChange={onSelectionChange}>
       <DataGridHeader>
         <DataGridRow>
           {({ renderHeaderCell }) => (
@@ -124,7 +151,10 @@ export function PathChainList(): ReactElement {
       </DataGridHeader>
       <DataGridBody<NamedPathChain>>
         {({ item, rowId }) => (
-          <DataGridRow<NamedPathChain> key={rowId}>
+          <DataGridRow<NamedPathChain>
+            key={rowId}
+            selectionCell={{ radioIndicator: { 'aria-label': 'Select row' } }}
+            onClick={() => maybeClearSelection(item.name)}>
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>
             )}

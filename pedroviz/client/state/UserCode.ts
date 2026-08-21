@@ -43,13 +43,13 @@ import { OneFileIndex } from '../types';
 import { darkOnWhite, lightOnBlack } from '../ui-tools/Colors';
 import { GetFullDb, LoadAndIndexFile, PutFullDb, UpdateIndexFile } from './API';
 import { EmptyMappedFile, GetNameLookup } from './IndexedFile';
-import { ThemeAtom } from './SavedSettings';
+import { DisplayOptionsAtom, ThemeAtom } from './SavedSettings';
 
 export const ColorsAtom = atom((get) => {
   const theme = get(ThemeAtom);
   return theme === 'dark' ? lightOnBlack : darkOnWhite;
 });
-export const ColorForNumber = atomFamily((index: number) =>
+/*export*/ const ColorForNumber = atomFamily((index: number) =>
   atom((get) => {
     const colors = get(ColorsAtom);
     return colors[index % colors.length];
@@ -68,7 +68,7 @@ export const FullDatabaseAtom = atomWithRefresh(
   },
 );
 
-export const IndexedDatabaseAtom = atomWithRefresh(
+/*export*/ const IndexedDatabaseAtom = atomWithRefresh(
   async (get) => {
     const db = await get(FullDatabaseAtom);
     const index = GetNameLookup();
@@ -82,19 +82,19 @@ export const IndexedDatabaseAtom = atomWithRefresh(
   },*/,
 );
 
-export function ClearCache() {
+/*export*/ function ClearCache() {
   dbCache = null;
 }
 
-export const TeamPathsSelect = selectAtom(
+/*export*/ const TeamPathsSelect = selectAtom(
   FullDatabaseAtom,
   async (db) => (await db).TeamPaths,
 );
-export const PathClassesSelect = selectAtom(
+/*export*/ const PathClassesSelect = selectAtom(
   FullDatabaseAtom,
   async (db) => (await db).PathClasses,
 );
-export const ParsedClassesSelect = selectAtom(
+/*export*/ const ParsedClassesSelect = selectAtom(
   FullDatabaseAtom,
   async (db) => (await db).ParsedClasses,
 );
@@ -104,13 +104,13 @@ export const TeamsAtom = atom(async (get): Promise<Team[]> => {
   return [...tp.keys()];
 });
 
-export const PathKeysForTeamFamily = atomFamily((team: Team) =>
+/*export*/ const PathKeysForTeamFamily = atomFamily((team: Team) =>
   atom(async (get): Promise<Set<PathKey>> => {
     return (await get(TeamPathsSelect)).get(team) || new Set();
   }),
 );
 
-export const PathsForTeamFamily = atomFamily((team: Team) =>
+/*export*/ const PathsForTeamFamily = atomFamily((team: Team) =>
   atom(async (get): Promise<Path[]> => {
     return [...(await get(PathKeysForTeamFamily(team))).keys()].map(
       PathFromKey,
@@ -118,13 +118,13 @@ export const PathsForTeamFamily = atomFamily((team: Team) =>
   }),
 );
 
-export const ClassKeysForPathKeyFamily = atomFamily((pk: PathKey) =>
+/*export*/ const ClassKeysForPathKeyFamily = atomFamily((pk: PathKey) =>
   atom(async (get): Promise<Set<ClassKey>> => {
     return (await get(PathClassesSelect)).get(pk) || new Set();
   }),
 );
 
-export const ClassesForPathKeyFamily = atomFamily((pk: PathKey) =>
+/*export*/ const ClassesForPathKeyFamily = atomFamily((pk: PathKey) =>
   atom(async (get): Promise<ClassName[]> => {
     return [...(await get(ClassKeysForPathKeyFamily(pk))).keys()].map(
       ClassFromKey,
@@ -132,7 +132,7 @@ export const ClassesForPathKeyFamily = atomFamily((pk: PathKey) =>
   }),
 );
 
-export const PathKeysForSelectedTeamAtom = atom(
+/*export*/ const PathKeysForSelectedTeamAtom = atom(
   async (get): Promise<Set<PathKey>> => {
     const selTeam = await get(SelectedTeamAtom);
     return await get(PathKeysForTeamFamily(selTeam));
@@ -144,14 +144,14 @@ export const PathsForSelectedTeamAtom = atom(async (get): Promise<Path[]> => {
   return await get(PathsForTeamFamily(selTeam));
 });
 
-export const ClassKeysForSelectedPathAtom = atom(
+/*export*/ const ClassKeysForSelectedPathAtom = atom(
   async (get): Promise<Set<ClassKey>> => {
     const pathKey = get(SelectedPathKeyAtom);
     return get(ClassKeysForPathKeyFamily(pathKey));
   },
 );
 
-export const SelectedTeamBacking = atomWithStorage<Team>(
+/*export*/ const SelectedTeamBacking = atomWithStorage<Team>(
   'selectedTeam',
   '' as Team,
   undefined,
@@ -170,14 +170,14 @@ export const SelectedTeamAtom = atom(
   },
 );
 
-export const SelectedPathKeyBacking = atomWithStorage<PathKey>(
+/*export*/ const SelectedPathKeyBacking = atomWithStorage<PathKey>(
   'selectedPathKey',
   '' as PathKey,
   undefined,
   { getOnInit: true },
 );
 
-export const SelectedPathKeyAtom = atom(
+/*export*/ const SelectedPathKeyAtom = atom(
   (get) => get(SelectedPathKeyBacking),
   (get, set, val: PathKey | string) => {
     const pathKey = get(SelectedPathKeyBacking);
@@ -210,7 +210,7 @@ export const ClassesForSelectedPathAtom = atom(
   },
 );
 
-export const SelectedClassKeyAtom = atomWithStorage(
+/*export*/ const SelectedClassKeyAtom = atomWithStorage(
   'selectedClass',
   '' as ClassKey,
   undefined,
@@ -292,7 +292,7 @@ export const NamedPosesAtom = atom(async (get): Promise<NamedPose[]> => {
   return index ? index.poses : [];
 });
 
-export const MappedPosesAtom: MapAtom<PoseName, PoseRef> = focusAtom(
+/*export*/ const MappedPosesAtom: MapAtom<PoseName, PoseRef> = focusAtom(
   MappedFileAtom,
   (optic) => optic.prop('namedPoses'),
 );
@@ -308,7 +308,7 @@ export const NamedPathChainsAtom = atom(
     return index?.pathChains || [];
   },
 );
-export const MappedBeziersAtom: MapAtom<BezierName, BezierRef> = focusAtom(
+/*export*/ const MappedBeziersAtom: MapAtom<BezierName, BezierRef> = focusAtom(
   MappedFileAtom,
   (optic) => optic.prop('namedBeziers'),
 );
@@ -326,5 +326,17 @@ function makeItemFromNameFamily<Str, T>(theAtom: MapAtom<Str, T>) {
   );
 }
 
-export const ValueAtomFamily = makeItemFromNameFamily(MappedValuesAtom);
+/*export*/ const ValueAtomFamily = makeItemFromNameFamily(MappedValuesAtom);
 export const PoseAtomFamily = makeItemFromNameFamily(MappedPosesAtom);
+
+export const FocusedPoseAtom = atom<NamedPose | undefined>(undefined);
+export const FocusedCurveAtom = atom<NamedBezier | undefined>(undefined);
+export const FocusedPathAtom = atom<NamedPathChain | undefined>(undefined);
+
+export const FieldConfigHashAtom = atom((get) => {
+  const d = get(DisplayOptionsAtom);
+  const c = get(UnwrappedParsedClass);
+  const p = get(FocusedPoseAtom);
+  const b = get(FocusedCurveAtom);
+  return JSON.stringify({ d, c, p, b });
+});

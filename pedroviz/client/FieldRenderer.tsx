@@ -1,92 +1,196 @@
-import { CSSProperties, ReactElement, useCallback } from 'react';
+import { ReactElement, useCallback, useRef } from 'react';
 import { useAtomValue } from 'jotai';
 
-import { isDefined } from '@freik/typechk';
+import { tokens } from '@fluentui/tokens';
+import { isDefined, isUndefined } from '@freik/typechk';
 
+import { BezierRef, ParsedClass, PathChainName, PoseRef } from '../CodeTypes';
+import { animateBot, BotAnimationState } from './BotAnimation';
+import { ConcreteHeading, Point } from './ConcreteEvalTypes';
 import {
-  chkConcreteLinearHeading,
-  chkConcreteSimpleHeading,
-} from './ConcreteEvalTypeCheck';
+  addHeadingToCurve,
+  CloseTo,
+  CurveDetail,
+  getCurveDetail,
+  ptDistance,
+  vector,
+} from './DrawingHelpers';
+import { calcBezierRef, calcFacing, calcPoseRef } from './ExpressionEval';
 import {
-  ConcreteHeading,
-  ConcreteHeadingType,
-  ConcreteSimpleHeading,
-  Point,
-} from './ConcreteEvalTypes';
-import { calcBezierRef, calcFacing } from './ExpressionEval';
+  BotDrawStyleAtom,
+  CoordVizPercentAtom,
+  CurveOptionsAtom,
+  PathOptionsAtom,
+  PoseOptionsAtom,
+  ShowPathHeadingAtom,
+  ThemeAtom,
+} from './state/SavedSettings';
 import {
   ColorsAtom,
+  FocusedCurveAtom,
+  FocusedPathAtom,
+  FocusedPoseAtom,
   NamedPathChainsAtom,
   SelectedParsedClassAtom,
-} from './state/Atoms';
-import { PathRenderOptionsAtom, ThemeAtom } from './state/SavedSettings';
-import { CtrlPtStyles, PathRenderOptions } from './types';
-import { bezierLength, deCasteljau } from './ui-tools/bezier';
+} from './state/UserCode';
+import {
+  ControlPointStyle,
+  CtrlPtStyles,
+  CurveStyle,
+  HeadingStyle,
+  PathStyle,
+} from './types';
 import { ResponsiveSquareCanvas } from './ui-tools/ResponsiveSquareCanvas';
 
-const baseStyle: CSSProperties = {
-  border: '2px solid #666',
-  // boxSizing: 'border-box',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-};
-
 export function FieldRenderer(): ReactElement {
-  const opts = useAtomValue(PathRenderOptionsAtom);
   const theme = useAtomValue(ThemeAtom);
+  const coordViz = useAtomValue(CoordVizPercentAtom);
+
+  const showPathHeadings = useAtomValue(ShowPathHeadingAtom);
+  const pathStyle = useAtomValue(PathOptionsAtom);
+
+  const curveOpts = useAtomValue(CurveOptionsAtom);
+  const poseOpts = useAtomValue(PoseOptionsAtom);
+  const botStyle = useAtomValue(BotDrawStyleAtom);
 
   const colors = useAtomValue(ColorsAtom);
   const allPCs = useAtomValue(NamedPathChainsAtom);
   const file = useAtomValue(SelectedParsedClassAtom);
-  const points = allPCs.flatMap((npc) =>
-    npc.paths.map((br): [Point[], ConcreteHeading] => [
-      calcBezierRef(br, file),
-      calcFacing(npc.heading, file),
+
+  const focusedPose = useAtomValue(FocusedPoseAtom);
+  const focusedCurve = useAtomValue(FocusedCurveAtom);
+  const focusedPath = useAtomValue(FocusedPathAtom);
+
+  const concretePaths = new Map(
+    allPCs.map((npc) => [
+      npc.name,
+      npc.paths.map((br): [Point[], ConcreteHeading] => [
+        calcBezierRef(br, file),
+        calcFacing(npc.heading, file),
+      ]),
     ]),
   );
 
-  const bgStyle = opts.ShowField
-    ? {
-        ...baseStyle,
-        backgroundImage: `url('/assets/field-${theme}.jpg')`,
-      }
-    : baseStyle;
+  const points = [...concretePaths.values()].flatMap((val) => val);
 
   const renderField = useCallback(
-    (ctx: CanvasRenderingContext2D, size: number, dpr: number) => {
+    (ctx: CanvasRenderingContext2D, dpr: number) => {
       // Map logical 144×144 units into square
+      const size = ctx.canvas.width;
       const scale = size / 144;
 
       // Move the origin to the lower left, corner, and scale it up
-      // ctx.translate(0, size * dpr);
-      // ctx.scale(dpr * scale, -dpr * scale);
+      // ctx.translate(0, size);
+      // ctx.scale(scale, -scale);
       // or just a single line of code:
-      ctx.setTransform(dpr * scale, 0, 0, -dpr * scale, 0, size * dpr);
-      if (opts.ShowCoords) {
-        renderCoordinateLegend(ctx, dpr, scale, theme);
-      }
+      ctx.setTransform(scale, 0, 0, -scale, 0, size);
+      ctx.globalAlpha = coordViz;
+      renderCoordinateLegend(ctx, 1, scale, theme);
+      ctx.globalAlpha = 1.0;
 
       points.forEach(([ctrlPoints, facing], index) =>
         renderPath(
           ctx,
           ctrlPoints,
-          opts.Heading.Display ? facing : false,
+          showPathHeadings ? facing : false,
           colors[index % colors.length]!,
-          opts,
+          pathStyle,
         ),
       );
+
+      if (isDefined(focusedPose)) {
+        drawFocusedPose(poseOpts, ctx, focusedPose.pose, file);
+      }
+      if (isDefined(focusedCurve)) {
+        drawFocusedCurve(curveOpts, ctx, focusedCurve.points, file);
+      }
     },
-    [opts, theme, allPCs, colors, points],
+    [
+      coordViz,
+      theme,
+      showPathHeadings,
+      pathStyle,
+      focusedCurve,
+      focusedPose,
+      poseOpts,
+      curveOpts,
+      allPCs,
+      colors,
+      points,
+      focusedPose,
+      focusedCurve,
+      file,
+    ],
+  );
+
+  const animationStateRef = useRef<BotAnimationState>({
+    name: '' as PathChainName,
+    curveIndex: 0,
+    curvePoint: 0,
+    count: 60,
+    curves: [],
+  });
+  const animate = useCallback(
+    (ctx: CanvasRenderingContext2D, dpr: number) => {
+      const size = ctx.canvas.width;
+      const scale = size / 144;
+      const selectedConcretePath = concretePaths.get(focusedPath!.name);
+      if (!selectedConcretePath) {
+        return;
+      }
+      ctx.save();
+      ctx.setTransform(scale, 0, 0, -scale, 0, size);
+      animateBot(
+        ctx,
+        focusedPath?.name,
+        selectedConcretePath,
+        animationStateRef.current,
+        botStyle,
+      );
+      ctx.restore();
+    },
+    [focusedPath, concretePaths, botStyle],
   );
 
   return (
     <ResponsiveSquareCanvas
       anchor={{ x: 'right', y: 'top' }}
-      style={bgStyle}
       render={renderField}
+      animate={focusedPath && animate}
     />
   );
+}
+
+function drawFocusedCurve(
+  opts: CurveStyle,
+  ctx: CanvasRenderingContext2D,
+  focusedCurve: BezierRef,
+  file: ParsedClass,
+) {
+  const br = calcBezierRef(focusedCurve, file);
+  const curve = getCurveDetail(br);
+  renderCurve(ctx, curve, '#fff', opts);
+}
+
+function drawFocusedPose(
+  poseStyle: { Points: ControlPointStyle; Headings: HeadingStyle },
+  ctx: CanvasRenderingContext2D,
+  focusedPose: PoseRef,
+  file: ParsedClass,
+) {
+  const pt = calcPoseRef(focusedPose, file);
+  ctx.beginPath();
+  ctx.strokeStyle = tokens.colorNeutralForeground1; // TODO: Update this
+  drawPoint(ctx, pt, poseStyle.Points);
+  ctx.stroke();
+  if (isDefined(pt.h)) {
+    drawHeadingLine(
+      ctx,
+      poseStyle.Headings,
+      tokens.colorNeutralForeground1,
+      pt,
+    );
+  }
 }
 
 function outlineText(
@@ -172,13 +276,30 @@ function renderCoordinateLegend(
   ctx.restore();
 }
 
-function ptDiff(a: Point, b: Point): Point {
-  return { x: a.x - b.x, y: a.y - b.y };
+function renderCurve(
+  ctx: CanvasRenderingContext2D,
+  curve: CurveDetail,
+  color: string,
+  opts: CurveStyle,
+): void {
+  if (curve.length > 0 && !CloseTo(opts.Thickness, 0)) {
+    ctx.beginPath();
+    ctx.lineWidth = opts.Thickness;
+    ctx.strokeStyle = color;
+    ctx.moveTo(curve.points[0]!.x, curve.points[0]!.y);
+    for (const pt of curve.points) {
+      ctx.lineTo(pt.x, pt.y);
+    }
+    ctx.stroke();
+  }
 }
 
-function ptDistance(a: Point, b: Point): number {
-  const delta = ptDiff(a, b);
-  return Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+function shouldDrawCurve(curveStyle: CurveStyle): boolean {
+  return (
+    curveStyle.ControlPoint.Style != 'z' &&
+    !CloseTo(curveStyle.ControlPoint.Size, 0) &&
+    !CloseTo(curveStyle.ControlPoint.Thickness, 0)
+  );
 }
 
 function renderPath(
@@ -186,115 +307,77 @@ function renderPath(
   curveControlPoints: Point[],
   heading: ConcreteHeading | false,
   color: string,
-  opts: PathRenderOptions,
+  pathStyle: PathStyle,
 ) {
-  if (curveControlPoints.length < 2) {
-    return;
-  }
-  const len = bezierLength(curveControlPoints);
-  const pts: Point[] = [];
-  for (let t = 0; t <= 1.0; t += 1 / len) {
-    pts.push(deCasteljau(curveControlPoints, t));
-  }
-  const drawPath = opts.PathThickness > 1e-10;
-  if (drawPath) {
-    ctx.beginPath();
-  }
-  ctx.lineWidth = opts.PathThickness;
-  ctx.strokeStyle = color;
-  let approxLen = 0;
-  if (drawPath) {
-    ctx.moveTo(curveControlPoints[0]!.x, curveControlPoints[0]!.y);
-  }
-  let lastPt = curveControlPoints[0]!;
-  for (const pt of pts) {
-    approxLen += ptDistance(lastPt, pt);
-    lastPt = pt;
-    if (drawPath) {
-      ctx.lineTo(pt.x, pt.y);
-    }
-  }
-  approxLen += ptDistance(
-    lastPt,
-    curveControlPoints[curveControlPoints.length - 1]!,
-  );
-  if (drawPath) {
-    ctx.lineTo(
-      curveControlPoints[curveControlPoints.length - 1]!.x,
-      curveControlPoints[curveControlPoints.length - 1]!.y,
+  const curve = getCurveDetail(curveControlPoints);
+  renderCurve(ctx, curve, color, pathStyle.Curves);
+  if (shouldDrawCurve(pathStyle.Curves)) {
+    drawControlPoints(
+      ctx,
+      pathStyle.Curves.ControlPoint,
+      curveControlPoints,
+      color,
     );
-    ctx.stroke();
-  }
-  if (
-    opts.ControlPoint.Style != 'z' &&
-    opts.ControlPoint.Size > 1e-10 &&
-    opts.ControlPoint.Thickness > 1e-10
-  ) {
-    drawControlPoints(ctx, opts, curveControlPoints, color);
   }
   if (heading) {
+    addHeadingToCurve(curve, heading);
     drawHeadingLines(
       ctx,
       color,
-      approxLen,
-      [...pts, curveControlPoints[curveControlPoints.length - 1]!],
-      heading,
-      opts,
+      curve,
+      pathStyle.HeadingCount,
+      pathStyle.Heading,
     );
   }
+}
 
-  // These two items wil be useful for animation in the footure
-  /*
-      const tang = bezierDerivative(curveControlPoints, 0.4);
-      const mid = deCasteljau(curveControlPoints, 0.4);
-      */
+function drawPoint(
+  ctx: CanvasRenderingContext2D,
+  pt: Point,
+  style: ControlPointStyle,
+) {
+  ctx.lineWidth = style.Thickness;
+  const half = style.Size / 2;
+  const shape = style.Style;
+  switch (shape) {
+    case CtrlPtStyles.Circle:
+      ctx.moveTo(pt.x + half, pt.y);
+      ctx.arc(pt.x, pt.y, half, 0, 2 * Math.PI);
+      break;
+    case CtrlPtStyles.Square:
+      ctx.rect(pt.x - half, pt.y - half, style.Size, style.Size);
+      break;
+    case CtrlPtStyles.X:
+      ctx.moveTo(pt.x - half, pt.y - half);
+      ctx.lineTo(pt.x + half, pt.y + half);
+      ctx.moveTo(pt.x - half, pt.y + half);
+      ctx.lineTo(pt.x + half, pt.y - half);
+      break;
+    case CtrlPtStyles.Triangle:
+      ctx.moveTo(pt.x - half, pt.y - half);
+      ctx.lineTo(pt.x, pt.y + half);
+      ctx.lineTo(pt.x + half, pt.y - half);
+      ctx.closePath();
+      break;
+    case CtrlPtStyles.Crosshair:
+      ctx.moveTo(pt.x - half, pt.y);
+      ctx.lineTo(pt.x + half, pt.y);
+      ctx.moveTo(pt.x, pt.y + half);
+      ctx.lineTo(pt.x, pt.y - half);
+      break;
+  }
 }
 
 function drawControlPoints(
   ctx: CanvasRenderingContext2D,
-  opts: PathRenderOptions,
+  opts: ControlPointStyle,
   curveControlPoints: Point[],
   color: string,
 ) {
   ctx.beginPath();
-  ctx.lineWidth = opts.ControlPoint.Thickness;
-  const half = opts.ControlPoint.Size / 2;
-  const shape = opts.ControlPoint.Style;
+  ctx.strokeStyle = color;
   for (const pt of curveControlPoints) {
-    ctx.strokeStyle = color;
-    // TODO: Support more point display styles
-    switch (shape) {
-      case CtrlPtStyles.Circle:
-        ctx.moveTo(pt.x + half, pt.y);
-        ctx.arc(pt.x, pt.y, half, 0, 2 * Math.PI);
-        break;
-      case CtrlPtStyles.Square:
-        ctx.rect(
-          pt.x - half,
-          pt.y - half,
-          opts.ControlPoint.Size,
-          opts.ControlPoint.Size,
-        );
-        break;
-      case CtrlPtStyles.X:
-        ctx.moveTo(pt.x - half, pt.y - half);
-        ctx.lineTo(pt.x + half, pt.y + half);
-        ctx.moveTo(pt.x - half, pt.y + half);
-        ctx.lineTo(pt.x + half, pt.y - half);
-        break;
-      case CtrlPtStyles.Triangle:
-        ctx.moveTo(pt.x - half, pt.y - half);
-        ctx.lineTo(pt.x, pt.y + half);
-        ctx.lineTo(pt.x + half, pt.y - half);
-        ctx.closePath();
-        break;
-      case CtrlPtStyles.Crosshair:
-        ctx.moveTo(pt.x - half, pt.y);
-        ctx.lineTo(pt.x + half, pt.y);
-        ctx.moveTo(pt.x, pt.y + half);
-        ctx.lineTo(pt.x, pt.y - half);
-        break;
-    }
+    drawPoint(ctx, pt, opts);
   }
   ctx.stroke();
 }
@@ -310,162 +393,82 @@ function drawColors(ctx: CanvasRenderingContext2D, colors: string[]) {
   ctx.restore();
 }
 
-function magnitude(pt: Point, val: number): Point {
-  const mag = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
-  return { x: (pt.x * val) / mag, y: (pt.y * val) / mag };
-}
-
 function drawHeadingLines(
   ctx: CanvasRenderingContext2D,
   color: string,
-  len: number,
-  pts: Point[],
-  heading: ConcreteHeading,
-  opts: PathRenderOptions,
+  curve: CurveDetail,
+  headingCount: number,
+  headingStyle: HeadingStyle,
 ) {
-  // for "n" points, I'm not drawing starting/ending headings, so I actually want to split
-  // the length into count + 1 pieces, and find the point in between each piece
-  const pieceLen = len / (opts.Heading.Count + 1);
-  if (opts.Heading.Count <= 0 || pts.length < 3 || pieceLen < 1) {
+  // for "n" points, I'm not drawing starting/ending headings, so I actually
+  // want to split the length into n + 1 pieces, and find the last point in
+  // between each piece
+  const pieceLen = curve.length / (headingCount + 1);
+  if (headingCount <= 0 || curve.points.length < 3) {
     return;
   }
-  let curPtIndex = 1;
-  let lastDelta: Point = { x: 0, y: 0 };
-  for (
-    let pos = 0;
-    pos < opts.Heading.Count && curPtIndex < pts.length;
-    pos++
-  ) {
-    let pathPos = pieceLen * (pos + 1);
-    // Walk the length of the path, until we find the heading-draw point
-    let point: Point | undefined;
-    // This is just laziness. I shouldn't need to recalculate the whole thing, but
-    // math is hard...
-    for (let curPtIndex = 1; pathPos > 0; curPtIndex++) {
-      const prev = pts[curPtIndex - 1]!;
-      const cur = pts[curPtIndex]!;
-      lastDelta = ptDiff(cur, prev);
-      const l = ptDistance(prev, cur);
-      if (l >= pathPos) {
-        const partWay = magnitude(ptDiff(cur, prev), pathPos);
-        point = { x: prev.x + partWay.x, y: prev.y + partWay.y };
-      }
-      pathPos -= l;
+  let totalDist = 0;
+  let lastPoint = curve.points[0]!;
+  let curTarget = pieceLen;
+  // Just walk the points, checking the distance to the next target.
+  for (const curPoint of curve.points) {
+    // Let's figure out how far along the curve we are...
+    const ptDist = ptDistance(lastPoint, curPoint);
+    const newDist = totalDist + ptDist;
+    if (newDist >= curTarget) {
+      // Interpolate between the two points. This looks backward
+      // because for scaling, the smaller number is the weight for
+      // the furthest away point...
+      const nextPortion = (curTarget - totalDist) / ptDist;
+      const prevPortion = (newDist - curTarget) / ptDist;
+      const avg = {
+        x: prevPortion * lastPoint.x + nextPortion * curPoint.x,
+        y: prevPortion * lastPoint.y + nextPortion * curPoint.y,
+        h: prevPortion * lastPoint.h! + nextPortion * curPoint.h!,
+      };
+
+      // we're progressing further from the target than the previous point, so
+      // draw the heading at the previous point
+      drawHeadingLine(ctx, headingStyle, color, avg);
+      curTarget += pieceLen;
     }
-    if (isDefined(point)) {
-      // Draw the heading line at this location.
-      // Include the tangent, and the portion of the overall path that's complete.
-      drawHeadingLine(
-        ctx,
-        color,
-        point,
-        lastDelta,
-        (pos + 1) / (opts.Heading.Count + 1),
-        heading,
-        opts,
-      );
-    }
+    lastPoint = curPoint;
+    totalDist = newDist;
   }
 }
 
 function drawHeadingLine(
   ctx: CanvasRenderingContext2D,
+  style: HeadingStyle,
   color: string,
   point: Point,
-  tangent: Point,
-  percentage: number,
-  heading: ConcreteHeading,
-  opts: PathRenderOptions,
 ) {
-  let targetPoint: Point = { x: 0, y: 0 };
-  if (chkConcreteSimpleHeading(heading)) {
-    targetPoint = calcSimpleHeading(heading, point, tangent, percentage);
-  } else /* if (heading.type == ConcreteHeadingType.Piecewise)*/ {
-    // Find the piece that this percentage is contained by
-    // I think a linear search is fine, here..
-    for (const piece of heading.pieces) {
-      if (percentage <= piece.end && percentage >= piece.start) {
-        // Found the right piece, rescale percentage accordingly, and
-        // get the heading for the piece
-        targetPoint = calcSimpleHeading(
-          piece.heading,
-          point,
-          tangent,
-          (percentage - piece.start) / (piece.end - piece.start),
-        );
-      }
-    }
+  if (isUndefined(point.h)) {
+    return;
   }
   ctx.beginPath();
   ctx.lineCap = 'round';
-  ctx.lineWidth = opts.Heading.Thickness;
+  ctx.lineWidth = style.Thickness;
   ctx.strokeStyle = color;
   ctx.moveTo(point.x, point.y);
-  const displacement = magnitude(targetPoint, opts.Heading.Length);
-  ctx.lineTo(point.x + displacement.x, point.y + displacement.y);
+  const displacement = vector(point.h, style.Length);
+  const endx = point.x + displacement.x;
+  const endy = point.y + displacement.y;
+  ctx.lineTo(endx, endy);
   ctx.stroke();
-}
-
-function calcSimpleHeading(
-  heading: ConcreteSimpleHeading,
-  point: Point,
-  tangent: Point,
-  percent: number,
-): Point {
-  switch (heading.type) {
-    case ConcreteHeadingType.Tangent:
-      return tangent;
-    case ConcreteHeadingType.Constant:
-      return {
-        x: Math.cos(heading.heading),
-        y: Math.sin(heading.heading),
-      };
-    case ConcreteHeadingType.Linear:
-      const radians = linearRangeRadians(
-        heading.headings[0],
-        heading.headings[1],
-        percent,
-      );
-      return { x: Math.cos(radians), y: Math.sin(radians) };
-    case ConcreteHeadingType.Point:
-      return ptDiff(point, heading.heading);
-    case ConcreteHeadingType.Reverse:
-      // Get the target point, then flip it the other direction
-      // TODO: Fix this; it only reverses for Constant, Tangent, and Point.
-      // For Linear, it's supposed to go the 'other' direction.
-      const lin = chkConcreteLinearHeading(heading.heading);
-      let pct = lin ? -percent : percent;
-      const toReverse = calcSimpleHeading(heading.heading, point, tangent, pct);
-      return lin ? toReverse : ptDiff(point, ptDiff(toReverse, point));
-  }
-}
-
-function CloseTo(a: number, b: number): boolean {
-  return Math.abs(a - b) < 1e-7;
-}
-
-function normalizeRadian(a: number) {
-  const result = a % (2 * Math.PI);
-  return result >= 0 ? result : result + 2 * Math.PI;
-}
-
-function linearRangeRadians(
-  start: number,
-  end: number,
-  percent: number,
-): number {
-  // First, push the values until they're all positive:
-  const s = normalizeRadian(start);
-  const e = normalizeRadian(end);
-  let range = Math.abs(e - s);
-  if (range > Math.PI && percent >= 0) {
-    range = Math.PI * 2 - range;
-  } else if (range < Math.PI && percent < 0) {
-    range = Math.PI * 2 - range;
-  }
-  const flipped = !CloseTo(normalizeRadian(s + range), e);
-  const target = normalizeRadian(
-    s + range * (flipped ? -1 : 1) * Math.abs(percent),
+  // Draw a little arrow point:
+  const angle = Math.atan2(displacement.y, displacement.x);
+  const headSize = style.Length * style.ArrowPercent;
+  ctx.beginPath();
+  ctx.lineCap = 'square';
+  ctx.moveTo(
+    endx - headSize * Math.cos(angle - style.ArrowAngle),
+    endy - headSize * Math.sin(angle - style.ArrowAngle),
   );
-  return target;
+  ctx.lineTo(endx, endy);
+  ctx.lineTo(
+    endx - headSize * Math.cos(angle + style.ArrowAngle),
+    endy - headSize * Math.sin(angle + style.ArrowAngle),
+  );
+  ctx.stroke();
 }

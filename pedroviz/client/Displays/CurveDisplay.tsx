@@ -1,5 +1,5 @@
-import { ReactElement } from 'react';
-import { useAtomValue } from 'jotai';
+import { ReactElement, useCallback } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 
 import {
   createTableColumn,
@@ -8,14 +8,17 @@ import {
   DataGridCell,
   DataGridHeader,
   DataGridHeaderCell,
+  DataGridProps,
   DataGridRow,
   TableColumnDefinition,
+  TableRowId,
   Text,
 } from '@fluentui/react-components';
+import { isString } from '@freik/typechk';
 
 import { isRef } from '../../CodeTypeCheck';
-import { BezierRef, NamedBezier } from '../../CodeTypes';
-import { NamedBeziersAtom } from '../state/Atoms';
+import { BezierName, BezierRef, NamedBezier } from '../../CodeTypes';
+import { FocusedCurveAtom, NamedBeziersAtom } from '../state/UserCode';
 import { InlinePoseRefDisplay } from './PoseDisplay';
 
 export function InlineBezierRefDisplay({
@@ -58,13 +61,37 @@ const columns: TableColumnDefinition<NamedBezier>[] = [
 
 export function NamedBezierList(): ReactElement {
   const curves = useAtomValue(NamedBeziersAtom);
+  const [focusedCurve, setFocusedCurve] = useAtom(FocusedCurveAtom);
+  const selectedRows = new Set<TableRowId>(
+    focusedCurve && [focusedCurve.name as TableRowId],
+  );
+  const onSelectionChange: DataGridProps['onSelectionChange'] = useCallback(
+    (e, data) => {
+      if (data.selectedItems.size === 0) {
+        setFocusedCurve(undefined);
+      } else {
+        const item = [...data.selectedItems].pop();
+        const ref = curves.find(
+          (val) => isString(item) && val.name === (item as BezierName),
+        );
+        setFocusedCurve(ref);
+      }
+    },
+    [curves],
+  );
+  // This enables deselection
+  const maybeClearSelection = (id: BezierName) =>
+    id === focusedCurve?.name && setFocusedCurve(undefined);
   return (
     <DataGrid
       items={curves}
       columns={columns}
       sortable
       resizableColumns
-      getRowId={(item: NamedBezier) => item.name}>
+      getRowId={(item: NamedBezier) => item.name}
+      selectionMode="single"
+      selectedItems={selectedRows}
+      onSelectionChange={onSelectionChange}>
       <DataGridHeader>
         <DataGridRow>
           {({ renderHeaderCell }) => (
@@ -74,7 +101,10 @@ export function NamedBezierList(): ReactElement {
       </DataGridHeader>
       <DataGridBody<NamedBezier>>
         {({ item, rowId }) => (
-          <DataGridRow<NamedBezier> key={rowId}>
+          <DataGridRow<NamedBezier>
+            key={rowId}
+            selectionCell={{ radioIndicator: { 'aria-label': 'Select row' } }}
+            onClick={() => maybeClearSelection(item.name)}>
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>
             )}

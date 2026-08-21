@@ -16,26 +16,27 @@ and edit PedroPath's. The _reasons_ for this as opposed to just using
 
 - [x] Read paths from code
 - [x] Display those paths on the canvas.
-- [ ] Allow creation:
-  - [x] Named values
-  - [ ] Named poses
-  - [ ] Named curves
-  - [ ] Named PathChains
+- [x] Highlight hovered-over paths/curves/points
+  - [ ] Highlight the hovered path/curve/point in the PathChain list
+- [ ] Animate the robot along the path
+  - [ ] Specify robot dimensions
+- [x] Put the field graphic under the canvas
+- [x] Have a grid key near/under the canvas
 - [ ] Edit existing:
-  - [x] Named values
+  - [ ] Named values
   - [ ] Named poses
   - [ ] Named curves
   - [ ] Named PathChains
+- [ ] Allow editing points by dragging & dropping on the canvas
 - [ ] Reflect those changes in the code
   - [ ] Checksum the code to detect external edits?
   - [ ] When external edits have occurred, try to resolve the conflicts (ugh...)
-- [ ] Allow editing points by dragging & dropping on the canvas
-- [ ] Highlight hovered-over paths/curves/points (both directions)
-- [ ] Animate the robot along the path
-- [ ] Put the field graphic under the canvas
-- [ ] Have a grid key near/under the canvas
+- [ ] Allow creation:
+  - [ ] Named values
+  - [ ] Named poses
+  - [ ] Named curves
+  - [ ] Named PathChains
 - [ ] Enable "warning" lines: warn if the robot crosses a line on a path
-  - [ ] Specify robot dimensions
 - [ ] Specify different alliance paths
   - [ ] Bonus: Reflect a path along a line or axis
 - [ ] Support additional parts of the path builder
@@ -86,7 +87,5 @@ for now, that's good enough.
 The back end code is all served through `index.tsx` which serves up the .ts/.tsx
 files from the `pedroviz` subdirectory, and runs the stuff in the `server`
 subdirectory on the backend.
-
-> > > This is probably a bad way to nest code, if I'm thinking about it
 
 TODO: Write moar dox

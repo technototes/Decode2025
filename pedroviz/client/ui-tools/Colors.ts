@@ -65,7 +65,10 @@ function nextPrime(num: number): number {
 }
 
 // Generate N distinct colors visible against background
-export function GenerateColors(n: number, bg: RGB = [255, 255, 255]): string[] {
+/*export*/ function GenerateColors(
+  n: number,
+  bg: RGB = [255, 255, 255],
+): string[] {
   const colors: RGB[] = [];
   const basel = 80 - 10 * luminance(bg);
   const bases = 90;

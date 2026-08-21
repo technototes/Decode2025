@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, useCallback } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
 import {
@@ -8,21 +8,24 @@ import {
   DataGridCell,
   DataGridHeader,
   DataGridHeaderCell,
+  DataGridProps,
   DataGridRow,
   TableColumnDefinition,
+  TableRowId,
   Text,
 } from '@fluentui/react-components';
-import { GetValueAsString } from 'client/ExpressionEval';
-import { isDefined } from '@freik/typechk';
+import { isDefined, isString } from '@freik/typechk';
 
 import { isPoseName, isRef } from '../../CodeTypeCheck';
 import { AnonymousPose, NamedPose, PoseName, PoseRef } from '../../CodeTypes';
+import { GetValueAsString } from '../ExpressionEval';
 import {
   ColorsAtom,
+  FocusedPoseAtom,
   NamedPosesAtom,
   PoseAtomFamily,
   ValuesLookupAtom,
-} from '../state/Atoms';
+} from '../state/UserCode';
 import { HasKeys } from '../types';
 import { ItemWithStyle } from '../ui-tools/types';
 import { NumberOrNamedValue } from './NumberOrNamedValueEditor';
@@ -190,13 +193,37 @@ const columns: TableColumnDefinition<NamedPose>[] = [
 
 export function NamedPoseList(): ReactElement {
   const poses = useAtomValue(NamedPosesAtom);
+  const [focusedPose, setFocusedPose] = useAtom(FocusedPoseAtom);
+  const selectedRows = new Set<TableRowId>(
+    focusedPose && [focusedPose.name as TableRowId],
+  );
+  const onSelectionChange: DataGridProps['onSelectionChange'] = useCallback(
+    (e, data) => {
+      if (data.selectedItems.size === 0) {
+        setFocusedPose(undefined);
+      } else {
+        const item = [...data.selectedItems].pop();
+        const ref = poses.find(
+          (val) => isString(item) && val.name === (item as PoseName),
+        );
+        setFocusedPose(ref);
+      }
+    },
+    [poses],
+  );
+  // This enables deselection
+  const maybeClearSelection = (id: PoseName) =>
+    id === focusedPose?.name && setFocusedPose(undefined);
   return (
     <DataGrid
       items={poses}
       columns={columns}
       sortable
       resizableColumns
-      getRowId={(itm: NamedPose) => itm.name}>
+      getRowId={(itm: NamedPose) => itm.name}
+      selectionMode="single"
+      selectedItems={selectedRows}
+      onSelectionChange={onSelectionChange}>
       <DataGridHeader>
         <DataGridRow>
           {({ renderHeaderCell }) => (
@@ -206,7 +233,10 @@ export function NamedPoseList(): ReactElement {
       </DataGridHeader>
       <DataGridBody<NamedPose>>
         {({ item, rowId }) => (
-          <DataGridRow<NamedPose> key={rowId}>
+          <DataGridRow<NamedPose>
+            key={rowId}
+            selectionCell={{ radioIndicator: { 'aria-label': 'Select row' } }}
+            onClick={() => maybeClearSelection(item.name)}>
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>
             )}
